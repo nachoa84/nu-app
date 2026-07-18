@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6f4ef6" />
+  <title>Rutina 30 Días</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">PROTOTIPO</div>
+        <h1>Rutina 30 Días</h1>
+      </div>
+      <button id="installBtn" class="ghost hidden">Instalar</button>
+    </header>
+
+    <main>
+      <section id="view-hoy" class="view active">
+        <div class="hero-card">
+          <div class="day-pill">DÍA 1</div>
+          <h2>Tu nueva acción está disponible</h2>
+          <p>Viví la experiencia como un chat y accedé al material en el orden correcto.</p>
+          <div class="hero-actions">
+            <button id="startDayBtn" class="primary">Ver mi acción</button>
+            <button id="showAllBtn" class="secondary">Mostrar todo</button>
+          </div>
+        </div>
+
+        <div id="chatWrap" class="chat-wrap hidden">
+          <div class="chat-header">
+            <div>
+              <strong>Día 1 · #30DíasCollagen+</strong>
+              <span id="progressText">0/9 bloques</span>
+            </div>
+            <button id="restartBtn" class="ghost">Reiniciar</button>
+          </div>
+          <div id="chat" class="chat"></div>
+        </div>
+      </section>
+
+      <section id="view-rutina" class="view">
+        <div class="section-head">
+          <h2>Mi rutina</h2>
+          <p>En la versión final estarán disponibles los 30 días. Este prototipo muestra 7.</p>
+        </div>
+        <div id="daysGrid" class="days-grid"></div>
+      </section>
+
+      <section id="view-favoritos" class="view">
+        <div class="section-head">
+          <h2>Favoritos</h2>
+          <p>Guardá el contenido que más te sirve para encontrarlo rápido.</p>
+        </div>
+        <div id="favoritesList" class="favorites-list empty-state">Todavía no guardaste contenido.</div>
+      </section>
+
+      <section id="view-bot" class="view">
+        <div class="section-head">
+          <h2>Preguntar al bot</h2>
+          <p>Una muestra de cómo podrían reemplazarse los comandos de WhatsApp.</p>
+        </div>
+        <div class="bot-card">
+          <div id="botThread" class="bot-thread">
+            <div class="bubble bot">Hola 👋 Escribime algo como <b>comisiones</b>, <b>documentación</b>, <b>primeros pasos</b> o <b>colágeno</b>.</div>
+          </div>
+          <div class="quick-commands">
+            <button data-command="comisiones">Comisiones</button>
+            <button data-command="documentación">Documentación</button>
+            <button data-command="primeros pasos">Primeros pasos</button>
+            <button data-command="colágeno">Colágeno</button>
+          </div>
+          <form id="botForm" class="bot-form">
+            <input id="botInput" placeholder="¿Qué necesitás?" autocomplete="off" />
+            <button class="primary" type="submit">Enviar</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-view="hoy">🏠<span>Hoy</span></button>
+      <button class="nav-btn" data-view="rutina">📅<span>Rutina</span></button>
+      <button class="nav-btn" data-view="favoritos">❤️<span>Favoritos</span></button>
+      <button class="nav-btn" data-view="bot">🤖<span>Bot</span></button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "Rutina 30 Días",
+  "short_name": "Rutina30",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f7fb",
+  "theme_color": "#6f4ef6",
+  "icons": []
+}
