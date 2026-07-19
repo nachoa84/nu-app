@@ -1,0 +1,158 @@
+.onboarding-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:rgba(20,22,34,.58);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.onboarding-panel{
+  width:min(520px,100%);
+  max-height:calc(100vh - 40px);
+  overflow:auto;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 24px 80px rgba(25,25,50,.22);
+  padding:24px;
+}
+
+.onboarding-badge{
+  display:inline-flex;
+  background:#eeeaff;
+  color:var(--primary);
+  font-size:12px;
+  font-weight:800;
+  border-radius:999px;
+  padding:7px 10px;
+  margin-bottom:12px;
+}
+
+.onboarding-panel h2{
+  margin:0;
+  font-size:28px;
+  line-height:1.08;
+}
+
+.onboarding-intro{
+  color:var(--muted);
+  line-height:1.5;
+  margin:10px 0 22px;
+}
+
+.onboarding-form{
+  display:grid;
+  gap:16px;
+}
+
+.onboarding-field{
+  display:grid;
+  gap:7px;
+}
+
+.onboarding-field label{
+  font-size:13px;
+  font-weight:800;
+}
+
+.onboarding-field input,
+.onboarding-field select{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fafafe;
+  color:var(--text);
+  border-radius:12px;
+  padding:13px 14px;
+  outline:none;
+}
+
+.onboarding-field input:focus,
+.onboarding-field select:focus{
+  border-color:var(--primary);
+}
+
+.onboarding-help{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
+
+.onboarding-timezone{
+  background:#f7f7fb;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px 13px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.onboarding-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+
+.onboarding-actions button{
+  flex:1;
+  min-width:150px;
+}
+
+.profile-greeting{
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.profile-summary{
+  margin-top:14px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+
+.profile-summary-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.profile-summary strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.profile-summary span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.profile-summary button{
+  white-space:nowrap;
+  padding:8px 10px;
+}
+
+@media (max-width:520px){
+  .onboarding-panel{
+    padding:20px;
+    border-radius:20px;
+  }
+
+  .onboarding-panel h2{
+    font-size:25px;
+  }
+
+  .profile-summary-top{
+    flex-direction:column;
+  }
+}
