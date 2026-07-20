@@ -3,17 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#c95d3a" />
+  <meta name="theme-color" content="#b94f31" />
   <title>Rutina 30 Días</title>
 
   <link rel="manifest" href="manifest.webmanifest" />
 
   <!-- Estilos existentes -->
-  <link rel="stylesheet" href="styles.css?v=15-terracota-1" />
-  <link rel="stylesheet" href="onboarding.css?v=15-terracota-1" />
+  <link rel="stylesheet" href="styles.css?v=18-terracota-app" />
+  <link rel="stylesheet" href="onboarding.css?v=18-terracota-app" />
 
-  <!-- Rediseño terracota -->
-  <link rel="stylesheet" href="ui-redesign.css?v=15-terracota-1" />
 </head>
 
 <body>
@@ -31,12 +29,12 @@
       <section id="view-hoy" class="view active">
         <div class="hero-card">
           <div class="day-pill">DÍA 1</div>
-          <h2>Tu nueva acción está disponible</h2>
-          <p>Accedé a tu contenido y avanzá paso a paso.</p>
+          <h2>Tu acción está lista</h2>
+          <p>Abrí el contenido y avanzá a tu ritmo.</p>
 
           <div class="hero-actions">
             <button id="startDayBtn" class="primary">Ver mi acción</button>
-            <button id="showAllBtn" class="secondary">Mostrar todo</button>
+            <button id="showAllBtn" class="secondary">Abrir todo</button>
           </div>
         </div>
 
@@ -60,14 +58,14 @@
           <p>Tu plan diario</p>
         </div>
 
-        <!-- app.js conserva este nodo; ui-redesign.js lo transforma -->
+        <!-- app.js renderiza aquí el progreso y las semanas -->
         <div id="daysGrid" class="days-grid"></div>
       </section>
 
       <section id="view-favoritos" class="view">
         <div class="section-head">
           <h2>Material guardado</h2>
-          <p>Todo lo que guardaste</p>
+          <p>Tus recursos</p>
         </div>
 
         <div id="favoritesList" class="favorites-list empty-state">
@@ -78,7 +76,7 @@
       <section id="view-bot" class="view">
         <div class="section-head">
           <h2>Bot</h2>
-          <p>Consultas rápidas</p>
+          <p>Ayuda rápida</p>
         </div>
 
         <div class="bot-card">
@@ -132,10 +130,7 @@
 
   <script src="backend-client.js"></script>
   <script src="push-client.js"></script>
-  <script src="app.js"></script>
-  <script src="onboarding.js"></script>
-
-  <!-- Siempre después de app.js -->
-  <script src="ui-redesign.js?v=15-terracota-1"></script>
+  <script src="app.js?v=18-terracota-app"></script>
+  <script src="onboarding.js?v=18-terracota-app"></script>
 </body>
 </html>
