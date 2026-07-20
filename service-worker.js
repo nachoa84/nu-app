@@ -1,4 +1,4 @@
-const CACHE="rutina30-v13-3";
+const CACHE="rutina30-v13-4";
 
 const CORE=[
   "./",
@@ -142,7 +142,7 @@ self.addEventListener(
       }
     }
 
-    event.waitUntil(
+    const tasks = [
       self.registration
         .showNotification(
           data.title,
@@ -159,6 +159,24 @@ self.addEventListener(
             renotify: true
           }
         )
+    ];
+
+    // iOS/iPadOS Home Screen web apps soportan Badging API.
+    // Si está disponible, marcamos que hay una acción nueva.
+    if (
+      self.navigator &&
+      "setAppBadge" in
+        self.navigator
+    ) {
+      tasks.push(
+        self.navigator
+          .setAppBadge(1)
+          .catch(() => {})
+      );
+    }
+
+    event.waitUntil(
+      Promise.all(tasks)
     );
   }
 );
@@ -167,6 +185,16 @@ self.addEventListener(
   "notificationclick",
   event => {
     event.notification.close();
+
+    if (
+      self.navigator &&
+      "clearAppBadge" in
+        self.navigator
+    ) {
+      self.navigator
+        .clearAppBadge()
+        .catch(() => {});
+    }
 
     const targetUrl =
       new URL(

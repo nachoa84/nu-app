@@ -2,6 +2,45 @@
   const CARD_ID =
     "pushNotificationCard";
 
+
+  function isAppleMobileDevice() {
+    const ua =
+      navigator.userAgent || "";
+
+    const classicIOS =
+      /iPhone|iPad|iPod/i
+        .test(ua);
+
+    const iPadDesktopMode =
+      navigator.platform ===
+        "MacIntel" &&
+      navigator.maxTouchPoints >
+        1;
+
+    return (
+      classicIOS ||
+      iPadDesktopMode
+    );
+  }
+
+  function isStandaloneWebApp() {
+    return Boolean(
+      window.matchMedia?.(
+        "(display-mode: standalone)"
+      )?.matches ||
+      window.navigator
+        .standalone === true
+    );
+  }
+
+  function isPushSupported() {
+    return (
+      "Notification" in window &&
+      "serviceWorker" in navigator &&
+      "PushManager" in window
+    );
+  }
+
   function getProfile() {
     try {
       return JSON.parse(
@@ -119,6 +158,15 @@
   }
 
   async function subscribe() {
+    if (
+      isAppleMobileDevice() &&
+      !isStandaloneWebApp()
+    ) {
+      throw new Error(
+        "En iPhone o iPad, primero agregá la PWA a la pantalla de inicio y abrila desde su ícono."
+      );
+    }
+
     const profile =
       await ensureBackendReady();
 
@@ -338,10 +386,67 @@
       );
     }
 
+    const appleMobile =
+      isAppleMobileDevice();
+
+    const standalone =
+      isStandaloneWebApp();
+
     const supported =
-      "Notification" in window &&
-      "serviceWorker" in navigator &&
-      "PushManager" in window;
+      isPushSupported();
+
+    // iPhone/iPad: Web Push requiere abrir la experiencia
+    // como web app desde la pantalla de inicio.
+    if (
+      appleMobile &&
+      !standalone
+    ) {
+      card.innerHTML = `
+        <div class="profile-summary-top">
+          <div>
+            <strong>
+              📱 Activá notificaciones en iPhone
+            </strong>
+
+            <span>
+              Para recibir avisos, primero agregá Rutina 30 Días a tu pantalla de inicio.
+            </span>
+
+            <div
+              style="
+                margin-top:10px;
+                padding:12px 14px;
+                border-radius:12px;
+                background:#f7f5ff;
+                line-height:1.5;
+                font-size:13px;
+              "
+            >
+              <strong style="display:block;margin-bottom:6px;">
+                Cómo hacerlo:
+              </strong>
+              <div>1. Tocá el botón Compartir del navegador.</div>
+              <div>2. Elegí “Agregar a pantalla de inicio”.</div>
+              <div>3. Abrí Rutina 30 Días desde el nuevo ícono.</div>
+              <div>4. Volvé a esta sección y tocá “Activar”.</div>
+            </div>
+
+            <span
+              style="
+                display:block;
+                margin-top:8px;
+              "
+            >
+              En iPhone/iPad, el permiso de notificaciones se solicita desde la web app instalada.
+            </span>
+
+            <span data-push-message></span>
+          </div>
+        </div>
+      `;
+
+      return;
+    }
 
     if (!supported) {
       card.innerHTML = `
@@ -351,7 +456,11 @@
               🔕 Notificaciones no disponibles
             </strong>
             <span>
-              Este navegador no admite Web Push.
+              ${
+                appleMobile
+                  ? "Este iPhone o iPad no ofrece Web Push en esta configuración. Verificá que el sistema esté actualizado y que abras la PWA desde la pantalla de inicio."
+                  : "Este navegador no admite Web Push."
+              }
             </span>
           </div>
         </div>
@@ -391,7 +500,11 @@
               active
                 ? "Este dispositivo ya está suscripto."
                 : permission === "denied"
-                  ? "Las notificaciones están bloqueadas en Chrome."
+                  ? (
+                      appleMobile
+                        ? "Las notificaciones están bloqueadas. Podés volver a habilitarlas desde Ajustes del iPhone."
+                        : "Las notificaciones están bloqueadas en el navegador."
+                    )
                   : "Recibí un aviso cuando tu próximo día esté disponible."
             }
           </span>
@@ -563,6 +676,31 @@
         render,
         100
       );
+    }
+  );
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      setTimeout(
+        render,
+        100
+      );
+    }
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+        setTimeout(
+          render,
+          100
+        );
+      }
     }
   );
 
