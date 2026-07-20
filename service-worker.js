@@ -1,4 +1,4 @@
-const CACHE="rutina30-v13-4";
+const CACHE="rutina30-v14-1";
 
 const CORE=[
   "./",
@@ -10,6 +10,8 @@ const CORE=[
   "./onboarding.js",
   "./onboarding.css",
   "./manifest.webmanifest",
+  "/ui-redesign.css",
+  "/ui-redesign.js",
 
   "./assets/D01_05_IMAGEN.jpg",
   "./assets/D01_06_IMAGEN.jpg",
