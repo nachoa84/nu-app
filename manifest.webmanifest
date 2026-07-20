@@ -3,8 +3,8 @@
   "short_name": "Rutina30",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f7fb",
-  "theme_color": "#6f4ef6",
+  "background_color": "#fff8f3",
+  "theme_color": "#b94f31",
   "icons": [],
   "id": "/",
   "scope": "/"

@@ -2305,3 +2305,522 @@ input:focus-visible{
   outline:3px solid rgba(200,95,61,.28);
   outline-offset:2px;
 }
+
+
+/* =========================================================
+   V18 · TERRACOTA APP
+   Referencia aprobada: opción terracota.
+   Tipografía de aplicación, menos texto y cero decoración
+   botánica o editorial.
+   ========================================================= */
+
+:root{
+  --bg:#fff8f3;
+  --card:#fffdfb;
+  --text:#382a25;
+  --muted:#8b766c;
+  --primary:#c95d3a;
+  --primary-2:#a84429;
+  --primary-soft:#f9dfd2;
+  --line:#ead8ce;
+  --success:#a84429;
+  --shadow:0 10px 26px rgba(106,54,37,.075);
+}
+
+html,
+body{
+  background:#efe3dc;
+}
+
+body,
+button,
+input,
+.topbar h1,
+.section-head h2,
+.hero-card h2,
+.chat-header strong,
+.routine-summary-top strong,
+.daily-detail-header h2,
+.daily-intro-card h3,
+.daily-section > h3,
+.saved-day-header strong,
+.saved-link-card strong,
+.complete-done-copy h3,
+.daily-detail .complete-card.done .complete-done-copy h3{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+}
+
+#app{
+  max-width:560px;
+  background:var(--bg);
+}
+
+/* Sin flores, hojas, plantas, texturas ni dibujos decorativos. */
+#view-hoy .hero-card::before,
+.hero-card::before,
+.hero-card::after,
+.rt-flower,
+.rt-leaf,
+.rt-plant,
+.rt-decoration{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
+
+.topbar{
+  min-height:66px;
+  padding:15px 18px 12px;
+  color:#fff;
+  background:#b94f31;
+}
+
+.topbar h1{
+  font-size:18px;
+  font-weight:760;
+  letter-spacing:-.025em;
+}
+
+.topbar-icon-btn{
+  color:#fff;
+}
+
+.view{
+  padding-top:15px;
+}
+
+.section-head{
+  padding:4px 2px 13px;
+}
+
+.section-head h2,
+#view-rutina .section-head h2,
+#view-favoritos .section-head h2,
+#view-bot .section-head h2{
+  margin:0;
+  color:var(--text);
+  font-size:29px;
+  font-weight:780;
+  line-height:1.05;
+  letter-spacing:-.045em;
+}
+
+.section-head p{
+  margin-top:5px;
+  font-size:13px;
+  line-height:1.35;
+}
+
+/* Inicio limpio: bloque cálido sin patrones. */
+#view-hoy .hero-card,
+#view-hoy:has(.daily-detail) .hero-card{
+  min-height:285px;
+  padding:25px 22px 22px;
+  color:#fff;
+  background:linear-gradient(145deg,#dc7652,#b64a2d);
+  border:0;
+  border-radius:24px;
+  box-shadow:0 16px 34px rgba(143,56,31,.18);
+}
+
+#view-hoy .profile-greeting{
+  margin-bottom:15px;
+  font-size:13px;
+}
+
+#view-hoy .day-pill{
+  margin-bottom:16px;
+  color:#fff;
+  background:rgba(255,255,255,.17);
+  border:1px solid rgba(255,255,255,.18);
+}
+
+#view-hoy .hero-card h2,
+#view-hoy:has(.daily-detail) .hero-card h2{
+  max-width:360px;
+  margin:0 0 9px;
+  color:#fff;
+  font-size:32px;
+  font-weight:780;
+  line-height:1.04;
+  letter-spacing:-.045em;
+}
+
+#view-hoy .hero-card p{
+  max-width:340px;
+  margin:0;
+  color:rgba(255,255,255,.78);
+  font-size:13px;
+  line-height:1.45;
+}
+
+#view-hoy .hero-actions{
+  width:100%;
+  max-width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:20px;
+}
+
+#view-hoy .hero-actions .primary,
+#view-hoy .hero-actions .secondary{
+  min-height:48px;
+  border-radius:14px;
+  font-size:13px;
+}
+
+#view-hoy .hero-actions .primary{
+  color:var(--primary-2);
+  background:#fff8f3;
+  border:0;
+}
+
+#view-hoy .hero-actions .secondary{
+  color:#fff;
+  background:rgba(126,43,22,.30);
+  border:1px solid rgba(255,255,255,.18);
+}
+
+/* Rutina: progreso + panel terracota + check-in blanco. */
+.routine-dashboard{
+  gap:11px;
+}
+
+.routine-summary,
+.routine-week{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+
+.routine-summary{
+  padding:17px;
+}
+
+.routine-summary-top{
+  align-items:center;
+}
+
+.routine-kicker{
+  margin-bottom:4px;
+  color:var(--primary-2);
+  font-size:9px;
+  font-weight:850;
+}
+
+.routine-summary-top strong{
+  font-size:22px;
+  font-weight:780;
+  letter-spacing:-.035em;
+}
+
+.routine-percent{
+  color:var(--primary-2);
+  font-size:15px;
+}
+
+.routine-progress-track{
+  height:7px;
+  margin-top:12px;
+  background:#f0dfd6;
+}
+
+.routine-progress-fill{
+  background:linear-gradient(90deg,#de7955,#bd5032);
+}
+
+.routine-current-panel{
+  margin-top:15px;
+  padding:13px;
+  border-radius:19px;
+  background:linear-gradient(145deg,#dc7652,#b64a2d);
+  box-shadow:0 12px 25px rgba(155,61,34,.18);
+}
+
+.routine-current-card{
+  width:100%;
+  margin:0;
+  padding:2px 1px 13px;
+  grid-template-columns:44px minmax(0,1fr) 24px;
+  border:0;
+  border-radius:0;
+  color:#fff;
+  background:transparent;
+  box-shadow:none;
+}
+
+.routine-current-card:hover{
+  background:transparent;
+}
+
+.routine-current-icon{
+  width:44px;
+  height:44px;
+  border-radius:15px;
+  color:#fff;
+  background:rgba(255,255,255,.18);
+  font-size:15px;
+  font-weight:850;
+}
+
+.routine-current-copy strong{
+  color:#fff;
+  font-size:17px;
+  font-weight:760;
+}
+
+.routine-current-copy small{
+  color:rgba(255,255,255,.76);
+  font-size:11px;
+}
+
+.routine-current-arrow{
+  color:#fff;
+}
+
+.routine-checkin-btn{
+  width:100%;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  padding:0 16px;
+  border:0;
+  border-radius:16px;
+  color:var(--primary-2);
+  background:#fff9f5;
+  box-shadow:0 8px 18px rgba(93,35,18,.13);
+  font-size:15px;
+  font-weight:790;
+}
+
+.routine-checkin-btn.done{
+  color:var(--text);
+  background:#fff;
+  opacity:1;
+}
+
+.routine-checkin-icon{
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+}
+
+.routine-checkin-icon svg{
+  width:21px;
+  height:21px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.routine-checkin-note{
+  display:block;
+  margin-top:7px;
+  color:rgba(255,255,255,.68);
+  font-size:10px;
+  text-align:center;
+}
+
+.routine-week{
+  padding:14px 13px 16px;
+}
+
+.routine-week-head{
+  margin-bottom:12px;
+  padding-bottom:11px;
+  border-bottom-color:#efddd3;
+}
+
+.routine-week-head strong{
+  font-size:14px;
+  font-weight:760;
+}
+
+.routine-week-head span{
+  font-size:10px;
+}
+
+.routine-days-row{
+  gap:7px;
+}
+
+.routine-day{
+  max-width:none;
+  border:1px solid transparent;
+  background:#f5e8e1;
+  color:#8b7064;
+  font-size:11px;
+}
+
+.routine-day.available{
+  color:#60463b;
+  background:#fff9f5;
+  border-color:#e8d0c4;
+}
+
+.routine-day.current{
+  color:#fff;
+  background:var(--primary);
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px #f8ddd1;
+}
+
+.routine-day.complete{
+  color:#fff;
+  background:var(--primary-2);
+  border-color:var(--primary-2);
+}
+
+.routine-day.locked{
+  color:#b69b90;
+  background:#f3e9e4;
+}
+
+/* Pantalla diaria: lenguaje visual de app, no editorial. */
+.daily-detail{
+  gap:12px;
+  padding-bottom:105px;
+}
+
+.daily-detail-header h2{
+  font-size:26px;
+  font-weight:780;
+  letter-spacing:-.04em;
+}
+
+.daily-status{
+  color:var(--primary-2);
+  background:var(--primary-soft);
+}
+
+.daily-intro-card,
+.daily-section{
+  border-radius:18px;
+  box-shadow:var(--shadow);
+}
+
+.daily-intro-card h3,
+.daily-section > h3{
+  font-size:18px;
+  font-weight:760;
+  letter-spacing:-.025em;
+}
+
+.daily-message-copy{
+  font-size:14px;
+  line-height:1.5;
+}
+
+.daily-message-number{
+  background:var(--primary);
+}
+
+.daily-resource-item{
+  background:#fbece5;
+}
+
+.daily-resource-save,
+.daily-resource-share{
+  color:var(--primary-2);
+  background:#f6d9ca;
+}
+
+.complete-card .complete-day-btn,
+.daily-detail .complete-card .complete-day-btn{
+  min-height:58px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#d86e4a,#b64a2d);
+  font-size:15px;
+}
+
+.complete-helper{
+  margin-top:8px;
+  font-size:10px;
+}
+
+.complete-card.done,
+.daily-detail .complete-card.done{
+  border-color:#e7c5b5;
+  background:#fbe9df;
+}
+
+.complete-done-copy h3,
+.daily-detail .complete-card.done .complete-done-copy h3{
+  color:var(--primary-2);
+  font-size:17px;
+  font-weight:760;
+}
+
+/* Guardados y bot más compactos. */
+.saved-day-header strong{
+  font-size:19px;
+  font-weight:760;
+}
+
+.saved-link-card strong{
+  font-size:16px;
+  font-weight:760;
+}
+
+.bot-card{
+  min-height:420px;
+}
+
+/* Navegación inferior clara como app móvil. */
+.bottom-nav{
+  max-width:560px;
+  min-height:70px;
+  color:var(--text);
+  background:rgba(255,252,249,.96);
+  border-top:1px solid var(--line);
+  box-shadow:0 -8px 24px rgba(84,44,31,.06);
+}
+
+.nav-btn{
+  color:#9a8378;
+  border-radius:15px;
+}
+
+.nav-btn.active{
+  color:var(--primary-2);
+  background:var(--primary-soft);
+}
+
+.nav-btn span:last-child{
+  font-size:10px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible{
+  outline:3px solid rgba(201,93,58,.25);
+  outline-offset:2px;
+}
+
+@media (max-width:420px){
+  #view-hoy .hero-card,
+  #view-hoy:has(.daily-detail) .hero-card{
+    min-height:270px;
+    padding:23px 19px 20px;
+  }
+
+  #view-hoy .hero-card h2,
+  #view-hoy:has(.daily-detail) .hero-card h2{
+    font-size:29px;
+  }
+
+  .routine-summary{
+    padding:15px;
+  }
+
+  .routine-current-panel{
+    padding:12px;
+  }
+}

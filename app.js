@@ -1393,6 +1393,30 @@ function addLinks(container, links) {
   container.appendChild(wrap);
 }
 
+function registerDayComplete(day) {
+  const key = `day${day}Complete`;
+
+  if (localStorage.getItem(key) === "1") {
+    return false;
+  }
+
+  localStorage.setItem(key, "1");
+  renderDays();
+
+  if (window.BackendAPI) {
+    window.BackendAPI
+      .completeDay(day)
+      .catch(error => {
+        console.warn(
+          "No se pudo sincronizar el avance con el backend.",
+          error
+        );
+      });
+  }
+
+  return true;
+}
+
 function createBlock(block) {
   if (block.type === "text") {
     const el = document.createElement("div");
@@ -1507,8 +1531,8 @@ function createBlock(block) {
       card.innerHTML = `
         <span class="complete-done-mark" aria-hidden="true">✓</span>
         <div class="complete-done-copy">
-          <h3>¡Hecho por hoy!</h3>
-          <p>Tu avance quedó registrado.</p>
+          <h3>Hecho hoy</h3>
+          <p>Avance registrado</p>
         </div>
       `;
     };
@@ -1519,8 +1543,8 @@ function createBlock(block) {
     }
 
     card.innerHTML = `
-      <h3>¿Terminaste tu acción de hoy?</h3>
-      <p>Registrala para llevar tu progreso personal.</p>
+      <h3>¿Lo hiciste?</h3>
+      <p>Registrá tu avance.</p>
     `;
 
     const btn = document.createElement("button");
@@ -1529,23 +1553,11 @@ function createBlock(block) {
 
     const helper = document.createElement("small");
     helper.className = "complete-helper";
-    helper.textContent = "Opcional · no desbloquea el siguiente día";
+    helper.textContent = "Solo registra tu avance";
 
     btn.onclick = () => {
-      localStorage.setItem(key, "1");
+      registerDayComplete(selectedDay);
       renderDoneState();
-      renderDays();
-
-      if (window.BackendAPI) {
-        window.BackendAPI
-          .completeDay(selectedDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
-      }
     };
 
     card.append(btn, helper);
@@ -1729,7 +1741,7 @@ function renderStructuredDayDetail() {
     messagesSection.className = "daily-section";
 
     const title = document.createElement("h3");
-    title.textContent = "Acciones y mensajes del día";
+    title.textContent = "Acciones";
     messagesSection.appendChild(title);
 
     const messageList = document.createElement("div");
@@ -1754,7 +1766,7 @@ function renderStructuredDayDetail() {
     materials.className = "daily-section";
 
     const title = document.createElement("h3");
-    title.textContent = "Materiales del día";
+    title.textContent = "Materiales";
     materials.appendChild(title);
 
     const list = document.createElement("div");
@@ -1777,8 +1789,8 @@ function renderStructuredDayDetail() {
     const title = document.createElement("h3");
     title.textContent =
       videoBlocks.length > 1
-        ? "Videos del día"
-        : "Video del día";
+        ? "Videos"
+        : "Video";
     videos.appendChild(title);
 
     const list = document.createElement("div");
@@ -1824,8 +1836,11 @@ function updateProgress() {
 function renderSelectedDayHeader() {
   const day = days[selectedDay];
   dayPill.textContent = `DÍA ${selectedDay}`;
-  heroTitle.textContent = day.hero;
-  heroDescription.textContent = day.description;
+  heroTitle.textContent = selectedDay === 1
+    ? "Tu acción está lista"
+    : `Día ${selectedDay} listo`;
+  heroDescription.textContent =
+    "Abrí el contenido y avanzá a tu ritmo.";
   chatTitle.textContent = day.title;
 
   localStorage.setItem(
@@ -1949,6 +1964,9 @@ function renderDays() {
     (Math.max(completedDays.length, state.currentDay - 1) / TOTAL_PROGRAM_DAYS) * 100
   );
 
+  const currentDayDone =
+    localStorage.getItem(`day${state.currentDay}Complete`) === "1";
+
   const summary = document.createElement("div");
   summary.className = "routine-summary";
   summary.innerHTML = `
@@ -1964,19 +1982,41 @@ function renderDays() {
       <div class="routine-progress-fill" style="width:${progressValue}%"></div>
     </div>
 
-    <button type="button" class="routine-current-card" id="routineCurrentBtn">
-      <span class="routine-current-icon" aria-hidden="true">${state.currentDay}</span>
-      <span class="routine-current-copy">
-        <strong>Continuar día ${state.currentDay}</strong>
-        <small>Tu acción del día</small>
-      </span>
-      <span class="routine-current-arrow">${ICONS.arrow}</span>
-    </button>
+    <div class="routine-current-panel">
+      <button type="button" class="routine-current-card" id="routineCurrentBtn">
+        <span class="routine-current-icon" aria-hidden="true">${state.currentDay}</span>
+        <span class="routine-current-copy">
+          <strong>Continuar día ${state.currentDay}</strong>
+          <small>Tu acción del día</small>
+        </span>
+        <span class="routine-current-arrow">${ICONS.arrow}</span>
+      </button>
+
+      <button
+        type="button"
+        class="routine-checkin-btn${currentDayDone ? " done" : ""}"
+        id="routineCheckinBtn"
+        ${currentDayDone ? "disabled" : ""}
+      >
+        <span class="routine-checkin-icon" aria-hidden="true">${ICONS.check}</span>
+        <span>${currentDayDone ? "Hecho hoy" : "Hoy lo hice"}</span>
+      </button>
+      <small class="routine-checkin-note">Solo registra tu avance</small>
+    </div>
   `;
 
   summary.querySelector("#routineCurrentBtn").onclick = () => {
     selectDay(state.currentDay, true);
   };
+
+  const routineCheckinBtn =
+    summary.querySelector("#routineCheckinBtn");
+
+  if (routineCheckinBtn && !currentDayDone) {
+    routineCheckinBtn.onclick = () => {
+      registerDayComplete(state.currentDay);
+    };
+  }
 
   grid.appendChild(summary);
 
@@ -2343,7 +2383,7 @@ function setupInterfaceChrome() {
 
   if (favoriteDescription) {
     favoriteDescription.textContent =
-      "Encontrá rápido las imágenes y videos que guardaste.";
+      "Tus recursos guardados.";
   }
 
   const botDescription =
@@ -2351,7 +2391,7 @@ function setupInterfaceChrome() {
 
   if (botDescription) {
     botDescription.textContent =
-      "Encontrá rápido herramientas, capacitaciones y recursos para tu negocio.";
+      "Consultas y recursos.";
   }
 }
 
