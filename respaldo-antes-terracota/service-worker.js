@@ -1,14 +1,14 @@
-const CACHE="rutina30-v17-terracota";
+const CACHE="rutina30-v16-1-spacing-actions";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css?v=17-terracota",
-  "./app.js?v=17-terracota",
+  "./styles.css?v=16-1-spacing-actions",
+  "./app.js?v=16-daily-detail-1",
   "./backend-client.js",
   "./push-client.js",
   "./onboarding.js",
-  "./onboarding.css?v=17-terracota",
+  "./onboarding.css?v=16-daily-detail-1",
   "./manifest.webmanifest",
 
   "./assets/D01_05_IMAGEN.jpg",

@@ -74,7 +74,7 @@ Importante:
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 1 como completado"
       }
     ]
   },
@@ -178,7 +178,7 @@ A continuación el contenido para tus Redes Sociales de HOY!`
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 2 como completado"
       }
     ]
   },
@@ -290,7 +290,7 @@ Me encantaría contarte de qué se trata
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 3 como completado"
       }
     ]
   },
@@ -368,7 +368,7 @@ Me encantaría contarte de qué se trata
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 4 como completado"
       }
     ]
   },
@@ -456,7 +456,7 @@ Te sugerimos tomar nota de los tips y luego salir y ponerlos en práctica!`
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 5 como completado"
       }
     ]
   },
@@ -527,7 +527,7 @@ Te sugerimos tomar nota de los tips y luego salir y ponerlos en práctica!`
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 6 como completado"
       }
     ]
   },
@@ -613,7 +613,7 @@ El contenido para que publique hoy`
       },
       {
         type: "complete",
-        label: "Hoy lo hice"
+        label: "Marcar Día 7 como completado"
       }
     ]
   }
@@ -1502,53 +1502,43 @@ function createBlock(block) {
     const key = `day${selectedDay}Complete`;
     const done = localStorage.getItem(key) === "1";
 
-    const renderDoneState = () => {
-      card.classList.add("done");
-      card.innerHTML = `
-        <span class="complete-done-mark" aria-hidden="true">✓</span>
-        <div class="complete-done-copy">
-          <h3>¡Hecho por hoy!</h3>
-          <p>Tu avance quedó registrado.</p>
-        </div>
-      `;
-    };
+    card.innerHTML = done
+      ? `<div style="font-size:34px">✅</div>
+         <h3>Día ${selectedDay} completado</h3>
+         <p>Podés volver cuando quieras desde Rutina.</p>`
+      : `<h3>¿Terminaste tu acción de hoy?</h3>
+         <p>Marcá el día como completado para registrar tu avance.</p>`;
 
-    if (done) {
-      renderDoneState();
-      return card;
+    if (!done) {
+      const btn = document.createElement("button");
+      btn.className = "primary";
+      btn.textContent = block.label;
+
+      btn.onclick = () => {
+        localStorage.setItem(key, "1");
+        card.classList.add("done");
+        card.innerHTML = `
+          <div style="font-size:34px">✅</div>
+          <h3>Día ${selectedDay} completado</h3>
+          <p>Tu progreso quedó registrado.</p>
+        `;
+        renderDays();
+
+        if (window.BackendAPI) {
+          window.BackendAPI
+            .completeDay(selectedDay)
+            .catch(error => {
+              console.warn(
+                "No se pudo sincronizar el completado con el backend.",
+                error
+              );
+            });
+        }
+      };
+
+      card.appendChild(btn);
     }
 
-    card.innerHTML = `
-      <h3>¿Terminaste tu acción de hoy?</h3>
-      <p>Registrala para llevar tu progreso personal.</p>
-    `;
-
-    const btn = document.createElement("button");
-    btn.className = "primary complete-day-btn";
-    btn.textContent = "Hoy lo hice";
-
-    const helper = document.createElement("small");
-    helper.className = "complete-helper";
-    helper.textContent = "Opcional · no desbloquea el siguiente día";
-
-    btn.onclick = () => {
-      localStorage.setItem(key, "1");
-      renderDoneState();
-      renderDays();
-
-      if (window.BackendAPI) {
-        window.BackendAPI
-          .completeDay(selectedDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
-      }
-    };
-
-    card.append(btn, helper);
     return card;
   }
 }
@@ -1965,10 +1955,10 @@ function renderDays() {
     </div>
 
     <button type="button" class="routine-current-card" id="routineCurrentBtn">
-      <span class="routine-current-icon" aria-hidden="true">${state.currentDay}</span>
+      <span class="routine-current-icon">${ICONS.check}</span>
       <span class="routine-current-copy">
         <strong>Continuar día ${state.currentDay}</strong>
-        <small>Tu acción del día</small>
+        <small>Acción del día</small>
       </span>
       <span class="routine-current-arrow">${ICONS.arrow}</span>
     </button>
