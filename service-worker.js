@@ -1,4 +1,4 @@
-const CACHE="rutina30-v11";
+const CACHE="rutina30-v13-3";
 
 const CORE=[
   "./",
@@ -6,6 +6,7 @@ const CORE=[
   "./styles.css",
   "./app.js",
   "./backend-client.js",
+  "./push-client.js",
   "./onboarding.js",
   "./onboarding.css",
   "./manifest.webmanifest",
@@ -118,3 +119,99 @@ self.addEventListener("fetch",event=>{
     )
   );
 });
+self.addEventListener(
+  "push",
+  event => {
+    let data = {
+      title:
+        "Rutina 30 Días",
+      body:
+        "Tenés una nueva actualización.",
+      url: "/"
+    };
+
+    if (event.data) {
+      try {
+        data = {
+          ...data,
+          ...event.data.json()
+        };
+      } catch (error) {
+        data.body =
+          event.data.text();
+      }
+    }
+
+    event.waitUntil(
+      self.registration
+        .showNotification(
+          data.title,
+          {
+            body:
+              data.body,
+            data: {
+              url:
+                data.url || "/"
+            },
+            tag:
+              data.tag ||
+              "rutina30",
+            renotify: true
+          }
+        )
+    );
+  }
+);
+
+self.addEventListener(
+  "notificationclick",
+  event => {
+    event.notification.close();
+
+    const targetUrl =
+      new URL(
+        event.notification
+          .data?.url || "/",
+        self.location.origin
+      ).href;
+
+    event.waitUntil(
+      clients
+        .matchAll({
+          type: "window",
+          includeUncontrolled:
+            true
+        })
+        .then(
+          windowClients => {
+            for (
+              const client of
+              windowClients
+            ) {
+              if (
+                "focus" in client
+              ) {
+                client.navigate(
+                  targetUrl
+                );
+
+                return client
+                  .focus();
+              }
+            }
+
+            if (
+              clients.openWindow
+            ) {
+              return clients
+                .openWindow(
+                  targetUrl
+                );
+            }
+
+            return null;
+          }
+        )
+    );
+  }
+);

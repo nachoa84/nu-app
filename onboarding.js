@@ -268,6 +268,12 @@
           !getProfile();
 
         const profile = {
+          ...(existing?.userId
+            ? {
+                userId:
+                  existing.userId
+              }
+            : {}),
           name,
           country,
           timezone,
@@ -292,20 +298,6 @@
 
         if (firstProfile) {
           resetRoutineForNewUser();
-        }
-
-        if (
-          !firstProfile &&
-          window.BackendAPI
-        ) {
-          window.BackendAPI
-            .updateProfile(profile)
-            .catch(error => {
-              console.warn(
-                "No se pudo actualizar el perfil en el backend.",
-                error
-              );
-            });
         }
 
         removeOverlay();
@@ -432,6 +424,24 @@
     renderGreeting(profile);
     renderProfileSummary(profile);
   }
+
+  // V13.2:
+  // Cuando el backend sincroniza un perfil autoritativo
+  // (por ejemplo Europe/Madrid), volvemos a renderizar
+  // inmediatamente la tarjeta y el saludo.
+  window.addEventListener(
+    "routine-profile-synced",
+    event => {
+      const profile =
+        event.detail ||
+        getProfile();
+
+      if (!profile) return;
+
+      renderGreeting(profile);
+      renderProfileSummary(profile);
+    }
+  );
 
   function init() {
     handleNewUserTestParam();

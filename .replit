@@ -34,3 +34,7 @@ externalPort = 80
 
 [userenv.shared]
 PORT = "5000"
+
+[deployment]
+run = "npm start"
+deploymentTarget = "cloudrun"

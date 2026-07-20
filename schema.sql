@@ -40,3 +40,26 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
 
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user
   ON push_subscriptions(user_id);
+
+CREATE TABLE IF NOT EXISTS notification_jobs (
+  id BIGSERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  cycle INTEGER NOT NULL DEFAULT 1,
+  day INTEGER NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'day_available',
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  UNIQUE (user_id, cycle, day, kind)
+);
+
+CREATE INDEX IF NOT EXISTS idx_notification_jobs_pending
+  ON notification_jobs(status, created_at)
+  WHERE status IN ('pending', 'failed');
+
+CREATE INDEX IF NOT EXISTS idx_notification_jobs_user
+  ON notification_jobs(user_id, cycle, day);
+

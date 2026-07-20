@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pruebas Push Admin</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:680px;margin:40px auto;padding:0 16px;color:#222}
+    .card{border:1px solid #ddd;border-radius:16px;padding:20px;margin-bottom:16px}
+    input,button{width:100%;box-sizing:border-box;padding:12px;border-radius:10px;font-size:16px}
+    input{border:1px solid #ccc;margin:10px 0 14px}
+    button{border:0;background:#111;color:#fff;font-weight:700;cursor:pointer;margin-top:8px}
+    button.secondary{background:#eee;color:#222}
+    pre{white-space:pre-wrap;background:#f6f6f6;padding:12px;border-radius:10px;margin-top:16px}
+    .hint{color:#666;line-height:1.5;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Pruebas Push</h1>
+    <label for="token">ADMIN_TEST_TOKEN</label>
+    <input id="token" type="password" autocomplete="off" placeholder="Pegá tu token secreto">
+  </div>
+
+  <div class="card">
+    <h2>1. Push inmediato</h2>
+    <p class="hint">Envía una notificación ahora al dispositivo suscripto más recientemente.</p>
+    <button id="sendNow">Enviar prueba inmediata</button>
+    <pre id="resultNow">Esperando...</pre>
+  </div>
+
+  <div class="card">
+    <h2>2. Prueba automática V13</h2>
+    <p class="hint">Primero abrí tu día actual en la PWA. Después programá el siguiente día unos segundos hacia adelante, cerrá Chrome y esperá. El scheduler debería habilitar el día siguiente y enviar la notificación sin tocar nada más.</p>
+    <label for="seconds">Segundos hasta el desbloqueo</label>
+    <input id="seconds" type="number" min="10" max="3600" value="120">
+    <button id="schedule">Programar prueba automática</button>
+    <button id="runScheduler" class="secondary">Ejecutar scheduler ahora</button>
+    <pre id="resultSchedule">Esperando...</pre>
+  </div>
+
+  <script>
+    const token = document.getElementById("token");
+
+    async function callApi(path, body) {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token.value
+        },
+        body: JSON.stringify(body || {})
+      });
+
+      const text = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch (error) {
+        throw new Error("El servidor devolvió una respuesta no JSON: " + text.slice(0,180));
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error");
+      }
+
+      return data;
+    }
+
+    document.getElementById("sendNow").addEventListener("click", async () => {
+      const out = document.getElementById("resultNow");
+      out.textContent = "Enviando...";
+      try {
+        const data = await callApi("/api/admin/push-test-latest", {});
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        out.textContent = "Error: " + error.message;
+      }
+    });
+
+    document.getElementById("schedule").addEventListener("click", async () => {
+      const out = document.getElementById("resultSchedule");
+      const seconds = Number(document.getElementById("seconds").value || 120);
+      out.textContent = "Programando...";
+      try {
+        const data = await callApi("/api/admin/schedule-auto-test-latest", {seconds});
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        out.textContent = "Error: " + error.message;
+      }
+    });
+
+    document.getElementById("runScheduler").addEventListener("click", async () => {
+      const out = document.getElementById("resultSchedule");
+      out.textContent = "Ejecutando scheduler...";
+      try {
+        const data = await callApi("/api/admin/scheduler-run", {});
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        out.textContent = "Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

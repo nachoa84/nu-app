@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const { Pool } = require("pg");
+const webpush = require("web-push");
 const {
   DateTime,
   IANAZone
@@ -14,6 +15,15 @@ const PORT =
 
 const MAX_DAY =
   Number(process.env.MAX_DAY || 7);
+
+const SCHEDULER_INTERVAL_MS =
+  Math.max(
+    Number(
+      process.env.SCHEDULER_INTERVAL_MS ||
+      30000
+    ),
+    5000
+  );
 
 const DATABASE_URL =
   process.env.DATABASE_URL;
@@ -29,6 +39,38 @@ const pool = DATABASE_URL
       connectionString: DATABASE_URL
     })
   : null;
+
+
+const VAPID_PUBLIC_KEY =
+  process.env.VAPID_PUBLIC_KEY || "";
+
+const VAPID_PRIVATE_KEY =
+  process.env.VAPID_PRIVATE_KEY || "";
+
+const VAPID_SUBJECT =
+  process.env.VAPID_SUBJECT || "";
+
+const ADMIN_TEST_TOKEN =
+  process.env.ADMIN_TEST_TOKEN || "";
+
+const pushConfigured =
+  Boolean(
+    VAPID_PUBLIC_KEY &&
+    VAPID_PRIVATE_KEY &&
+    VAPID_SUBJECT
+  );
+
+if (pushConfigured) {
+  webpush.setVapidDetails(
+    VAPID_SUBJECT,
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY
+  );
+} else {
+  console.warn(
+    "Push no configurado. Faltan VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY o VAPID_SUBJECT."
+  );
+}
 
 app.use(
   express.json({
@@ -126,6 +168,87 @@ function clampDay(value) {
     ),
     MAX_DAY
   );
+}
+
+
+function assertPushConfigured() {
+  if (!pushConfigured) {
+    const error =
+      new Error(
+        "Las notificaciones push todavía no están configuradas en el servidor."
+      );
+
+    error.status = 503;
+
+    throw error;
+  }
+}
+
+
+function assertAdminTestToken(req) {
+  if (!ADMIN_TEST_TOKEN) {
+    const error =
+      new Error(
+        "ADMIN_TEST_TOKEN no configurado."
+      );
+
+    error.status = 503;
+
+    throw error;
+  }
+
+  const provided =
+    String(
+      req.headers[
+        "x-admin-token"
+      ] || ""
+    );
+
+  if (
+    !provided ||
+    provided !== ADMIN_TEST_TOKEN
+  ) {
+    const error =
+      new Error(
+        "Token de prueba inválido."
+      );
+
+    error.status = 401;
+
+    throw error;
+  }
+}
+
+function normalizePushSubscription(input) {
+  if (
+    !input ||
+    typeof input !== "object" ||
+    !input.endpoint ||
+    !input.keys?.p256dh ||
+    !input.keys?.auth
+  ) {
+    const error =
+      new Error(
+        "Suscripción push inválida."
+      );
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  return {
+    endpoint:
+      String(input.endpoint),
+    expirationTime:
+      input.expirationTime || null,
+    keys: {
+      p256dh:
+        String(input.keys.p256dh),
+      auth:
+        String(input.keys.auth)
+    }
+  };
 }
 
 function nextUnlockAt({
@@ -244,28 +367,80 @@ async function advanceIfEligible(
       user.next_unlock_at
     ).getTime() <= Date.now()
   ) {
+    const nextDay =
+      Number(user.current_day) + 1;
+
     await client.query(
       `
       UPDATE users
       SET
-        current_day = current_day + 1,
+        current_day = $2,
         next_unlock_at = NULL,
         updated_at = NOW(),
         last_seen_at = NOW()
       WHERE id = $1
       `,
-      [userId]
+      [
+        userId,
+        nextDay
+      ]
     );
-  } else {
+
     await client.query(
       `
-      UPDATE users
-      SET last_seen_at = NOW()
-      WHERE id = $1
+      INSERT INTO notification_jobs (
+        user_id,
+        cycle,
+        day,
+        kind,
+        status
+      )
+      VALUES (
+        $1,
+        $2,
+        $3,
+        'day_available',
+        'pending'
+      )
+      ON CONFLICT (
+        user_id,
+        cycle,
+        day,
+        kind
+      )
+      DO NOTHING
       `,
-      [userId]
+      [
+        userId,
+        user.cycle,
+        nextDay
+      ]
     );
+
+    return {
+      advanced: true,
+      day: nextDay,
+      cycle:
+        Number(user.cycle)
+    };
   }
+
+  await client.query(
+    `
+    UPDATE users
+    SET last_seen_at = NOW()
+    WHERE id = $1
+    `,
+    [userId]
+  );
+
+  return {
+    advanced: false,
+    day:
+      Number(user.current_day),
+    cycle:
+      Number(user.cycle)
+  };
 }
 
 async function getState(
@@ -451,6 +626,326 @@ async function recalculatePendingUnlock(
       userId,
       next
     ]
+  );
+}
+
+
+let schedulerRunning = false;
+
+async function sendPushToUser(
+  userId,
+  payload
+) {
+  assertDatabase();
+  assertPushConfigured();
+
+  const result =
+    await pool.query(
+      `
+      SELECT
+        id,
+        subscription
+      FROM push_subscriptions
+      WHERE user_id = $1
+      ORDER BY updated_at DESC
+      `,
+      [userId]
+    );
+
+  let sent = 0;
+  let removed = 0;
+  const errors = [];
+
+  for (
+    const row of result.rows
+  ) {
+    try {
+      await webpush
+        .sendNotification(
+          row.subscription,
+          JSON.stringify(payload)
+        );
+
+      sent += 1;
+    } catch (error) {
+      if (
+        error.statusCode === 404 ||
+        error.statusCode === 410
+      ) {
+        await pool.query(
+          `
+          DELETE FROM push_subscriptions
+          WHERE id = $1
+          `,
+          [row.id]
+        );
+
+        removed += 1;
+      } else {
+        errors.push(
+          error.message ||
+          String(error)
+        );
+      }
+    }
+  }
+
+  return {
+    sent,
+    removed,
+    errors,
+    subscriptions:
+      result.rowCount
+  };
+}
+
+async function enqueueDueUnlocks() {
+  assertDatabase();
+
+  const dueResult =
+    await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE
+        current_day < $1
+        AND next_unlock_at IS NOT NULL
+        AND next_unlock_at <= NOW()
+      ORDER BY next_unlock_at ASC
+      LIMIT 200
+      `,
+      [MAX_DAY]
+    );
+
+  let advanced = 0;
+
+  for (
+    const row of dueResult.rows
+  ) {
+    const result =
+      await withTransaction(
+        async client => {
+          return advanceIfEligible(
+            client,
+            row.id
+          );
+        }
+      );
+
+    if (result.advanced) {
+      advanced += 1;
+    }
+  }
+
+  return advanced;
+}
+
+async function claimNextNotificationJob() {
+  return withTransaction(
+    async client => {
+      const result =
+        await client.query(
+          `
+          SELECT *
+          FROM notification_jobs
+          WHERE
+            status IN (
+              'pending',
+              'failed'
+            )
+            AND attempts < 5
+          ORDER BY created_at ASC
+          LIMIT 1
+          FOR UPDATE SKIP LOCKED
+          `
+        );
+
+      if (!result.rowCount) {
+        return null;
+      }
+
+      const job =
+        result.rows[0];
+
+      await client.query(
+        `
+        UPDATE notification_jobs
+        SET
+          status = 'processing',
+          attempts = attempts + 1,
+          updated_at = NOW()
+        WHERE id = $1
+        `,
+        [job.id]
+      );
+
+      return job;
+    }
+  );
+}
+
+async function markNotificationJob(
+  jobId,
+  {
+    status,
+    lastError = null
+  }
+) {
+  await pool.query(
+    `
+    UPDATE notification_jobs
+    SET
+      status = $2,
+      last_error = $3,
+      updated_at = NOW(),
+      sent_at =
+        CASE
+          WHEN $2 = 'sent'
+          THEN NOW()
+          ELSE sent_at
+        END
+    WHERE id = $1
+    `,
+    [
+      jobId,
+      status,
+      lastError
+    ]
+  );
+}
+
+async function processNotificationJobs() {
+  let processed = 0;
+
+  while (processed < 100) {
+    const job =
+      await claimNextNotificationJob();
+
+    if (!job) {
+      break;
+    }
+
+    const payload = {
+      title:
+        `🔥 Tu Día ${job.day} ya está disponible`,
+      body:
+        "Entrá y descubrí tu acción de hoy.",
+      url: "/",
+      tag:
+        `day_available_${job.cycle}_${job.day}`
+    };
+
+    try {
+      const result =
+        await sendPushToUser(
+          job.user_id,
+          payload
+        );
+
+      if (result.sent > 0) {
+        await markNotificationJob(
+          job.id,
+          {
+            status: "sent"
+          }
+        );
+      } else {
+        const reason =
+          result.subscriptions === 0
+            ? "El usuario no tiene dispositivos suscriptos."
+            : (
+                result.errors.join(
+                  " | "
+                ) ||
+                "No se pudo enviar la notificación."
+              );
+
+        await markNotificationJob(
+          job.id,
+          {
+            status: "failed",
+            lastError: reason
+          }
+        );
+      }
+    } catch (error) {
+      await markNotificationJob(
+        job.id,
+        {
+          status: "failed",
+          lastError:
+            error.message ||
+            String(error)
+        }
+      );
+    }
+
+    processed += 1;
+  }
+
+  return processed;
+}
+
+async function runSchedulerCycle() {
+  if (
+    schedulerRunning ||
+    !pool ||
+    !pushConfigured
+  ) {
+    return;
+  }
+
+  schedulerRunning = true;
+
+  try {
+    const advanced =
+      await enqueueDueUnlocks();
+
+    const notifications =
+      await processNotificationJobs();
+
+    if (
+      advanced > 0 ||
+      notifications > 0
+    ) {
+      console.log(
+        `[scheduler] desbloqueos=${advanced} notificaciones=${notifications}`
+      );
+    }
+  } catch (error) {
+    console.error(
+      "[scheduler] error:",
+      error
+    );
+  } finally {
+    schedulerRunning = false;
+  }
+}
+
+function startScheduler() {
+  if (
+    !pool ||
+    !pushConfigured
+  ) {
+    console.warn(
+      "Scheduler no iniciado: falta base de datos o configuración push."
+    );
+
+    return;
+  }
+
+  console.log(
+    `Scheduler activo cada ${SCHEDULER_INTERVAL_MS} ms.`
+  );
+
+  setTimeout(
+    runSchedulerCycle,
+    3000
+  );
+
+  setInterval(
+    runSchedulerCycle,
+    SCHEDULER_INTERVAL_MS
   );
 }
 
@@ -643,24 +1138,23 @@ app.post(
                 );
               }
             } else {
+              // V13.1:
+              // Para usuarios existentes, PostgreSQL es la fuente de verdad
+              // del perfil. Un navegador/dispositivo NO debe sobrescribir
+              // automáticamente timezone, país, nombre u hora preferida
+              // durante el bootstrap.
+              //
+              // Los cambios intencionales de perfil siguen entrando por
+              // PATCH /api/profile/:userId.
               await client.query(
                 `
                 UPDATE users
                 SET
-                  name = $2,
-                  country = $3,
-                  timezone = $4,
-                  notification_time = $5,
-                  updated_at = NOW(),
                   last_seen_at = NOW()
                 WHERE id = $1
                 `,
                 [
-                  profile.userId,
-                  profile.name,
-                  profile.country,
-                  profile.timezone,
-                  profile.notificationTime
+                  profile.userId
                 ]
               );
             }
@@ -1120,6 +1614,496 @@ app.post(
   }
 );
 
+
+app.get(
+  "/api/push/public-key",
+  (req, res, next) => {
+    try {
+      assertPushConfigured();
+
+      res.json({
+        ok: true,
+        publicKey:
+          VAPID_PUBLIC_KEY
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/push/subscribe",
+  async (req, res, next) => {
+    try {
+      assertDatabase();
+      assertPushConfigured();
+
+      const userId =
+        String(
+          req.body.userId || ""
+        ).trim();
+
+      if (!userId) {
+        const error =
+          new Error(
+            "Falta userId."
+          );
+
+        error.status = 400;
+
+        throw error;
+      }
+
+      const subscription =
+        normalizePushSubscription(
+          req.body.subscription
+        );
+
+      const userResult =
+        await pool.query(
+          `
+          SELECT id
+          FROM users
+          WHERE id = $1
+          `,
+          [userId]
+        );
+
+      if (!userResult.rowCount) {
+        const error =
+          new Error(
+            "Usuario no encontrado."
+          );
+
+        error.status = 404;
+
+        throw error;
+      }
+
+      await pool.query(
+        `
+        INSERT INTO push_subscriptions (
+          user_id,
+          endpoint,
+          subscription
+        )
+        VALUES (
+          $1, $2, $3::jsonb
+        )
+        ON CONFLICT (endpoint)
+        DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          subscription =
+            EXCLUDED.subscription,
+          updated_at = NOW()
+        `,
+        [
+          userId,
+          subscription.endpoint,
+          JSON.stringify(
+            subscription
+          )
+        ]
+      );
+
+      res.json({
+        ok: true,
+        subscribed: true
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/push/unsubscribe",
+  async (req, res, next) => {
+    try {
+      assertDatabase();
+
+      const userId =
+        String(
+          req.body.userId || ""
+        ).trim();
+
+      const endpoint =
+        String(
+          req.body.endpoint || ""
+        ).trim();
+
+      if (!userId || !endpoint) {
+        const error =
+          new Error(
+            "Faltan datos para eliminar la suscripción."
+          );
+
+        error.status = 400;
+
+        throw error;
+      }
+
+      await pool.query(
+        `
+        DELETE FROM push_subscriptions
+        WHERE
+          user_id = $1
+          AND endpoint = $2
+        `,
+        [
+          userId,
+          endpoint
+        ]
+      );
+
+      res.json({
+        ok: true,
+        subscribed: false
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/push/test",
+  async (req, res, next) => {
+    try {
+      assertDatabase();
+      assertPushConfigured();
+
+      const userId =
+        String(
+          req.body.userId || ""
+        ).trim();
+
+      if (!userId) {
+        const error =
+          new Error(
+            "Falta userId."
+          );
+
+        error.status = 400;
+
+        throw error;
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            endpoint,
+            subscription
+          FROM push_subscriptions
+          WHERE user_id = $1
+          ORDER BY updated_at DESC
+          `,
+          [userId]
+        );
+
+      if (!result.rowCount) {
+        const error =
+          new Error(
+            "Este usuario no tiene dispositivos suscriptos."
+          );
+
+        error.status = 404;
+
+        throw error;
+      }
+
+      const payload =
+        JSON.stringify({
+          title:
+            "🔥 Notificaciones activadas",
+          body:
+            "La PWA ya puede avisarte cuando tu próximo día esté disponible.",
+          url: "/"
+        });
+
+      let sent = 0;
+      let removed = 0;
+
+      for (
+        const row of result.rows
+      ) {
+        try {
+          await webpush
+            .sendNotification(
+              row.subscription,
+              payload
+            );
+
+          sent += 1;
+        } catch (error) {
+          if (
+            error.statusCode === 404 ||
+            error.statusCode === 410
+          ) {
+            await pool.query(
+              `
+              DELETE FROM push_subscriptions
+              WHERE id = $1
+              `,
+              [row.id]
+            );
+
+            removed += 1;
+          } else {
+            throw error;
+          }
+        }
+      }
+
+      res.json({
+        ok: true,
+        sent,
+        removed
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+
+
+app.post(
+  "/api/admin/schedule-auto-test-latest",
+  async (req, res, next) => {
+    try {
+      assertDatabase();
+      assertPushConfigured();
+      assertAdminTestToken(req);
+
+      const seconds =
+        Math.min(
+          Math.max(
+            Number(
+              req.body.seconds ||
+              120
+            ),
+            10
+          ),
+          3600
+        );
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            u.id,
+            u.name,
+            u.current_day,
+            u.cycle
+          FROM push_subscriptions ps
+          JOIN users u
+            ON u.id = ps.user_id
+          ORDER BY
+            ps.updated_at DESC
+          LIMIT 1
+          `
+        );
+
+      if (!result.rowCount) {
+        const error =
+          new Error(
+            "No hay dispositivos suscriptos."
+          );
+
+        error.status = 404;
+
+        throw error;
+      }
+
+      const user =
+        result.rows[0];
+
+      if (
+        Number(user.current_day) >=
+        MAX_DAY
+      ) {
+        const error =
+          new Error(
+            "El usuario ya está en el último día de la prueba."
+          );
+
+        error.status = 409;
+
+        throw error;
+      }
+
+      const progress =
+        await pool.query(
+          `
+          SELECT opened_at
+          FROM day_progress
+          WHERE
+            user_id = $1
+            AND cycle = $2
+            AND day = $3
+          `,
+          [
+            user.id,
+            user.cycle,
+            user.current_day
+          ]
+        );
+
+      if (
+        !progress.rows[0]
+          ?.opened_at
+      ) {
+        const error =
+          new Error(
+            `Primero abrí el Día ${user.current_day} en la PWA.`
+          );
+
+        error.status = 409;
+
+        throw error;
+      }
+
+      const scheduled =
+        await pool.query(
+          `
+          UPDATE users
+          SET
+            next_unlock_at =
+              NOW() +
+              ($2 * INTERVAL '1 second'),
+            updated_at = NOW()
+          WHERE id = $1
+          RETURNING next_unlock_at
+          `,
+          [
+            user.id,
+            seconds
+          ]
+        );
+
+      res.json({
+        ok: true,
+        userId: user.id,
+        name: user.name,
+        currentDay:
+          Number(user.current_day),
+        nextDay:
+          Number(user.current_day) + 1,
+        scheduledFor:
+          scheduled.rows[0]
+            .next_unlock_at,
+        seconds
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/admin/scheduler-run",
+  async (req, res, next) => {
+    try {
+      assertAdminTestToken(req);
+
+      await runSchedulerCycle();
+
+      res.json({
+        ok: true
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/admin/push-test-latest",
+  async (req, res, next) => {
+    try {
+      assertDatabase();
+      assertPushConfigured();
+      assertAdminTestToken(req);
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            ps.id,
+            ps.user_id,
+            ps.subscription,
+            u.name
+          FROM push_subscriptions ps
+          JOIN users u
+            ON u.id = ps.user_id
+          ORDER BY
+            ps.updated_at DESC
+          LIMIT 1
+          `
+        );
+
+      if (!result.rowCount) {
+        const error =
+          new Error(
+            "No hay dispositivos suscriptos."
+          );
+
+        error.status = 404;
+
+        throw error;
+      }
+
+      const row =
+        result.rows[0];
+
+      const payload =
+        JSON.stringify({
+          title:
+            "🔥 Prueba en segundo plano",
+          body:
+            "Si estás viendo esto, el push funciona aunque la PWA no esté abierta.",
+          url: "/"
+        });
+
+      try {
+        await webpush
+          .sendNotification(
+            row.subscription,
+            payload
+          );
+      } catch (error) {
+        if (
+          error.statusCode === 404 ||
+          error.statusCode === 410
+        ) {
+          await pool.query(
+            `
+            DELETE FROM push_subscriptions
+            WHERE id = $1
+            `,
+            [row.id]
+          );
+        }
+
+        throw error;
+      }
+
+      res.json({
+        ok: true,
+        sent: 1,
+        userId: row.user_id,
+        name: row.name
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 app.use(
   (req, res, next) => {
     const blocked =
@@ -1183,6 +2167,8 @@ async function start() {
       console.log(
         `Servidor listo en puerto ${PORT}`
       );
+
+      startScheduler();
     }
   );
 }

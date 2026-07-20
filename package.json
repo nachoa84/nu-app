@@ -1,6 +1,6 @@
 {
   "name": "rutina-30-dias-pwa",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "description": "PWA Rutina 30 Dias con backend PostgreSQL",
   "main": "server.js",
@@ -12,8 +12,9 @@
     "node": ">=20"
   },
   "dependencies": {
-    "express": "^5.2.1",
-    "luxon": "^3.7.2",
-    "pg": "^8.22.0"
+    "express": "^5.0.0",
+    "luxon": "^3.0.0",
+    "pg": "^8.0.0",
+    "web-push": "^3.6.7"
   }
 }

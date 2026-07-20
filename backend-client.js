@@ -110,8 +110,48 @@
     return payload;
   }
 
+  function syncProfileFromState(state) {
+    if (
+      !state?.profile ||
+      !state?.userId
+    ) {
+      return;
+    }
+
+    const current =
+      getProfile() || {};
+
+    const synced = {
+      ...current,
+      userId:
+        state.userId,
+      name:
+        state.profile.name,
+      country:
+        state.profile.country,
+      timezone:
+        state.profile.timezone,
+      notificationTime:
+        state.profile.notificationTime,
+      startedAt:
+        current.startedAt ||
+        new Date().toISOString(),
+      updatedAt:
+        new Date().toISOString()
+    };
+
+    saveProfile(synced);
+
+    emit(
+      "routine-profile-synced",
+      synced
+    );
+  }
+
   function publishState(state) {
     if (!state) return;
+
+    syncProfileFromState(state);
 
     emit(
       "backend-state-updated",
@@ -288,6 +328,26 @@
     ensureUserId,
     getProfile
   };
+
+
+  window.addEventListener(
+    "routine-profile-updated",
+    event => {
+      const profile =
+        event.detail ||
+        getProfile();
+
+      if (!profile) return;
+
+      updateProfile(profile)
+        .catch(error => {
+          console.warn(
+            "No se pudo sincronizar el perfil con el backend.",
+            error
+          );
+        });
+    }
+  );
 
   window.addEventListener(
     "DOMContentLoaded",
