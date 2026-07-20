@@ -1,4 +1,4 @@
-const CACHE="rutina30-v14-1";
+const CACHE="rutina30-rollback-20260720";
 
 const CORE=[
   "./",
