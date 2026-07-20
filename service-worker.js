@@ -1,17 +1,15 @@
-const CACHE="rutina30-rollback-20260720";
+const CACHE="rutina30-v16-1-spacing-actions";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css",
-  "./app.js",
+  "./styles.css?v=16-1-spacing-actions",
+  "./app.js?v=16-daily-detail-1",
   "./backend-client.js",
   "./push-client.js",
   "./onboarding.js",
-  "./onboarding.css",
+  "./onboarding.css?v=16-daily-detail-1",
   "./manifest.webmanifest",
-  "/ui-redesign.css",
-  "/ui-redesign.js",
 
   "./assets/D01_05_IMAGEN.jpg",
   "./assets/D01_06_IMAGEN.jpg",

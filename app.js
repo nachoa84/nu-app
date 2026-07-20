@@ -640,6 +640,20 @@ const params = new URLSearchParams(window.location.search);
 const isPreviewMode = params.get("preview") === "1";
 const isDemoMode = params.get("demo") === "1";
 const DEFAULT_UNLOCK_HOUR = 9;
+const TOTAL_PROGRAM_DAYS = 30;
+const PILOT_DAYS = 7;
+let savedFilter = "all";
+
+const ICONS = {
+  home: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>`,
+  bookmark: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18l-6-4-6 4z"/></svg>`,
+  bot: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="3"/><path d="M9 11h.01M15 11h.01M9 15h6M12 2v4"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`,
+  lock: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`
+};
 
 
 function applyBackendRoutineState(serverState) {
@@ -1257,7 +1271,7 @@ function updateFavoriteButtons() {
   });
 }
 
-function saveFavorite(src, label, mediaType, day = selectedDay) {
+function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
   const favs = getFavorites();
 
   const idx = favs.findIndex(
@@ -1272,7 +1286,8 @@ function saveFavorite(src, label, mediaType, day = selectedDay) {
       src,
       label,
       mediaType,
-      day: Number(day)
+      day: Number(day),
+      ...(url ? { url } : {})
     });
     toast("Guardado en favoritos");
   }
@@ -1280,6 +1295,20 @@ function saveFavorite(src, label, mediaType, day = selectedDay) {
   localStorage.setItem("favorites", JSON.stringify(favs));
   renderFavorites();
   updateFavoriteButtons();
+
+  document
+    .querySelectorAll(".resource-link-save")
+    .forEach(() => {});
+
+  if (!chatWrap.classList.contains("hidden")) {
+    const currentScroll = window.scrollY;
+    const showingAll = revealIndex >= currentBlocks().length;
+
+    if (showingAll) {
+      showAll();
+      window.scrollTo(0, currentScroll);
+    }
+  }
 }
 
 async function shareAsset(src, label, mediaType) {
@@ -1323,21 +1352,42 @@ function addLinks(container, links) {
   if (!links || !links.length) return;
 
   const wrap = document.createElement("div");
-  wrap.style.marginTop = "10px";
-  wrap.style.display = "flex";
-  wrap.style.gap = "8px";
-  wrap.style.flexWrap = "wrap";
+  wrap.className = "resource-links";
 
   links.forEach(link => {
+    const row = document.createElement("div");
+    row.className = "resource-link-row";
+
     const a = document.createElement("a");
     a.href = link.url;
     a.target = "_blank";
     a.rel = "noopener";
     a.textContent = link.label;
-    a.className = "secondary";
-    a.style.display = "inline-block";
-    a.style.textDecoration = "none";
-    wrap.appendChild(a);
+    a.className = "resource-link-main";
+
+    const favoriteKey = `link:${link.url}`;
+    const saved = isFavorite(favoriteKey, selectedDay);
+
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "resource-link-save";
+    save.setAttribute(
+      "aria-label",
+      saved ? "Quitar enlace de guardados" : "Guardar enlace"
+    );
+    save.innerHTML = saved ? "♥" : "♡";
+
+    save.onclick = () =>
+      saveFavorite(
+        favoriteKey,
+        link.label,
+        "link",
+        selectedDay,
+        link.url
+      );
+
+    row.append(a, save);
+    wrap.appendChild(row);
   });
 
   container.appendChild(wrap);
@@ -1493,6 +1543,268 @@ function createBlock(block) {
   }
 }
 
+
+function createCompactMediaItem(block) {
+  const item = document.createElement("article");
+  item.className = `daily-resource-item daily-resource-${block.mediaType}`;
+
+  const preview = document.createElement("div");
+  preview.className = "daily-resource-preview";
+
+  const media =
+    block.mediaType === "video"
+      ? document.createElement("video")
+      : document.createElement("img");
+
+  media.src = block.src;
+
+  if (block.mediaType === "video") {
+    media.preload = "metadata";
+    media.muted = true;
+    media.playsInline = true;
+  } else {
+    media.alt = block.label;
+    media.loading = "lazy";
+  }
+
+  preview.appendChild(media);
+
+  if (block.mediaType === "video") {
+    const play = document.createElement("button");
+    play.type = "button";
+    play.className = "daily-resource-play";
+    play.setAttribute("aria-label", `Reproducir ${block.label}`);
+    play.textContent = "▶";
+
+    play.onclick = () => {
+      media.controls = true;
+      media.muted = false;
+      media.play().catch(() => {});
+      play.remove();
+    };
+
+    preview.appendChild(play);
+  }
+
+  const copy = document.createElement("div");
+  copy.className = "daily-resource-copy";
+
+  const typeLabel =
+    block.mediaType === "video"
+      ? "Video"
+      : "Imagen";
+
+  copy.innerHTML = `
+    <strong>${block.label}</strong>
+    <span>${typeLabel}</span>
+  `;
+
+  const actions = document.createElement("div");
+  actions.className = "daily-resource-actions";
+
+  if (block.favorite) {
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "daily-resource-save";
+    save.dataset.favoriteSrc = block.src;
+    save.dataset.favoriteDay = String(selectedDay);
+    save.textContent = isFavorite(block.src, selectedDay)
+      ? "♥"
+      : "♡";
+    save.setAttribute("aria-label", "Guardar material");
+
+    save.onclick = () =>
+      saveFavorite(
+        block.src,
+        block.label,
+        block.mediaType,
+        selectedDay
+      );
+
+    actions.appendChild(save);
+  }
+
+  if (block.shareable) {
+    const share = document.createElement("button");
+    share.type = "button";
+    share.className = "daily-resource-share";
+    share.textContent = "Compartir";
+
+    share.onclick = () =>
+      shareAsset(
+        block.src,
+        block.label,
+        block.mediaType
+      );
+
+    actions.appendChild(share);
+  }
+
+  item.append(preview, copy, actions);
+  return item;
+}
+
+function createDailyTextCard(block, index, isIntro = false) {
+  const card = document.createElement("article");
+  card.className = isIntro
+    ? "daily-intro-card"
+    : "daily-message-card";
+
+  if (isIntro) {
+    const title = document.createElement("h3");
+    title.textContent = "Introducción del día";
+    card.appendChild(title);
+  } else {
+    const number = document.createElement("span");
+    number.className = "daily-message-number";
+    number.textContent = String(index);
+    card.appendChild(number);
+  }
+
+  const body = document.createElement("div");
+  body.className = "daily-message-copy";
+  body.textContent = block.content;
+  addLinks(body, block.links);
+  card.appendChild(body);
+
+  return card;
+}
+
+function renderStructuredDayDetail() {
+  const blocks = currentBlocks();
+  const textBlocks = blocks.filter(block => block.type === "text");
+  const imageBlocks = blocks.filter(
+    block =>
+      block.type === "media" &&
+      block.mediaType === "image"
+  );
+  const videoBlocks = blocks.filter(
+    block =>
+      block.type === "media" &&
+      block.mediaType === "video"
+  );
+  const actionBlocks = blocks.filter(
+    block => block.type === "action"
+  );
+  const completeBlock = blocks.find(
+    block => block.type === "complete"
+  );
+
+  chat.innerHTML = "";
+  chat.className = "daily-detail";
+  chatWrap.classList.remove("hidden");
+
+  const dayHeader = document.createElement("header");
+  dayHeader.className = "daily-detail-header";
+  dayHeader.innerHTML = `
+    <div>
+      <span class="daily-status">En progreso</span>
+      <h2>${days[selectedDay].title.replace(" · #30DíasCollagen+", "")}</h2>
+    </div>
+  `;
+  chat.appendChild(dayHeader);
+
+  if (textBlocks.length) {
+    chat.appendChild(
+      createDailyTextCard(
+        textBlocks[0],
+        1,
+        true
+      )
+    );
+  }
+
+  if (textBlocks.length > 1) {
+    const messagesSection = document.createElement("section");
+    messagesSection.className = "daily-section";
+
+    const title = document.createElement("h3");
+    title.textContent = "Acciones y mensajes del día";
+    messagesSection.appendChild(title);
+
+    const messageList = document.createElement("div");
+    messageList.className = "daily-message-list";
+
+    textBlocks.slice(1).forEach((block, index) => {
+      messageList.appendChild(
+        createDailyTextCard(
+          block,
+          index + 1,
+          false
+        )
+      );
+    });
+
+    messagesSection.appendChild(messageList);
+    chat.appendChild(messagesSection);
+  }
+
+  if (imageBlocks.length) {
+    const materials = document.createElement("section");
+    materials.className = "daily-section";
+
+    const title = document.createElement("h3");
+    title.textContent = "Materiales del día";
+    materials.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "daily-resource-list";
+
+    imageBlocks.forEach(block => {
+      list.appendChild(
+        createCompactMediaItem(block)
+      );
+    });
+
+    materials.appendChild(list);
+    chat.appendChild(materials);
+  }
+
+  if (videoBlocks.length) {
+    const videos = document.createElement("section");
+    videos.className = "daily-section";
+
+    const title = document.createElement("h3");
+    title.textContent =
+      videoBlocks.length > 1
+        ? "Videos del día"
+        : "Video del día";
+    videos.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "daily-resource-list";
+
+    videoBlocks.forEach(block => {
+      list.appendChild(
+        createCompactMediaItem(block)
+      );
+    });
+
+    videos.appendChild(list);
+    chat.appendChild(videos);
+  }
+
+  actionBlocks.forEach(block => {
+    chat.appendChild(createBlock(block));
+  });
+
+  if (completeBlock) {
+    chat.appendChild(
+      createBlock(completeBlock)
+    );
+  }
+
+  revealIndex = blocks.length;
+  updateProgress();
+
+  setTimeout(() => {
+    chatWrap.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 40);
+}
+
 function updateProgress() {
   const blocks = currentBlocks();
   progressText.textContent =
@@ -1541,29 +1853,13 @@ function revealNext() {
 function startProgressive() {
   markCurrentDayOpened();
   clearTimeout(revealTimer);
-  chat.innerHTML = "";
-  revealIndex = 0;
-  chatWrap.classList.remove("hidden");
-  updateProgress();
-  revealNext();
+  renderStructuredDayDetail();
 }
 
 function showAll() {
   markCurrentDayOpened();
   clearTimeout(revealTimer);
-  chat.innerHTML = "";
-  chatWrap.classList.remove("hidden");
-
-  currentBlocks().forEach(block => {
-    chat.appendChild(createBlock(block));
-  });
-
-  revealIndex = currentBlocks().length;
-  updateProgress();
-
-  chatWrap.scrollIntoView({
-    behavior: "smooth"
-  });
+  renderStructuredDayDetail();
 }
 
 function selectDay(day, showImmediately = false) {
@@ -1587,6 +1883,7 @@ function selectDay(day, showImmediately = false) {
 
   chatWrap.classList.add("hidden");
   chat.innerHTML = "";
+  chat.className = "chat";
   revealIndex = 0;
   updateProgress();
 
@@ -1628,60 +1925,128 @@ function renderDays() {
   const state = getRoutineState();
 
   grid.innerHTML = "";
+  grid.className = "routine-dashboard";
 
-  for (let d = 1; d <= 7; d++) {
-    const card = document.createElement("div");
+  const completedDays = [];
 
-    const available =
-      isPreviewMode ||
-      d <= state.currentDay;
-
-    const complete =
-      localStorage.getItem(`day${d}Complete`) === "1";
-
-    const opened =
-      Boolean(state.openedDays[d]);
-
-    card.className =
-      `day-card ${d === selectedDay ? "current" : ""} ${!available ? "locked" : ""}`;
-
-    let status = "🔒 Próximamente";
-
-    if (isPreviewMode) {
-      status = complete
-        ? "✅ Completado"
-        : "Disponible para prueba";
-    } else if (d < state.currentDay) {
-      status = complete
-        ? "✅ Completado"
-        : "👀 Abierto";
-    } else if (d === state.currentDay) {
-      if (opened && state.nextUnlockAt) {
-        status =
-          `👀 Abierto · Próximo día ${formatNextUnlock(state.nextUnlockAt)}`;
-      } else if (opened && d === 7) {
-        status = "👀 Abierto · Último día de prueba";
-      } else {
-        status = "🔥 Disponible";
-      }
+  for (let day = 1; day <= PILOT_DAYS; day++) {
+    if (localStorage.getItem(`day${day}Complete`) === "1") {
+      completedDays.push(day);
     }
+  }
 
-    card.innerHTML = `
-      <strong>Día ${d}</strong>
-      <span>${status}</span>
+  const progressValue = Math.round(
+    (Math.max(completedDays.length, state.currentDay - 1) / TOTAL_PROGRAM_DAYS) * 100
+  );
+
+  const summary = document.createElement("div");
+  summary.className = "routine-summary";
+  summary.innerHTML = `
+    <div class="routine-summary-top">
+      <div>
+        <span class="routine-kicker">TU PROGRESO</span>
+        <strong>Día ${state.currentDay} de ${TOTAL_PROGRAM_DAYS}</strong>
+      </div>
+      <span class="routine-percent">${progressValue}%</span>
+    </div>
+
+    <div class="routine-progress-track">
+      <div class="routine-progress-fill" style="width:${progressValue}%"></div>
+    </div>
+
+    <button type="button" class="routine-current-card" id="routineCurrentBtn">
+      <span class="routine-current-icon">${ICONS.check}</span>
+      <span class="routine-current-copy">
+        <strong>Continuar día ${state.currentDay}</strong>
+        <small>Acción del día</small>
+      </span>
+      <span class="routine-current-arrow">${ICONS.arrow}</span>
+    </button>
+  `;
+
+  summary.querySelector("#routineCurrentBtn").onclick = () => {
+    selectDay(state.currentDay, true);
+  };
+
+  grid.appendChild(summary);
+
+  const weeks = [
+    { label: "Semana 1", start: 1, end: 7 },
+    { label: "Semana 2", start: 8, end: 14 },
+    { label: "Semana 3", start: 15, end: 21 },
+    { label: "Semana 4+", start: 22, end: 30 }
+  ];
+
+  weeks.forEach(weekInfo => {
+    const week = document.createElement("section");
+    week.className = "routine-week";
+
+    const head = document.createElement("div");
+    head.className = "routine-week-head";
+    head.innerHTML = `
+      <strong>${weekInfo.label}</strong>
+      <span>Días ${weekInfo.start}–${weekInfo.end}</span>
     `;
 
-    if (available) {
-      card.onclick = () => {
-        selectDay(d, true);
-        renderDays();
-      };
+    const daysRow = document.createElement("div");
+    daysRow.className = "routine-days-row";
 
-      card.style.cursor = "pointer";
+    for (let d = weekInfo.start; d <= weekInfo.end; d++) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "routine-day";
+
+      const existsInPilot = d <= PILOT_DAYS;
+      const available =
+        existsInPilot &&
+        (isPreviewMode || d <= state.currentDay);
+
+      const complete =
+        existsInPilot &&
+        localStorage.getItem(`day${d}Complete`) === "1";
+
+      const isCurrent =
+        existsInPilot &&
+        d === state.currentDay;
+
+      if (!existsInPilot || !available) {
+        button.classList.add("locked");
+        button.disabled = true;
+        button.innerHTML = `
+          <span class="routine-day-number">${d}</span>
+          <span class="routine-day-status">${ICONS.lock}</span>
+        `;
+      } else {
+        button.classList.add("available");
+
+        if (complete) {
+          button.classList.add("complete");
+        }
+
+        if (isCurrent) {
+          button.classList.add("current");
+        }
+
+        button.innerHTML = `
+          <span class="routine-day-number">${d}</span>
+          <span class="routine-day-status">
+            ${complete ? ICONS.check : ""}
+          </span>
+        `;
+
+        button.onclick = () => {
+          selectDay(d, true);
+          renderDays();
+        };
+      }
+
+      button.setAttribute("aria-label", `Día ${d}`);
+      daysRow.appendChild(button);
     }
 
-    grid.appendChild(card);
-  }
+    week.append(head, daysRow);
+    grid.appendChild(week);
+  });
 
   ensureDemoControls();
 }
@@ -1690,19 +2055,90 @@ function renderFavorites() {
   const list = document.getElementById("favoritesList");
   const favs = getFavorites();
 
+  let filterBar = document.getElementById("savedFilterBar");
+
+  if (!filterBar) {
+    filterBar = document.createElement("div");
+    filterBar.id = "savedFilterBar";
+    filterBar.className = "saved-filter-bar";
+
+    const filters = [
+      ["all", "Todos"],
+      ["image", "Imágenes"],
+      ["video", "Videos"],
+      ["link", "Enlaces"]
+    ];
+
+    filters.forEach(([value, label]) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className =
+        `saved-filter-btn ${savedFilter === value ? "active" : ""}`;
+      btn.dataset.savedFilter = value;
+      btn.textContent = label;
+
+      btn.onclick = () => {
+        savedFilter = value;
+
+        filterBar
+          .querySelectorAll(".saved-filter-btn")
+          .forEach(item => {
+            item.classList.toggle(
+              "active",
+              item.dataset.savedFilter === value
+            );
+          });
+
+        renderFavorites();
+      };
+
+      filterBar.appendChild(btn);
+    });
+
+    list.before(filterBar);
+  } else {
+    filterBar
+      .querySelectorAll(".saved-filter-btn")
+      .forEach(item => {
+        item.classList.toggle(
+          "active",
+          item.dataset.savedFilter === savedFilter
+        );
+      });
+  }
+
+  const filtered =
+    savedFilter === "all"
+      ? favs
+      : favs.filter(f => f.mediaType === savedFilter);
+
   if (!favs.length) {
     list.className = "favorites-list empty-state";
-    list.textContent = "Todavía no guardaste contenido.";
+    list.innerHTML = `
+      <div class="saved-empty-icon">${ICONS.bookmark}</div>
+      <strong>Todavía no guardaste contenido</strong>
+      <span>Guardá imágenes, videos o enlaces y aparecerán organizados por día.</span>
+    `;
     return;
   }
 
-  list.className = "favorites-list";
+  if (!filtered.length) {
+    list.className = "favorites-list empty-state";
+    list.innerHTML = `
+      <div class="saved-empty-icon">${ICONS.bookmark}</div>
+      <strong>No hay contenido en este filtro</strong>
+      <span>Probá con otra categoría.</span>
+    `;
+    return;
+  }
+
+  list.className = "favorites-list grouped";
   list.innerHTML = "";
 
   const grouped = {};
 
-  favs.forEach(f => {
-    const day = Number(f.day);
+  filtered.forEach(f => {
+    const day = Number(f.day) || 1;
 
     if (!grouped[day]) {
       grouped[day] = [];
@@ -1715,17 +2151,72 @@ function renderFavorites() {
     .map(Number)
     .sort((a, b) => a - b)
     .forEach(day => {
-      const section = document.createElement("div");
-      section.className = "favorite-day-section";
+      const daySection = document.createElement("section");
+      daySection.className = "saved-day-section";
 
-      const title = document.createElement("h3");
-      title.className = "favorite-day-title";
-      title.textContent = `Día ${day}`;
-      section.appendChild(title);
+      const dayHeader = document.createElement("div");
+      dayHeader.className = "saved-day-header";
+      dayHeader.innerHTML = `
+        <div>
+          <strong>Día ${day}</strong>
+          <span>${grouped[day].length} guardado${grouped[day].length === 1 ? "" : "s"}</span>
+        </div>
+      `;
+
+      const grid = document.createElement("div");
+      grid.className = "saved-day-grid";
 
       grouped[day].forEach(f => {
-        const item = document.createElement("div");
-        item.className = "favorite-item";
+        const item = document.createElement("article");
+        item.className =
+          `favorite-item favorite-type-${f.mediaType}`;
+
+        if (f.mediaType === "link") {
+          const linkCard = document.createElement("a");
+          linkCard.className = "saved-link-card";
+          linkCard.href = f.url || f.src.replace(/^link:/, "");
+          linkCard.target = "_blank";
+          linkCard.rel = "noopener";
+
+          const domain = (() => {
+            try {
+              return new URL(linkCard.href).hostname.replace("www.", "");
+            } catch (e) {
+              return "Enlace";
+            }
+          })();
+
+          linkCard.innerHTML = `
+            <span class="saved-link-type">ENLACE</span>
+            <strong>${f.label}</strong>
+            <small>${domain}</small>
+          `;
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "favorite-bookmark";
+          remove.setAttribute("aria-label", "Quitar de guardados");
+          remove.innerHTML = ICONS.bookmark;
+          remove.onclick = event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            saveFavorite(
+              f.src,
+              f.label,
+              f.mediaType,
+              day,
+              f.url
+            );
+          };
+
+          item.append(linkCard, remove);
+          grid.appendChild(item);
+          return;
+        }
+
+        const mediaWrap = document.createElement("div");
+        mediaWrap.className = "favorite-media-wrap";
 
         const media = f.mediaType === "video"
           ? document.createElement("video")
@@ -1736,41 +2227,17 @@ function renderFavorites() {
         if (f.mediaType === "video") {
           media.controls = true;
           media.preload = "metadata";
+        } else {
+          media.alt = f.label;
+          media.loading = "lazy";
         }
 
-        item.appendChild(media);
-
-        const pad = document.createElement("div");
-        pad.className = "pad";
-        pad.innerHTML = `
-          <strong>${f.label}</strong>
-          <span style="
-            display:block;
-            font-size:12px;
-            color:var(--muted);
-            margin-top:3px;
-          ">
-            Día ${day}
-          </span>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "media-actions";
-
-        const share = document.createElement("button");
-        share.className = "primary";
-        share.textContent = "Compartir";
-        share.onclick = () =>
-          shareAsset(
-            f.src,
-            f.label,
-            f.mediaType
-          );
-
-        const remove = document.createElement("button");
-        remove.className = "secondary";
-        remove.textContent = "Quitar";
-        remove.onclick = () =>
+        const savedBadge = document.createElement("button");
+        savedBadge.type = "button";
+        savedBadge.className = "favorite-bookmark";
+        savedBadge.setAttribute("aria-label", "Quitar de guardados");
+        savedBadge.innerHTML = ICONS.bookmark;
+        savedBadge.onclick = () =>
           saveFavorite(
             f.src,
             f.label,
@@ -1778,27 +2245,117 @@ function renderFavorites() {
             day
           );
 
-        actions.append(share, remove);
-        pad.appendChild(actions);
+        mediaWrap.append(media, savedBadge);
+        item.appendChild(mediaWrap);
+
+        const pad = document.createElement("div");
+        pad.className = "pad";
+        pad.innerHTML = `
+          <strong>${f.label}</strong>
+          <span>${f.mediaType === "video" ? "Video" : "Imagen"}</span>
+        `;
+
         item.appendChild(pad);
-        section.appendChild(item);
+        grid.appendChild(item);
       });
 
-      list.appendChild(section);
+      daySection.append(dayHeader, grid);
+      list.appendChild(daySection);
     });
+}
+
+function setupInterfaceChrome() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar && !document.getElementById("notificationBellBtn")) {
+    const bell = document.createElement("button");
+    bell.id = "notificationBellBtn";
+    bell.className = "topbar-icon-btn";
+    bell.type = "button";
+    bell.setAttribute("aria-label", "Notificaciones");
+    bell.innerHTML = ICONS.bell;
+
+    bell.onclick = () => {
+      document.querySelector('[data-view="rutina"]')?.click();
+
+      setTimeout(() => {
+        const notificationArea =
+          document.querySelector(
+            ".push-settings-card, .notification-card, [data-push-card]"
+          );
+
+        if (notificationArea) {
+          notificationArea.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        } else {
+          toast("Las notificaciones se administran desde Rutina.");
+        }
+      }, 120);
+    };
+
+    topbar.appendChild(bell);
+  }
+
+  const navIcons = {
+    hoy: ICONS.home,
+    rutina: ICONS.calendar,
+    favoritos: ICONS.bookmark,
+    bot: ICONS.bot
+  };
+
+  const navLabels = {
+    hoy: "Inicio",
+    rutina: "Rutina",
+    favoritos: "Guardado",
+    bot: "Bot"
+  };
+
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    const view = btn.dataset.view;
+    const label = navLabels[view] || btn.textContent.trim();
+
+    btn.innerHTML = `
+      <span class="nav-icon">${navIcons[view] || ""}</span>
+      <span>${label}</span>
+    `;
+  });
+
+  const favoriteTitle =
+    document.querySelector("#view-favoritos .section-head h2");
+
+  const favoriteDescription =
+    document.querySelector("#view-favoritos .section-head p");
+
+  if (favoriteTitle) {
+    favoriteTitle.textContent = "Material guardado";
+  }
+
+  if (favoriteDescription) {
+    favoriteDescription.textContent =
+      "Encontrá rápido las imágenes y videos que guardaste.";
+  }
+
+  const botDescription =
+    document.querySelector("#view-bot .section-head p");
+
+  if (botDescription) {
+    botDescription.textContent =
+      "Encontrá rápido herramientas, capacitaciones y recursos para tu negocio.";
+  }
 }
 
 const answers = {
   comisiones:
     "Para cobrar tus comisiones necesitás tener tu cuenta y documentación en regla. En la versión final, acá aparecería el paso a paso completo y actualizado.",
 
-  documentación:
-    "Acá podríamos mostrar la documentación necesaria, organizada por país, con enlaces y checklist.",
+  presentaciones:
+    "Acá podríamos centralizar presentaciones de negocio y producto, ordenadas por objetivo y duración.",
 
   "primeros pasos":
     "Podríamos guiar a un nuevo socio con una secuencia de primeros pasos, accesos, capacitaciones y acciones iniciales.",
 
-  colágeno:
+  productos:
     "Podríamos centralizar información de producto, preguntas frecuentes, contenido de venta y material para compartir."
 };
 
@@ -1929,6 +2486,7 @@ window.addEventListener(
   }
 );
 
+setupInterfaceChrome();
 migrateOldDay1FavoritePaths();
 rescheduleNextUnlockFromProfile();
 advanceRoutineIfEligible();

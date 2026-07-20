@@ -1,78 +1,90 @@
+
 .onboarding-overlay{
   position:fixed;
   inset:0;
   z-index:200;
-  background:rgba(20,22,34,.58);
-  backdrop-filter:blur(8px);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:18px;
+  background:rgba(244,246,248,.98);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 
 .onboarding-panel{
-  width:min(520px,100%);
-  max-height:calc(100vh - 40px);
+  width:min(430px,100%);
+  max-height:calc(100vh - 36px);
   overflow:auto;
-  background:var(--card);
+  padding:26px 22px 22px;
+  background:#fff;
   border:1px solid var(--line);
   border-radius:24px;
-  box-shadow:0 24px 80px rgba(25,25,50,.22);
-  padding:24px;
+  box-shadow:0 18px 60px rgba(23,32,51,.12);
 }
 
 .onboarding-badge{
-  display:inline-flex;
-  background:#eeeaff;
-  color:var(--primary);
-  font-size:12px;
-  font-weight:800;
-  border-radius:999px;
-  padding:7px 10px;
-  margin-bottom:12px;
+  display:none;
 }
 
 .onboarding-panel h2{
   margin:0;
+  text-align:center;
   font-size:28px;
   line-height:1.08;
+  letter-spacing:-.04em;
 }
 
 .onboarding-intro{
+  margin:9px 0 24px;
+  text-align:center;
   color:var(--muted);
   line-height:1.5;
-  margin:10px 0 22px;
+  font-size:14px;
 }
 
 .onboarding-form{
   display:grid;
-  gap:16px;
+  gap:0;
 }
 
 .onboarding-field{
   display:grid;
   gap:7px;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.onboarding-field:last-of-type{
+  border-bottom:none;
 }
 
 .onboarding-field label{
   font-size:13px;
   font-weight:800;
+  color:var(--text);
 }
 
 .onboarding-field input,
 .onboarding-field select{
   width:100%;
-  border:1px solid var(--line);
-  background:#fafafe;
+  min-height:42px;
+  border:none;
+  background:transparent;
   color:var(--text);
-  border-radius:12px;
-  padding:13px 14px;
+  border-radius:0;
+  padding:6px 0 0;
   outline:none;
+}
+
+.onboarding-field input::placeholder{
+  color:#a1a8b5;
 }
 
 .onboarding-field input:focus,
 .onboarding-field select:focus{
-  border-color:var(--primary);
+  border-color:transparent;
+  box-shadow:none;
 }
 
 .onboarding-help{
@@ -82,40 +94,39 @@
 }
 
 .onboarding-timezone{
-  background:#f7f7fb;
+  padding:10px 12px;
   border:1px solid var(--line);
   border-radius:12px;
-  padding:11px 13px;
+  background:#f7f8fa;
   color:var(--muted);
-  font-size:13px;
+  font-size:12px;
 }
 
 .onboarding-actions{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  margin-top:6px;
+  margin-top:22px;
 }
 
 .onboarding-actions button{
   flex:1;
   min-width:150px;
+  min-height:50px;
+  border-radius:14px;
 }
 
 .profile-greeting{
+  margin-bottom:10px;
   color:var(--muted);
   font-size:14px;
   font-weight:700;
-  margin-bottom:10px;
 }
 
 .profile-summary{
   margin-top:14px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
   padding:14px;
-  box-shadow:var(--shadow);
+  border-radius:16px;
 }
 
 .profile-summary-top{
@@ -142,14 +153,29 @@
   padding:8px 10px;
 }
 
+/* El botón Editar queda menos protagonista sin romper su función */
+.profile-summary .ghost{
+  min-height:36px;
+  color:var(--muted);
+  background:#fff;
+}
+
+/* iPhone: respeta el área segura */
+@supports (padding:max(0px)){
+  .onboarding-overlay{
+    padding-top:max(18px,env(safe-area-inset-top));
+    padding-bottom:max(18px,env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width:520px){
   .onboarding-panel{
-    padding:20px;
-    border-radius:20px;
+    padding:24px 19px 20px;
+    border-radius:22px;
   }
 
   .onboarding-panel h2{
-    font-size:25px;
+    font-size:26px;
   }
 
   .profile-summary-top{

@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6f4ef6" />
+  <meta name="theme-color" content="#3557d6" />
   <title>Rutina 30 Días</title>
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="onboarding.css" />
+  <link rel="stylesheet" href="styles.css?v=16-1-spacing-actions" />
+  <link rel="stylesheet" href="onboarding.css?v=16-daily-detail-1" />
 </head>
 <body>
   <div id="app">
@@ -45,16 +45,16 @@
 
       <section id="view-rutina" class="view">
         <div class="section-head">
-          <h2>Mi rutina</h2>
-          <p>En la versión final estarán disponibles los 30 días. Este prototipo muestra 7.</p>
+          <h2>Rutina</h2>
+          <p>Tu progreso, semana a semana.</p>
         </div>
         <div id="daysGrid" class="days-grid"></div>
       </section>
 
       <section id="view-favoritos" class="view">
         <div class="section-head">
-          <h2>Favoritos</h2>
-          <p>Guardá el contenido que más te sirve para encontrarlo rápido.</p>
+          <h2>Material guardado</h2>
+          <p>Encontrá rápido las imágenes y videos que guardaste.</p>
         </div>
         <div id="favoritesList" class="favorites-list empty-state">Todavía no guardaste contenido.</div>
       </section>
@@ -66,13 +66,13 @@
         </div>
         <div class="bot-card">
           <div id="botThread" class="bot-thread">
-            <div class="bubble bot">Hola 👋 Escribime algo como <b>comisiones</b>, <b>documentación</b>, <b>primeros pasos</b> o <b>colágeno</b>.</div>
+            <div class="bubble bot">Hola 👋 Podés consultarme por <b>comisiones</b>, <b>presentaciones</b>, <b>primeros pasos</b> o <b>productos</b>.</div>
           </div>
           <div class="quick-commands">
             <button data-command="comisiones">Comisiones</button>
-            <button data-command="documentación">Documentación</button>
+            <button data-command="presentaciones">Presentaciones</button>
             <button data-command="primeros pasos">Primeros pasos</button>
-            <button data-command="colágeno">Colágeno</button>
+            <button data-command="productos">Productos</button>
           </div>
           <form id="botForm" class="bot-form">
             <input id="botInput" placeholder="¿Qué necesitás?" autocomplete="off" />
@@ -83,16 +83,16 @@
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-btn active" data-view="hoy">🏠<span>Hoy</span></button>
-      <button class="nav-btn" data-view="rutina">📅<span>Rutina</span></button>
-      <button class="nav-btn" data-view="favoritos">❤️<span>Favoritos</span></button>
-      <button class="nav-btn" data-view="bot">🤖<span>Bot</span></button>
+      <button class="nav-btn active" data-view="hoy"><span>Inicio</span></button>
+      <button class="nav-btn" data-view="rutina"><span>Rutina</span></button>
+      <button class="nav-btn" data-view="favoritos"><span>Guardado</span></button>
+      <button class="nav-btn" data-view="bot"><span>Bot</span></button>
     </nav>
   </div>
 
   <script src="backend-client.js"></script>
   <script src="push-client.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=16-daily-detail-1"></script>
   <script src="onboarding.js"></script>
 </body>
 </html>
