@@ -1,4 +1,4 @@
-const CACHE="rutina30-v35-3-icons";
+const CACHE = "rutina30-v35-4-maskable";
 
 const CORE=[
   "./",
@@ -14,6 +14,7 @@ const CORE=[
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/icon-maskable-512.png",
 
   "./assets/D01_05_IMAGEN.jpg",
   "./assets/D01_06_IMAGEN.jpg",
