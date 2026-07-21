@@ -1,19 +1,24 @@
-const CACHE="rutina30-v18-terracota-app";
+const CACHE="rutina30-v35-3-icons";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css?v=18-terracota-app",
-  "./app.js?v=18-terracota-app",
+  "./styles.css?v=35-2-verified",
+  "./app.js?v=35-2-verified",
   "./backend-client.js",
   "./push-client.js",
-  "./onboarding.js?v=18-terracota-app",
-  "./onboarding.css?v=18-terracota-app",
+  "./onboarding.js?v=33-native-window-actions",
+  "./onboarding.css?v=35-2-verified",
   "./manifest.webmanifest",
+
+  "./icons/apple-touch-icon.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
 
   "./assets/D01_05_IMAGEN.jpg",
   "./assets/D01_06_IMAGEN.jpg",
   "./assets/D01_07_IMAGEN.jpg",
+  "./assets/D01_08_VIDEO.mp4",
 
   "./assets/D02_05_IMAGEN.jpg",
   "./assets/D02_06_IMAGEN.jpg",
@@ -22,6 +27,7 @@ const CORE=[
   "./assets/D02_09_IMAGEN.jpg",
   "./assets/D02_10_IMAGEN.jpg",
   "./assets/D02_11_IMAGEN.jpg",
+  "./assets/D02_03_VIDEO.mp4",
 
   "./assets/D03_05_IMAGEN.jpg",
   "./assets/D03_06_IMAGEN.jpg",
@@ -35,6 +41,7 @@ const CORE=[
   "./assets/D04_06_IMAGEN.jpg",
   "./assets/D04_07_IMAGEN.jpg",
   "./assets/D04_08_IMAGEN.jpg",
+  "./assets/D04_09_VIDEO.mp4",
 
   "./assets/D05_02_IMAGEN.jpg",
   "./assets/D05_03_IMAGEN.jpg",
@@ -47,10 +54,13 @@ const CORE=[
   "./assets/D06_05_IMAGEN.jpg",
   "./assets/D06_06_IMAGEN.jpg",
   "./assets/D06_07_IMAGEN.jpg",
+  "./assets/D06_08_VIDEO.mp4",
 
   "./assets/D07_04_IMAGEN.jpg",
   "./assets/D07_05_IMAGEN.jpg",
-  "./assets/D07_06_IMAGEN.jpg"
+  "./assets/D07_06_IMAGEN.jpg",
+  "./assets/D07_03_VIDEO.mp4",
+  "./assets/D07_07_VIDEO.mp4"
 ];
 
 self.addEventListener("install",event=>{

@@ -643,16 +643,49 @@ const DEFAULT_UNLOCK_HOUR = 9;
 const TOTAL_PROGRAM_DAYS = 30;
 const PILOT_DAYS = 7;
 let savedFilter = "all";
+let favoriteOpenDay = null;
+let favoriteSearchOpen = false;
+let favoriteSearchQuery = "";
+let previewState = { items: [], index: 0, day: 1 };
 
 const ICONS = {
   home: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>`,
+  homeFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M2.6 10.9 12 3.2l9.4 7.7a1.4 1.4 0 0 1 .5 1.1v7.3a2 2 0 0 1-2 2h-5.6v-6.2H9.7v6.2H4.1a2 2 0 0 1-2-2V12a1.4 1.4 0 0 1 .5-1.1Z"/><path class="icon-cut" d="M9.7 21.3v-6.2h4.6v6.2"/></svg>`,
   calendar: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>`,
+  calendarFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect class="icon-fill" x="2.7" y="4.8" width="18.6" height="16.5" rx="3"/><path class="icon-cut" d="M7.7 3v4M16.3 3v4M3.7 9.5h16.6M7.5 13h.01M12 13h.01M16.5 13h.01M7.5 17h.01M12 17h.01"/></svg>`,
+  heart: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.9a5.5 5.5 0 0 0-7.8 0L12 5.9l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.5l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>`,
+  heartFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M12 21.6 3.9 14A6.2 6.2 0 0 1 12 4.7 6.2 6.2 0 0 1 20.1 14L12 21.6Z"/></svg>`,
   bookmark: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18l-6-4-6 4z"/></svg>`,
+  bookmarkFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M7.8 2h8.4A1.8 1.8 0 0 1 18 3.8v18.1l-6-4-6 4V3.8A1.8 1.8 0 0 1 7.8 2Z"/></svg>`,
   bot: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="3"/><path d="M9 11h.01M15 11h.01M9 15h6M12 2v4"/></svg>`,
+  botFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect class="icon-fill" x="3" y="5" width="18" height="14" rx="4"/><path class="icon-cut" d="M9 10.8h.01M15 10.8h.01M9 15h6M12 1.8V5"/></svg>`,
   bell: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`,
   lock: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
   check: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>`,
-  arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`
+  checkCircleFilled: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="icon-fill" cx="12" cy="12" r="10"/><path class="icon-cut" d="m7.5 12.2 3 3 6-6.4"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`,
+  down: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`,
+  back: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>`,
+  close: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>`,
+  share: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.3 10.8 7.4-4.5M8.3 13.2l7.4 4.5"/></svg>`,
+  send: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8-8-2Z"/><path d="m11 13 5-5"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8V7m2 0-.8 12.2A2 2 0 0 1 14.2 21H9.8a2 2 0 0 1-2-1.8L7 7"/><path d="M10 11v6M14 11v6"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>`,
+  folder: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-11Z"/></svg>`,
+  copy: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 8 5-8 5V7Z"/></svg>`
+};
+
+
+const DAY_OBJECTIVES = {
+  1: "Conocé Collagen+ y prepará tu primer contenido.",
+  2: "Descargá Stela y conocé las herramientas clave.",
+  3: "Creá tu lista de contactos potenciales.",
+  4: "Organizá tu agenda y sostené acciones simples.",
+  5: "Mejorá tu contenido y tu conversación de venta.",
+  6: "Aprendé a asesorar mejor a cada cliente.",
+  7: "Cerrá tu primera semana con más ritmo y confianza."
 };
 
 
@@ -1192,12 +1225,59 @@ function currentBlocks() {
   return days[selectedDay].blocks;
 }
 
-function toast(text) {
+function ensureToastHost() {
+  let host = document.getElementById("appToastHost");
+  if (host) return host;
+
+  host = document.createElement("div");
+  host.id = "appToastHost";
+  host.className = "toast-host";
+  host.setAttribute("aria-live", "polite");
+  host.setAttribute("aria-atomic", "false");
+  document.body.appendChild(host);
+  return host;
+}
+
+function toast(text, {
+  type = "info",
+  actionLabel = "",
+  onAction = null,
+  duration = 2400
+} = {}) {
+  const host = ensureToastHost();
   const el = document.createElement("div");
-  el.className = "toast";
-  el.textContent = text;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2200);
+  el.className = `toast toast-${type}`;
+
+  const symbol = type === "success" ? "✓" : type === "error" ? "!" : "i";
+  el.innerHTML = `
+    <span class="toast-status" aria-hidden="true">${symbol}</span>
+    <span class="toast-text"></span>
+  `;
+  el.querySelector(".toast-text").textContent = text;
+
+  let timer = null;
+  const dismiss = () => {
+    if (timer) clearTimeout(timer);
+    el.classList.add("is-leaving");
+    setTimeout(() => el.remove(), 170);
+  };
+
+  if (actionLabel && typeof onAction === "function") {
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "toast-action";
+    action.textContent = actionLabel;
+    action.onclick = () => {
+      dismiss();
+      onAction();
+    };
+    el.appendChild(action);
+  }
+
+  host.appendChild(el);
+  requestAnimationFrame(() => el.classList.add("is-visible"));
+  timer = setTimeout(dismiss, duration);
+  return el;
 }
 
 
@@ -1264,41 +1344,29 @@ function updateFavoriteButtons() {
   document.querySelectorAll("[data-favorite-src]").forEach(btn => {
     const src = btn.dataset.favoriteSrc;
     const day = Number(btn.dataset.favoriteDay);
+    const saved = isFavorite(src, day);
 
-    btn.textContent = isFavorite(src, day)
-      ? "♥ Guardado"
-      : "♡ Favorito";
+    btn.classList.toggle("is-saved", saved);
+    btn.setAttribute(
+      "aria-label",
+      saved ? "Quitar de favoritos" : "Guardar en favoritos"
+    );
+
+    const bookmarkIcon = saved ? ICONS.bookmarkFilled : ICONS.bookmark;
+
+    if (btn.classList.contains("resource-action-btn")) {
+      btn.innerHTML = `${bookmarkIcon}<span>${saved ? "Guardado" : "Guardar"}</span>`;
+    } else if (btn.classList.contains("preview-save-action")) {
+      btn.innerHTML = `${bookmarkIcon}<span>${saved ? "Guardado" : "Guardar"}</span>`;
+    } else {
+      btn.innerHTML = bookmarkIcon;
+    }
   });
 }
 
-function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
-  const favs = getFavorites();
-
-  const idx = favs.findIndex(
-    f => f.src === src && Number(f.day) === Number(day)
-  );
-
-  if (idx >= 0) {
-    favs.splice(idx, 1);
-    toast("Eliminado de favoritos");
-  } else {
-    favs.push({
-      src,
-      label,
-      mediaType,
-      day: Number(day),
-      ...(url ? { url } : {})
-    });
-    toast("Guardado en favoritos");
-  }
-
-  localStorage.setItem("favorites", JSON.stringify(favs));
+function refreshFavoriteUI() {
   renderFavorites();
   updateFavoriteButtons();
-
-  document
-    .querySelectorAll(".resource-link-save")
-    .forEach(() => {});
 
   if (!chatWrap.classList.contains("hidden")) {
     const currentScroll = window.scrollY;
@@ -1311,41 +1379,225 @@ function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
   }
 }
 
-async function shareAsset(src, label, mediaType) {
+
+function prefersReducedMotion() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+}
+
+function animateFavoriteTargets(src, day, saved = true) {
+  requestAnimationFrame(() => {
+    document.querySelectorAll("[data-favorite-src]").forEach(button => {
+      if (
+        button.dataset.favoriteSrc !== src ||
+        Number(button.dataset.favoriteDay) !== Number(day)
+      ) return;
+
+      const animationClass = saved ? "favorite-pop" : "favorite-unpop";
+      button.classList.remove("favorite-pop", "favorite-unpop");
+      void button.offsetWidth;
+      button.classList.add(animationClass);
+      setTimeout(() => button.classList.remove(animationClass), 360);
+    });
+  });
+}
+
+function setupAnimatedDetails(details) {
+  if (!details || details.dataset.nativeAnimated === "1") return;
+  const summary = details.querySelector(":scope > summary");
+  const body = details.querySelector(":scope > .native-details-body, :scope > .action-step-body");
+  if (!summary || !body) return;
+
+  details.dataset.nativeAnimated = "1";
+
+  summary.addEventListener("click", event => {
+    if (prefersReducedMotion() || !body.animate) return;
+    event.preventDefault();
+    if (details.dataset.animating === "1") return;
+
+    details.dataset.animating = "1";
+    body.style.overflow = "hidden";
+
+    if (details.open) {
+      const startHeight = Math.max(body.getBoundingClientRect().height, body.scrollHeight);
+      const animation = body.animate(
+        [
+          { height: `${startHeight}px`, opacity: 1, transform: "translateY(0)" },
+          { height: "0px", opacity: 0, transform: "translateY(-5px)" }
+        ],
+        { duration: 180, easing: "cubic-bezier(.4,0,.2,1)" }
+      );
+      animation.onfinish = () => {
+        details.open = false;
+        body.style.height = "";
+        body.style.opacity = "";
+        body.style.transform = "";
+        body.style.overflow = "";
+        delete details.dataset.animating;
+      };
+      animation.oncancel = animation.onfinish;
+      return;
+    }
+
+    details.open = true;
+    const endHeight = body.scrollHeight;
+    const animation = body.animate(
+      [
+        { height: "0px", opacity: 0, transform: "translateY(-5px)" },
+        { height: `${endHeight}px`, opacity: 1, transform: "translateY(0)" }
+      ],
+      { duration: 220, easing: "cubic-bezier(.22,.8,.24,1)" }
+    );
+    animation.onfinish = () => {
+      body.style.height = "";
+      body.style.opacity = "";
+      body.style.transform = "";
+      body.style.overflow = "";
+      delete details.dataset.animating;
+    };
+    animation.oncancel = animation.onfinish;
+  });
+}
+
+function setupNativePressState(element, ignoreSelector = "button, a, input, textarea, select") {
+  if (!element || element.dataset.nativePress === "1") return;
+  element.dataset.nativePress = "1";
+
+  const release = () => element.classList.remove("is-native-pressed");
+  element.addEventListener("pointerdown", event => {
+    if (event.target.closest(ignoreSelector)) return;
+    element.classList.add("is-native-pressed");
+  });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
+    element.addEventListener(type, release);
+  });
+}
+
+function setupNativeInteractionGuards() {
+  const selector = ".resource-row, .favorite-content-row, .favorite-folder-card, .media-preview";
+
+  document.addEventListener("contextmenu", event => {
+    if (event.target.closest(selector)) event.preventDefault();
+  });
+
+  document.addEventListener("selectstart", event => {
+    if (event.target.closest(selector)) event.preventDefault();
+  });
+
+  document.addEventListener("dragstart", event => {
+    if (event.target.closest(selector)) event.preventDefault();
+  });
+}
+
+function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
+  if (navigator.vibrate) navigator.vibrate(10);
+  const favs = getFavorites();
+
+  const idx = favs.findIndex(
+    f => f.src === src && Number(f.day) === Number(day)
+  );
+
+  if (idx >= 0) {
+    const removed = favs.splice(idx, 1)[0];
+    localStorage.setItem("favorites", JSON.stringify(favs));
+    refreshFavoriteUI();
+    animateFavoriteTargets(src, day, false);
+
+    toast("Eliminado de favoritos", {
+      type: "info",
+      actionLabel: "Deshacer",
+      duration: 4200,
+      onAction: () => {
+        const current = getFavorites();
+        const exists = current.some(
+          item => item.src === removed.src && Number(item.day) === Number(removed.day)
+        );
+        if (!exists) current.push(removed);
+        localStorage.setItem("favorites", JSON.stringify(current));
+        refreshFavoriteUI();
+        toast("Restaurado en favoritos", { type: "success" });
+      }
+    });
+    return;
+  }
+
+  favs.push({
+    src,
+    label,
+    mediaType,
+    day: Number(day),
+    ...(url ? { url } : {})
+  });
+
+  localStorage.setItem("favorites", JSON.stringify(favs));
+  refreshFavoriteUI();
+  animateFavoriteTargets(src, day, true);
+  toast("Guardado en favoritos", { type: "success" });
+}
+
+function setButtonBusy(button, busy, label = "Preparando") {
+  if (!button) return;
+
+  if (busy) {
+    if (!button.dataset.originalHtml) button.dataset.originalHtml = button.innerHTML;
+    button.disabled = true;
+    button.classList.add("is-busy");
+    button.innerHTML = `<span class="button-spinner" aria-hidden="true"></span><span>${label}</span>`;
+    return;
+  }
+
+  button.disabled = false;
+  button.classList.remove("is-busy");
+  if (button.dataset.originalHtml) {
+    button.innerHTML = button.dataset.originalHtml;
+    delete button.dataset.originalHtml;
+  }
+}
+
+async function shareAsset(src, label, mediaType, triggerButton = null) {
+  setButtonBusy(triggerButton, true, "Preparando");
+
   try {
     const res = await fetch(src);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const blob = await res.blob();
     const ext = mediaType === "video" ? "mp4" : "jpg";
 
     const file = new File(
       [blob],
       `${label.replaceAll(" ", "_")}.${ext}`,
-      { type: blob.type }
+      { type: blob.type || (mediaType === "video" ? "video/mp4" : "image/jpeg") }
     );
 
-    if (
-      navigator.canShare &&
-      navigator.canShare({ files: [file] })
-    ) {
-      await navigator.share({
-        files: [file],
-        title: label
-      });
-      return;
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: label });
+        toast("Compartir completado", { type: "success" });
+        return;
+      } catch (error) {
+        // Cancelar el menú de compartir no debe descargar ni abrir el archivo.
+        if (error?.name === "AbortError") return;
+        console.warn("El menú nativo de compartir falló. Se usa alternativa.", error);
+      }
     }
-  } catch (e) {
-    console.error("No se pudo compartir directamente:", e);
+  } catch (error) {
+    console.warn("No se pudo preparar el archivo para compartir:", error);
+  } finally {
+    setButtonBusy(triggerButton, false);
   }
 
-  const a = document.createElement("a");
-  a.href = src;
-  a.download = "";
-  a.target = "_blank";
-  a.click();
+  try {
+    const a = document.createElement("a");
+    a.href = src;
+    a.download = "";
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.click();
 
-  toast(
-    "Tu dispositivo no permite compartir directo desde esta PWA. Se abrió/descargó el archivo."
-  );
+    toast("Se abrió el archivo para compartir o guardar", { type: "info", duration: 3200 });
+  } catch (error) {
+    toast("No se pudo abrir el archivo", { type: "error" });
+  }
 }
 
 function addLinks(container, links) {
@@ -1370,12 +1622,14 @@ function addLinks(container, links) {
 
     const save = document.createElement("button");
     save.type = "button";
-    save.className = "resource-link-save";
+    save.className = `resource-link-save${saved ? " is-saved" : ""}`;
+    save.dataset.favoriteSrc = favoriteKey;
+    save.dataset.favoriteDay = String(selectedDay);
     save.setAttribute(
       "aria-label",
-      saved ? "Quitar enlace de guardados" : "Guardar enlace"
+      saved ? "Quitar enlace de favoritos" : "Guardar enlace en favoritos"
     );
-    save.innerHTML = saved ? "♥" : "♡";
+    save.innerHTML = saved ? ICONS.bookmarkFilled : ICONS.bookmark;
 
     save.onclick = () =>
       saveFavorite(
@@ -1391,30 +1645,6 @@ function addLinks(container, links) {
   });
 
   container.appendChild(wrap);
-}
-
-function registerDayComplete(day) {
-  const key = `day${day}Complete`;
-
-  if (localStorage.getItem(key) === "1") {
-    return false;
-  }
-
-  localStorage.setItem(key, "1");
-  renderDays();
-
-  if (window.BackendAPI) {
-    window.BackendAPI
-      .completeDay(day)
-      .catch(error => {
-        console.warn(
-          "No se pudo sincronizar el avance con el backend.",
-          error
-        );
-      });
-  }
-
-  return true;
 }
 
 function createBlock(block) {
@@ -1506,7 +1736,8 @@ function createBlock(block) {
           shareAsset(
             block.src,
             block.label,
-            block.mediaType
+            block.mediaType,
+            share
           );
 
         actions.appendChild(share);
@@ -1526,15 +1757,19 @@ function createBlock(block) {
     const key = `day${selectedDay}Complete`;
     const done = localStorage.getItem(key) === "1";
 
-    const renderDoneState = () => {
+    const renderDoneState = ({ animate = false } = {}) => {
       card.classList.add("done");
+      card.classList.toggle("just-completed", animate && !prefersReducedMotion());
       card.innerHTML = `
-        <span class="complete-done-mark" aria-hidden="true">✓</span>
+        <span class="complete-done-mark" aria-hidden="true">${ICONS.check}</span>
         <div class="complete-done-copy">
           <h3>Hecho hoy</h3>
-          <p>Avance registrado</p>
+          <p>Registrado.</p>
         </div>
       `;
+      if (animate) {
+        setTimeout(() => card.classList.remove("just-completed"), 620);
+      }
     };
 
     if (done) {
@@ -1556,8 +1791,21 @@ function createBlock(block) {
     helper.textContent = "Solo registra tu avance";
 
     btn.onclick = () => {
-      registerDayComplete(selectedDay);
-      renderDoneState();
+      localStorage.setItem(key, "1");
+      if (navigator.vibrate) navigator.vibrate(12);
+      renderDoneState({ animate: true });
+      renderDays();
+
+      if (window.BackendAPI) {
+        window.BackendAPI
+          .completeDay(selectedDay)
+          .catch(error => {
+            console.warn(
+              "No se pudo sincronizar el completado con el backend.",
+              error
+            );
+          });
+      }
     };
 
     card.append(btn, helper);
@@ -1566,265 +1814,714 @@ function createBlock(block) {
 }
 
 
-function createCompactMediaItem(block) {
+function normalizePreviewItem(item) {
+  return {
+    src: item.src,
+    label: item.label || "Material",
+    mediaType: item.mediaType || "image",
+    favorite: item.favorite !== false,
+    shareable: item.shareable !== false,
+    url: item.url || null
+  };
+}
+
+function closeMediaPreview(direction = "right") {
+  const modal = document.getElementById("mediaPreview");
+  const shell = document.getElementById("mediaPreviewShell");
+  if (!modal || modal.hidden) return;
+
+  if (shell && !prefersReducedMotion()) {
+    shell.style.transition = "transform 0.22s cubic-bezier(.4,0,.2,1), opacity .18s ease";
+    shell.style.opacity = "0.86";
+    shell.style.transform = direction === "down" ? "translateY(100%)" : "translateX(100%)";
+  }
+
+  modal.classList.add("is-closing");
+
+  setTimeout(() => {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    modal.classList.remove("is-closing");
+    document.body.classList.remove("preview-open");
+    document.getElementById("previewStage").innerHTML = "";
+    if (shell) {
+      shell.style.transition = "";
+      shell.style.transform = "";
+      shell.style.opacity = "";
+    }
+  }, shell && !prefersReducedMotion() ? 205 : 0);
+}
+
+function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
+  const modal = document.getElementById("mediaPreview");
+  if (!modal || !previewState.items.length) return;
+
+  const item = previewState.items[previewState.index];
+  const stage = document.getElementById("previewStage");
+  const counter = document.getElementById("previewCounter");
+  const segments = document.getElementById("previewSegments");
+  const title = document.getElementById("previewTitle");
+  const type = document.getElementById("previewType");
+  const saveTop = document.getElementById("previewTopSaveBtn");
+  const save = document.getElementById("previewSaveBtn");
+  const share = document.getElementById("previewShareBtn");
+  const prev = document.getElementById("previewPrevBtn");
+  const next = document.getElementById("previewNextBtn");
+
+  counter.textContent = `${previewState.index + 1} de ${previewState.items.length}`;
+
+  if (segments) {
+    segments.innerHTML = previewState.items
+      .map((_, segmentIndex) => {
+        const stateClass = segmentIndex < previewState.index
+          ? " is-past"
+          : segmentIndex === previewState.index
+            ? " is-current"
+            : "";
+        return `<span class="preview-segment${stateClass}"></span>`;
+      })
+      .join("");
+  }
+
+  title.textContent = item.label;
+  type.textContent = item.mediaType === "video" ? "Video" : "Imagen";
+
+  stage.classList.remove("preview-enter-left", "preview-enter-right");
+  stage.style.transition = "";
+  stage.style.transform = "";
+  stage.style.opacity = "";
+  stage.innerHTML = "";
+  stage.classList.add("is-loading");
+
+  const media = item.mediaType === "video"
+    ? document.createElement("video")
+    : document.createElement("img");
+
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
+
+  const finishPreviewLoad = () => stage.classList.remove("is-loading");
+  const failPreviewLoad = () => {
+    stage.classList.remove("is-loading");
+    stage.innerHTML = `
+      <div class="preview-load-error">
+        <strong>No se pudo cargar este archivo</strong>
+        <span>Revisá tu conexión e intentá nuevamente.</span>
+      </div>
+    `;
+  };
+
+  if (item.mediaType === "video") {
+    media.controls = true;
+    media.playsInline = true;
+    media.preload = "metadata";
+    media.addEventListener("loadedmetadata", finishPreviewLoad, { once: true });
+  } else {
+    media.alt = item.label;
+    media.addEventListener("load", finishPreviewLoad, { once: true });
+  }
+  media.addEventListener("error", failPreviewLoad, { once: true });
+  media.src = item.src;
+
+  stage.appendChild(media);
+
+  if (enterFrom && !prefersReducedMotion()) {
+    stage.classList.add(enterFrom === "left" ? "preview-enter-left" : "preview-enter-right");
+  }
+
+  const saved = isFavorite(item.src, previewState.day);
+  [saveTop, save].forEach(button => {
+    button.hidden = !item.favorite;
+    button.dataset.favoriteSrc = item.src;
+    button.dataset.favoriteDay = String(previewState.day);
+    button.classList.toggle("is-saved", saved);
+  });
+
+  saveTop.innerHTML = saved ? ICONS.bookmarkFilled : ICONS.bookmark;
+  save.innerHTML = `${saved ? ICONS.bookmarkFilled : ICONS.bookmark}<span>${saved ? "Guardado" : "Guardar"}</span>`;
+  save.className = `preview-save-action${saved ? " is-saved" : ""}`;
+
+  const toggleFavorite = () => {
+    saveFavorite(
+      item.src,
+      item.label,
+      item.mediaType,
+      previewState.day,
+      item.url
+    );
+    const nowSaved = isFavorite(item.src, previewState.day);
+    renderMediaPreview({ favoritePulse: true });
+    animateFavoriteTargets(item.src, previewState.day, nowSaved);
+  };
+
+  saveTop.onclick = toggleFavorite;
+  save.onclick = toggleFavorite;
+
+  if (favoritePulse && !prefersReducedMotion()) {
+    saveTop.classList.add("favorite-pop");
+    save.classList.add("favorite-pop");
+    setTimeout(() => {
+      saveTop.classList.remove("favorite-pop");
+      save.classList.remove("favorite-pop");
+    }, 360);
+  }
+
+  share.hidden = !item.shareable;
+  share.innerHTML = `${ICONS.share}<span>Compartir</span>`;
+  share.onclick = () => shareAsset(item.src, item.label, item.mediaType, share);
+
+  prev.innerHTML = ICONS.back;
+  next.innerHTML = ICONS.arrow;
+  prev.disabled = previewState.index === 0;
+  next.disabled = previewState.index === previewState.items.length - 1;
+
+  modal.hidden = false;
+  modal.classList.remove("is-closing");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("preview-open");
+}
+
+function navigateMediaPreview(delta, { animate = true } = {}) {
+  const nextIndex = previewState.index + delta;
+  if (nextIndex < 0 || nextIndex >= previewState.items.length) return;
+
+  const stage = document.getElementById("previewStage");
+  if (!stage || prefersReducedMotion() || !animate) {
+    previewState.index = nextIndex;
+    renderMediaPreview();
+    return;
+  }
+
+  const exitDirection = delta > 0 ? -1 : 1;
+  stage.style.transition = "transform .15s cubic-bezier(.4,0,.2,1), opacity .15s ease";
+  stage.style.transform = `translateX(${exitDirection * 100}%)`;
+  stage.style.opacity = ".45";
+
+  setTimeout(() => {
+    previewState.index = nextIndex;
+    renderMediaPreview({ enterFrom: delta > 0 ? "right" : "left" });
+    if (navigator.vibrate) navigator.vibrate(5);
+  }, 145);
+}
+
+function openMediaPreview(items, index = 0, day = selectedDay) {
+  const normalized = items
+    .filter(item => item && item.src && item.mediaType !== "link")
+    .map(normalizePreviewItem);
+
+  if (!normalized.length) return;
+
+  previewState = {
+    items: normalized,
+    index: Math.min(Math.max(index, 0), normalized.length - 1),
+    day: Number(day) || selectedDay
+  };
+
+  renderMediaPreview();
+}
+
+function setupMediaPreview() {
+  const modal = document.getElementById("mediaPreview");
+  if (!modal) return;
+
+  const shell = document.getElementById("mediaPreviewShell");
+  const stage = document.getElementById("previewStage");
+  const dragHandles = [
+    document.querySelector(".media-preview-grabber"),
+    document.querySelector(".media-preview-header")
+  ].filter(Boolean);
+
+  if (shell && dragHandles.length) {
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+
+    const onStart = e => {
+      dragging = true;
+      startY = (e.touches ? e.touches[0].clientY : e.clientY);
+      shell.style.transition = "none";
+    };
+
+    const onMove = e => {
+      if (!dragging) return;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY);
+      currentY = Math.max(0, y - startY);
+      shell.style.transform = `translateY(${currentY}px)`;
+    };
+
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      shell.style.transition = "transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)";
+
+      if (currentY > 110) {
+        closeMediaPreview("down");
+      } else {
+        shell.style.transform = "translateY(0)";
+      }
+      currentY = 0;
+    };
+
+    dragHandles.forEach(handle => {
+      handle.addEventListener("touchstart", onStart, { passive: true });
+      handle.addEventListener("touchmove", onMove, { passive: true });
+      handle.addEventListener("touchend", onEnd);
+    });
+  }
+
+  if (stage) {
+    let startX = 0;
+    let startY = 0;
+    let deltaX = 0;
+    let deltaY = 0;
+    let horizontal = false;
+
+    stage.addEventListener("touchstart", event => {
+      if (modal.hidden || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      deltaX = 0;
+      deltaY = 0;
+      horizontal = false;
+      stage.style.transition = "none";
+    }, { passive: true });
+
+    stage.addEventListener("touchmove", event => {
+      if (modal.hidden || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      deltaX = touch.clientX - startX;
+      deltaY = touch.clientY - startY;
+
+      if (!horizontal && Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
+        horizontal = true;
+      }
+
+      if (!horizontal) return;
+      event.preventDefault();
+
+      const atStart = previewState.index === 0 && deltaX > 0;
+      const atEnd = previewState.index === previewState.items.length - 1 && deltaX < 0;
+      const resistance = atStart || atEnd ? 0.28 : 1;
+      stage.style.transform = `translateX(${deltaX * resistance}px)`;
+      stage.style.opacity = String(Math.max(.62, 1 - Math.abs(deltaX) / 700));
+    }, { passive: false });
+
+    stage.addEventListener("touchend", () => {
+      if (!horizontal) {
+        stage.style.transition = "";
+        stage.style.transform = "";
+        stage.style.opacity = "";
+        return;
+      }
+
+      const threshold = Math.min(72, window.innerWidth * .17);
+      if (Math.abs(deltaX) >= threshold) {
+        const delta = deltaX < 0 ? 1 : -1;
+        const targetIndex = previewState.index + delta;
+        if (targetIndex >= 0 && targetIndex < previewState.items.length) {
+          navigateMediaPreview(delta, { animate: true });
+          return;
+        }
+      }
+
+      stage.style.transition = "transform .18s cubic-bezier(.22,.8,.24,1), opacity .18s ease";
+      stage.style.transform = "translateX(0)";
+      stage.style.opacity = "1";
+      setTimeout(() => {
+        stage.style.transition = "";
+      }, 190);
+    }, { passive: true });
+  }
+
+  document.getElementById("previewCloseBtn").innerHTML = ICONS.close;
+  document.getElementById("previewCloseBtn").onclick = () => closeMediaPreview("right");
+
+  document.getElementById("previewPrevBtn").onclick = () => navigateMediaPreview(-1);
+  document.getElementById("previewNextBtn").onclick = () => navigateMediaPreview(1);
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) closeMediaPreview("right");
+  });
+
+  document.addEventListener("keydown", event => {
+    if (modal.hidden) return;
+    if (event.key === "Escape") closeMediaPreview("right");
+    if (event.key === "ArrowLeft") navigateMediaPreview(-1);
+    if (event.key === "ArrowRight") navigateMediaPreview(1);
+  });
+}
+
+function createCompactMediaItem(block, order, mediaBlocks) {
   const item = document.createElement("article");
-  item.className = `daily-resource-item daily-resource-${block.mediaType}`;
+  item.className = `resource-row resource-row-${block.mediaType}`;
+  item.tabIndex = 0;
+  item.setAttribute("role", "button");
+  item.setAttribute("aria-label", `Abrir ${block.label}`);
+
+  const openPreview = () => openMediaPreview(mediaBlocks, order - 1, selectedDay);
+
+  const orderBadge = document.createElement("span");
+  orderBadge.className = "resource-order";
+  orderBadge.textContent = String(order);
 
   const preview = document.createElement("div");
-  preview.className = "daily-resource-preview";
+  preview.className = "resource-thumb";
+  preview.setAttribute("aria-hidden", "true");
 
-  const media =
-    block.mediaType === "video"
-      ? document.createElement("video")
-      : document.createElement("img");
+  const media = block.mediaType === "video"
+    ? document.createElement("video")
+    : document.createElement("img");
 
-  media.src = block.src;
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
+  preview.classList.add("is-loading");
+  const thumbReady = () => preview.classList.remove("is-loading");
+  const thumbFailed = () => {
+    preview.classList.remove("is-loading");
+    preview.classList.add("is-error");
+  };
 
   if (block.mediaType === "video") {
     media.preload = "metadata";
     media.muted = true;
     media.playsInline = true;
+    media.addEventListener("loadedmetadata", thumbReady, { once: true });
   } else {
-    media.alt = block.label;
+    media.alt = "";
     media.loading = "lazy";
+    media.addEventListener("load", thumbReady, { once: true });
   }
-
+  media.addEventListener("error", thumbFailed, { once: true });
+  media.src = block.src;
   preview.appendChild(media);
 
   if (block.mediaType === "video") {
-    const play = document.createElement("button");
-    play.type = "button";
-    play.className = "daily-resource-play";
-    play.setAttribute("aria-label", `Reproducir ${block.label}`);
-    play.textContent = "▶";
-
-    play.onclick = () => {
-      media.controls = true;
-      media.muted = false;
-      media.play().catch(() => {});
-      play.remove();
-    };
-
+    const play = document.createElement("span");
+    play.className = "resource-play-badge";
+    play.innerHTML = ICONS.play;
     preview.appendChild(play);
   }
 
+  const main = document.createElement("div");
+  main.className = "resource-main";
+
   const copy = document.createElement("div");
-  copy.className = "daily-resource-copy";
-
-  const typeLabel =
-    block.mediaType === "video"
-      ? "Video"
-      : "Imagen";
-
+  copy.className = "resource-copy";
   copy.innerHTML = `
     <strong>${block.label}</strong>
-    <span>${typeLabel}</span>
+    <span>${block.mediaType === "video" ? "Video" : "Imagen"}</span>
   `;
 
+  const disclosure = document.createElement("span");
+  disclosure.className = "resource-disclosure";
+  disclosure.setAttribute("aria-hidden", "true");
+  disclosure.innerHTML = ICONS.arrow;
+
   const actions = document.createElement("div");
-  actions.className = "daily-resource-actions";
+  actions.className = "resource-row-actions";
 
   if (block.favorite) {
     const save = document.createElement("button");
     save.type = "button";
-    save.className = "daily-resource-save";
+    save.className = "resource-action-btn";
     save.dataset.favoriteSrc = block.src;
     save.dataset.favoriteDay = String(selectedDay);
-    save.textContent = isFavorite(block.src, selectedDay)
-      ? "♥"
-      : "♡";
-    save.setAttribute("aria-label", "Guardar material");
-
-    save.onclick = () =>
+    save.onclick = event => {
+      event.stopPropagation();
       saveFavorite(
         block.src,
         block.label,
         block.mediaType,
         selectedDay
       );
-
+    };
     actions.appendChild(save);
   }
 
   if (block.shareable) {
     const share = document.createElement("button");
     share.type = "button";
-    share.className = "daily-resource-share";
-    share.textContent = "Compartir";
-
-    share.onclick = () =>
-      shareAsset(
-        block.src,
-        block.label,
-        block.mediaType
-      );
-
+    share.className = "resource-action-btn";
+    share.innerHTML = `${ICONS.share}<span>Compartir</span>`;
+    share.onclick = event => {
+      event.stopPropagation();
+      shareAsset(block.src, block.label, block.mediaType, share);
+    };
     actions.appendChild(share);
   }
 
-  item.append(preview, copy, actions);
+  item.addEventListener("click", event => {
+    if (event.target.closest(".resource-action-btn")) return;
+    openPreview();
+  });
+  item.addEventListener("keydown", event => {
+    if ((event.key === "Enter" || event.key === " ") && !event.target.closest(".resource-action-btn")) {
+      event.preventDefault();
+      openPreview();
+    }
+  });
+
+  setupNativePressState(item, ".resource-action-btn");
+  main.append(copy, actions);
+  item.append(orderBadge, preview, main, disclosure);
+  updateFavoriteButtons();
   return item;
 }
 
-function createDailyTextCard(block, index, isIntro = false) {
-  const card = document.createElement("article");
-  card.className = isIntro
-    ? "daily-intro-card"
-    : "daily-message-card";
+function cleanLeadingSymbols(value) {
+  return String(value || "")
+    .replace(/^[\s✅☑️✔️✨🔥🚀🙌🏻🧡💛]+/u, "")
+    .trim();
+}
 
-  if (isIntro) {
-    const title = document.createElement("h3");
-    title.textContent = "Introducción del día";
-    card.appendChild(title);
-  } else {
-    const number = document.createElement("span");
-    number.className = "daily-message-number";
-    number.textContent = String(index);
-    card.appendChild(number);
+function firstMeaningfulLine(content) {
+  const line = String(content || "")
+    .split(/\n+/)
+    .map(value => cleanLeadingSymbols(value))
+    .find(Boolean) || "Tu acción de hoy";
+
+  return line.length > 68 ? `${line.slice(0, 65)}…` : line;
+}
+
+function appendFormattedContent(container, content, options = {}) {
+  const { dropFirstParagraph = false } = options;
+  let paragraphs = String(content || "")
+    .split(/\n\s*\n/)
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  if (dropFirstParagraph) {
+    paragraphs = paragraphs.slice(1);
   }
 
-  const body = document.createElement("div");
-  body.className = "daily-message-copy";
-  body.textContent = block.content;
-  addLinks(body, block.links);
-  card.appendChild(body);
+  paragraphs.forEach(paragraph => {
+    const lines = paragraph
+      .split(/\n+/)
+      .map(value => value.trim())
+      .filter(Boolean);
+
+    lines.forEach(line => {
+      if (/^(✅|☑️|✔️)/u.test(line)) {
+        const check = document.createElement("div");
+        check.className = "native-check-item";
+        check.innerHTML = `
+          <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
+          <span>${line.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
+        `;
+        container.appendChild(check);
+        return;
+      }
+
+      const isLabel = line.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
+      const element = document.createElement(isLabel ? "div" : "p");
+      element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
+      element.textContent = line;
+      container.appendChild(element);
+    });
+  });
+}
+
+function createObjectiveCard(block) {
+  const card = document.createElement("section");
+  card.className = "objective-card";
+
+  const header = document.createElement("div");
+  header.className = "objective-card-header";
+  header.innerHTML = `
+    <div>
+      <span>Tu objetivo de hoy</span>
+      <h3>${DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content)}</h3>
+    </div>
+  `;
+
+  card.appendChild(header);
+
+  const fullText = String(block.content || "").trim();
+  if (fullText) {
+    const details = document.createElement("details");
+    details.className = "native-details";
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span class="details-label">Ver detalles</span><span class="details-arrow">${ICONS.down}</span>`;
+
+    const body = document.createElement("div");
+    body.className = "native-details-body";
+    appendFormattedContent(body, fullText, { dropFirstParagraph: true });
+    addLinks(body, block.links);
+
+    details.addEventListener("toggle", () => {
+      summary.querySelector(".details-label").textContent = details.open ? "Ocultar detalles" : "Ver detalles";
+    });
+
+    details.append(summary, body);
+    setupAnimatedDetails(details);
+    card.appendChild(details);
+  }
 
   return card;
+}
+
+function createActionStep(block, index) {
+  const paragraphs = String(block.content || "")
+    .split(/\n\s*\n/)
+    .map(value => value.trim())
+    .filter(Boolean);
+  const hasDetails = paragraphs.length > 1 || Boolean(block.links?.length);
+
+  if (!hasDetails) {
+    const row = document.createElement("div");
+    row.className = "action-step action-step-static";
+    row.innerHTML = `
+      <div class="action-step-static-row">
+        <span class="action-step-number">${index}</span>
+        <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
+      </div>
+    `;
+    return row;
+  }
+
+  const details = document.createElement("details");
+  details.className = "action-step";
+
+  const summary = document.createElement("summary");
+  summary.innerHTML = `
+    <span class="action-step-number">${index}</span>
+    <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
+    <span class="action-step-arrow">${ICONS.down}</span>
+  `;
+
+  const body = document.createElement("div");
+  body.className = "action-step-body";
+  appendFormattedContent(body, block.content, { dropFirstParagraph: true });
+  addLinks(body, block.links);
+
+  details.append(summary, body);
+  setupAnimatedDetails(details);
+  return details;
 }
 
 function renderStructuredDayDetail() {
   const blocks = currentBlocks();
   const textBlocks = blocks.filter(block => block.type === "text");
-  const imageBlocks = blocks.filter(
-    block =>
-      block.type === "media" &&
-      block.mediaType === "image"
-  );
-  const videoBlocks = blocks.filter(
-    block =>
-      block.type === "media" &&
-      block.mediaType === "video"
-  );
-  const actionBlocks = blocks.filter(
-    block => block.type === "action"
-  );
-  const completeBlock = blocks.find(
-    block => block.type === "complete"
-  );
+  const mediaBlocks = blocks.filter(block => block.type === "media");
+  const actionBlocks = blocks.filter(block => block.type === "action");
+  const completeBlock = blocks.find(block => block.type === "complete");
 
   chat.innerHTML = "";
-  chat.className = "daily-detail";
+  chat.className = "daily-detail continuous-day-detail";
   chatWrap.classList.remove("hidden");
-
-  const dayHeader = document.createElement("header");
-  dayHeader.className = "daily-detail-header";
-  dayHeader.innerHTML = `
-    <div>
-      <span class="daily-status">En progreso</span>
-      <h2>${days[selectedDay].title.replace(" · #30DíasCollagen+", "")}</h2>
-    </div>
-  `;
-  chat.appendChild(dayHeader);
+  document.getElementById("view-hoy")?.classList.remove("day-open");
 
   if (textBlocks.length) {
-    chat.appendChild(
-      createDailyTextCard(
-        textBlocks[0],
-        1,
-        true
-      )
-    );
+    const planGroup = document.createElement("section");
+    planGroup.className = "day-plan-group";
+
+    const objective = createObjectiveCard(textBlocks[0]);
+    objective.classList.add("day-plan-objective");
+    planGroup.appendChild(objective);
+
+    if (textBlocks.length > 1) {
+      const steps = document.createElement("section");
+      steps.className = "native-section steps-section day-plan-steps";
+      steps.innerHTML = `
+        <div class="native-section-heading">
+          <div>
+            <span>Acciones</span>
+            <h3>Pasos de hoy</h3>
+          </div>
+          <small>${textBlocks.length - 1} pasos</small>
+        </div>
+      `;
+
+      const list = document.createElement("div");
+      list.className = "action-step-list";
+      textBlocks.slice(1).forEach((block, index) => {
+        list.appendChild(createActionStep(block, index + 1));
+      });
+      steps.appendChild(list);
+      planGroup.appendChild(steps);
+    }
+
+    chat.appendChild(planGroup);
   }
 
-  if (textBlocks.length > 1) {
-    const messagesSection = document.createElement("section");
-    messagesSection.className = "daily-section";
-
-    const title = document.createElement("h3");
-    title.textContent = "Acciones";
-    messagesSection.appendChild(title);
-
-    const messageList = document.createElement("div");
-    messageList.className = "daily-message-list";
-
-    textBlocks.slice(1).forEach((block, index) => {
-      messageList.appendChild(
-        createDailyTextCard(
-          block,
-          index + 1,
-          false
-        )
-      );
-    });
-
-    messagesSection.appendChild(messageList);
-    chat.appendChild(messagesSection);
-  }
-
-  if (imageBlocks.length) {
+  if (mediaBlocks.length) {
     const materials = document.createElement("section");
-    materials.className = "daily-section";
-
-    const title = document.createElement("h3");
-    title.textContent = "Materiales";
-    materials.appendChild(title);
+    materials.className = "native-section materials-section";
+    materials.innerHTML = `
+      <div class="native-section-heading">
+        <div>
+          <span>En este orden</span>
+          <h3>Para publicar</h3>
+        </div>
+        <small>${mediaBlocks.length} archivo${mediaBlocks.length === 1 ? "" : "s"}</small>
+      </div>
+    `;
 
     const list = document.createElement("div");
-    list.className = "daily-resource-list";
-
-    imageBlocks.forEach(block => {
-      list.appendChild(
-        createCompactMediaItem(block)
-      );
+    list.className = "resource-sequence";
+    mediaBlocks.forEach((block, index) => {
+      list.appendChild(createCompactMediaItem(block, index + 1, mediaBlocks));
     });
-
     materials.appendChild(list);
     chat.appendChild(materials);
   }
 
-  if (videoBlocks.length) {
-    const videos = document.createElement("section");
-    videos.className = "daily-section";
-
-    const title = document.createElement("h3");
-    title.textContent =
-      videoBlocks.length > 1
-        ? "Videos"
-        : "Video";
-    videos.appendChild(title);
-
-    const list = document.createElement("div");
-    list.className = "daily-resource-list";
-
-    videoBlocks.forEach(block => {
-      list.appendChild(
-        createCompactMediaItem(block)
-      );
-    });
-
-    videos.appendChild(list);
-    chat.appendChild(videos);
-  }
-
-  actionBlocks.forEach(block => {
-    chat.appendChild(createBlock(block));
-  });
+  actionBlocks.forEach(block => chat.appendChild(createBlock(block)));
 
   if (completeBlock) {
-    chat.appendChild(
-      createBlock(completeBlock)
-    );
+    chat.appendChild(createBlock(completeBlock));
   }
 
   revealIndex = blocks.length;
   updateProgress();
+  updateFavoriteButtons();
+}
 
-  setTimeout(() => {
-    chatWrap.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }, 40);
+function scrollToTodayContent({ markOpened = true } = {}) {
+  if (markOpened) {
+    markCurrentDayOpened();
+  }
+
+  clearTimeout(revealTimer);
+
+  if (!chat.children.length) {
+    renderStructuredDayDetail();
+  }
+
+  const target =
+    chat.querySelector(".objective-card") ||
+    chat.querySelector(".native-section") ||
+    chatWrap;
+
+  target?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function setupContinuousDayOpenTracking() {
+  if (!("IntersectionObserver" in window) || !chatWrap) return;
+
+  let opened = false;
+
+  const observer = new IntersectionObserver(
+    entries => {
+      const entry = entries[0];
+      if (!entry?.isIntersecting || opened) return;
+
+      opened = true;
+      markCurrentDayOpened();
+      observer.disconnect();
+    },
+    {
+      threshold: 0.18,
+      rootMargin: "0px 0px -12% 0px"
+    }
+  );
+
+  observer.observe(chatWrap);
 }
 
 function updateProgress() {
@@ -1836,12 +2533,22 @@ function updateProgress() {
 function renderSelectedDayHeader() {
   const day = days[selectedDay];
   dayPill.textContent = `DÍA ${selectedDay}`;
-  heroTitle.textContent = selectedDay === 1
-    ? "Tu acción está lista"
-    : `Día ${selectedDay} listo`;
+  heroTitle.textContent = "Tu acción de hoy";
   heroDescription.textContent =
-    "Abrí el contenido y avanzá a tu ritmo.";
+    DAY_OBJECTIVES[selectedDay] || day.description;
   chatTitle.textContent = day.title;
+
+  const heroIcon = document.querySelector(".hero-card-icon");
+  if (heroIcon) heroIcon.innerHTML = ICONS.play;
+
+  startDayBtn.innerHTML = `${ICONS.down}<span>Comenzar mi día</span>`;
+
+  if (showAllBtn) {
+    showAllBtn.hidden = true;
+  }
+
+  const homeDayTitle = document.getElementById("homeDayTitle");
+  if (homeDayTitle) homeDayTitle.textContent = `Día ${selectedDay}`;
 
   localStorage.setItem(
     "selectedDay",
@@ -1876,15 +2583,11 @@ function revealNext() {
 }
 
 function startProgressive() {
-  markCurrentDayOpened();
-  clearTimeout(revealTimer);
-  renderStructuredDayDetail();
+  scrollToTodayContent({ markOpened: true });
 }
 
 function showAll() {
-  markCurrentDayOpened();
-  clearTimeout(revealTimer);
-  renderStructuredDayDetail();
+  scrollToTodayContent({ markOpened: true });
 }
 
 function selectDay(day, showImmediately = false) {
@@ -1906,28 +2609,37 @@ function selectDay(day, showImmediately = false) {
     .querySelector('[data-view="hoy"]')
     .click();
 
-  chatWrap.classList.add("hidden");
   chat.innerHTML = "";
-  chat.className = "chat";
+  chat.className = "daily-detail continuous-day-detail";
   revealIndex = 0;
-  updateProgress();
+  renderStructuredDayDetail();
 
   if (showImmediately) {
-    showAll();
+    setTimeout(() => {
+      scrollToTodayContent({ markOpened: true });
+    }, 70);
   }
 }
 
 startDayBtn.onclick = startProgressive;
-showAllBtn.onclick = showAll;
+if (showAllBtn) showAllBtn.onclick = showAll;
 restartBtn.onclick = startProgressive;
 
 document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const view = btn.dataset.view;
 
+    if (!btn.classList.contains("active") && navigator.vibrate) {
+      navigator.vibrate(8);
+    }
+
+    closeMediaPreview();
+    document.body.dataset.activeView = view;
+
     document.querySelectorAll(".nav-btn").forEach(b => {
       b.classList.toggle("active", b === btn);
     });
+    updateNavigationVisuals();
 
     document.querySelectorAll(".view").forEach(v => {
       v.classList.remove("active");
@@ -1937,8 +2649,21 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
       .getElementById(`view-${view}`)
       .classList.add("active");
 
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    if (view === "rutina") {
+      renderDays();
+    }
+
     if (view === "favoritos") {
       renderFavorites();
+    }
+
+    if (view === "bot") {
+      const thread = document.getElementById("botThread");
+      if (thread) thread.scrollTop = thread.scrollHeight;
     }
   });
 });
@@ -1949,162 +2674,163 @@ function renderDays() {
   const grid = document.getElementById("daysGrid");
   const state = getRoutineState();
 
+  if (!grid) return;
+
   grid.innerHTML = "";
-  grid.className = "routine-dashboard";
+  grid.className = "app-routine";
 
-  const completedDays = [];
-
-  for (let day = 1; day <= PILOT_DAYS; day++) {
-    if (localStorage.getItem(`day${day}Complete`) === "1") {
-      completedDays.push(day);
-    }
-  }
-
-  const progressValue = Math.round(
-    (Math.max(completedDays.length, state.currentDay - 1) / TOTAL_PROGRAM_DAYS) * 100
+  const progressValue = Math.min(
+    100,
+    Math.round((state.currentDay / TOTAL_PROGRAM_DAYS) * 100)
   );
 
-  const currentDayDone =
+  const currentComplete =
     localStorage.getItem(`day${state.currentDay}Complete`) === "1";
 
-  const summary = document.createElement("div");
-  summary.className = "routine-summary";
-  summary.innerHTML = `
-    <div class="routine-summary-top">
+  const progressCard = document.createElement("section");
+  progressCard.className = "app-progress-card";
+  progressCard.innerHTML = `
+    <div class="app-progress-row">
       <div>
-        <span class="routine-kicker">TU PROGRESO</span>
+        <span class="app-label">TU PROGRESO</span>
         <strong>Día ${state.currentDay} de ${TOTAL_PROGRAM_DAYS}</strong>
       </div>
-      <span class="routine-percent">${progressValue}%</span>
+      <span class="app-progress-percent">${progressValue}%</span>
     </div>
-
-    <div class="routine-progress-track">
-      <div class="routine-progress-fill" style="width:${progressValue}%"></div>
-    </div>
-
-    <div class="routine-current-panel">
-      <button type="button" class="routine-current-card" id="routineCurrentBtn">
-        <span class="routine-current-icon" aria-hidden="true">${state.currentDay}</span>
-        <span class="routine-current-copy">
-          <strong>Continuar día ${state.currentDay}</strong>
-          <small>Tu acción del día</small>
-        </span>
-        <span class="routine-current-arrow">${ICONS.arrow}</span>
-      </button>
-
-      <button
-        type="button"
-        class="routine-checkin-btn${currentDayDone ? " done" : ""}"
-        id="routineCheckinBtn"
-        ${currentDayDone ? "disabled" : ""}
-      >
-        <span class="routine-checkin-icon" aria-hidden="true">${ICONS.check}</span>
-        <span>${currentDayDone ? "Hecho hoy" : "Hoy lo hice"}</span>
-      </button>
-      <small class="routine-checkin-note">Solo registra tu avance</small>
+    <div class="app-progress-track" aria-label="Progreso ${progressValue}%">
+      <span class="app-progress-fill" style="width:${progressValue}%"></span>
     </div>
   `;
 
-  summary.querySelector("#routineCurrentBtn").onclick = () => {
+  const progressFill = progressCard.querySelector(".app-progress-fill");
+  if (progressFill && !prefersReducedMotion()) {
+    progressFill.style.width = "0%";
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      progressFill.style.width = `${progressValue}%`;
+    }));
+  }
+
+  const todayCard = document.createElement("section");
+  todayCard.className = "app-today-card";
+  todayCard.innerHTML = `
+    <button type="button" class="app-today-main" aria-label="Continuar día ${state.currentDay}">
+      <span class="app-today-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5V7Z"/></svg>
+      </span>
+      <span class="app-today-copy">
+        <strong>Continuar día ${state.currentDay}</strong>
+        <small>Tu acción del día</small>
+      </span>
+      <span class="app-today-arrow" aria-hidden="true">${ICONS.arrow}</span>
+    </button>
+    <div class="app-checkin-area">
+      <button type="button" class="app-checkin-btn${currentComplete ? " is-done" : ""}" ${currentComplete ? "disabled" : ""}>
+        <span class="app-checkin-icon" aria-hidden="true">${currentComplete ? ICONS.checkCircleFilled : ICONS.check}</span>
+        <span>${currentComplete ? "Hecho hoy" : "Hoy lo hice"}</span>
+      </button>
+    </div>
+  `;
+
+  todayCard.querySelector(".app-today-main").onclick = () => {
     selectDay(state.currentDay, true);
   };
 
-  const routineCheckinBtn =
-    summary.querySelector("#routineCheckinBtn");
+  const checkinBtn = todayCard.querySelector(".app-checkin-btn");
+  if (!currentComplete) {
+    checkinBtn.onclick = () => {
+      if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+      localStorage.setItem(`day${state.currentDay}Complete`, "1");
+      renderDays();
 
-  if (routineCheckinBtn && !currentDayDone) {
-    routineCheckinBtn.onclick = () => {
-      registerDayComplete(state.currentDay);
+      if (window.BackendAPI) {
+        window.BackendAPI
+          .completeDay(state.currentDay)
+          .catch(error => {
+            console.warn(
+              "No se pudo sincronizar el completado con el backend.",
+              error
+            );
+          });
+      }
     };
   }
 
-  grid.appendChild(summary);
+  const weekOne = document.createElement("section");
+  weekOne.className = "app-week-card app-week-open";
 
-  const weeks = [
-    { label: "Semana 1", start: 1, end: 7 },
-    { label: "Semana 2", start: 8, end: 14 },
-    { label: "Semana 3", start: 15, end: 21 },
-    { label: "Semana 4+", start: 22, end: 30 }
-  ];
+  const weekOneHead = document.createElement("div");
+  weekOneHead.className = "app-week-open-head";
+  weekOneHead.innerHTML = `
+    <div>
+      <strong>Semana 1</strong>
+      <span>Días 1–7</span>
+    </div>
+  `;
 
-  weeks.forEach(weekInfo => {
-    const week = document.createElement("section");
-    week.className = "routine-week";
+  const weekOneDays = document.createElement("div");
+  weekOneDays.className = "app-week-days";
 
-    const head = document.createElement("div");
-    head.className = "routine-week-head";
-    head.innerHTML = `
-      <strong>${weekInfo.label}</strong>
-      <span>Días ${weekInfo.start}–${weekInfo.end}</span>
-    `;
+  for (let day = 1; day <= 7; day++) {
+    const available = isPreviewMode || day <= state.currentDay;
+    const complete = localStorage.getItem(`day${day}Complete`) === "1";
+    const current = day === state.currentDay;
 
-    const daysRow = document.createElement("div");
-    daysRow.className = "routine-days-row";
+    const dayButton = document.createElement("button");
+    dayButton.type = "button";
+    dayButton.className = "app-day-dot";
+    dayButton.textContent = String(day);
+    dayButton.setAttribute("aria-label", `Día ${day}`);
 
-    for (let d = weekInfo.start; d <= weekInfo.end; d++) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "routine-day";
+    if (complete) dayButton.classList.add("is-complete");
+    if (current) dayButton.classList.add("is-current");
 
-      const existsInPilot = d <= PILOT_DAYS;
-      const available =
-        existsInPilot &&
-        (isPreviewMode || d <= state.currentDay);
-
-      const complete =
-        existsInPilot &&
-        localStorage.getItem(`day${d}Complete`) === "1";
-
-      const isCurrent =
-        existsInPilot &&
-        d === state.currentDay;
-
-      if (!existsInPilot || !available) {
-        button.classList.add("locked");
-        button.disabled = true;
-        button.innerHTML = `
-          <span class="routine-day-number">${d}</span>
-          <span class="routine-day-status">${ICONS.lock}</span>
-        `;
-      } else {
-        button.classList.add("available");
-
-        if (complete) {
-          button.classList.add("complete");
-        }
-
-        if (isCurrent) {
-          button.classList.add("current");
-        }
-
-        button.innerHTML = `
-          <span class="routine-day-number">${d}</span>
-          <span class="routine-day-status">
-            ${complete ? ICONS.check : ""}
-          </span>
-        `;
-
-        button.onclick = () => {
-          selectDay(d, true);
-          renderDays();
-        };
-      }
-
-      button.setAttribute("aria-label", `Día ${d}`);
-      daysRow.appendChild(button);
+    if (!available) {
+      dayButton.classList.add("is-future");
+      dayButton.disabled = true;
+    } else {
+      dayButton.onclick = () => {
+        selectDay(day, true);
+        renderDays();
+      };
     }
 
-    week.append(head, daysRow);
-    grid.appendChild(week);
+    weekOneDays.appendChild(dayButton);
+  }
+
+  weekOne.append(weekOneHead, weekOneDays);
+
+  const lockedWeeks = [
+    { number: 2, start: 8, end: 14 },
+    { number: 3, start: 15, end: 21 },
+    { number: 4, start: 22, end: 30 }
+  ].map(week => {
+    const row = document.createElement("section");
+    row.className = "app-week-locked";
+    row.innerHTML = `
+      <span class="app-week-number">${week.number}</span>
+      <span class="app-week-copy">
+        <strong>Semana ${week.number}</strong>
+        <small>Días ${week.start}–${week.end}</small>
+      </span>
+      <span class="app-week-lock" aria-hidden="true">${ICONS.lock}</span>
+    `;
+    return row;
   });
+
+  const lockedWeeksGroup = document.createElement("div");
+  lockedWeeksGroup.className = "app-grouped-list";
+  lockedWeeksGroup.append(...lockedWeeks);
+
+  grid.append(
+    progressCard,
+    todayCard,
+    weekOne,
+    lockedWeeksGroup
+  );
 
   ensureDemoControls();
 }
-
-function renderFavorites() {
-  const list = document.getElementById("favoritesList");
-  const favs = getFavorites();
-
+function renderFavoriteFilterBar(list) {
   let filterBar = document.getElementById("savedFilterBar");
 
   if (!filterBar) {
@@ -2112,287 +2838,654 @@ function renderFavorites() {
     filterBar.id = "savedFilterBar";
     filterBar.className = "saved-filter-bar";
 
-    const filters = [
+    [
       ["all", "Todos"],
       ["image", "Imágenes"],
       ["video", "Videos"],
       ["link", "Enlaces"]
-    ];
-
-    filters.forEach(([value, label]) => {
+    ].forEach(([value, label]) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className =
-        `saved-filter-btn ${savedFilter === value ? "active" : ""}`;
+      btn.className = "saved-filter-btn";
       btn.dataset.savedFilter = value;
       btn.textContent = label;
-
       btn.onclick = () => {
         savedFilter = value;
-
-        filterBar
-          .querySelectorAll(".saved-filter-btn")
-          .forEach(item => {
-            item.classList.toggle(
-              "active",
-              item.dataset.savedFilter === value
-            );
-          });
-
         renderFavorites();
       };
-
       filterBar.appendChild(btn);
     });
 
     list.before(filterBar);
-  } else {
-    filterBar
-      .querySelectorAll(".saved-filter-btn")
-      .forEach(item => {
-        item.classList.toggle(
-          "active",
-          item.dataset.savedFilter === savedFilter
-        );
-      });
   }
 
-  const filtered =
-    savedFilter === "all"
-      ? favs
-      : favs.filter(f => f.mediaType === savedFilter);
+  filterBar.querySelectorAll(".saved-filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.savedFilter === savedFilter);
+  });
+
+  return filterBar;
+}
+
+
+function normalizeFavoriteSearch(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function favoriteMatchesSearch(favorite, query) {
+  const needle = normalizeFavoriteSearch(query);
+  if (!needle) return true;
+
+  const day = Number(favorite.day) || 1;
+  const typeLabel =
+    favorite.mediaType === "video" ? "video videos" :
+    favorite.mediaType === "link" ? "enlace enlaces link links" :
+    "imagen imagenes foto fotos";
+
+  const haystack = normalizeFavoriteSearch(
+    `${favorite.label || ""} ${typeLabel} dia ${day} día ${day} ${favorite.src || ""}`
+  );
+
+  return haystack.includes(needle);
+}
+
+function ensureFavoritesSearchPanel() {
+  let panel = document.getElementById("favoritesSearchPanel");
+  if (panel) return panel;
+
+  const view = document.getElementById("view-favoritos");
+  const header = view?.querySelector(".app-page-header");
+  if (!view || !header) return null;
+
+  panel = document.createElement("div");
+  panel.id = "favoritesSearchPanel";
+  panel.className = "favorites-search-panel";
+  panel.hidden = true;
+  panel.innerHTML = `
+    <button type="button" class="favorites-search-back" aria-label="Cerrar búsqueda">
+      ${ICONS.back}
+    </button>
+    <label class="favorites-search-field">
+      ${ICONS.search}
+      <input id="favoritesSearchInput" type="search" placeholder="Buscar en favoritos" autocomplete="off" />
+      <button type="button" class="favorites-search-clear" aria-label="Borrar búsqueda" hidden>×</button>
+    </label>
+  `;
+
+  header.after(panel);
+
+  const back = panel.querySelector(".favorites-search-back");
+  const input = panel.querySelector("#favoritesSearchInput");
+  const clear = panel.querySelector(".favorites-search-clear");
+
+  back.onclick = closeFavoritesSearch;
+
+  clear.onclick = () => {
+    favoriteSearchQuery = "";
+    input.value = "";
+    clear.hidden = true;
+    renderFavorites();
+    input.focus({ preventScroll: true });
+  };
+
+  input.addEventListener("input", () => {
+    favoriteSearchQuery = input.value;
+    clear.hidden = !favoriteSearchQuery;
+    renderFavorites();
+  });
+
+  return panel;
+}
+
+function openFavoritesSearch() {
+  favoriteSearchOpen = true;
+  favoriteOpenDay = null;
+
+  const view = document.getElementById("view-favoritos");
+  const panel = ensureFavoritesSearchPanel();
+  if (!view || !panel) return;
+
+  view.classList.add("favorites-searching");
+  panel.hidden = false;
+
+  const input = panel.querySelector("#favoritesSearchInput");
+  const clear = panel.querySelector(".favorites-search-clear");
+  input.value = favoriteSearchQuery;
+  clear.hidden = !favoriteSearchQuery;
+
+  renderFavorites();
+
+  requestAnimationFrame(() => {
+    input.focus({ preventScroll: true });
+  });
+}
+
+function closeFavoritesSearch() {
+  favoriteSearchOpen = false;
+  favoriteSearchQuery = "";
+
+  const view = document.getElementById("view-favoritos");
+  const panel = document.getElementById("favoritesSearchPanel");
+  const input = panel?.querySelector("#favoritesSearchInput");
+
+  if (input) input.value = "";
+  if (panel) panel.hidden = true;
+  view?.classList.remove("favorites-searching");
+
+  renderFavorites();
+}
+
+function favoritePreviewNode(favorite) {
+  const wrap = document.createElement("div");
+  wrap.className = `favorite-folder-preview favorite-preview-${favorite.mediaType}`;
+
+  if (favorite.mediaType === "link") {
+    wrap.innerHTML = `${ICONS.folder}<span>Enlace</span>`;
+    return wrap;
+  }
+
+  const media = favorite.mediaType === "video"
+    ? document.createElement("video")
+    : document.createElement("img");
+
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
+
+  wrap.classList.add("is-loading");
+  const favoriteReady = () => wrap.classList.remove("is-loading");
+  const favoriteFailed = () => {
+    wrap.classList.remove("is-loading");
+    wrap.classList.add("is-error");
+  };
+
+  if (favorite.mediaType === "video") {
+    media.preload = "metadata";
+    media.muted = true;
+    media.playsInline = true;
+    media.addEventListener("loadedmetadata", favoriteReady, { once: true });
+    const play = document.createElement("span");
+    play.className = "favorite-folder-play";
+    play.innerHTML = ICONS.play;
+    wrap.append(media, play);
+  } else {
+    media.alt = favorite.label;
+    media.loading = "lazy";
+    media.addEventListener("load", favoriteReady, { once: true });
+    wrap.appendChild(media);
+  }
+  media.addEventListener("error", favoriteFailed, { once: true });
+  media.src = favorite.src;
+
+  return wrap;
+}
+
+function createFavoriteContentRow(favorite, order, allItems, day) {
+  const row = document.createElement("article");
+  row.className = `favorite-content-row favorite-content-${favorite.mediaType}`;
+
+  const orderBadge = document.createElement("span");
+  orderBadge.className = "favorite-content-order";
+  orderBadge.textContent = String(order);
+
+  if (favorite.mediaType === "link") {
+    const icon = document.createElement("span");
+    icon.className = "favorite-link-icon";
+    icon.innerHTML = ICONS.folder;
+
+    const copy = document.createElement("a");
+    copy.className = "favorite-content-copy";
+    copy.href = favorite.url || favorite.src.replace(/^link:/, "");
+    copy.target = "_blank";
+    copy.rel = "noopener";
+    copy.innerHTML = `<strong>${favorite.label}</strong><span>Enlace</span>`;
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "favorite-row-remove is-saved";
+    remove.dataset.favoriteSrc = favorite.src;
+    remove.dataset.favoriteDay = String(day);
+    remove.innerHTML = ICONS.bookmarkFilled;
+    remove.setAttribute("aria-label", "Quitar de favoritos");
+    remove.onclick = () => saveFavorite(
+      favorite.src,
+      favorite.label,
+      favorite.mediaType,
+      day,
+      favorite.url
+    );
+
+    row.append(orderBadge, icon, copy, remove);
+    setupNativePressState(row, ".favorite-row-remove");
+    return row;
+  }
+
+  const mediaItems = allItems.filter(item => item.mediaType !== "link");
+  const mediaIndex = mediaItems.findIndex(item => item.src === favorite.src);
+
+  const preview = document.createElement("button");
+  preview.type = "button";
+  preview.className = "favorite-content-thumb";
+  preview.appendChild(favoritePreviewNode(favorite));
+  preview.onclick = () => openMediaPreview(mediaItems, Math.max(mediaIndex, 0), day);
+
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.className = "favorite-content-copy";
+  copy.innerHTML = `<strong>${favorite.label}</strong><span>${favorite.mediaType === "video" ? "Video" : "Imagen"}</span>`;
+  copy.onclick = preview.onclick;
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "favorite-row-remove is-saved";
+  remove.dataset.favoriteSrc = favorite.src;
+  remove.dataset.favoriteDay = String(day);
+  remove.innerHTML = ICONS.bookmarkFilled;
+  remove.setAttribute("aria-label", "Quitar de favoritos");
+  remove.onclick = () => saveFavorite(
+    favorite.src,
+    favorite.label,
+    favorite.mediaType,
+    day,
+    favorite.url
+  );
+
+  row.append(orderBadge, preview, copy, remove);
+  setupNativePressState(row, ".favorite-row-remove");
+  return row;
+}
+
+function renderFavorites() {
+  const list = document.getElementById("favoritesList");
+  const favs = getFavorites();
+  if (!list) return;
+
+  const favoritesView = document.getElementById("view-favoritos");
+  favoritesView?.classList.toggle("favorite-day-open", Boolean(favoriteOpenDay));
+
+  const searchPanel = ensureFavoritesSearchPanel();
+  if (searchPanel) searchPanel.hidden = !favoriteSearchOpen;
+  favoritesView?.classList.toggle("favorites-searching", favoriteSearchOpen);
+
+  renderFavoriteFilterBar(list);
+
+  const searched = favoriteSearchQuery
+    ? favs.filter(favorite => favoriteMatchesSearch(favorite, favoriteSearchQuery))
+    : favs;
+
+  const filtered = savedFilter === "all"
+    ? searched
+    : searched.filter(favorite => favorite.mediaType === savedFilter);
 
   if (!favs.length) {
+    favoriteOpenDay = null;
     list.className = "favorites-list empty-state";
     list.innerHTML = `
-      <div class="saved-empty-icon">${ICONS.bookmark}</div>
-      <strong>Todavía no guardaste contenido</strong>
-      <span>Guardá imágenes, videos o enlaces y aparecerán organizados por día.</span>
+      <div class="saved-empty-icon">${ICONS.heart}</div>
+      <strong>Todavía no tenés favoritos</strong>
+      <span>Guardá imágenes, videos o enlaces y aparecerán en una carpeta por día.</span>
+      <button type="button" class="empty-state-cta">Explorar contenido</button>
     `;
+    list.querySelector(".empty-state-cta")?.addEventListener("click", () => {
+      document.querySelector('[data-view="hoy"]')?.click();
+    });
+    return;
+  }
+
+  if (favoriteOpenDay) {
+    const day = Number(favoriteOpenDay);
+    const rawDayItems = favs.filter(favorite => (Number(favorite.day) || 1) === day);
+
+    if (!rawDayItems.length) {
+      favoriteOpenDay = null;
+      return renderFavorites();
+    }
+
+    const visibleItems = filtered.filter(
+      favorite => (Number(favorite.day) || 1) === day
+    );
+
+    list.innerHTML = "";
+    list.className = "favorites-list favorite-day-screen";
+
+    const header = document.createElement("header");
+    header.className = "favorite-day-header";
+    header.innerHTML = `
+      <button type="button" class="favorite-back-link" aria-label="Volver a Favoritos">
+        ${ICONS.back}<span>Favoritos</span>
+      </button>
+      <div class="favorite-day-title">
+        <h2>Día ${day}</h2>
+        <span>${rawDayItems.length} favorito${rawDayItems.length === 1 ? "" : "s"}</span>
+      </div>
+    `;
+
+    header.querySelector("button").onclick = () => {
+      favoriteOpenDay = null;
+      savedFilter = "all";
+      renderFavorites();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const content = document.createElement("div");
+    content.className = "favorite-day-content";
+
+    if (!visibleItems.length) {
+      const empty = document.createElement("div");
+      empty.className = "favorite-day-filter-empty";
+      const filterNames = {
+        image: "imágenes",
+        video: "videos",
+        link: "enlaces"
+      };
+      const name = filterNames[savedFilter] || "contenido";
+      empty.innerHTML = `
+        <strong>No hay ${name} en este día</strong>
+        <span>Podés volver a ver todos los favoritos del Día ${day}.</span>
+        <button type="button" class="empty-state-cta">Ver todos</button>
+      `;
+      empty.querySelector("button").onclick = () => {
+        savedFilter = "all";
+        renderFavorites();
+      };
+      content.appendChild(empty);
+    } else {
+      visibleItems.forEach(favorite => {
+        const originalOrder = rawDayItems.findIndex(item => item.src === favorite.src) + 1;
+        content.appendChild(
+          createFavoriteContentRow(
+            favorite,
+            Math.max(originalOrder, 1),
+            rawDayItems,
+            day
+          )
+        );
+      });
+    }
+
+    list.append(header, content);
     return;
   }
 
   if (!filtered.length) {
     list.className = "favorites-list empty-state";
-    list.innerHTML = `
-      <div class="saved-empty-icon">${ICONS.bookmark}</div>
-      <strong>No hay contenido en este filtro</strong>
-      <span>Probá con otra categoría.</span>
-    `;
+
+    if (favoriteSearchQuery) {
+      list.innerHTML = `
+        <div class="saved-empty-icon">${ICONS.search}</div>
+        <strong>No encontramos favoritos</strong>
+        <span>Probá con otra palabra, día o tipo de contenido.</span>
+        <button type="button" class="empty-state-cta">Borrar búsqueda</button>
+      `;
+      list.querySelector(".empty-state-cta")?.addEventListener("click", () => {
+        favoriteSearchQuery = "";
+        const input = document.getElementById("favoritesSearchInput");
+        const clear = document.querySelector(".favorites-search-clear");
+        if (input) input.value = "";
+        if (clear) clear.hidden = true;
+        renderFavorites();
+        input?.focus({ preventScroll: true });
+      });
+    } else {
+      list.innerHTML = `
+        <div class="saved-empty-icon">${ICONS.heart}</div>
+        <strong>No hay contenido en este filtro</strong>
+        <span>Probá con otra categoría.</span>
+        <button type="button" class="empty-state-cta">Ver todos</button>
+      `;
+      list.querySelector(".empty-state-cta")?.addEventListener("click", () => {
+        savedFilter = "all";
+        renderFavorites();
+      });
+    }
     return;
   }
 
-  list.className = "favorites-list grouped";
-  list.innerHTML = "";
-
   const grouped = {};
-
-  filtered.forEach(f => {
-    const day = Number(f.day) || 1;
-
-    if (!grouped[day]) {
-      grouped[day] = [];
-    }
-
-    grouped[day].push(f);
+  filtered.forEach(favorite => {
+    const day = Number(favorite.day) || 1;
+    (grouped[day] ||= []).push(favorite);
   });
+
+  list.innerHTML = "";
+  list.className = "favorites-list favorite-folders";
+
+  const label = document.createElement("p");
+  label.className = "favorite-folder-label";
+  label.textContent = favoriteSearchQuery ? "Resultados" : "Tus días guardados";
+  list.appendChild(label);
+
+  const foldersGroup = document.createElement("div");
+  foldersGroup.className = "app-grouped-list favorite-folders-group";
+  list.appendChild(foldersGroup);
 
   Object.keys(grouped)
     .map(Number)
     .sort((a, b) => a - b)
     .forEach(day => {
-      const daySection = document.createElement("section");
-      daySection.className = "saved-day-section";
+      const items = grouped[day];
+      const folder = document.createElement("button");
+      folder.type = "button";
+      folder.className = "favorite-folder-card";
 
-      const dayHeader = document.createElement("div");
-      dayHeader.className = "saved-day-header";
-      dayHeader.innerHTML = `
-        <div>
-          <strong>Día ${day}</strong>
-          <span>${grouped[day].length} guardado${grouped[day].length === 1 ? "" : "s"}</span>
-        </div>
+      const preview = favoritePreviewNode(items[0]);
+      const copy = document.createElement("span");
+      copy.className = "favorite-folder-copy";
+      copy.innerHTML = `
+        <strong>Día ${day}</strong>
+        <small>${items.length} favorito${items.length === 1 ? "" : "s"}</small>
       `;
 
-      const grid = document.createElement("div");
-      grid.className = "saved-day-grid";
+      const arrow = document.createElement("span");
+      arrow.className = "favorite-folder-arrow";
+      arrow.innerHTML = ICONS.arrow;
 
-      grouped[day].forEach(f => {
-        const item = document.createElement("article");
-        item.className =
-          `favorite-item favorite-type-${f.mediaType}`;
+      folder.append(preview, copy, arrow);
+      folder.onclick = () => {
+        favoriteOpenDay = day;
+        favoriteSearchOpen = false;
+        favoriteSearchQuery = "";
+        const panel = document.getElementById("favoritesSearchPanel");
+        if (panel) panel.hidden = true;
+        favoritesView?.classList.remove("favorites-searching");
+        renderFavorites();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
 
-        if (f.mediaType === "link") {
-          const linkCard = document.createElement("a");
-          linkCard.className = "saved-link-card";
-          linkCard.href = f.url || f.src.replace(/^link:/, "");
-          linkCard.target = "_blank";
-          linkCard.rel = "noopener";
-
-          const domain = (() => {
-            try {
-              return new URL(linkCard.href).hostname.replace("www.", "");
-            } catch (e) {
-              return "Enlace";
-            }
-          })();
-
-          linkCard.innerHTML = `
-            <span class="saved-link-type">ENLACE</span>
-            <strong>${f.label}</strong>
-            <small>${domain}</small>
-          `;
-
-          const remove = document.createElement("button");
-          remove.type = "button";
-          remove.className = "favorite-bookmark";
-          remove.setAttribute("aria-label", "Quitar de guardados");
-          remove.innerHTML = ICONS.bookmark;
-          remove.onclick = event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            saveFavorite(
-              f.src,
-              f.label,
-              f.mediaType,
-              day,
-              f.url
-            );
-          };
-
-          item.append(linkCard, remove);
-          grid.appendChild(item);
-          return;
-        }
-
-        const mediaWrap = document.createElement("div");
-        mediaWrap.className = "favorite-media-wrap";
-
-        const media = f.mediaType === "video"
-          ? document.createElement("video")
-          : document.createElement("img");
-
-        media.src = f.src;
-
-        if (f.mediaType === "video") {
-          media.controls = true;
-          media.preload = "metadata";
-        } else {
-          media.alt = f.label;
-          media.loading = "lazy";
-        }
-
-        const savedBadge = document.createElement("button");
-        savedBadge.type = "button";
-        savedBadge.className = "favorite-bookmark";
-        savedBadge.setAttribute("aria-label", "Quitar de guardados");
-        savedBadge.innerHTML = ICONS.bookmark;
-        savedBadge.onclick = () =>
-          saveFavorite(
-            f.src,
-            f.label,
-            f.mediaType,
-            day
-          );
-
-        mediaWrap.append(media, savedBadge);
-        item.appendChild(mediaWrap);
-
-        const pad = document.createElement("div");
-        pad.className = "pad";
-        pad.innerHTML = `
-          <strong>${f.label}</strong>
-          <span>${f.mediaType === "video" ? "Video" : "Imagen"}</span>
-        `;
-
-        item.appendChild(pad);
-        grid.appendChild(item);
-      });
-
-      daySection.append(dayHeader, grid);
-      list.appendChild(daySection);
+      setupNativePressState(folder, ".favorite-folder-arrow");
+      foldersGroup.appendChild(folder);
     });
 }
 
-function setupInterfaceChrome() {
-  const topbar = document.querySelector(".topbar");
-  if (topbar && !document.getElementById("notificationBellBtn")) {
-    const bell = document.createElement("button");
-    bell.id = "notificationBellBtn";
-    bell.className = "topbar-icon-btn";
-    bell.type = "button";
-    bell.setAttribute("aria-label", "Notificaciones");
-    bell.innerHTML = ICONS.bell;
+const NAV_LABELS = {
+  hoy: "Inicio",
+  rutina: "Rutina",
+  favoritos: "Favoritos",
+  bot: "Bot"
+};
 
-    bell.onclick = () => {
-      document.querySelector('[data-view="rutina"]')?.click();
+const NAV_ICONS = {
+  hoy: [ICONS.home, ICONS.homeFilled],
+  rutina: [ICONS.calendar, ICONS.calendarFilled],
+  favoritos: [ICONS.heart, ICONS.heartFilled],
+  bot: [ICONS.bot, ICONS.botFilled]
+};
 
-      setTimeout(() => {
-        const notificationArea =
-          document.querySelector(
-            ".push-settings-card, .notification-card, [data-push-card]"
-          );
-
-        if (notificationArea) {
-          notificationArea.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-        } else {
-          toast("Las notificaciones se administran desde Rutina.");
-        }
-      }, 120);
-    };
-
-    topbar.appendChild(bell);
-  }
-
-  const navIcons = {
-    hoy: ICONS.home,
-    rutina: ICONS.calendar,
-    favoritos: ICONS.bookmark,
-    bot: ICONS.bot
-  };
-
-  const navLabels = {
-    hoy: "Inicio",
-    rutina: "Rutina",
-    favoritos: "Guardado",
-    bot: "Bot"
-  };
-
+function updateNavigationVisuals() {
   document.querySelectorAll(".nav-btn").forEach(btn => {
     const view = btn.dataset.view;
-    const label = navLabels[view] || btn.textContent.trim();
-
+    const active = btn.classList.contains("active");
+    const pair = NAV_ICONS[view] || ["", ""];
     btn.innerHTML = `
-      <span class="nav-icon">${navIcons[view] || ""}</span>
-      <span>${label}</span>
+      <span class="nav-icon">${pair[active ? 1 : 0]}</span>
+      <span>${NAV_LABELS[view] || ""}</span>
     `;
   });
+}
 
-  const favoriteTitle =
-    document.querySelector("#view-favoritos .section-head h2");
+function setupScrollCollapse() {
+  let ticking = false;
 
-  const favoriteDescription =
-    document.querySelector("#view-favoritos .section-head p");
+  const update = () => {
+    ticking = false;
+    document.body.classList.toggle("is-scrolled", window.scrollY > 24);
+  };
 
-  if (favoriteTitle) {
-    favoriteTitle.textContent = "Material guardado";
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    },
+    { passive: true }
+  );
+}
+
+
+function closeActionSheet() {
+  const sheet = document.getElementById("appActionSheet");
+  if (sheet) sheet.remove();
+}
+
+function showActionSheet({
+  title,
+  message = "",
+  actionLabel = "Confirmar",
+  onConfirm
+}) {
+  closeActionSheet();
+
+  const sheet = document.createElement("div");
+  sheet.id = "appActionSheet";
+  sheet.className = "app-action-sheet";
+  sheet.innerHTML = `
+    <div class="app-action-sheet-inner" role="dialog" aria-modal="true" aria-label="${title}">
+      <div class="app-action-sheet-panel">
+        <div class="app-action-sheet-copy">
+          <strong>${title}</strong>
+          ${message ? `<span>${message}</span>` : ""}
+        </div>
+        <button type="button" class="app-action-sheet-action">${actionLabel}</button>
+      </div>
+      <button type="button" class="app-action-sheet-cancel">Cancelar</button>
+    </div>
+  `;
+
+  const action = sheet.querySelector(".app-action-sheet-action");
+  const cancel = sheet.querySelector(".app-action-sheet-cancel");
+
+  action.onclick = () => {
+    closeActionSheet();
+    if (navigator.vibrate) navigator.vibrate(12);
+    onConfirm?.();
+  };
+
+  cancel.onclick = closeActionSheet;
+
+  sheet.addEventListener("click", event => {
+    if (event.target === sheet) closeActionSheet();
+  });
+
+  document.body.appendChild(sheet);
+}
+
+function ensureNetworkBanner() {
+  let banner = document.getElementById("networkBanner");
+  if (banner) return banner;
+
+  banner = document.createElement("div");
+  banner.id = "networkBanner";
+  banner.className = "network-banner";
+  banner.setAttribute("role", "status");
+  banner.innerHTML = `<span class="network-banner-dot" aria-hidden="true"></span><span>Sin conexión · El contenido ya cargado sigue disponible.</span>`;
+  document.body.appendChild(banner);
+  return banner;
+}
+
+let networkWasOffline = !navigator.onLine;
+
+function updateNetworkStatus({ announce = false } = {}) {
+  const offline = !navigator.onLine;
+  const banner = ensureNetworkBanner();
+  document.body.classList.toggle("is-offline", offline);
+  banner.classList.toggle("is-visible", offline);
+
+  const status = document.querySelector(".bot-status");
+  if (status) {
+    status.innerHTML = `<i aria-hidden="true"></i>${offline ? "Sin conexión" : "En línea"}`;
   }
 
-  if (favoriteDescription) {
-    favoriteDescription.textContent =
-      "Tus recursos guardados.";
+  if (announce) {
+    if (offline) {
+      toast("Estás sin conexión", { type: "info", duration: 3000 });
+    } else if (networkWasOffline) {
+      toast("Volviste a estar en línea", { type: "success" });
+    }
   }
 
-  const botDescription =
-    document.querySelector("#view-bot .section-head p");
+  networkWasOffline = offline;
+}
 
-  if (botDescription) {
-    botDescription.textContent =
-      "Consultas y recursos.";
+window.addEventListener("offline", () => updateNetworkStatus({ announce: true }));
+window.addEventListener("online", () => updateNetworkStatus({ announce: true }));
+
+function setupInterfaceChrome() {
+  updateNavigationVisuals();
+  updateNetworkStatus();
+
+  const profile = getRoutineProfile();
+  const name = profile?.name || profile?.firstName || "";
+  const greeting = document.getElementById("homeGreeting");
+  if (greeting) greeting.textContent = name ? `Hola, ${name}` : "Hola";
+
+  const bell = document.getElementById("homeBellBtn");
+  if (bell) {
+    bell.innerHTML = ICONS.bell;
+
+    const state = getRoutineState();
+    const lastSeenDay = Number(localStorage.getItem("notificationLastSeenDay") || "0");
+    bell.classList.toggle("has-badge", state.currentDay > lastSeenDay);
+
+    bell.onclick = () => {
+      const currentState = getRoutineState();
+      localStorage.setItem("notificationLastSeenDay", String(currentState.currentDay));
+      bell.classList.remove("has-badge");
+      document.querySelector('[data-view="rutina"]')?.click();
+      toast("Las notificaciones se administran desde Rutina.");
+    };
   }
+
+  const search = document.getElementById("favoritesSearchBtn");
+  if (search) {
+    search.innerHTML = ICONS.search;
+    search.onclick = openFavoritesSearch;
+  }
+
+  const botSend = document.querySelector(".bot-send");
+  if (botSend) botSend.innerHTML = ICONS.send;
+
+  const botClear = document.getElementById("botClearBtn");
+  if (botClear) {
+    botClear.innerHTML = ICONS.trash;
+    botClear.onclick = () => {
+      showActionSheet({
+        title: "¿Limpiar conversación?",
+        message: "Se eliminarán los mensajes de esta conversación en este dispositivo.",
+        actionLabel: "Limpiar conversación",
+        onConfirm: () => {
+          resetBotConversation();
+          toast("Conversación limpiada", { type: "success" });
+        }
+      });
+    };
+  }
+
+  const activeNav = document.querySelector(".nav-btn.active");
+  if (activeNav) document.body.dataset.activeView = activeNav.dataset.view || "hoy";
+  updateNavigationVisuals();
 }
 
 const answers = {
@@ -2409,42 +3502,201 @@ const answers = {
     "Podríamos centralizar información de producto, preguntas frecuentes, contenido de venta y material para compartir."
 };
 
-function botAsk(q) {
-  const thread =
-    document.getElementById("botThread");
+const BOT_THREAD_KEY = "routineBotThreadV28";
+const BOT_SAVED_KEY = "routineBotSavedResponsesV28";
+const BOT_GREETING = "Hola 👋 ¿Qué necesitás hoy?";
 
-  const user =
-    document.createElement("div");
+function createBotMessage(role, text) {
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    role,
+    text
+  };
+}
 
-  user.className = "bubble user";
-  user.textContent = q;
+function loadBotConversation() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BOT_THREAD_KEY) || "null");
+    if (Array.isArray(saved) && saved.length) return saved;
+  } catch (error) {}
 
-  thread.appendChild(user);
+  return [{ id: "greeting", role: "bot", text: BOT_GREETING }];
+}
 
-  const normalized =
-    q.toLowerCase();
+function saveBotConversation(messages) {
+  localStorage.setItem(BOT_THREAD_KEY, JSON.stringify(messages));
+}
 
+function getSavedBotResponses() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BOT_SAVED_KEY) || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function isBotResponseSaved(message) {
+  return getSavedBotResponses().some(item => item.id === message.id);
+}
+
+function toggleBotResponseSaved(message) {
+  const saved = getSavedBotResponses();
+  const index = saved.findIndex(item => item.id === message.id);
+
+  if (index >= 0) {
+    saved.splice(index, 1);
+    toast("Respuesta quitada de guardados.", { type: "info" });
+  } else {
+    saved.push({ id: message.id, text: message.text, savedAt: Date.now() });
+    toast("Respuesta guardada.", { type: "success" });
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  localStorage.setItem(BOT_SAVED_KEY, JSON.stringify(saved));
+  renderBotConversation({ scroll: true });
+}
+
+async function copyBotResponse(text, button) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+
+    if (button) {
+      const original = button.innerHTML;
+      button.classList.add("is-copied");
+      button.innerHTML = `${ICONS.check}<span>Copiado</span>`;
+      clearTimeout(button._copyResetTimer);
+      button._copyResetTimer = setTimeout(() => {
+        button.classList.remove("is-copied");
+        button.innerHTML = original;
+      }, 1400);
+    } else {
+      toast("Respuesta copiada.", { type: "success" });
+    }
+
+    if (navigator.vibrate) navigator.vibrate(8);
+  } catch (error) {
+    toast("No se pudo copiar la respuesta.", { type: "error" });
+  }
+}
+
+function scrollBotToEnd(behavior = "smooth") {
+  const thread = document.getElementById("botThread");
+  if (!thread) return;
+
+  requestAnimationFrame(() => {
+    thread.scrollTo({ top: thread.scrollHeight, behavior });
+  });
+}
+
+function renderBotConversation({ scroll = false } = {}) {
+  const thread = document.getElementById("botThread");
+  const card = document.querySelector(".bot-card");
+  const quick = document.querySelector(".quick-commands");
+  if (!thread || !card) return;
+
+  const messages = loadBotConversation();
+  const started = messages.some(message => message.role === "user");
+
+  thread.innerHTML = "";
+  messages.forEach(message => {
+    const wrap = document.createElement("div");
+    wrap.className = `bot-message bot-message-${message.role}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = `bubble ${message.role}`;
+    bubble.textContent = message.text;
+    wrap.appendChild(bubble);
+
+    if (message.role === "bot" && message.id !== "greeting") {
+      const actions = document.createElement("div");
+      actions.className = "bot-message-actions";
+
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "bot-message-action";
+      copy.innerHTML = `${ICONS.copy}<span>Copiar</span>`;
+      copy.onclick = () => copyBotResponse(message.text, copy);
+
+      const saved = isBotResponseSaved(message);
+      const save = document.createElement("button");
+      save.type = "button";
+      save.className = `bot-message-action${saved ? " is-saved" : ""}`;
+      save.innerHTML = `${saved ? ICONS.bookmarkFilled : ICONS.bookmark}<span>${saved ? "Guardado" : "Guardar"}</span>`;
+      save.onclick = () => toggleBotResponseSaved(message);
+
+      actions.append(copy, save);
+      wrap.appendChild(actions);
+    }
+
+    thread.appendChild(wrap);
+  });
+
+  card.classList.toggle("has-conversation", started);
+  if (quick) quick.classList.toggle("is-hidden", started);
+
+  if (scroll) scrollBotToEnd("smooth");
+}
+
+function resetBotConversation() {
+  localStorage.removeItem(BOT_THREAD_KEY);
+  renderBotConversation({ scroll: false });
+  document.getElementById("botInput")?.focus({ preventScroll: true });
+}
+
+function resolveBotAnswer(q) {
+  const normalized = q.toLowerCase();
   let response =
     "Todavía no tengo una respuesta preparada para eso. En la versión completa, este buscador podría encontrar el recurso correcto aunque la persona no recuerde el comando exacto.";
 
-  Object.keys(answers).forEach(k => {
-    if (normalized.includes(k)) {
-      response = answers[k];
-    }
+  Object.keys(answers).forEach(key => {
+    if (normalized.includes(key)) response = answers[key];
   });
 
+  return response;
+}
+
+function showBotTyping() {
+  const thread = document.getElementById("botThread");
+  if (!thread || document.getElementById("botTyping")) return;
+
+  const typing = document.createElement("div");
+  typing.id = "botTyping";
+  typing.className = "bot-message bot-message-bot bot-typing-wrap";
+  typing.innerHTML = `<div class="bubble bot bot-typing" aria-label="Escribiendo"><i></i><i></i><i></i></div>`;
+  thread.appendChild(typing);
+  scrollBotToEnd("smooth");
+}
+
+function botAsk(q) {
+  const question = String(q || "").trim();
+  if (!question) return;
+
+  const messages = loadBotConversation();
+  messages.push(createBotMessage("user", question));
+  saveBotConversation(messages);
+  renderBotConversation({ scroll: true });
+  showBotTyping();
+
+  const response = resolveBotAnswer(question);
+
   setTimeout(() => {
-    const bot =
-      document.createElement("div");
-
-    bot.className = "bubble bot";
-    bot.textContent = response;
-
-    thread.appendChild(bot);
-
-    thread.scrollTop =
-      thread.scrollHeight;
-  }, 350);
+    const nextMessages = loadBotConversation();
+    nextMessages.push(createBotMessage("bot", response));
+    saveBotConversation(nextMessages);
+    renderBotConversation({ scroll: true });
+  }, 420);
 }
 
 document
@@ -2452,28 +3704,63 @@ document
   .addEventListener("submit", e => {
     e.preventDefault();
 
-    const input =
-      document.getElementById("botInput");
-
-    const q =
-      input.value.trim();
-
+    const input = document.getElementById("botInput");
+    const q = input.value.trim();
     if (!q) return;
 
     input.value = "";
-
     botAsk(q);
   });
 
 document
   .querySelectorAll("[data-command]")
-  .forEach(b => {
-    b.onclick = () => {
-      botAsk(
-        b.dataset.command
-      );
-    };
+  .forEach(button => {
+    button.onclick = () => botAsk(button.dataset.command);
   });
+
+const botInput = document.getElementById("botInput");
+
+function updateBotKeyboardState() {
+  if (!botInput) return;
+
+  const viewport = window.visualViewport;
+  const focused = document.activeElement === botInput;
+  const viewportHeight = viewport?.height || window.innerHeight;
+  const keyboardOpen = focused && (window.innerHeight - viewportHeight > 140);
+
+  document.body.classList.toggle("keyboard-open", keyboardOpen);
+  document.documentElement.style.setProperty("--bot-visual-height", `${Math.round(viewportHeight)}px`);
+
+  if (keyboardOpen) {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      scrollBotToEnd("auto");
+    });
+  }
+}
+
+botInput?.addEventListener("focus", () => {
+  setTimeout(() => {
+    updateBotKeyboardState();
+    scrollBotToEnd("auto");
+  }, 120);
+});
+
+botInput?.addEventListener("blur", () => {
+  setTimeout(updateBotKeyboardState, 80);
+});
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", () => {
+    updateBotKeyboardState();
+    if (document.activeElement === botInput) {
+      setTimeout(() => scrollBotToEnd("auto"), 40);
+    }
+  });
+  window.visualViewport.addEventListener("scroll", updateBotKeyboardState);
+}
+
+window.addEventListener("resize", updateBotKeyboardState);
 
 let deferredPrompt;
 
@@ -2487,11 +3774,11 @@ window.addEventListener(
 
     deferredPrompt = e;
 
-    installBtn.classList.remove("hidden");
+    installBtn?.classList.remove("hidden");
   }
 );
 
-installBtn.onclick = async () => {
+if (installBtn) installBtn.onclick = async () => {
   if (!deferredPrompt) return;
 
   deferredPrompt.prompt();
@@ -2500,7 +3787,7 @@ installBtn.onclick = async () => {
 
   deferredPrompt = null;
 
-  installBtn.classList.add("hidden");
+  installBtn?.classList.add("hidden");
 };
 
 if ("serviceWorker" in navigator) {
@@ -2526,10 +3813,9 @@ window.addEventListener(
 
       renderSelectedDayHeader();
 
-      chatWrap.classList.add("hidden");
       chat.innerHTML = "";
       revealIndex = 0;
-      updateProgress();
+      renderStructuredDayDetail();
     }
 
     renderDays();
@@ -2537,6 +3823,10 @@ window.addEventListener(
 );
 
 setupInterfaceChrome();
+setupNativeInteractionGuards();
+renderBotConversation();
+setupScrollCollapse();
+setupMediaPreview();
 migrateOldDay1FavoritePaths();
 rescheduleNextUnlockFromProfile();
 advanceRoutineIfEligible();
@@ -2546,6 +3836,8 @@ if (!isPreviewMode) {
 }
 
 renderSelectedDayHeader();
+renderStructuredDayDetail();
+setupContinuousDayOpenTracking();
 renderDays();
 renderFavorites();
 ensureDemoControls();

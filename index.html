@@ -3,70 +3,81 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#b94f31" />
+  <meta name="theme-color" content="#fffaf6" />
+
+  <meta name="apple-mobile-web-app-title" content="Rutina 30 Días" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Rutina 30 Días</title>
 
   <link rel="manifest" href="manifest.webmanifest" />
-
-  <!-- Estilos existentes -->
-  <link rel="stylesheet" href="styles.css?v=18-terracota-app" />
-  <link rel="stylesheet" href="onboarding.css?v=18-terracota-app" />
-
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="styles.css?v=35-2-verified" />
+  <link rel="stylesheet" href="onboarding.css?v=35-2-verified" />
 </head>
 
-<body>
+<body data-active-view="hoy">
   <div id="app">
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">PROTOTIPO</div>
-        <h1>Rutina 30 Días</h1>
-      </div>
-
-      <button id="installBtn" class="ghost hidden">Instalar</button>
-    </header>
-
     <main>
       <section id="view-hoy" class="view active">
+        <header class="app-page-header home-page-header">
+          <div>
+            <span id="homeGreeting" class="page-kicker">Hola</span>
+            <h1 id="homeDayTitle">Día 1</h1>
+          </div>
+          <button id="homeBellBtn" class="icon-button" type="button" aria-label="Notificaciones"></button>
+        </header>
+
         <div class="hero-card">
-          <div class="day-pill">DÍA 1</div>
-          <h2>Tu acción está lista</h2>
-          <p>Abrí el contenido y avanzá a tu ritmo.</p>
+          <div class="hero-card-top">
+            <div class="day-pill">DÍA 1</div>
+            <span class="hero-status">En progreso</span>
+          </div>
+
+          <div class="hero-card-title">
+            <span class="hero-card-icon" aria-hidden="true"></span>
+            <div>
+              <h2>Tu acción de hoy</h2>
+            </div>
+          </div>
+
+          <p>Todo lo que necesitás para avanzar hoy.</p>
 
           <div class="hero-actions">
-            <button id="startDayBtn" class="primary">Ver mi acción</button>
-            <button id="showAllBtn" class="secondary">Abrir todo</button>
+            <button id="startDayBtn" class="primary hero-primary">Comenzar mi día</button>
           </div>
         </div>
 
-        <div id="chatWrap" class="chat-wrap hidden">
+        <div id="chatWrap" class="chat-wrap">
           <div class="chat-header">
             <div>
               <strong>Día 1 · Rutina 30 Días</strong>
               <span id="progressText">0/9 bloques</span>
             </div>
-
             <button id="restartBtn" class="ghost">Reiniciar</button>
           </div>
-
           <div id="chat" class="chat"></div>
         </div>
       </section>
 
       <section id="view-rutina" class="view">
-        <div class="section-head">
-          <h2>Rutina</h2>
-          <p>Tu plan diario</p>
-        </div>
-
-        <!-- app.js renderiza aquí el progreso y las semanas -->
+        <header class="app-page-header">
+          <div>
+            <span class="page-kicker">Tu plan</span>
+            <h1>Rutina</h1>
+          </div>
+        </header>
         <div id="daysGrid" class="days-grid"></div>
       </section>
 
       <section id="view-favoritos" class="view">
-        <div class="section-head">
-          <h2>Material guardado</h2>
-          <p>Tus recursos</p>
-        </div>
+        <header class="app-page-header">
+          <div>
+            <span class="page-kicker">Tus contenidos</span>
+            <h1>Favoritos</h1>
+          </div>
+          <button id="favoritesSearchBtn" class="icon-button" type="button" aria-label="Buscar favoritos"></button>
+        </header>
 
         <div id="favoritesList" class="favorites-list empty-state">
           Todavía no guardaste contenido.
@@ -74,21 +85,16 @@
       </section>
 
       <section id="view-bot" class="view">
-        <div class="section-head">
-          <h2>Bot</h2>
-          <p>Ayuda rápida</p>
-        </div>
+        <header class="app-page-header bot-page-header">
+          <div>
+            <h1>Bot</h1>
+            <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
+          </div>
+          <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
+        </header>
 
         <div class="bot-card">
-          <div id="botThread" class="bot-thread">
-            <div class="bubble bot">
-              Hola 👋 Podés consultarme por
-              <b>comisiones</b>,
-              <b>presentaciones</b>,
-              <b>primeros pasos</b>
-              o <b>productos</b>.
-            </div>
-          </div>
+          <div id="botThread" class="bot-thread" aria-live="polite"></div>
 
           <div class="quick-commands">
             <button data-command="comisiones">Comisiones</button>
@@ -98,39 +104,63 @@
           </div>
 
           <form id="botForm" class="bot-form">
-            <input
-              id="botInput"
-              placeholder="¿Qué necesitás?"
-              autocomplete="off"
-            />
-            <button class="primary" type="submit">Enviar</button>
+            <input id="botInput" placeholder="Escribí tu consulta..." autocomplete="off" />
+            <button class="primary bot-send" type="submit" aria-label="Enviar"></button>
           </form>
         </div>
       </section>
     </main>
 
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" aria-label="Navegación principal">
       <button class="nav-btn active" data-view="hoy">
-        🏠<span>Inicio</span>
+        <span class="nav-icon"></span><span>Inicio</span>
       </button>
-
       <button class="nav-btn" data-view="rutina">
-        📅<span>Rutina</span>
+        <span class="nav-icon"></span><span>Rutina</span>
       </button>
-
       <button class="nav-btn" data-view="favoritos">
-        🗂️<span>Guardado</span>
+        <span class="nav-icon"></span><span>Favoritos</span>
       </button>
-
       <button class="nav-btn" data-view="bot">
-        🤖<span>Bot</span>
+        <span class="nav-icon"></span><span>Bot</span>
       </button>
     </nav>
   </div>
 
+  <div id="mediaPreview" class="media-preview" hidden aria-hidden="true">
+    <div id="mediaPreviewShell" class="media-preview-shell" role="dialog" aria-modal="true" aria-label="Vista previa del material">
+      <div class="media-preview-grabber" aria-hidden="true"></div>
+      <div id="previewSegments" class="preview-segments" aria-hidden="true"></div>
+      <header class="media-preview-header">
+        <button id="previewCloseBtn" class="preview-icon-btn" type="button" aria-label="Cerrar"></button>
+        <strong id="previewCounter">1 de 1</strong>
+        <button id="previewTopSaveBtn" class="preview-icon-btn" type="button" aria-label="Guardar"></button>
+      </header>
+
+      <div id="previewStage" class="media-preview-stage"></div>
+
+      <div class="media-preview-meta">
+        <div>
+          <strong id="previewTitle">Material</strong>
+          <span id="previewType">Imagen</span>
+        </div>
+      </div>
+
+      <div class="media-preview-actions">
+        <button id="previewSaveBtn" type="button"></button>
+        <button id="previewShareBtn" type="button"></button>
+      </div>
+
+      <button id="previewPrevBtn" class="preview-nav preview-prev" type="button" aria-label="Anterior"></button>
+      <button id="previewNextBtn" class="preview-nav preview-next" type="button" aria-label="Siguiente"></button>
+    </div>
+  </div>
+
+  <button id="installBtn" class="hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+
   <script src="backend-client.js"></script>
   <script src="push-client.js"></script>
-  <script src="app.js?v=18-terracota-app"></script>
-  <script src="onboarding.js?v=18-terracota-app"></script>
+  <script src="app.js?v=35-2-verified"></script>
+  <script src="onboarding.js?v=33-native-window-actions"></script>
 </body>
 </html>

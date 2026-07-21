@@ -1,11 +1,24 @@
 {
   "name": "Rutina 30 Días",
-  "short_name": "Rutina30",
+  "short_name": "Rutina 30 Días",
+  "description": "Tu rutina diaria de acciones, materiales y favoritos.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fff8f3",
-  "theme_color": "#b94f31",
-  "icons": [],
+  "background_color": "#fff9f5",
+  "theme_color": "#fffaf6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
   "id": "/",
   "scope": "/"
 }
