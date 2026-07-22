@@ -1,15 +1,15 @@
-const CACHE="rutina30-v35-7-selector-horario";
+const CACHE="rutina30-v35-8-publicacion-fixes";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css?v=35-7-selector-horario",
-  "./app.js?v=35-7-selector-horario",
+  "./styles.css?v=35-8-publicacion-fixes",
+  "./app.js?v=35-8-publicacion-fixes",
   "./backend-client.js",
   "./push-client.js",
   "./onboarding.js?v=33-native-window-actions",
   "./onboarding.css?v=35-2-verified",
-  "./manifest.webmanifest?v=35-7-selector-horario",
+  "./manifest.webmanifest?v=35-8-publicacion-fixes",
 
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
@@ -67,10 +67,23 @@ const CORE=[
 self.addEventListener("install",event=>{
   event.waitUntil(
     caches.open(CACHE)
-      .then(cache=>cache.addAll(CORE))
-  );
+      .then(async cache=>{
+        const results = await Promise.allSettled(
+          CORE.map(url=>cache.add(url))
+        );
 
-  self.skipWaiting();
+        results.forEach((result,index)=>{
+          if(result.status==="rejected"){
+            console.warn(
+              "[service-worker] No se pudo precachear:",
+              CORE[index],
+              result.reason
+            );
+          }
+        });
+      })
+      .then(()=>self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate",event=>{

@@ -1189,20 +1189,21 @@ function ensureDemoControls() {
     return;
   }
 
-  const sectionHead =
-    document.querySelector("#view-rutina .section-head");
+  const pageHeader =
+    document.querySelector("#view-rutina .app-page-header");
 
-  if (!sectionHead) return;
+  if (!pageHeader) return;
 
   const btn = document.createElement("button");
 
   btn.id = "demoAdvanceBtn";
-  btn.className = "secondary";
-  btn.textContent = "Simular próximo día";
-  btn.style.marginTop = "8px";
+  btn.className = "secondary demo-advance-btn";
+  btn.type = "button";
+  btn.textContent = "Simular día";
+  btn.setAttribute("aria-label", "Simular el desbloqueo del próximo día");
   btn.onclick = simulateNextDay;
 
-  sectionHead.appendChild(btn);
+  pageHeader.appendChild(btn);
 }
 
 
@@ -1590,15 +1591,29 @@ async function shareAsset(src, label, mediaType, triggerButton = null) {
     const blob = await res.blob();
     const ext = mediaType === "video" ? "mp4" : "jpg";
 
+    const sourceName = decodeURIComponent(
+      String(src)
+        .split("/")
+        .pop()
+        .split("?")[0]
+    );
+
+    const fileName =
+      sourceName && sourceName.includes(".")
+        ? sourceName
+        : `rutina30-material.${ext}`;
+
     const file = new File(
       [blob],
-      `${label.replaceAll(" ", "_")}.${ext}`,
+      fileName,
       { type: blob.type || (mediaType === "video" ? "video/mp4" : "image/jpeg") }
     );
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: label });
+        // Compartimos únicamente el archivo. No enviamos title ni text,
+        // para que "Historia X de X" no aparezca como leyenda.
+        await navigator.share({ files: [file] });
         toast("Compartir completado", { type: "success" });
         return;
       } catch (error) {
@@ -3662,6 +3677,7 @@ async function activateNotificationsFromSettings() {
   }
 
   await syncPushSubscription(subscription);
+  saveNotificationEnabledLocally(true);
   return true;
 }
 
@@ -3687,16 +3703,149 @@ function saveNotificationTimeLocally(value) {
   return updatedProfile;
 }
 
+function saveNotificationEnabledLocally(enabled) {
+  const profile = getRoutineProfile() || {};
+  const schedule = getScheduleProfile();
+  const updatedProfile = {
+    ...profile,
+    timezone: profile.timezone || schedule.timezone,
+    notificationTime: profile.notificationTime || schedule.notificationTime,
+    reminderEnabled: Boolean(enabled),
+    reminder_enabled: Boolean(enabled)
+  };
+
+  localStorage.setItem(
+    "routineUserProfile",
+    JSON.stringify(updatedProfile)
+  );
+
+  window.dispatchEvent(
+    new CustomEvent("routine-profile-updated", {
+      detail: updatedProfile
+    })
+  );
+
+  return updatedProfile;
+}
+
+async function syncNotificationEnabledWithBackend(
+  profile,
+  enabled,
+  subscription = null
+) {
+  const api = window.BackendAPI;
+  const userId =
+    profile.userId ||
+    profile.id ||
+    getOrCreateNotificationUserId();
+
+  const payload = {
+    ...profile,
+    userId,
+    timezone: profile.timezone || getDeviceTimezone(),
+    notificationTime:
+      profile.notificationTime ||
+      getScheduleProfile().notificationTime,
+    schedule_time:
+      profile.notificationTime ||
+      getScheduleProfile().notificationTime,
+    reminder_enabled: Boolean(enabled),
+    ...(subscription?.endpoint
+      ? { endpoint: subscription.endpoint }
+      : {})
+  };
+
+  const candidates = [
+    [api, "updateNotificationProfile", [payload]],
+    [api, "updateProfile", [payload]],
+    [api, "saveProfile", [payload]],
+    [api, "syncProfile", [payload]],
+    [api, "setNotificationsEnabled", [Boolean(enabled)]],
+    [api, "disableNotifications", [payload]]
+  ];
+
+  for (const [owner, method, args] of candidates) {
+    const fn = owner?.[method];
+    if (typeof fn !== "function") continue;
+
+    try {
+      await fn.apply(owner, args);
+      return true;
+    } catch (error) {
+      console.warn(
+        `[notifications] ${method} no pudo sincronizar el estado.`,
+        error
+      );
+    }
+  }
+
+  // Respaldo para el backend actual: la rutina se actualiza por userId.
+  try {
+    const response = await fetch(
+      `/api/routines/${encodeURIComponent(userId)}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (response.ok) return true;
+  } catch (error) {
+    console.warn(
+      "No se pudo sincronizar el estado de notificaciones con la rutina.",
+      error
+    );
+  }
+
+  return false;
+}
+
+async function deactivateNotificationsFromSettings() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    saveNotificationEnabledLocally(false);
+    return true;
+  }
+
+  const registration = await ensureNotificationRegistration();
+  const subscription = await registration.pushManager.getSubscription();
+  const profile = saveNotificationEnabledLocally(false);
+
+  // Primero avisamos al backend, conservando el endpoint todavía disponible.
+  await syncNotificationEnabledWithBackend(
+    profile,
+    false,
+    subscription
+  ).catch(() => false);
+
+  if (subscription) {
+    const unsubscribed = await subscription.unsubscribe();
+
+    if (!unsubscribed) {
+      throw new Error("No se pudo desactivar la suscripción.");
+    }
+  }
+
+  if ("clearAppBadge" in navigator) {
+    navigator.clearAppBadge().catch(() => {});
+  }
+
+  return true;
+}
+
 async function syncNotificationTimeWithBackend(profile) {
   const api = window.BackendAPI;
   const time = profile.notificationTime;
+  const reminderEnabled = await hasActivePushSubscription();
   const payload = {
     ...profile,
     userId: profile.userId || profile.id || getOrCreateNotificationUserId(),
     timezone: profile.timezone || getDeviceTimezone(),
     notificationTime: time,
     schedule_time: time,
-    reminder_enabled: true
+    reminder_enabled: reminderEnabled
   };
 
   const candidates = [
@@ -3746,14 +3895,18 @@ async function renderNotificationSettings() {
 
   enable.disabled = true;
   enable.classList.remove("is-active");
+  enable.removeAttribute("aria-pressed");
   enable.textContent = "Revisando...";
 
   const active = await hasActivePushSubscription();
 
+  enable.dataset.notificationState = active ? "active" : "inactive";
+  enable.setAttribute("aria-pressed", active ? "true" : "false");
+
   if (active) {
-    enable.textContent = "Activadas";
+    enable.textContent = "Desactivar";
     enable.classList.add("is-active");
-    enable.disabled = true;
+    enable.disabled = false;
     return;
   }
 
@@ -3947,17 +4100,25 @@ function setupNotificationSettings() {
 
   enable?.addEventListener("click", async () => {
     enable.disabled = true;
-    enable.textContent = "Activando...";
+
+    const active = await hasActivePushSubscription();
+    enable.textContent = active ? "Desactivando..." : "Activando...";
 
     try {
+      if (active) {
+        await deactivateNotificationsFromSettings();
+        await renderNotificationSettings();
+        toast("Notificaciones desactivadas", { type: "success" });
+        return;
+      }
+
       await activateNotificationsFromSettings();
       await renderNotificationSettings();
       toast("Notificaciones activadas", { type: "success" });
     } catch (error) {
-      console.warn("No se pudieron activar las notificaciones.", error);
-      enable.disabled = false;
-      enable.textContent = "Activar";
-      toast(error.message || "No se pudieron activar las notificaciones.", {
+      console.warn("No se pudo cambiar el estado de las notificaciones.", error);
+      await renderNotificationSettings();
+      toast(error.message || "No se pudo cambiar el estado de las notificaciones.", {
         type: "error",
         duration: 3600
       });

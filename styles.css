@@ -4431,3 +4431,16 @@ body.notification-settings-open {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   V35.8 · Correcciones funcionales antes de publicación
+   ========================================================= */
+
+.demo-advance-btn {
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 13px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
