@@ -1124,7 +1124,7 @@ main {
 
 .saved-filter-bar {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 18;
   display: grid;
   grid-auto-flow: column;
@@ -1884,7 +1884,7 @@ body.preview-open #app {
 
 .app-page-header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 30;
   align-items: center;
   padding: 4px 3px 15px;
@@ -4431,16 +4431,3 @@ body.notification-settings-open {
     animation: none !important;
   }
 }
-
-/* =========================================================
-   V35.8 · Correcciones funcionales antes de publicación
-   ========================================================= */
-
-.demo-advance-btn {
-  min-height: 38px;
-  padding: 0 12px;
-  border-radius: 13px;
-  font-size: 11.5px;
-  white-space: nowrap;
-}
-
