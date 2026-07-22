@@ -673,7 +673,10 @@
     "routine-profile-updated",
     () => {
       setTimeout(
-        render,
+        async () => {
+          await syncExistingSubscriptionToBackend();
+          await render();
+        },
         100
       );
     }
@@ -708,6 +711,7 @@
     render,
     subscribe,
     unsubscribe,
-    sendTest
+    sendTest,
+    syncExistingSubscriptionToBackend
   };
 })();

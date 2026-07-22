@@ -726,6 +726,14 @@ function applyBackendRoutineState(serverState) {
 
   saveRoutineState(localState);
 
+  // PostgreSQL es la fuente de verdad del progreso.
+  // Limpiamos estados locales viejos antes de aplicar los completados reales.
+  for (let day = 1; day <= TOTAL_PROGRAM_DAYS; day++) {
+    localStorage.removeItem(
+      `day${day}Complete`
+    );
+  }
+
   (
     serverState.completedDays || []
   ).forEach(day => {
@@ -3648,13 +3656,16 @@ async function activateNotificationsFromSettings() {
     throw new Error("No se concedió el permiso de notificaciones.");
   }
 
-  if (await tryExistingPushClient()) return true;
+  if (await tryExistingPushClient()) {
+    saveNotificationEnabledLocally(true);
+    return true;
+  }
 
   const registration = await ensureNotificationRegistration();
   let subscription = await registration.pushManager.getSubscription();
 
   if (!subscription) {
-    const configResponse = await fetch("/api/config", {
+    const configResponse = await fetch("/api/push/public-key", {
       cache: "no-store",
       credentials: "same-origin"
     });
@@ -3664,7 +3675,7 @@ async function activateNotificationsFromSettings() {
     }
 
     const config = await configResponse.json();
-    const publicKey = config.vapidPublicKey || config.publicKey || "";
+    const publicKey = config.publicKey || config.vapidPublicKey || "";
 
     if (!publicKey) {
       throw new Error("Falta la clave pública de notificaciones.");
@@ -3809,24 +3820,51 @@ async function deactivateNotificationsFromSettings() {
     return true;
   }
 
+  // Preferimos el cliente push central porque elimina primero la fila
+  // push_subscriptions del backend y luego desuscribe el dispositivo.
+  if (typeof window.PushClient?.unsubscribe === "function") {
+    await window.PushClient.unsubscribe();
+    saveNotificationEnabledLocally(false);
+
+    if ("clearAppBadge" in navigator) {
+      navigator.clearAppBadge().catch(() => {});
+    }
+
+    return true;
+  }
+
   const registration = await ensureNotificationRegistration();
   const subscription = await registration.pushManager.getSubscription();
-  const profile = saveNotificationEnabledLocally(false);
-
-  // Primero avisamos al backend, conservando el endpoint todavía disponible.
-  await syncNotificationEnabledWithBackend(
-    profile,
-    false,
-    subscription
-  ).catch(() => false);
+  const profile = getRoutineProfile() || {};
+  const userId =
+    profile.userId ||
+    profile.id ||
+    getOrCreateNotificationUserId();
 
   if (subscription) {
+    const response = await fetch("/api/push/unsubscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      credentials: "same-origin",
+      body: JSON.stringify({
+        userId,
+        endpoint: subscription.endpoint
+      })
+    });
+
+    if (!response.ok && response.status !== 404) {
+      throw new Error("No se pudo desactivar la suscripción en el servidor.");
+    }
+
     const unsubscribed = await subscription.unsubscribe();
 
     if (!unsubscribed) {
       throw new Error("No se pudo desactivar la suscripción.");
     }
   }
+
+  saveNotificationEnabledLocally(false);
 
   if ("clearAppBadge" in navigator) {
     navigator.clearAppBadge().catch(() => {});
