@@ -1238,6 +1238,29 @@ function ensureToastHost() {
   return host;
 }
 
+let activeToastElement = null;
+let activeToastTimer = null;
+
+function dismissActiveToast({ immediate = false } = {}) {
+  if (activeToastTimer) {
+    clearTimeout(activeToastTimer);
+    activeToastTimer = null;
+  }
+
+  const current = activeToastElement;
+  activeToastElement = null;
+
+  if (!current) return;
+
+  if (immediate) {
+    current.remove();
+    return;
+  }
+
+  current.classList.add("is-leaving");
+  setTimeout(() => current.remove(), 170);
+}
+
 function toast(text, {
   type = "info",
   actionLabel = "",
@@ -1245,6 +1268,10 @@ function toast(text, {
   duration = 2400
 } = {}) {
   const host = ensureToastHost();
+
+  // Siempre hay un solo aviso visible. El nuevo reemplaza al anterior.
+  dismissActiveToast({ immediate: true });
+
   const el = document.createElement("div");
   el.className = `toast toast-${type}`;
 
@@ -1255,11 +1282,9 @@ function toast(text, {
   `;
   el.querySelector(".toast-text").textContent = text;
 
-  let timer = null;
   const dismiss = () => {
-    if (timer) clearTimeout(timer);
-    el.classList.add("is-leaving");
-    setTimeout(() => el.remove(), 170);
+    if (activeToastElement !== el) return;
+    dismissActiveToast();
   };
 
   if (actionLabel && typeof onAction === "function") {
@@ -1268,15 +1293,17 @@ function toast(text, {
     action.className = "toast-action";
     action.textContent = actionLabel;
     action.onclick = () => {
-      dismiss();
+      if (activeToastElement !== el) return;
+      dismissActiveToast({ immediate: true });
       onAction();
     };
     el.appendChild(action);
   }
 
-  host.appendChild(el);
+  host.replaceChildren(el);
+  activeToastElement = el;
   requestAnimationFrame(() => el.classList.add("is-visible"));
-  timer = setTimeout(dismiss, duration);
+  activeToastTimer = setTimeout(dismiss, duration);
   return el;
 }
 
@@ -2978,6 +3005,18 @@ function closeFavoritesSearch() {
   renderFavorites();
 }
 
+function preferredFavoriteFolderPreview(items) {
+  const list = Array.isArray(items) ? items : [];
+
+  return (
+    list.find(item => item.mediaType === "image") ||
+    list.find(item => item.mediaType === "video") ||
+    list.find(item => item.mediaType === "link") ||
+    list[0] ||
+    null
+  );
+}
+
 function favoritePreviewNode(favorite) {
   const wrap = document.createElement("div");
   wrap.className = `favorite-folder-preview favorite-preview-${favorite.mediaType}`;
@@ -3270,7 +3309,11 @@ function renderFavorites() {
       folder.type = "button";
       folder.className = "favorite-folder-card";
 
-      const preview = favoritePreviewNode(items[0]);
+      const allDayItems = favs.filter(
+        favorite => (Number(favorite.day) || 1) === day
+      );
+      const previewFavorite = preferredFavoriteFolderPreview(allDayItems);
+      const preview = favoritePreviewNode(previewFavorite || items[0]);
       const copy = document.createElement("span");
       copy.className = "favorite-folder-copy";
       copy.innerHTML = `
@@ -3432,6 +3475,391 @@ function updateNetworkStatus({ announce = false } = {}) {
 window.addEventListener("offline", () => updateNetworkStatus({ announce: true }));
 window.addEventListener("online", () => updateNetworkStatus({ announce: true }));
 
+function getOrCreateNotificationUserId() {
+  const profile = getRoutineProfile() || {};
+  const fromApi =
+    typeof window.BackendAPI?.getUserId === "function"
+      ? window.BackendAPI.getUserId()
+      : null;
+
+  const known =
+    fromApi ||
+    profile.userId ||
+    profile.id ||
+    localStorage.getItem("routineUserId") ||
+    localStorage.getItem("routineUserUUID") ||
+    localStorage.getItem("mrc_uid") ||
+    localStorage.getItem("userId");
+
+  if (known) return String(known);
+
+  const generated =
+    `routine_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
+  localStorage.setItem("routineUserId", generated);
+  return generated;
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const output = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; i++) {
+    output[i] = rawData.charCodeAt(i);
+  }
+
+  return output;
+}
+
+async function ensureNotificationRegistration() {
+  if (!("serviceWorker" in navigator)) {
+    throw new Error("Este dispositivo no permite notificaciones web.");
+  }
+
+  let registration = await navigator.serviceWorker.getRegistration();
+
+  if (!registration) {
+    registration = await navigator.serviceWorker.register("service-worker.js");
+  }
+
+  return navigator.serviceWorker.ready;
+}
+
+async function hasActivePushSubscription() {
+  if (
+    !("Notification" in window) ||
+    Notification.permission !== "granted" ||
+    !("serviceWorker" in navigator) ||
+    !("PushManager" in window)
+  ) {
+    return false;
+  }
+
+  try {
+    const registration = await ensureNotificationRegistration();
+    return Boolean(await registration.pushManager.getSubscription());
+  } catch (error) {
+    return false;
+  }
+}
+
+async function syncPushSubscription(subscription) {
+  const json = subscription.toJSON();
+  const profile = getRoutineProfile() || {};
+  const schedule = getScheduleProfile();
+  const userId = getOrCreateNotificationUserId();
+
+  const flatPayload = {
+    userId,
+    endpoint: json.endpoint,
+    expirationTime: json.expirationTime || null,
+    keys: json.keys,
+    subscription: json,
+    userAgent: navigator.userAgent,
+    name: profile.name || profile.firstName || "",
+    timezone: schedule.timezone,
+    notificationTime: schedule.notificationTime,
+    schedule_time: schedule.notificationTime,
+    reminder_enabled: true
+  };
+
+  let lastError = null;
+
+  for (const endpoint of ["/api/push/subscribe", "/api/subscribe"]) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        credentials: "same-origin",
+        body: JSON.stringify(flatPayload)
+      });
+
+      if (response.ok) return true;
+      lastError = new Error(`${endpoint} respondió ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("No se pudo guardar la suscripción.");
+}
+
+async function tryExistingPushClient() {
+  const candidates = [
+    [window.PushClient, "subscribe"],
+    [window.PushClient, "enable"],
+    [window.PushNotifications, "subscribe"],
+    [window.PushNotifications, "enable"],
+    [window, "subscribeToPush"],
+    [window, "enablePushNotifications"]
+  ];
+
+  for (const [owner, method] of candidates) {
+    const fn = owner?.[method];
+    if (typeof fn !== "function") continue;
+
+    try {
+      await fn.call(owner);
+      if (await hasActivePushSubscription()) return true;
+    } catch (error) {
+      console.warn(`[push] ${method} no pudo completar la activación.`, error);
+    }
+  }
+
+  return false;
+}
+
+async function activateNotificationsFromSettings() {
+  if (!("Notification" in window) || !("PushManager" in window)) {
+    throw new Error("Este navegador no soporta notificaciones.");
+  }
+
+  if (Notification.permission === "denied") {
+    throw new Error("Las notificaciones están bloqueadas en los ajustes del dispositivo.");
+  }
+
+  let permission = Notification.permission;
+
+  if (permission !== "granted") {
+    permission = await Notification.requestPermission();
+  }
+
+  if (permission !== "granted") {
+    throw new Error("No se concedió el permiso de notificaciones.");
+  }
+
+  if (await tryExistingPushClient()) return true;
+
+  const registration = await ensureNotificationRegistration();
+  let subscription = await registration.pushManager.getSubscription();
+
+  if (!subscription) {
+    const configResponse = await fetch("/api/config", {
+      cache: "no-store",
+      credentials: "same-origin"
+    });
+
+    if (!configResponse.ok) {
+      throw new Error("No se pudo obtener la configuración de notificaciones.");
+    }
+
+    const config = await configResponse.json();
+    const publicKey = config.vapidPublicKey || config.publicKey || "";
+
+    if (!publicKey) {
+      throw new Error("Falta la clave pública de notificaciones.");
+    }
+
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+  }
+
+  await syncPushSubscription(subscription);
+  return true;
+}
+
+function saveNotificationTimeLocally(value) {
+  const profile = getRoutineProfile() || {};
+  const updatedProfile = {
+    ...profile,
+    timezone: profile.timezone || getDeviceTimezone(),
+    notificationTime: value
+  };
+
+  localStorage.setItem(
+    "routineUserProfile",
+    JSON.stringify(updatedProfile)
+  );
+
+  window.dispatchEvent(
+    new CustomEvent("routine-profile-updated", {
+      detail: updatedProfile
+    })
+  );
+
+  return updatedProfile;
+}
+
+async function syncNotificationTimeWithBackend(profile) {
+  const api = window.BackendAPI;
+  const time = profile.notificationTime;
+  const payload = {
+    ...profile,
+    userId: profile.userId || profile.id || getOrCreateNotificationUserId(),
+    timezone: profile.timezone || getDeviceTimezone(),
+    notificationTime: time,
+    schedule_time: time,
+    reminder_enabled: true
+  };
+
+  const candidates = [
+    [api, "updateNotificationProfile", [payload]],
+    [api, "updateProfile", [payload]],
+    [api, "saveProfile", [payload]],
+    [api, "syncProfile", [payload]],
+    [api, "updateSchedule", [payload]],
+    [api, "setNotificationTime", [time]]
+  ];
+
+  for (const [owner, method, args] of candidates) {
+    const fn = owner?.[method];
+    if (typeof fn !== "function") continue;
+
+    try {
+      await fn.apply(owner, args);
+      return true;
+    } catch (error) {
+      console.warn(`[profile] ${method} no pudo sincronizar el horario.`, error);
+    }
+  }
+
+  // Si ya hay una suscripción, la reenviamos con el horario actualizado.
+  try {
+    const registration = await ensureNotificationRegistration();
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      await syncPushSubscription(subscription);
+      return true;
+    }
+  } catch (error) {
+    console.warn("No se pudo resincronizar la suscripción push.", error);
+  }
+
+  return false;
+}
+
+async function renderNotificationSettings() {
+  const enable = document.getElementById("notificationEnableBtn");
+  const timeValue = document.getElementById("notificationTimeValue");
+  const timeInput = document.getElementById("notificationTimeInput");
+  const schedule = getScheduleProfile();
+
+  if (timeValue) timeValue.textContent = schedule.notificationTime;
+  if (timeInput) timeInput.value = schedule.notificationTime;
+
+  if (!enable) return;
+
+  enable.disabled = true;
+  enable.classList.remove("is-active");
+  enable.textContent = "Revisando...";
+
+  const active = await hasActivePushSubscription();
+
+  if (active) {
+    enable.textContent = "Activadas";
+    enable.classList.add("is-active");
+    enable.disabled = true;
+    return;
+  }
+
+  enable.textContent = "Activar";
+  enable.disabled = false;
+}
+
+function openNotificationSettings() {
+  const modal = document.getElementById("notificationSettings");
+  if (!modal) return;
+
+  const currentState = getRoutineState();
+  localStorage.setItem(
+    "notificationLastSeenDay",
+    String(currentState.currentDay)
+  );
+  document.getElementById("homeBellBtn")?.classList.remove("has-badge");
+
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("notification-settings-open");
+  document.getElementById("notificationTimeEditor")?.setAttribute("hidden", "");
+  renderNotificationSettings();
+}
+
+function closeNotificationSettings() {
+  const modal = document.getElementById("notificationSettings");
+  if (!modal || modal.hidden) return;
+
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("notification-settings-open");
+  document.getElementById("notificationTimeEditor")?.setAttribute("hidden", "");
+}
+
+function setupNotificationSettings() {
+  const modal = document.getElementById("notificationSettings");
+  if (!modal) return;
+
+  const close = document.getElementById("notificationSettingsClose");
+  const backdrop = document.getElementById("notificationSettingsBackdrop");
+  const enable = document.getElementById("notificationEnableBtn");
+  const change = document.getElementById("notificationChangeTimeBtn");
+  const editor = document.getElementById("notificationTimeEditor");
+  const input = document.getElementById("notificationTimeInput");
+  const cancel = document.getElementById("notificationTimeCancelBtn");
+  const save = document.getElementById("notificationTimeSaveBtn");
+
+  if (close) close.innerHTML = ICONS.close;
+  close?.addEventListener("click", closeNotificationSettings);
+  backdrop?.addEventListener("click", closeNotificationSettings);
+
+  enable?.addEventListener("click", async () => {
+    enable.disabled = true;
+    enable.textContent = "Activando...";
+
+    try {
+      await activateNotificationsFromSettings();
+      await renderNotificationSettings();
+      toast("Notificaciones activadas", { type: "success" });
+    } catch (error) {
+      console.warn("No se pudieron activar las notificaciones.", error);
+      enable.disabled = false;
+      enable.textContent = "Activar";
+      toast(error.message || "No se pudieron activar las notificaciones.", {
+        type: "error",
+        duration: 3600
+      });
+    }
+  });
+
+  change?.addEventListener("click", () => {
+    const schedule = getScheduleProfile();
+    if (input) input.value = schedule.notificationTime;
+    editor?.removeAttribute("hidden");
+    input?.focus({ preventScroll: true });
+  });
+
+  cancel?.addEventListener("click", () => {
+    editor?.setAttribute("hidden", "");
+  });
+
+  save?.addEventListener("click", async () => {
+    const value = input?.value || "";
+
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+      toast("Elegí un horario válido", { type: "error" });
+      return;
+    }
+
+    const profile = saveNotificationTimeLocally(value);
+    editor?.setAttribute("hidden", "");
+    await renderNotificationSettings();
+    syncNotificationTimeWithBackend(profile).catch(() => {});
+    toast("Horario actualizado", { type: "success" });
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !modal.hidden) {
+      closeNotificationSettings();
+    }
+  });
+}
+
 function setupInterfaceChrome() {
   updateNavigationVisuals();
   updateNetworkStatus();
@@ -3449,13 +3877,7 @@ function setupInterfaceChrome() {
     const lastSeenDay = Number(localStorage.getItem("notificationLastSeenDay") || "0");
     bell.classList.toggle("has-badge", state.currentDay > lastSeenDay);
 
-    bell.onclick = () => {
-      const currentState = getRoutineState();
-      localStorage.setItem("notificationLastSeenDay", String(currentState.currentDay));
-      bell.classList.remove("has-badge");
-      document.querySelector('[data-view="rutina"]')?.click();
-      toast("Las notificaciones se administran desde Rutina.");
-    };
+    bell.onclick = openNotificationSettings;
   }
 
   const search = document.getElementById("favoritesSearchBtn");
@@ -3819,9 +4241,43 @@ window.addEventListener(
     }
 
     renderDays();
+
+    const notificationPanel = document.getElementById("notificationSettings");
+    if (notificationPanel && !notificationPanel.hidden) {
+      renderNotificationSettings();
+    }
   }
 );
 
+
+// =========================================================
+// V35.5 · Bloqueo de zoom accidental en la PWA
+// =========================================================
+function setupZoomGuards() {
+  const preventGesture = event => {
+    event.preventDefault();
+  };
+
+  // Safari/iOS expone estos eventos para los gestos de pellizco.
+  ["gesturestart", "gesturechange", "gestureend"].forEach(type => {
+    document.addEventListener(type, preventGesture, { passive: false });
+  });
+
+  // Respaldo para navegadores móviles que representan el pellizco
+  // como un movimiento con dos o más contactos.
+  document.addEventListener(
+    "touchmove",
+    event => {
+      if (event.touches && event.touches.length > 1) {
+        event.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+}
+
+setupZoomGuards();
+setupNotificationSettings();
 setupInterfaceChrome();
 setupNativeInteractionGuards();
 renderBotConversation();

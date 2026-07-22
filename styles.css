@@ -4069,3 +4069,260 @@ body.is-offline .bot-status i {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   V35.5 · NO ZOOM EN PWA
+   Mantiene el scroll y los gestos de navegación, pero evita
+   el zoom por pellizco y el zoom automático de formularios.
+   ========================================================= */
+
+html,
+body {
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* iOS amplía la pantalla al enfocar controles con texto menor a 16px. */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
+
+/* =========================================================
+   V35.6 · Favoritos y configuración de notificaciones
+   ========================================================= */
+
+/* El host conserva un único aviso; nunca se apilan favoritos. */
+.toast-host {
+  display: block;
+}
+
+.toast-host .toast {
+  width: max-content;
+  max-width: min(396px, calc(100vw - 28px));
+}
+
+body.notification-settings-open {
+  overflow: hidden;
+}
+
+.notification-settings {
+  position: fixed;
+  inset: 0;
+  z-index: 380;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 12px 12px calc(12px + var(--safe-bottom));
+  background: rgba(40, 28, 23, 0.28);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.notification-settings[hidden] {
+  display: none !important;
+}
+
+.notification-settings-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.notification-settings-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(406px, 100%);
+  padding: 8px 14px 16px;
+  border: 1px solid rgba(83, 57, 46, 0.08);
+  border-radius: 26px;
+  background: rgba(255, 252, 250, 0.98);
+  box-shadow: 0 24px 70px rgba(48, 31, 24, 0.22);
+  animation: notification-sheet-in 0.27s cubic-bezier(.32, .72, 0, 1) both;
+  corner-shape: squircle;
+}
+
+.notification-settings-grabber {
+  width: 38px;
+  height: 5px;
+  margin: 1px auto 8px;
+  border-radius: 999px;
+  background: #d8cbc4;
+}
+
+.notification-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 2px 13px;
+}
+
+.notification-settings-header h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 21px;
+  font-weight: 820;
+  letter-spacing: -0.035em;
+}
+
+.notification-settings-close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f0e7e2;
+  color: #675850;
+}
+
+.notification-settings-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.notification-settings-list {
+  overflow: hidden;
+  border: 1px solid rgba(89, 62, 51, 0.08);
+  border-radius: 19px;
+  background: #fff;
+  corner-shape: squircle;
+}
+
+.notification-settings-row {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+}
+
+.notification-settings-row + .notification-settings-row {
+  border-top: 1px solid var(--app-line);
+}
+
+.notification-settings-row strong {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.notification-enable-btn {
+  min-width: 82px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--app-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.notification-enable-btn.is-active {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+}
+
+.notification-enable-btn:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.notification-time-value {
+  color: var(--app-accent-dark);
+  font-size: 17px;
+  font-weight: 820;
+  font-variant-numeric: tabular-nums;
+}
+
+.notification-change-time-btn {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  font-size: 13px;
+  font-weight: 780;
+}
+
+.notification-time-editor {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--app-line);
+  border-radius: 17px;
+  background: #fff;
+}
+
+.notification-time-editor input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  outline: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-size: 18px;
+  font-weight: 780;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.notification-time-editor input:focus {
+  border-color: rgba(214, 101, 63, 0.55);
+  box-shadow: 0 0 0 3px rgba(214, 101, 63, 0.12);
+}
+
+.notification-time-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.notification-time-actions button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 13px;
+  background: #f0e7e2;
+  color: #685950;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#notificationTimeSaveBtn {
+  background: var(--app-accent);
+  color: #fff;
+}
+
+@keyframes notification-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-settings-sheet {
+    animation: none !important;
+  }
+}

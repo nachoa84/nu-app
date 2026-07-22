@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#fffaf6" />
 
   <meta name="apple-mobile-web-app-title" content="Rutina 30 Días" />
@@ -10,9 +10,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Rutina 30 Días</title>
 
-  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="manifest" href="manifest.webmanifest?v=35-6-favoritos-notificaciones" />
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="styles.css?v=35-2-verified" />
+  <link rel="stylesheet" href="styles.css?v=35-6-favoritos-notificaciones" />
   <link rel="stylesheet" href="onboarding.css?v=35-2-verified" />
 </head>
 
@@ -156,11 +156,46 @@
     </div>
   </div>
 
+  <div id="notificationSettings" class="notification-settings" hidden aria-hidden="true">
+    <button id="notificationSettingsBackdrop" class="notification-settings-backdrop" type="button" aria-label="Cerrar notificaciones"></button>
+
+    <section class="notification-settings-sheet" role="dialog" aria-modal="true" aria-labelledby="notificationSettingsTitle">
+      <div class="notification-settings-grabber" aria-hidden="true"></div>
+
+      <header class="notification-settings-header">
+        <h2 id="notificationSettingsTitle">Notificaciones</h2>
+        <button id="notificationSettingsClose" class="notification-settings-close" type="button" aria-label="Cerrar"></button>
+      </header>
+
+      <div class="notification-settings-list">
+        <div class="notification-settings-row">
+          <strong>Notificaciones</strong>
+          <button id="notificationEnableBtn" class="notification-enable-btn" type="button">Activar</button>
+        </div>
+
+        <div class="notification-settings-row">
+          <strong>Horario elegido</strong>
+          <span id="notificationTimeValue" class="notification-time-value">09:00</span>
+        </div>
+      </div>
+
+      <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button">Cambiar horario</button>
+
+      <div id="notificationTimeEditor" class="notification-time-editor" hidden>
+        <input id="notificationTimeInput" type="time" step="900" aria-label="Nuevo horario" />
+        <div class="notification-time-actions">
+          <button id="notificationTimeCancelBtn" type="button">Cancelar</button>
+          <button id="notificationTimeSaveBtn" type="button">Guardar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <button id="installBtn" class="hidden" type="button" tabindex="-1" aria-hidden="true"></button>
 
   <script src="backend-client.js"></script>
   <script src="push-client.js"></script>
-  <script src="app.js?v=35-2-verified"></script>
+  <script src="app.js?v=35-6-favoritos-notificaciones"></script>
   <script src="onboarding.js?v=33-native-window-actions"></script>
 </body>
 </html>

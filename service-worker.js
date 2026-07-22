@@ -1,15 +1,15 @@
-const CACHE = "rutina30-v35-4-maskable";
+const CACHE="rutina30-v35-6-favoritos-notificaciones";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css?v=35-2-verified",
-  "./app.js?v=35-2-verified",
+  "./styles.css?v=35-6-favoritos-notificaciones",
+  "./app.js?v=35-6-favoritos-notificaciones",
   "./backend-client.js",
   "./push-client.js",
   "./onboarding.js?v=33-native-window-actions",
   "./onboarding.css?v=35-2-verified",
-  "./manifest.webmanifest",
+  "./manifest.webmanifest?v=35-6-favoritos-notificaciones",
 
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
