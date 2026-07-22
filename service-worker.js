@@ -1,15 +1,15 @@
-const CACHE="rutina30-v35-6-favoritos-notificaciones";
+const CACHE="rutina30-v35-7-selector-horario";
 
 const CORE=[
   "./",
   "./index.html",
-  "./styles.css?v=35-6-favoritos-notificaciones",
-  "./app.js?v=35-6-favoritos-notificaciones",
+  "./styles.css?v=35-7-selector-horario",
+  "./app.js?v=35-7-selector-horario",
   "./backend-client.js",
   "./push-client.js",
   "./onboarding.js?v=33-native-window-actions",
   "./onboarding.css?v=35-2-verified",
-  "./manifest.webmanifest?v=35-6-favoritos-notificaciones",
+  "./manifest.webmanifest?v=35-7-selector-horario",
 
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",

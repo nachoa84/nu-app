@@ -3738,11 +3738,9 @@ async function syncNotificationTimeWithBackend(profile) {
 async function renderNotificationSettings() {
   const enable = document.getElementById("notificationEnableBtn");
   const timeValue = document.getElementById("notificationTimeValue");
-  const timeInput = document.getElementById("notificationTimeInput");
   const schedule = getScheduleProfile();
 
   if (timeValue) timeValue.textContent = schedule.notificationTime;
-  if (timeInput) timeInput.value = schedule.notificationTime;
 
   if (!enable) return;
 
@@ -3761,6 +3759,144 @@ async function renderNotificationSettings() {
 
   enable.textContent = "Activar";
   enable.disabled = false;
+}
+
+
+const NOTIFICATION_HOURS = Array.from(
+  { length: 24 },
+  (_, index) => String(index).padStart(2, "0")
+);
+const NOTIFICATION_MINUTES = ["00", "15", "30", "45"];
+const NOTIFICATION_WHEEL_ITEM_HEIGHT = 44;
+let notificationPickerHour = "09";
+let notificationPickerMinute = "00";
+let notificationWheelScrollTimer = null;
+
+function notificationWheelValues(wheel) {
+  return wheel?.id === "notificationHourWheel"
+    ? NOTIFICATION_HOURS
+    : NOTIFICATION_MINUTES;
+}
+
+function selectedNotificationWheelIndex(wheel) {
+  const values = notificationWheelValues(wheel);
+  if (!wheel || !values.length) return 0;
+
+  return Math.max(
+    0,
+    Math.min(
+      values.length - 1,
+      Math.round(wheel.scrollTop / NOTIFICATION_WHEEL_ITEM_HEIGHT)
+    )
+  );
+}
+
+function updateNotificationWheelSelection(wheel, announce = false) {
+  if (!wheel) return;
+
+  const values = notificationWheelValues(wheel);
+  const index = selectedNotificationWheelIndex(wheel);
+  const value = values[index];
+
+  wheel.querySelectorAll(".notification-time-option").forEach((option, optionIndex) => {
+    const selected = optionIndex === index;
+    option.classList.toggle("is-selected", selected);
+    option.setAttribute("aria-selected", selected ? "true" : "false");
+  });
+
+  if (wheel.id === "notificationHourWheel") {
+    notificationPickerHour = value;
+  } else {
+    notificationPickerMinute = value;
+  }
+
+  if (announce) {
+    wheel.setAttribute("aria-valuetext", value);
+  }
+}
+
+function scrollNotificationWheelToIndex(wheel, index, smooth = false) {
+  if (!wheel) return;
+
+  const values = notificationWheelValues(wheel);
+  const safeIndex = Math.max(0, Math.min(values.length - 1, index));
+  wheel.scrollTo({
+    top: safeIndex * NOTIFICATION_WHEEL_ITEM_HEIGHT,
+    behavior: smooth ? "smooth" : "auto"
+  });
+
+  window.setTimeout(() => updateNotificationWheelSelection(wheel, true), smooth ? 180 : 0);
+}
+
+function buildNotificationTimeWheel(wheel, values) {
+  if (!wheel || wheel.dataset.ready === "true") return;
+
+  wheel.innerHTML = values
+    .map(
+      (value, index) =>
+        `<button class="notification-time-option" type="button" role="option" aria-selected="false" data-index="${index}" data-value="${value}">${value}</button>`
+    )
+    .join("");
+
+  wheel.dataset.ready = "true";
+
+  wheel.addEventListener("scroll", () => {
+    clearTimeout(notificationWheelScrollTimer);
+    notificationWheelScrollTimer = window.setTimeout(() => {
+      updateNotificationWheelSelection(wheel, true);
+    }, 80);
+  }, { passive: true });
+
+  wheel.addEventListener("click", event => {
+    const option = event.target.closest(".notification-time-option");
+    if (!option) return;
+    scrollNotificationWheelToIndex(wheel, Number(option.dataset.index), true);
+  });
+
+  wheel.addEventListener("keydown", event => {
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+
+    const current = selectedNotificationWheelIndex(wheel);
+    let next = current;
+    if (event.key === "ArrowUp") next = current - 1;
+    if (event.key === "ArrowDown") next = current + 1;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = values.length - 1;
+    scrollNotificationWheelToIndex(wheel, next, true);
+  });
+}
+
+function setupNotificationTimePicker() {
+  const hourWheel = document.getElementById("notificationHourWheel");
+  const minuteWheel = document.getElementById("notificationMinuteWheel");
+
+  buildNotificationTimeWheel(hourWheel, NOTIFICATION_HOURS);
+  buildNotificationTimeWheel(minuteWheel, NOTIFICATION_MINUTES);
+}
+
+function setNotificationPickerValue(value) {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value || "");
+  const hour = match?.[1] || "09";
+  const rawMinute = Number(match?.[2] || "00");
+  const minute = NOTIFICATION_MINUTES.reduce((nearest, candidate) =>
+    Math.abs(Number(candidate) - rawMinute) < Math.abs(Number(nearest) - rawMinute)
+      ? candidate
+      : nearest
+  , "00");
+
+  notificationPickerHour = hour;
+  notificationPickerMinute = minute;
+
+  const hourWheel = document.getElementById("notificationHourWheel");
+  const minuteWheel = document.getElementById("notificationMinuteWheel");
+
+  scrollNotificationWheelToIndex(hourWheel, NOTIFICATION_HOURS.indexOf(hour));
+  scrollNotificationWheelToIndex(minuteWheel, NOTIFICATION_MINUTES.indexOf(minute));
+}
+
+function getNotificationPickerValue() {
+  return `${notificationPickerHour}:${notificationPickerMinute}`;
 }
 
 function openNotificationSettings() {
@@ -3800,9 +3936,10 @@ function setupNotificationSettings() {
   const enable = document.getElementById("notificationEnableBtn");
   const change = document.getElementById("notificationChangeTimeBtn");
   const editor = document.getElementById("notificationTimeEditor");
-  const input = document.getElementById("notificationTimeInput");
   const cancel = document.getElementById("notificationTimeCancelBtn");
   const save = document.getElementById("notificationTimeSaveBtn");
+
+  setupNotificationTimePicker();
 
   if (close) close.innerHTML = ICONS.close;
   close?.addEventListener("click", closeNotificationSettings);
@@ -3829,9 +3966,11 @@ function setupNotificationSettings() {
 
   change?.addEventListener("click", () => {
     const schedule = getScheduleProfile();
-    if (input) input.value = schedule.notificationTime;
     editor?.removeAttribute("hidden");
-    input?.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      setNotificationPickerValue(schedule.notificationTime);
+      document.getElementById("notificationHourWheel")?.focus({ preventScroll: true });
+    });
   });
 
   cancel?.addEventListener("click", () => {
@@ -3839,12 +3978,7 @@ function setupNotificationSettings() {
   });
 
   save?.addEventListener("click", async () => {
-    const value = input?.value || "";
-
-    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
-      toast("Elegí un horario válido", { type: "error" });
-      return;
-    }
+    const value = getNotificationPickerValue();
 
     const profile = saveNotificationTimeLocally(value);
     editor?.setAttribute("hidden", "");

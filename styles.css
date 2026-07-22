@@ -4142,6 +4142,9 @@ body.notification-settings-open {
   position: relative;
   z-index: 1;
   width: min(406px, 100%);
+  max-height: calc(100dvh - 24px - var(--safe-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 8px 14px 16px;
   border: 1px solid rgba(83, 57, 46, 0.08);
   border-radius: 26px;
@@ -4149,6 +4152,12 @@ body.notification-settings-open {
   box-shadow: 0 24px 70px rgba(48, 31, 24, 0.22);
   animation: notification-sheet-in 0.27s cubic-bezier(.32, .72, 0, 1) both;
   corner-shape: squircle;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+.notification-settings-sheet::-webkit-scrollbar {
+  display: none;
 }
 
 .notification-settings-grabber {
@@ -4268,24 +4277,120 @@ body.notification-settings-open {
   background: #fff;
 }
 
-.notification-time-editor input {
-  width: 100%;
-  min-height: 50px;
-  padding: 0 14px;
-  border: 1px solid var(--app-line);
-  border-radius: 14px;
-  outline: 0;
+.notification-time-picker {
+  padding: 11px 12px 10px;
+  border: 1px solid rgba(89, 62, 51, 0.08);
+  border-radius: 16px;
   background: var(--app-bg);
-  color: var(--app-text);
-  font-size: 18px;
-  font-weight: 780;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
+  overflow: hidden;
 }
 
-.notification-time-editor input:focus {
-  border-color: rgba(214, 101, 63, 0.55);
-  box-shadow: 0 0 0 3px rgba(214, 101, 63, 0.12);
+.notification-time-picker-labels {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr;
+  align-items: center;
+  padding: 0 4px 5px;
+  color: #9b8c84;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.notification-time-picker-labels span:first-child {
+  grid-column: 1;
+}
+
+.notification-time-picker-labels span:last-child {
+  grid-column: 3;
+}
+
+.notification-time-wheel-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  align-items: center;
+  height: 132px;
+  isolation: isolate;
+}
+
+.notification-time-selection {
+  position: absolute;
+  z-index: 0;
+  top: 44px;
+  right: 2px;
+  left: 2px;
+  height: 44px;
+  border-top: 1px solid rgba(214, 101, 63, 0.16);
+  border-bottom: 1px solid rgba(214, 101, 63, 0.16);
+  border-radius: 12px;
+  background: rgba(214, 101, 63, 0.08);
+  pointer-events: none;
+}
+
+.notification-time-wheel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 132px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 44px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 27%, #000 73%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 27%, #000 73%, transparent 100%);
+}
+
+.notification-time-wheel::-webkit-scrollbar {
+  display: none;
+}
+
+.notification-time-option {
+  width: 100%;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 20px;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.34;
+  transform: scale(0.93);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  transition: opacity 0.16s ease, transform 0.16s ease, color 0.16s ease;
+}
+
+.notification-time-option.is-selected {
+  color: var(--app-accent-dark);
+  font-size: 23px;
+  font-weight: 840;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.notification-time-separator {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: var(--app-accent-dark);
+  font-size: 23px;
+  font-weight: 840;
+  transform: translateY(1px);
+  pointer-events: none;
 }
 
 .notification-time-actions {

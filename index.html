@@ -10,9 +10,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Rutina 30 Días</title>
 
-  <link rel="manifest" href="manifest.webmanifest?v=35-6-favoritos-notificaciones" />
+  <link rel="manifest" href="manifest.webmanifest?v=35-7-selector-horario" />
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="styles.css?v=35-6-favoritos-notificaciones" />
+  <link rel="stylesheet" href="styles.css?v=35-7-selector-horario" />
   <link rel="stylesheet" href="onboarding.css?v=35-2-verified" />
 </head>
 
@@ -182,7 +182,20 @@
       <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button">Cambiar horario</button>
 
       <div id="notificationTimeEditor" class="notification-time-editor" hidden>
-        <input id="notificationTimeInput" type="time" step="900" aria-label="Nuevo horario" />
+        <div class="notification-time-picker" role="group" aria-label="Elegir nuevo horario">
+          <div class="notification-time-picker-labels" aria-hidden="true">
+            <span>Hora</span>
+            <span>Minutos</span>
+          </div>
+
+          <div class="notification-time-wheel-shell">
+            <div class="notification-time-selection" aria-hidden="true"></div>
+            <div id="notificationHourWheel" class="notification-time-wheel" role="listbox" aria-label="Hora" tabindex="0"></div>
+            <span class="notification-time-separator" aria-hidden="true">:</span>
+            <div id="notificationMinuteWheel" class="notification-time-wheel" role="listbox" aria-label="Minutos" tabindex="0"></div>
+          </div>
+        </div>
+
         <div class="notification-time-actions">
           <button id="notificationTimeCancelBtn" type="button">Cancelar</button>
           <button id="notificationTimeSaveBtn" type="button">Guardar</button>
@@ -195,7 +208,7 @@
 
   <script src="backend-client.js"></script>
   <script src="push-client.js"></script>
-  <script src="app.js?v=35-6-favoritos-notificaciones"></script>
+  <script src="app.js?v=35-7-selector-horario"></script>
   <script src="onboarding.js?v=33-native-window-actions"></script>
 </body>
 </html>
