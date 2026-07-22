@@ -4177,13 +4177,49 @@ function setupNotificationSettings() {
   });
 
   save?.addEventListener("click", async () => {
-    const value = getNotificationPickerValue();
+    const hourWheel = document.getElementById("notificationHourWheel");
+    const minuteWheel = document.getElementById("notificationMinuteWheel");
 
+    // El scroll de la rueda se procesa con un pequeño debounce.
+    // Al guardar, forzamos una lectura inmediata de la posición visual real
+    // para no persistir por error el horario anterior.
+    updateNotificationWheelSelection(hourWheel, true);
+    updateNotificationWheelSelection(minuteWheel, true);
+
+    const value = getNotificationPickerValue();
+    const previousValue = getScheduleProfile().notificationTime;
     const profile = saveNotificationTimeLocally(value);
-    editor?.setAttribute("hidden", "");
-    await renderNotificationSettings();
-    syncNotificationTimeWithBackend(profile).catch(() => {});
-    toast("Horario actualizado", { type: "success" });
+
+    save.disabled = true;
+    save.setAttribute("aria-busy", "true");
+
+    try {
+      const synced = await syncNotificationTimeWithBackend(profile);
+
+      if (!synced) {
+        throw new Error("No se pudo guardar el horario en el servidor.");
+      }
+
+      editor?.setAttribute("hidden", "");
+      await renderNotificationSettings();
+      toast(`Horario actualizado a ${value}`, { type: "success" });
+    } catch (error) {
+      console.warn("No se pudo guardar el horario de notificaciones.", error);
+
+      // Si el backend no confirmó el cambio, restauramos el valor local
+      // para que la interfaz no muestre un horario que el servidor no tiene.
+      const restoredProfile = saveNotificationTimeLocally(previousValue);
+      setNotificationPickerValue(previousValue);
+      await renderNotificationSettings();
+
+      toast(
+        error.message || "No se pudo guardar el horario.",
+        { type: "error", duration: 3600 }
+      );
+    } finally {
+      save.disabled = false;
+      save.removeAttribute("aria-busy");
+    }
   });
 
   document.addEventListener("keydown", event => {

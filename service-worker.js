@@ -1,12 +1,12 @@
-const CACHE="rutina30-v35-9-notif-identity";
+const CACHE="rutina30-v35-9-1-notif-time-sync";
 
 const CORE=[
   "./",
   "./index.html",
   "./styles.css?v=35-8-publicacion-fixes",
-  "./app.js?v=35-9-notif-identity",
+  "./app.js?v=35-9-1-notif-time-sync",
   "./backend-client.js?v=35-9-notif-identity",
-  "./push-client.js?v=35-9-notif-identity",
+  "./push-client.js?v=35-9-1-notif-time-sync",
   "./onboarding.js?v=35-9-notif-identity",
   "./onboarding.css?v=35-2-verified",
   "./manifest.webmanifest?v=35-8-publicacion-fixes",

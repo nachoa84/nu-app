@@ -317,8 +317,13 @@
 
   async function syncExistingSubscriptionToBackend() {
     try {
+      // Para una resincronización de identidad no hacemos bootstrap:
+      // necesitamos respetar el perfil local recién guardado y evitar que
+      // una respuesta anterior del backend lo pise antes del PATCH.
       const profile =
-        await ensureBackendReady();
+        window.BackendAPI
+          ?.ensureUserId?.() ||
+        getProfile();
 
       if (!profile?.userId) {
         return;
