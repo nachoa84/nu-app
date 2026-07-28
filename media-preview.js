@@ -144,9 +144,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
   stage.classList.remove(
     "preview-enter-left",
-    "preview-enter-right",
-    "preview-exit-left",
-    "preview-exit-right"
+    "preview-enter-right"
   );
   stage.style.transition = "";
   stage.style.transform = "";
