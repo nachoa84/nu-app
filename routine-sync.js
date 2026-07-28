@@ -1,6 +1,9 @@
 // Rutina 30 Días · Sincronización y coordinación de rutina
 // Paso 11K: estado recibido del backend, apertura del día, demo y cambios de perfil.
 // La persistencia local permanece en routine-state.js.
+// currentDay y nextUnlockAt solo se modifican con estado confirmado por backend.
+
+let pendingOpenDay = null;
 
 function applyBackendRoutineState(serverState) {
   if (!serverState) return;
@@ -74,41 +77,41 @@ function markCurrentDayOpened() {
   if (isPreviewMode) return;
 
   const state = getRoutineState();
+  const currentDay =
+    Number(state.currentDay);
 
-  if (Number(selectedDay) !== Number(state.currentDay)) {
+  if (
+    Number(selectedDay) !== currentDay ||
+    state.openedDays[currentDay] ||
+    pendingOpenDay === currentDay
+  ) {
     return;
   }
 
-  if (!state.openedDays[state.currentDay]) {
-    state.openedDays[state.currentDay] = Date.now();
-
-    if (state.currentDay < 7) {
-      state.nextUnlockAt =
-        nextUnlockTimestampFromProfile(
-          state.openedDays[state.currentDay]
-        );
-
-      state.scheduleProfileSignature =
-        scheduleProfileSignature();
-    } else {
-      state.nextUnlockAt = null;
-      state.scheduleProfileSignature = null;
-    }
-
-    saveRoutineState(state);
-    renderDays();
-
-    if (window.BackendAPI) {
-      window.BackendAPI
-        .openDay(state.currentDay)
-        .catch(error => {
-          console.warn(
-            "No se pudo sincronizar la apertura con el backend.",
-            error
-          );
-        });
-    }
+  if (!window.BackendAPI) {
+    console.warn(
+      "Backend no disponible: la apertura no se persiste hasta recuperar conexión."
+    );
+    return;
   }
+
+  // No calculamos ni persistimos nextUnlockAt en el cliente.
+  // /api/routine/open registra la apertura y devuelve el estado oficial.
+  pendingOpenDay = currentDay;
+
+  window.BackendAPI
+    .openDay(currentDay)
+    .catch(error => {
+      console.warn(
+        "No se pudo registrar la apertura con el backend.",
+        error
+      );
+    })
+    .finally(() => {
+      if (pendingOpenDay === currentDay) {
+        pendingOpenDay = null;
+      }
+    });
 }
 
 async function simulateNextDay() {
@@ -141,52 +144,21 @@ async function simulateNextDay() {
       }
     } catch (error) {
       console.warn(
-        "Demo backend no disponible. Se usa el modo local.",
+        "Demo backend no disponible.",
         error
       );
+
+      toast(
+        "No se pudo simular el próximo día sin conexión al backend."
+      );
+
+      return;
     }
   }
 
-  const state = getRoutineState();
-
-  if (!state.openedDays[state.currentDay]) {
-    toast(
-      `Primero abrí el Día ${state.currentDay}.`
-    );
-    return;
-  }
-
-  if (state.currentDay >= 7) {
-    toast(
-      "Ya estás en el último día de la prueba."
-    );
-    return;
-  }
-
-  state.nextUnlockAt =
-    Date.now() - 1000;
-
-  saveRoutineState(state);
-
-  const advanced =
-    advanceRoutineIfEligible();
-
-  if (advanced) {
-    renderSelectedDayHeader();
-    renderDays();
-
-    chatWrap.classList.add(
-      "hidden"
-    );
-
-    chat.innerHTML = "";
-    revealIndex = 0;
-    updateProgress();
-
-    toast(
-      `Día ${getRoutineState().currentDay} desbloqueado para prueba.`
-    );
-  }
+  toast(
+    "No se pudo simular el próximo día sin conexión al backend."
+  );
 }
 
 function ensureDemoControls() {
@@ -216,22 +188,8 @@ function ensureDemoControls() {
 window.addEventListener(
   "routine-profile-updated",
   () => {
-    rescheduleNextUnlockFromProfile(true);
-
-    const advanced =
-      advanceRoutineIfEligible();
-
-    if (advanced) {
-      selectedDay =
-        getRoutineState().currentDay;
-
-      renderSelectedDayHeader();
-
-      chat.innerHTML = "";
-      revealIndex = 0;
-      renderStructuredDayDetail();
-    }
-
+    // backend-client.js sincroniza el perfil y publica luego
+    // backend-state-updated con currentDay/nextUnlockAt oficiales.
     renderDays();
 
     const notificationPanel = document.getElementById("notificationSettings");

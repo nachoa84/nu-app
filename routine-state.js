@@ -269,70 +269,14 @@ function nextUnlockTimestampFromProfile(
 function rescheduleNextUnlockFromProfile(
   force = false
 ) {
-  if (isPreviewMode) return;
-
-  const state = getRoutineState();
-
-  if (state.currentDay >= 7) {
-    return;
-  }
-
-  const openedAt =
-    state.openedDays[state.currentDay];
-
-  if (!openedAt) {
-    return;
-  }
-
-  const signature =
-    scheduleProfileSignature();
-
-  if (
-    !force &&
-    state.scheduleProfileSignature ===
-      signature &&
-    state.nextUnlockAt
-  ) {
-    return;
-  }
-
-  state.nextUnlockAt =
-    nextUnlockTimestampFromProfile(
-      Number(openedAt)
-    );
-
-  state.scheduleProfileSignature =
-    signature;
-
-  saveRoutineState(state);
+  // Compatibilidad con módulos antiguos.
+  // Desde V54 el cliente no puede recalcular ni persistir nextUnlockAt.
+  void force;
+  return false;
 }
 
 function advanceRoutineIfEligible() {
-  if (isPreviewMode) return false;
-
-  const state = getRoutineState();
-
-  if (
-    state.currentDay < 7 &&
-    state.openedDays[state.currentDay] &&
-    state.nextUnlockAt &&
-    Date.now() >= Number(state.nextUnlockAt)
-  ) {
-    state.currentDay += 1;
-    state.nextUnlockAt = null;
-    state.scheduleProfileSignature = null;
-
-    saveRoutineState(state);
-
-    selectedDay = state.currentDay;
-
-    localStorage.setItem(
-      "selectedDay",
-      String(selectedDay)
-    );
-
-    return true;
-  }
-
+  // Compatibilidad con módulos antiguos.
+  // Desde V54 currentDay solo avanza con estado confirmado por backend.
   return false;
 }

@@ -23,9 +23,8 @@ let revealIndex = 0;
 // Backend sync, day-open coordination and demo controls live in routine-sync.js.
 
 if (!isPreviewMode) {
-  rescheduleNextUnlockFromProfile();
-  advanceRoutineIfEligible();
-
+  // El estado local solo refleja el último estado confirmado.
+  // PostgreSQL/backend es la única autoridad para desbloquear días.
   const routineState = getRoutineState();
 
   selectedDay = routineState.currentDay;
@@ -90,8 +89,6 @@ setupNativeInteractionGuards();
 renderBotConversation();
 setupScrollCollapse();
 migrateOldDay1FavoritePaths();
-rescheduleNextUnlockFromProfile();
-advanceRoutineIfEligible();
 
 if (!isPreviewMode) {
   selectedDay = getRoutineState().currentDay;

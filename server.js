@@ -1433,12 +1433,22 @@ app.post(
       const state =
         await withTransaction(
           async client => {
+            // El backend decide primero si ya corresponde avanzar
+            // el día actual antes de validar el completado.
+            await advanceIfEligible(
+              client,
+              userId
+            );
+
             const userResult =
               await client.query(
                 `
-                SELECT cycle
+                SELECT
+                  cycle,
+                  current_day
                 FROM users
                 WHERE id = $1
+                FOR UPDATE
                 `,
                 [userId]
               );
@@ -1454,9 +1464,25 @@ app.post(
               throw error;
             }
 
+            const user =
+              userResult.rows[0];
+
+            if (
+              day >
+              Number(user.current_day)
+            ) {
+              const error =
+                new Error(
+                  "Ese día todavía no está disponible."
+                );
+
+              error.status = 409;
+
+              throw error;
+            }
+
             const cycle =
-              userResult.rows[0]
-                .cycle;
+              user.cycle;
 
             await client.query(
               `

@@ -73,6 +73,13 @@ function closeMediaPreview(direction = "right") {
   // Cortamos reproducción/red inmediatamente al cerrar el visor.
   destroyActivePreviewVideo();
 
+  // Una navegación/preload pendiente no puede quedar bloqueando
+  // la próxima apertura del preview.
+  previewPreloadToken += 1;
+  previewNavigationLocked = false;
+  previewQueuedDelta = 0;
+  modal.classList.remove("is-navigating");
+
   if (shell && !prefersReducedMotion()) {
     shell.style.transition = "transform 0.22s cubic-bezier(.4,0,.2,1), opacity .18s ease";
     shell.style.opacity = "0.86";
@@ -485,7 +492,16 @@ function openMediaPreview(items, index = 0, day = selectedDay) {
 
   if (!normalized.length) return;
 
+  // Cada apertura empieza con navegación limpia.
+  // Invalidamos cualquier preload/transición de una apertura anterior.
+  previewPreloadToken += 1;
+  previewNavigationLocked = false;
   previewQueuedDelta = 0;
+
+  document
+    .getElementById("mediaPreview")
+    ?.classList.remove("is-navigating");
+
   previewState = {
     items: normalized,
     index: Math.min(Math.max(index, 0), normalized.length - 1),
@@ -619,9 +635,13 @@ function setupMediaPreview() {
     if (!button) return;
     button.onclick = null;
     button.addEventListener("click", event => {
-      if (button.disabled || previewNavigationLocked) return;
       event.preventDefault();
       event.stopPropagation();
+
+      if (button.disabled) return;
+
+      // navigateMediaPreview ya administra el lock y encola taps
+      // recibidos durante una transición.
       navigateMediaPreview(delta);
     });
   };
