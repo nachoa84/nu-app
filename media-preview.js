@@ -5,9 +5,14 @@
 
 let previewState = { items: [], index: 0, day: 1 };
 let activePreviewVideo = null;
-let previewNavigationLocked = false;
-let previewPreloadToken = 0;
-let previewQueuedDelta = 0;
+
+// Cada render invalida callbacks de imágenes anteriores.
+// No bloquea la navegación: solo evita que una carga vieja toque la UI actual.
+let previewRenderToken = 0;
+
+// Mantiene en memoria únicamente los vecinos inmediatos del slide actual.
+// Los videos no se precargan: solo su poster.
+const previewNeighborCache = new Map();
 
 function normalizePreviewItem(item) {
   return {
@@ -73,12 +78,9 @@ function closeMediaPreview(direction = "right") {
   // Cortamos reproducción/red inmediatamente al cerrar el visor.
   destroyActivePreviewVideo();
 
-  // Una navegación/preload pendiente no puede quedar bloqueando
-  // la próxima apertura del preview.
-  previewPreloadToken += 1;
-  previewNavigationLocked = false;
-  previewQueuedDelta = 0;
-  modal.classList.remove("is-navigating");
+  // Invalida callbacks de carga de la story que se está cerrando.
+  previewRenderToken += 1;
+  previewNeighborCache.clear();
 
   if (shell && !prefersReducedMotion()) {
     shell.style.transition = "transform 0.22s cubic-bezier(.4,0,.2,1), opacity .18s ease";
@@ -106,6 +108,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   const modal = document.getElementById("mediaPreview");
   if (!modal || !previewState.items.length) return;
 
+  const renderToken = ++previewRenderToken;
   const item = previewState.items[previewState.index];
   const stage = document.getElementById("previewStage");
   const counter = document.getElementById("previewCounter");
@@ -151,8 +154,14 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   stage.innerHTML = "";
   stage.classList.add("is-loading");
 
-  const finishPreviewLoad = () => stage.classList.remove("is-loading");
+  const finishPreviewLoad = () => {
+    if (renderToken !== previewRenderToken) return;
+    stage.classList.remove("is-loading");
+  };
+
   const failPreviewLoad = () => {
+    if (renderToken !== previewRenderToken) return;
+
     stage.classList.remove("is-loading");
     stage.innerHTML = `
       <div class="preview-load-error">
@@ -178,6 +187,8 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       posterImage.src = item.poster;
 
       posterImage.addEventListener("error", () => {
+        if (renderToken !== previewRenderToken) return;
+
         // El Play sigue disponible aunque el poster falle.
         posterImage.hidden = true;
         shell.classList.add("is-error");
@@ -315,11 +326,23 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     media.addEventListener("error", failPreviewLoad, { once: true });
     media.src = item.src;
     stage.appendChild(media);
+
+    if (media.complete && media.naturalWidth > 0) {
+      finishPreviewLoad();
+    }
   }
 
   if (enterFrom && !prefersReducedMotion()) {
-    stage.classList.add(enterFrom === "left" ? "preview-enter-left" : "preview-enter-right");
+    // Reinicia una entrada muy corta incluso con taps consecutivos.
+    void stage.offsetWidth;
+    stage.classList.add(
+      enterFrom === "left"
+        ? "preview-enter-left"
+        : "preview-enter-right"
+    );
   }
+
+  warmPreviewNeighbors();
 
   const saved = isFavorite(item.src, previewState.day);
   saveTop.hidden = true;
@@ -369,120 +392,99 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   document.body.classList.add("preview-open");
 }
 
-function preloadPreviewItem(item, token) {
-  if (!item) return Promise.resolve();
+function previewWarmSource(item) {
+  if (!item) return null;
+  return item.mediaType === "video" ? item.poster : item.src;
+}
 
-  const source = item.mediaType === "video" ? item.poster : item.src;
-  if (!source) return Promise.resolve();
+function warmPreviewNeighbors() {
+  const indexes = [
+    previewState.index - 1,
+    previewState.index + 1
+  ];
 
-  return new Promise(resolve => {
+  const wantedSources = new Set();
+
+  indexes.forEach(index => {
+    if (
+      index < 0 ||
+      index >= previewState.items.length
+    ) {
+      return;
+    }
+
+    const source =
+      previewWarmSource(
+        previewState.items[index]
+      );
+
+    if (!source) return;
+
+    wantedSources.add(source);
+
+    if (
+      previewNeighborCache.has(source)
+    ) {
+      return;
+    }
+
     const image = new Image();
-    let settled = false;
-
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      resolve(token === previewPreloadToken);
-    };
-
-    image.onload = finish;
-    image.onerror = finish;
+    image.decoding = "async";
     image.src = source;
 
-    if (image.complete) finish();
-
-    setTimeout(finish, 280);
+    previewNeighborCache.set(
+      source,
+      image
+    );
   });
+
+  // Solo retenemos los vecinos del slide actual.
+  for (
+    const source of
+    previewNeighborCache.keys()
+  ) {
+    if (!wantedSources.has(source)) {
+      previewNeighborCache.delete(source);
+    }
+  }
 }
 
-function setPreviewNavigationBusy(busy) {
-  previewNavigationLocked = busy;
-  const modal = document.getElementById("mediaPreview");
-  const prev = document.getElementById("previewPrevBtn");
-  const next = document.getElementById("previewNextBtn");
+function navigateMediaPreview(
+  delta,
+  { animate = true } = {}
+) {
+  const direction =
+    delta > 0 ? 1 : -1;
 
-  modal?.classList.toggle("is-navigating", busy);
+  const nextIndex =
+    previewState.index + direction;
 
-  if (prev) prev.disabled = previewState.index === 0;
-  if (next) next.disabled = previewState.index === previewState.items.length - 1;
-}
-
-function flushPreviewNavigationQueue() {
-  if (previewNavigationLocked || previewQueuedDelta === 0) return;
-
-  const queuedDirection = previewQueuedDelta > 0 ? 1 : -1;
-  previewQueuedDelta -= queuedDirection;
-  navigateMediaPreview(queuedDirection, { animate: true });
-}
-
-async function navigateMediaPreview(delta, { animate = true } = {}) {
-  const direction = delta > 0 ? 1 : -1;
-
-  if (previewNavigationLocked) {
-    previewQueuedDelta = Math.max(-2, Math.min(2, previewQueuedDelta + direction));
+  if (
+    nextIndex < 0 ||
+    nextIndex >= previewState.items.length
+  ) {
     return;
   }
 
-  const nextIndex = previewState.index + direction;
-  if (nextIndex < 0 || nextIndex >= previewState.items.length) return;
+  // Navegación optimista:
+  // el índice y el contador cambian en el mismo gesto.
+  previewState.index = nextIndex;
 
-  const stage = document.getElementById("previewStage");
-  if (!stage) return;
-
-  // Evita doble click/tap mientras se está cambiando de material.
-  setPreviewNavigationBusy(true);
-
-  const token = ++previewPreloadToken;
-  const targetItem = previewState.items[nextIndex];
-
-  // Precargamos la próxima imagen/poster antes de retirar la actual.
-  await preloadPreviewItem(targetItem, token);
-
-  if (token !== previewPreloadToken) {
-    setPreviewNavigationBusy(false);
-    flushPreviewNavigationQueue();
-    return;
-  }
-
+  // Si había un video activo, se corta antes de pintar la nueva story.
   destroyActivePreviewVideo();
 
-  if (prefersReducedMotion() || !animate) {
-    previewState.index = nextIndex;
-    renderMediaPreview();
-    setPreviewNavigationBusy(false);
-    flushPreviewNavigationQueue();
-    return;
+  renderMediaPreview({
+    enterFrom:
+      animate && !prefersReducedMotion()
+        ? direction > 0
+          ? "right"
+          : "left"
+        : null
+  });
+
+  if (navigator.vibrate) {
+    navigator.vibrate(5);
   }
-
-  const exitDirection = direction > 0 ? -1 : 1;
-  stage.classList.remove(
-    "preview-enter-left",
-    "preview-enter-right",
-    "preview-exit-left",
-    "preview-exit-right"
-  );
-  stage.style.transition = "";
-  stage.style.transform = "";
-  stage.style.opacity = "";
-
-  // Movimiento corto: mantiene continuidad visual sin mandar la foto entera
-  // fuera del viewport antes de reconstruir el stage.
-  stage.classList.add(exitDirection < 0 ? "preview-exit-left" : "preview-exit-right");
-
-  setTimeout(() => {
-    if (token !== previewPreloadToken) return;
-
-    previewState.index = nextIndex;
-    renderMediaPreview({ enterFrom: direction > 0 ? "right" : "left" });
-
-    if (navigator.vibrate) navigator.vibrate(5);
-
-    setTimeout(() => {
-      setPreviewNavigationBusy(false);
-
-      flushPreviewNavigationQueue();
-    }, 190);
-  }, 125);
 }
 
 function openMediaPreview(items, index = 0, day = selectedDay) {
@@ -492,15 +494,9 @@ function openMediaPreview(items, index = 0, day = selectedDay) {
 
   if (!normalized.length) return;
 
-  // Cada apertura empieza con navegación limpia.
-  // Invalidamos cualquier preload/transición de una apertura anterior.
-  previewPreloadToken += 1;
-  previewNavigationLocked = false;
-  previewQueuedDelta = 0;
-
-  document
-    .getElementById("mediaPreview")
-    ?.classList.remove("is-navigating");
+  // Cada apertura invalida callbacks de una sesión anterior.
+  previewRenderToken += 1;
+  previewNeighborCache.clear();
 
   previewState = {
     items: normalized,
@@ -633,16 +629,39 @@ function setupMediaPreview() {
 
   const bindPreviewNav = (button, delta) => {
     if (!button) return;
+
     button.onclick = null;
-    button.addEventListener("click", event => {
+
+    button.addEventListener("pointerdown", event => {
+      if (
+        event.pointerType === "mouse" &&
+        event.button !== 0
+      ) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
       if (button.disabled) return;
 
-      // navigateMediaPreview ya administra el lock y encola taps
-      // recibidos durante una transición.
+      // En móvil no dependemos del click sintetizado:
+      // navegamos en el mismo contacto del dedo.
       navigateMediaPreview(delta);
+    });
+
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Click sin puntero = teclado/accesibilidad.
+      // Touch/mouse ya fueron atendidos en pointerdown.
+      if (
+        event.detail === 0 &&
+        !button.disabled
+      ) {
+        navigateMediaPreview(delta);
+      }
     });
   };
 

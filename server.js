@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 const { Pool } = require("pg");
 const webpush = require("web-push");
 const {
@@ -9,6 +10,10 @@ const {
 } = require("luxon");
 
 const app = express();
+
+// Replit publica la app detrás de un proxy.
+// Necesario para que req.ip represente al cliente real.
+app.set("trust proxy", 1);
 
 const PORT =
   Number(process.env.PORT || 3000);
@@ -53,6 +58,25 @@ const VAPID_SUBJECT =
 const ADMIN_TEST_TOKEN =
   process.env.ADMIN_TEST_TOKEN || "";
 
+const ADMIN_TEST_ROUTES_ENABLED =
+  String(
+    process.env.ENABLE_ADMIN_TEST_ROUTES ||
+    ""
+  ).toLowerCase() === "true";
+
+const EXTRA_ALLOWED_ORIGINS =
+  new Set(
+    String(
+      process.env.ALLOWED_ORIGINS ||
+      ""
+    )
+      .split(",")
+      .map(value =>
+        value.trim().replace(/\/$/, "")
+      )
+      .filter(Boolean)
+  );
+
 const pushConfigured =
   Boolean(
     VAPID_PUBLIC_KEY &&
@@ -76,6 +100,275 @@ app.use(
   express.json({
     limit: "256kb"
   })
+);
+
+function normalizeOrigin(value) {
+  try {
+    const url =
+      new URL(String(value || ""));
+
+    return `${url.protocol}//${url.host}`;
+  } catch (_) {
+    return "";
+  }
+}
+
+function sameHostOrigin(req, origin) {
+  const normalized =
+    normalizeOrigin(origin);
+
+  if (!normalized) {
+    return false;
+  }
+
+  try {
+    const originUrl =
+      new URL(normalized);
+
+    return (
+      originUrl.host.toLowerCase() ===
+      String(
+        req.get("host") || ""
+      ).toLowerCase()
+    );
+  } catch (_) {
+    return false;
+  }
+}
+
+function assertAllowedWriteOrigin(
+  req,
+  res,
+  next
+) {
+  const safeMethod =
+    req.method === "GET" ||
+    req.method === "HEAD" ||
+    req.method === "OPTIONS";
+
+  if (safeMethod) {
+    return next();
+  }
+
+  const origin =
+    String(
+      req.get("origin") || ""
+    ).trim();
+
+  // Requests same-origin desde la PWA pueden llegar sin Origin
+  // en algunos contextos. En cambio, fetch/XHR cross-site desde
+  // un navegador sí incluye Origin y queda bloqueado abajo.
+  if (!origin) {
+    return next();
+  }
+
+  const normalized =
+    normalizeOrigin(origin);
+
+  if (
+    sameHostOrigin(req, origin) ||
+    EXTRA_ALLOWED_ORIGINS.has(
+      normalized
+    )
+  ) {
+    return next();
+  }
+
+  const error =
+    new Error(
+      "Origen no permitido."
+    );
+
+  error.status = 403;
+
+  return next(error);
+}
+
+function requestRateKey(req) {
+  return `ip:${String(
+    req.ip || "unknown"
+  )}`;
+}
+
+function targetUserRateKey(req) {
+  const userId =
+    String(
+      req.body?.userId ||
+      req.params?.userId ||
+      ""
+    ).trim();
+
+  return userId
+    ? `user:${userId}`
+    : requestRateKey(req);
+}
+
+function createRateLimiter({
+  windowMs,
+  max,
+  keyFn = requestRateKey,
+  message =
+    "Demasiadas solicitudes. Esperá un momento e intentá nuevamente."
+}) {
+  const buckets =
+    new Map();
+
+  return (req, res, next) => {
+    const now = Date.now();
+    const key =
+      String(
+        keyFn(req) ||
+        requestRateKey(req)
+      );
+
+    let bucket =
+      buckets.get(key);
+
+    if (
+      !bucket ||
+      now >= bucket.resetAt
+    ) {
+      bucket = {
+        count: 0,
+        resetAt:
+          now + windowMs
+      };
+
+      buckets.set(
+        key,
+        bucket
+      );
+    }
+
+    if (bucket.count >= max) {
+      const retryAfter =
+        Math.max(
+          Math.ceil(
+            (
+              bucket.resetAt -
+              now
+            ) / 1000
+          ),
+          1
+        );
+
+      res.set(
+        "Retry-After",
+        String(retryAfter)
+      );
+
+      return res
+        .status(429)
+        .json({
+          ok: false,
+          error: message,
+          retryAfter
+        });
+    }
+
+    bucket.count += 1;
+
+    // Limpieza oportunista para que el Map no crezca sin límite.
+    if (
+      buckets.size > 500 &&
+      bucket.count === 1
+    ) {
+      for (
+        const [
+          existingKey,
+          existing
+        ] of buckets
+      ) {
+        if (
+          now >=
+          existing.resetAt
+        ) {
+          buckets.delete(
+            existingKey
+          );
+        }
+      }
+
+      // Cota defensiva para que un barrido de claves distintas
+      // no haga crecer memoria indefinidamente durante la ventana.
+      while (buckets.size > 2000) {
+        const oldestKey =
+          buckets.keys().next().value;
+
+        if (!oldestKey) break;
+
+        buckets.delete(oldestKey);
+      }
+    }
+
+    return next();
+  };
+}
+
+const apiWriteLimiter =
+  createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 120
+  });
+
+const pushLimiter =
+  createRateLimiter({
+    windowMs: 10 * 60 * 1000,
+    max: 30,
+    message:
+      "Demasiadas operaciones de notificaciones. Esperá unos minutos."
+  });
+
+const pushTestLimiter =
+  createRateLimiter({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    keyFn: targetUserRateKey,
+    message:
+      "Alcanzaste el límite de pruebas de notificaciones por ahora."
+  });
+
+const adminLimiter =
+  createRateLimiter({
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    keyFn: req =>
+      `admin:${String(
+        req.ip || "unknown"
+      )}`,
+    message:
+      "Demasiados intentos administrativos."
+  });
+
+app.use(
+  "/api",
+  assertAllowedWriteOrigin
+);
+
+app.use(
+  "/api",
+  (req, res, next) => {
+    const isWrite =
+      req.method === "POST" ||
+      req.method === "PATCH" ||
+      req.method === "PUT" ||
+      req.method === "DELETE";
+
+    if (!isWrite) {
+      return next();
+    }
+
+    return apiWriteLimiter(
+      req,
+      res,
+      next
+    );
+  }
+);
+
+app.use(
+  "/api/push",
+  pushLimiter
 );
 
 function assertDatabase() {
@@ -185,6 +478,19 @@ function assertPushConfigured() {
 }
 
 
+function assertAdminTestRoutesEnabled() {
+  if (!ADMIN_TEST_ROUTES_ENABLED) {
+    const error =
+      new Error(
+        "Ruta no disponible."
+      );
+
+    error.status = 404;
+
+    throw error;
+  }
+}
+
 function assertAdminTestToken(req) {
   if (!ADMIN_TEST_TOKEN) {
     const error =
@@ -204,9 +510,24 @@ function assertAdminTestToken(req) {
       ] || ""
     );
 
+  const expectedDigest =
+    crypto
+      .createHash("sha256")
+      .update(ADMIN_TEST_TOKEN)
+      .digest();
+
+  const providedDigest =
+    crypto
+      .createHash("sha256")
+      .update(provided)
+      .digest();
+
   if (
     !provided ||
-    provided !== ADMIN_TEST_TOKEN
+    !crypto.timingSafeEqual(
+      providedDigest,
+      expectedDigest
+    )
   ) {
     const error =
       new Error(
@@ -1795,6 +2116,7 @@ app.post(
 
 app.post(
   "/api/push/test",
+  pushTestLimiter,
   async (req, res, next) => {
     try {
       assertDatabase();
@@ -1896,6 +2218,19 @@ app.post(
 );
 
 
+
+app.use(
+  "/api/admin",
+  adminLimiter,
+  (req, res, next) => {
+    try {
+      assertAdminTestRoutesEnabled();
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 app.post(
   "/api/admin/schedule-auto-test-latest",
