@@ -4,7 +4,6 @@
   "description": "Tus rutinas, materiales, favoritos y asistente en un solo lugar.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f8f7",
   "theme_color": "#f7f8f7",
   "orientation": "portrait-primary",
   "icons": [

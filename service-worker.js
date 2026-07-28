@@ -1,4 +1,4 @@
-const CACHE="nuapp-v53-branding";
+const CACHE="nuapp-v53c-branding-clean-final";
 
 const CORE=[
   "./",
@@ -35,17 +35,17 @@ const CORE=[
   "./push-client.js?v=52c-final-visual-consistency",
   "./onboarding.js?v=52c-final-visual-consistency",
   "./onboarding.css?v=52c-final-visual-consistency",
-  "./manifest.webmanifest?v=53-nuapp-branding",
+  "./manifest.webmanifest?v=53c-branding-clean-final",
   "./assets/custom/nu-write-v2.mp4",
   "./assets/custom/nu-write-v2-poster.png",
   "./assets/custom/nu-app-word-v51.png",
 
-  "./icons/nuapp-favicon-32.png?v=53-nuapp-branding",
-  "./icons/nuapp-favicon-48.png?v=53-nuapp-branding",
-  "./icons/nuapp-apple-180.png?v=53-nuapp-branding",
-  "./icons/nuapp-icon-192.png?v=53-nuapp-branding",
-  "./icons/nuapp-icon-512.png?v=53-nuapp-branding",
-  "./icons/nuapp-maskable-512.png?v=53-nuapp-branding",
+  "./icons/nuapp-favicon-32.png?v=53c-branding-clean-final",
+  "./icons/nuapp-favicon-48.png?v=53c-branding-clean-final",
+  "./icons/nuapp-apple-180.png?v=53c-branding-clean-final",
+  "./icons/nuapp-icon-192.png?v=53c-branding-clean-final",
+  "./icons/nuapp-icon-512.png?v=53c-branding-clean-final",
+  "./icons/nuapp-maskable-512.png?v=53c-branding-clean-final",
   "./assets/custom/routine-collagen-home.png",
   "./assets/custom/routine-lumispa-home.png",
   "./assets/custom/routine-pharmanex-home.png",
