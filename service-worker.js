@@ -1,4 +1,4 @@
-const CACHE="rutina30-v52c-final-visual-consistency";
+const CACHE="nuapp-v53-branding";
 
 const CORE=[
   "./",
@@ -35,15 +35,17 @@ const CORE=[
   "./push-client.js?v=52c-final-visual-consistency",
   "./onboarding.js?v=52c-final-visual-consistency",
   "./onboarding.css?v=52c-final-visual-consistency",
-  "./manifest.webmanifest?v=52c-final-visual-consistency",
+  "./manifest.webmanifest?v=53-nuapp-branding",
   "./assets/custom/nu-write-v2.mp4",
   "./assets/custom/nu-write-v2-poster.png",
   "./assets/custom/nu-app-word-v51.png",
 
-  "./icons/apple-touch-icon.png",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/icon-maskable-512.png",
+  "./icons/nuapp-favicon-32.png?v=53-nuapp-branding",
+  "./icons/nuapp-favicon-48.png?v=53-nuapp-branding",
+  "./icons/nuapp-apple-180.png?v=53-nuapp-branding",
+  "./icons/nuapp-icon-192.png?v=53-nuapp-branding",
+  "./icons/nuapp-icon-512.png?v=53-nuapp-branding",
+  "./icons/nuapp-maskable-512.png?v=53-nuapp-branding",
   "./assets/custom/routine-collagen-home.png",
   "./assets/custom/routine-lumispa-home.png",
   "./assets/custom/routine-pharmanex-home.png",
@@ -336,7 +338,7 @@ self.addEventListener(
   event => {
     let data = {
       title:
-        "Rutina 30 Días",
+        "Nu App",
       body:
         "Tenés una nueva actualización.",
       url: "/"
