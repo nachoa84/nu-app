@@ -1,0 +1,168 @@
+/* =========================================================
+   V51 · Nu App splash
+   Video: Nu escrito.
+   Imagen determinística: App.
+   CSS: composición + loading.
+   Un único escenario 9:16 para Android/iPhone.
+   ========================================================= */
+
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.splash-stage {
+  position: relative;
+  width: min(100vw, 430px);
+  aspect-ratio: 9 / 16;
+  flex: none;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 240ms ease,
+    transform 240ms cubic-bezier(.22,.8,.24,1);
+}
+
+.nu-write-video,
+.nu-final-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
+  pointer-events: none;
+}
+
+.nu-final-poster {
+  visibility: hidden;
+}
+
+.app-splash.use-poster .nu-write-video {
+  visibility: hidden;
+}
+
+.app-splash.use-poster .nu-final-poster {
+  visibility: visible;
+}
+
+/*
+  Coordenadas tomadas del mismo prototipo que originó el video.
+  Al vivir dentro del stage 9:16 no cambian entre teléfonos.
+*/
+.nu-app-word {
+  position: absolute;
+  left: 47.35%;
+  top: 47.10%;
+  width: 38.40%;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) scale(.985);
+  transform-origin: 50% 45%;
+  transition:
+    opacity 540ms cubic-bezier(.16,.82,.24,1),
+    transform 540ms cubic-bezier(.16,.82,.24,1);
+  pointer-events: none;
+}
+
+.app-splash.is-nu-written .nu-app-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.nu-loading {
+  position: absolute;
+  left: 51.30%;
+  top: 66.55%;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  min-height: 24px;
+  margin: 0;
+  white-space: nowrap;
+  color: #969aa1;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  font-size: clamp(12px, 3.35vw, 15px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -.01em;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity 420ms ease,
+    transform 420ms ease;
+}
+
+.app-splash.is-loading-visible .nu-loading {
+  opacity: .84;
+  transform: translate(-50%, 0);
+}
+
+.nu-loading-dots {
+  display: inline-flex;
+  width: 18px;
+  margin-left: 1px;
+}
+
+.nu-loading-dots span {
+  opacity: .25;
+  animation: splash-dot 1.05s ease-in-out infinite;
+}
+
+.nu-loading-dots span:nth-child(2) { animation-delay: 140ms; }
+.nu-loading-dots span:nth-child(3) { animation-delay: 280ms; }
+
+.app-splash.is-content-exiting .splash-stage {
+  opacity: 0;
+  transform: scale(.994);
+}
+
+.app-splash.is-background-exiting {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms linear;
+}
+
+@keyframes splash-dot {
+  0%, 60%, 100% { opacity: .22; }
+  30% { opacity: 1; }
+}
+
+@media (max-width: 360px) {
+  .splash-stage {
+    width: 100vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-stage,
+  .nu-app-word,
+  .nu-loading,
+  .app-splash {
+    transition-duration: 120ms;
+  }
+
+  .nu-loading-dots span {
+    animation: none;
+    opacity: .65;
+  }
+}

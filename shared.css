@@ -1,0 +1,140 @@
+/* =========================================================
+   V36 Step 12P · Compartidos canónicos
+   Utilidades SVG, action sheet y estados transversales.
+   ========================================================= */
+
+.icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.icon-cut {
+  fill: none;
+  stroke: var(--app-bg);
+  stroke-width: 1.9;
+}
+
+/* Action sheet reutilizable */
+.app-action-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 12px 12px calc(12px + var(--safe-bottom));
+  background: rgba(17,28,43,.30);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: action-sheet-fade-in .18s ease both;
+}
+
+.app-action-sheet[hidden] {
+  display: none !important;
+}
+
+.app-action-sheet-inner {
+  width: min(406px, 100%);
+  transform-origin: bottom center;
+  animation: action-sheet-up .28s cubic-bezier(.32,.72,0,1) both;
+}
+
+.app-action-sheet-panel,
+.app-action-sheet-cancel {
+  overflow: hidden;
+  border: 1px solid rgba(23,34,61,.08);
+  border-radius: 20px;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 18px 48px rgba(17,28,43,.14);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  corner-shape: squircle;
+}
+
+.app-action-sheet-copy {
+  padding: 15px 18px 12px;
+  text-align: center;
+}
+
+.app-action-sheet-copy strong,
+.app-action-sheet-copy span {
+  display: block;
+}
+
+.app-action-sheet-copy strong {
+  font-size: 14px;
+  color: var(--app-text);
+}
+
+.app-action-sheet-copy span {
+  margin-top: 5px;
+  color: var(--app-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.app-action-sheet-action,
+.app-action-sheet-cancel {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.app-action-sheet-action {
+  border-top: 1px solid var(--app-line);
+  color: #c2412d;
+}
+
+.app-action-sheet-cancel {
+  margin-top: 8px;
+  border-color: rgba(23,34,61,.08);
+  background: rgba(255,255,255,.97);
+  color: var(--app-text);
+}
+
+@keyframes action-sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes action-sheet-up {
+  from { transform: translateY(24px) scale(.985); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* El teclado del Bot ajusta su layout sin alterar otros módulos. */
+body.keyboard-open #view-bot.active {
+  min-height: 0;
+  height: var(--bot-visual-height, 100dvh);
+  overflow: hidden;
+  padding-bottom: 4px;
+}
+
+body.keyboard-open .bot-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+body.keyboard-open .bot-card.has-conversation .bot-thread {
+  min-height: 0;
+  max-height: none;
+  flex: 1 1 0;
+  overflow-y: auto;
+}
+
+body.keyboard-open .bot-form {
+  position: relative;
+  bottom: auto;
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-bottom: calc(4px + var(--safe-bottom));
+}
+
+body.keyboard-open .bot-page-header {
+  padding-bottom: 4px;
+}

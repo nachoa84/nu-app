@@ -1029,16 +1029,34 @@
   });
 
   function init() {
+    // Guardamos el flag antes de limpiar el query string.
+    // Así ?newuser=1 siempre fuerza el onboarding incluso si después
+    // history.replaceState() elimina el parámetro de la URL.
+    const isNewUserTest = params.get("newuser") === "1";
+    const isForcedOnboarding = params.get("onboarding") === "1";
+
     handleNewUserTestParam();
 
+    if (isNewUserTest) {
+      openOnboarding({ mode: "create" });
+      return;
+    }
+
     const profile = getProfile();
+
+    // ?onboarding=1 sirve para abrir el onboarding manualmente sin
+    // borrar el progreso. Si ya existe perfil, lo abre en edición.
+    if (isForcedOnboarding) {
+      openOnboarding({ mode: profile ? "edit" : "create" });
+      return;
+    }
 
     if (profile) {
       renderProfileUI();
       return;
     }
 
-    if (previewMode && !forceOnboarding) {
+    if (previewMode) {
       return;
     }
 

@@ -1,0 +1,109 @@
+/* =========================================================
+   V36 Step 12P · Shell visual canónico
+   Resolución final de componentes globales que comparten
+   especificidad con estilos propios de las vistas.
+   ========================================================= */
+
+.app-page-header {
+  min-height: 56px;
+  padding-inline: 1px;
+  padding-bottom: 14px;
+}
+
+.app-page-header h1 {
+  color: var(--app-text);
+  font-size: 29px;
+  font-weight: 820;
+  letter-spacing: -0.042em;
+}
+
+.page-kicker {
+  color: #707884;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.92);
+  color: var(--app-text);
+  box-shadow: none;
+}
+
+.icon-button:active {
+  transform: scale(.96);
+  background: #f0f3f5;
+}
+
+body.is-scrolled .app-page-header {
+  min-height: 56px;
+  padding: 6px 2px 8px;
+  background: rgba(247,248,247,.92);
+  box-shadow: 0 1px 0 var(--app-line);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+body.is-scrolled .app-page-header h1 {
+  color: var(--app-text);
+  font-size: 18.5px;
+  font-weight: 800;
+}
+
+.primary,
+.secondary,
+.ghost {
+  min-height: 48px;
+  border-radius: 14px;
+  font-weight: 760;
+}
+
+.primary {
+  background: var(--app-accent);
+  color: #fff;
+}
+
+.secondary {
+  border-color: #dbe3ec;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+}
+
+.ghost {
+  border-color: var(--app-line);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.primary:active,
+.secondary:active,
+.ghost:active {
+  transform: scale(.97);
+}
+
+/* =========================================================
+   V52C · Consistencia global de headers
+   El shell vuelve a ser dueño del tamaño óptico y del estado colapsado.
+   ========================================================= */
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Las reglas locales de títulos usan IDs y antes impedían el colapso global. */
+body.is-scrolled #view-hoy .home-page-header h1,
+body.is-scrolled #view-favoritos .app-page-header h1,
+body.is-scrolled #view-bot .app-page-header h1 {
+  margin: 0;
+  font-size: 18.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+body.is-scrolled #view-hoy .home-greeting,
+body.is-scrolled #view-bot .bot-status {
+  display: none;
+}
+

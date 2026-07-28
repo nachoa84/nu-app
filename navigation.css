@@ -1,0 +1,117 @@
+/* =========================================================
+   V44A · Navegación nativa canónica
+   Una sola definición. 3 destinos, blur, safe area, teclado.
+   ========================================================= */
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 80;
+  width: min(430px, 100%);
+  min-height: var(--nav-height);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  padding: 6px 16px calc(6px + var(--safe-bottom));
+  transform: translateX(-50%);
+  border-top: 1px solid rgba(23, 34, 61, .065);
+  background: rgba(252, 253, 253, .88);
+  box-shadow: 0 -8px 28px rgba(21, 33, 61, .035);
+  backdrop-filter: blur(26px) saturate(155%);
+  -webkit-backdrop-filter: blur(26px) saturate(155%);
+  transition: transform .22s cubic-bezier(.22,.8,.24,1), opacity .18s ease;
+  contain: layout paint;
+}
+
+.nav-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  min-width: 0;
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px;
+  border: 0;
+  outline: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #8a919b;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: color .18s ease, transform .14s cubic-bezier(.32,.72,0,1), opacity .18s ease;
+}
+
+.nav-btn .nav-icon {
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: currentColor;
+  transform-origin: center;
+}
+
+.nav-btn .nav-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.nav-btn > span:last-child {
+  font-size: 11px;
+  font-weight: 570;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: font-weight .18s ease, opacity .18s ease;
+}
+
+.nav-btn.active {
+  color: var(--app-accent);
+}
+
+.nav-btn.active > span:last-child {
+  font-weight: 690;
+}
+
+.nav-btn:active,
+.nav-btn.native-press-active {
+  transform: scale(.955);
+}
+
+.nav-btn.nav-just-activated .nav-icon {
+  animation: v44-nav-icon-pop 240ms cubic-bezier(.22,.8,.24,1);
+}
+
+@keyframes v44-nav-icon-pop {
+  0% { transform: scale(.86); }
+  58% { transform: scale(1.09); }
+  100% { transform: scale(1); }
+}
+
+body.keyboard-open .bottom-nav {
+  transform: translate(-50%, calc(100% + 18px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.keyboard-open #app {
+  padding-bottom: var(--safe-bottom);
+}
+
+body.keyboard-open main {
+  min-height: var(--bot-visual-height, 100dvh);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav,
+  .nav-btn,
+  .nav-btn .nav-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}

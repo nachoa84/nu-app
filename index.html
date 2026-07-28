@@ -3,52 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#fff9f5" />
+  <meta name="theme-color" content="#f7f8f7" />
 
   <meta name="apple-mobile-web-app-title" content="Rutina 30 Días" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Rutina 30 Días</title>
 
-  <link rel="manifest" href="manifest.webmanifest?v=35-8-publicacion-fixes" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="manifest" href="manifest.webmanifest?v=52c-final-visual-consistency" />
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="styles.css?v=35-8-publicacion-fixes" />
-  <link rel="stylesheet" href="onboarding.css?v=35-2-verified" />
+  <link rel="stylesheet" href="tokens.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="base.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="splash.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="navigation.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="daily.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="progress.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="shared.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="ui-core.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="notifications.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="home.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="shell.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="media-preview.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="bot.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="favorites.css?v=52c-final-visual-consistency" />
+  <link rel="stylesheet" href="onboarding.css?v=52c-final-visual-consistency" />
 </head>
 
 <body data-active-view="hoy">
+  <div id="appSplash" class="app-splash" role="status" aria-label="Cargando rutinas">
+    <div class="splash-stage">
+      <video
+        id="nuSplashVideo"
+        class="nu-write-video"
+        autoplay
+        muted
+        playsinline
+        preload="auto"
+        aria-hidden="true"
+      >
+        <source src="assets/custom/nu-write-v2.mp4" type="video/mp4" />
+      </video>
+
+      <img
+        class="nu-final-poster"
+        src="assets/custom/nu-write-v2-poster.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="nu-app-word"
+        src="assets/custom/nu-app-word-v51.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <div class="nu-loading">
+        <span>Cargando rutinas</span>
+        <span class="nu-loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+      </div>
+    </div>
+  </div>
   <div id="app">
     <main>
       <section id="view-hoy" class="view active">
         <header class="app-page-header home-page-header">
           <div>
-            <span id="homeGreeting" class="page-kicker">Hola</span>
-            <h1 id="homeDayTitle">Día 1</h1>
+            <span id="homeGreeting" class="home-greeting">Hola</span>
+            <h1 id="homeDayTitle">Mis rutinas</h1>
           </div>
-          <button id="homeBellBtn" class="icon-button" type="button" aria-label="Notificaciones"></button>
+          <button id="homeBellBtn" class="icon-button home-bell-btn" type="button" aria-label="Notificaciones"></button>
         </header>
 
-        <div class="hero-card">
-          <div class="hero-card-top">
-            <div class="day-pill">DÍA 1</div>
-            <span class="hero-status">En progreso</span>
-          </div>
-
-          <div class="hero-card-title">
-            <span class="hero-card-icon" aria-hidden="true"></span>
-            <div>
-              <h2>Tu acción de hoy</h2>
+        <section class="home-routines" aria-labelledby="homeDayTitle">
+          <article class="home-routine-card home-routine-card-active">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
             </div>
-          </div>
 
-          <p>Todo lo que necesitás para avanzar hoy.</p>
+            <div class="home-routine-body">
+              <div class="home-routine-heading">
+                <h2>Collagen+</h2>
+              </div>
+              <p id="homeRoutineDay" class="home-routine-day">Día 1 de 30</p>
+              <div class="home-routine-progress-row">
+                <div class="home-routine-progress" aria-hidden="true">
+                  <span id="homeRoutineProgressFill"></span>
+                </div>
+                <span id="homeRoutinePercent" class="home-routine-percent">3%</span>
+              </div>
+              <button id="startDayBtn" class="home-routine-continue" type="button">
+                <span id="homeRoutineContinueLabel">Continuar Día 1</span>
+                <span class="home-routine-continue-icon" aria-hidden="true"></span>
+              </button>
+              <button id="openRoutineBtn" class="home-routine-progress-link" type="button" hidden>Ver progreso de 30 días</button>
+            </div>
+          </article>
 
-          <div class="hero-actions">
-            <button id="startDayBtn" class="primary hero-primary">Comenzar mi día</button>
-          </div>
-        </div>
+          <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
+            </div>
+            <div class="home-routine-body">
+              <div class="home-routine-heading"><h2>LumiSpa</h2></div>
+              <p class="home-routine-day">Próximamente</p>
+              <span class="home-routine-placeholder-label">Nueva rutina</span>
+            </div>
+          </article>
+
+          <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" />
+            </div>
+            <div class="home-routine-body">
+              <div class="home-routine-heading"><h2>Suplementos</h2></div>
+              <p class="home-routine-day">Próximamente</p>
+              <span class="home-routine-placeholder-label">Nueva rutina</span>
+            </div>
+          </article>
+        </section>
 
         <div id="chatWrap" class="chat-wrap">
+          <header id="dailyNativeHeader" class="daily-native-header" hidden>
+            <button id="dailyNativeBackBtn" class="icon-button daily-native-back" type="button" aria-label="Volver a Mis rutinas"></button>
+            <div class="daily-native-title">
+              <strong>Collagen+</strong>
+              <span id="dailyNativeDayLabel">Día 1 de 30</span>
+            </div>
+            <button id="dailyNativeProgressBtn" class="icon-button daily-native-progress" type="button" aria-label="Ver progreso de 30 días"></button>
+          </header>
           <div class="chat-header">
             <div>
               <strong>Día 1 · Rutina 30 Días</strong>
@@ -61,10 +148,11 @@
       </section>
 
       <section id="view-rutina" class="view">
-        <header class="app-page-header">
+        <header class="app-page-header routine-page-header">
+          <button id="routineBackBtn" class="icon-button routine-back-btn" type="button" aria-label="Volver a Inicio"></button>
           <div>
-            <span class="page-kicker">Tu plan</span>
-            <h1>Rutina</h1>
+            <span class="page-kicker">Collagen+</span>
+            <h1>Progreso</h1>
           </div>
         </header>
         <div id="daysGrid" class="days-grid"></div>
@@ -73,7 +161,6 @@
       <section id="view-favoritos" class="view">
         <header class="app-page-header">
           <div>
-            <span class="page-kicker">Tus contenidos</span>
             <h1>Favoritos</h1>
           </div>
           <button id="favoritesSearchBtn" class="icon-button" type="button" aria-label="Buscar favoritos"></button>
@@ -87,7 +174,7 @@
       <section id="view-bot" class="view">
         <header class="app-page-header bot-page-header">
           <div>
-            <h1>Bot</h1>
+            <h1>Asistente</h1>
             <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
           </div>
           <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
@@ -96,17 +183,23 @@
         <div class="bot-card">
           <div id="botThread" class="bot-thread" aria-live="polite"></div>
 
-          <div class="quick-commands">
-            <button data-command="comisiones">Comisiones</button>
-            <button data-command="presentaciones">Presentaciones</button>
-            <button data-command="primeros pasos">Primeros pasos</button>
-            <button data-command="productos">Productos</button>
+          <div id="botForm" class="bot-form">
+            <input
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              enterkeyhint="send"
+              aria-autocomplete="none"
+              role="textbox"
+              name="botInput"
+              id="botInput"
+              placeholder="Preguntá o buscá un recurso..."
+            />
+            <button class="primary bot-send" type="button" aria-label="Enviar"></button>
           </div>
-
-          <form id="botForm" class="bot-form">
-            <input id="botInput" placeholder="Escribí tu consulta..." autocomplete="off" />
-            <button class="primary bot-send" type="submit" aria-label="Enviar"></button>
-          </form>
         </div>
       </section>
     </main>
@@ -114,9 +207,6 @@
     <nav class="bottom-nav" aria-label="Navegación principal">
       <button class="nav-btn active" data-view="hoy">
         <span class="nav-icon"></span><span>Inicio</span>
-      </button>
-      <button class="nav-btn" data-view="rutina">
-        <span class="nav-icon"></span><span>Rutina</span>
       </button>
       <button class="nav-btn" data-view="favoritos">
         <span class="nav-icon"></span><span>Favoritos</span>
@@ -167,19 +257,30 @@
         <button id="notificationSettingsClose" class="notification-settings-close" type="button" aria-label="Cerrar"></button>
       </header>
 
+      <p class="notification-settings-intro">Elegí cuándo querés recibir tu recordatorio diario.</p>
+
       <div class="notification-settings-list">
         <div class="notification-settings-row">
-          <strong>Notificaciones</strong>
+          <div class="notification-settings-copy">
+            <strong>Recordatorio diario</strong>
+            <span>Recibí un aviso para continuar tu rutina.</span>
+          </div>
           <button id="notificationEnableBtn" class="notification-enable-btn" type="button">Activar</button>
         </div>
 
         <div class="notification-settings-row">
-          <strong>Horario elegido</strong>
+          <div class="notification-settings-copy">
+            <strong>Horario</strong>
+            <span>Hora local de tu dispositivo.</span>
+          </div>
           <span id="notificationTimeValue" class="notification-time-value">09:00</span>
         </div>
       </div>
 
-      <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button">Cambiar horario</button>
+      <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button">
+        <span>Cambiar horario</span>
+        <span class="notification-change-time-chevron" aria-hidden="true">›</span>
+      </button>
 
       <div id="notificationTimeEditor" class="notification-time-editor" hidden>
         <div class="notification-time-picker" role="group" aria-label="Elegir nuevo horario">
@@ -206,9 +307,45 @@
 
   <button id="installBtn" class="hidden" type="button" tabindex="-1" aria-hidden="true"></button>
 
-  <script src="backend-client.js?v=35-9-notif-identity"></script>
-  <script src="push-client.js?v=35-9-1-notif-time-sync"></script>
-  <script src="app.js?v=35-9-1-notif-time-sync"></script>
-  <script src="onboarding.js?v=35-9-notif-identity"></script>
+  <script>
+    (() => {
+      try {
+        const state = JSON.parse(localStorage.getItem("routineState") || "null");
+        const day = Number(state?.currentDay || localStorage.getItem("selectedDay") || 1);
+        if (!Number.isFinite(day) || day < 1) return;
+
+        const routineDay = document.getElementById("homeRoutineDay");
+        const routinePercent = document.getElementById("homeRoutinePercent");
+        const routineFill = document.getElementById("homeRoutineProgressFill");
+        const routineContinue = document.getElementById("homeRoutineContinueLabel");
+        const chatTitle = document.querySelector(".chat-header strong");
+        const percent = Math.min(100, Math.round((day / 30) * 100));
+
+        if (routineDay) routineDay.textContent = `Día ${day} de 30`;
+        if (routinePercent) routinePercent.textContent = `${percent}%`;
+        if (routineFill) routineFill.style.width = `${percent}%`;
+        if (routineContinue) routineContinue.textContent = `Continuar Día ${day}`;
+        if (chatTitle) chatTitle.textContent = `Día ${day} · Rutina 30 Días`;
+      } catch (_) {}
+    })();
+  </script>
+
+  <script src="splash.js?v=52c-final-visual-consistency"></script>
+  <script src="backend-client.js?v=52c-final-visual-consistency"></script>
+  <script src="push-client.js?v=52c-final-visual-consistency"></script>
+  <script src="bot-content.js?v=52c-final-visual-consistency"></script>
+  <script src="ui-core.js?v=52c-final-visual-consistency"></script>
+  <script src="routine-content.js?v=52c-final-visual-consistency"></script>
+  <script src="routine-state.js?v=52c-final-visual-consistency"></script>
+  <script src="routine-sync.js?v=52c-final-visual-consistency"></script>
+  <script src="bot.js?v=52c-final-visual-consistency"></script>
+  <script src="favorites.js?v=52c-final-visual-consistency"></script>
+  <script src="notifications.js?v=52c-final-visual-consistency"></script>
+  <script src="home-view.js?v=52c-final-visual-consistency"></script>
+  <script src="daily-view.js?v=52c-final-visual-consistency"></script>
+  <script src="progress-view.js?v=52c-final-visual-consistency"></script>
+  <script src="app.js?v=52c-final-visual-consistency"></script>
+  <script src="media-preview.js?v=52c-final-visual-consistency"></script>
+  <script src="onboarding.js?v=52c-final-visual-consistency"></script>
 </body>
 </html>

@@ -1,0 +1,843 @@
+/* =========================================================
+   Rutina 30 Días · Favoritos · definición canónica
+   v36 · Paso 12K
+
+   Unifica en UN solo archivo:
+   - pantalla principal "De mis rutinas"
+   - carrusel de días
+   - detalle de un día
+   - guardados "Del Bot"
+   - filtros, búsqueda y estados vacíos
+
+   Evita depender de favorites-detail.css / favorites-main-fix.css
+   y elimina overrides duplicados que antes vivían en styles.css.
+   ========================================================= */
+
+#view-favoritos {
+  --fav-brand: #273f7a;
+  --fav-brand-strong: #1c315f;
+  --fav-brand-soft: #eef1f8;
+  --fav-green: #738b5d;
+  --fav-green-soft: #eef2e9;
+  --fav-ink: #17223d;
+  --fav-muted: #717984;
+  --fav-line: #e5e7e8;
+  padding-top: calc(17px + var(--safe-top));
+  background: #fffdfa;
+}
+
+#view-favoritos .app-page-header {
+  position: relative;
+  padding: 2px 0 15px;
+  margin: 0;
+  background: transparent;
+}
+
+#view-favoritos .app-page-header h1 {
+  margin: 0;
+  color: var(--fav-ink);
+  font-size: 30px;
+  font-weight: 820;
+  letter-spacing: -.045em;
+}
+
+#view-favoritos .icon-button {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-ink);
+}
+
+#view-favoritos .icon-button:active {
+  background: var(--fav-brand-soft);
+}
+
+/* Filtros */
+#view-favoritos .saved-filter-bar {
+  position: relative;
+  top: auto;
+  z-index: 1;
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  margin: 0 -16px 24px;
+  padding: 0 16px 2px;
+  border-radius: 0;
+  background: transparent;
+  scrollbar-width: none;
+}
+
+#view-favoritos .saved-filter-bar::-webkit-scrollbar,
+#view-favoritos .favorite-day-strip::-webkit-scrollbar {
+  display: none;
+}
+
+#view-favoritos .saved-filter-btn {
+  min-height: 36px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #e2e4e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #626b75;
+  font-size: 12px;
+  font-weight: 680;
+  box-shadow: none;
+}
+
+#view-favoritos .saved-filter-btn.active {
+  border-color: var(--fav-brand);
+  background: var(--fav-brand);
+  color: #fff;
+}
+
+/* Lista / agrupación */
+#view-favoritos .favorites-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+#view-favoritos .favorites-native-groups {
+  display: grid;
+  gap: 28px;
+}
+
+#view-favoritos .favorite-native-section {
+  min-width: 0;
+}
+
+#view-favoritos .favorite-native-eyebrow {
+  margin: 0 0 12px;
+  color: var(--fav-ink);
+  font-size: 16px;
+  font-weight: 790;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  text-transform: none;
+}
+
+#view-favoritos .favorite-native-routine-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--fav-ink);
+}
+
+#view-favoritos .favorite-native-routine-heading strong {
+  font-size: 15px;
+  font-weight: 790;
+}
+
+#view-favoritos .favorite-native-routine-icon {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--fav-green-soft);
+  color: var(--fav-green);
+}
+
+#view-favoritos .favorite-native-routine-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Preview compartido dentro de Favoritos */
+#view-favoritos .favorite-folder-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #f1f1ee;
+  color: var(--fav-brand);
+}
+
+#view-favoritos .favorite-folder-preview img,
+#view-favoritos .favorite-folder-preview video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#view-favoritos .favorite-folder-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(22, 31, 42, .62);
+  color: #fff;
+  box-shadow: none;
+}
+
+#view-favoritos .favorite-folder-play svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================================================
+   Pantalla principal · carrusel de días
+   ========================================================= */
+#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 -16px;
+  padding: 0 16px 6px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 118px;
+  width: 118px;
+  min-width: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-ink);
+  font: inherit;
+  text-align: left;
+  vertical-align: top;
+  scroll-snap-align: start;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile:active,
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile.is-native-pressed {
+  transform: scale(.985);
+  opacity: .92;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview {
+  position: relative;
+  flex: 0 0 128px;
+  width: 118px;
+  height: 128px;
+  min-width: 118px;
+  min-height: 128px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--fav-line);
+  border-radius: 15px;
+  background: #f1f1ee;
+  transform: none;
+  touch-action: manipulation;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview::before {
+  display: none;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview .favorite-folder-play {
+  width: 38px;
+  height: 38px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy {
+  position: static;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 2px;
+  transform: none;
+  opacity: 1;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  position: static;
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  transform: none;
+  white-space: normal;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
+  margin: 0 0 3px;
+  color: var(--fav-ink);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  margin: 0;
+  color: var(--fav-muted);
+  font-size: 10.5px;
+  font-weight: 560;
+}
+
+/* =========================================================
+   Favoritos guardados desde el Bot
+   ========================================================= */
+#view-favoritos .favorite-native-bot {
+  padding-top: 3px;
+  border-top: 1px solid var(--fav-line);
+}
+
+#view-favoritos .favorite-native-bot .favorite-native-eyebrow {
+  margin-top: 21px;
+}
+
+#view-favoritos .bot-favorites-list {
+  overflow: hidden;
+  border: 1px solid var(--fav-line);
+  border-radius: 18px;
+  background: #fff;
+}
+
+#view-favoritos .bot-favorite-card {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  border-top: 1px solid var(--fav-line);
+  background: #fff;
+}
+
+#view-favoritos .bot-favorite-card:first-child {
+  border-top: 0;
+}
+
+#view-favoritos .bot-favorite-card.is-native-pressed {
+  background: #fafafa;
+}
+
+#view-favoritos .bot-favorite-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 4px 9px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--fav-ink);
+  text-align: left;
+  text-decoration: none;
+}
+
+#view-favoritos div.bot-favorite-main {
+  grid-template-columns: 58px minmax(0, 1fr);
+}
+
+#view-favoritos .bot-favorite-thumb {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--fav-brand-soft);
+  color: var(--fav-brand);
+}
+
+#view-favoritos .bot-favorite-thumb img,
+#view-favoritos .bot-favorite-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+#view-favoritos .bot-favorite-thumb > svg {
+  width: 24px;
+  height: 24px;
+}
+
+#view-favoritos .bot-favorite-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(21, 29, 41, .62);
+  color: #fff;
+}
+
+#view-favoritos .bot-favorite-play svg {
+  width: 14px;
+  height: 14px;
+}
+
+#view-favoritos .bot-favorite-copy {
+  min-width: 0;
+}
+
+#view-favoritos .bot-favorite-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--fav-ink);
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+#view-favoritos .bot-favorite-copy small {
+  display: block;
+  margin-top: 4px;
+  color: var(--fav-muted);
+  font-size: 10.5px;
+}
+
+#view-favoritos .bot-favorite-arrow {
+  display: grid;
+  place-items: center;
+  color: #9ca3aa;
+}
+
+#view-favoritos .bot-favorite-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+#view-favoritos .bot-favorite-remove {
+  width: 42px;
+  min-height: 76px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fav-brand);
+}
+
+#view-favoritos .bot-favorite-remove svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* =========================================================
+   Detalle de un día
+   ========================================================= */
+#view-favoritos.favorite-day-open {
+  padding-top: var(--safe-top);
+}
+
+#view-favoritos.favorite-day-open .app-page-header {
+  display: none;
+}
+
+#view-favoritos.favorite-day-open .saved-filter-bar {
+  margin-top: 6px;
+  margin-bottom: 17px;
+}
+
+#view-favoritos .favorite-day-screen {
+  width: 100%;
+  min-width: 0;
+  animation: favorite-day-enter .2s cubic-bezier(.22,.8,.24,1) both;
+}
+
+@keyframes favorite-day-enter {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+#view-favoritos .favorite-day-header {
+  display: block;
+  margin: 0 0 14px;
+}
+
+#view-favoritos .favorite-back-link {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 42px;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-brand);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 720;
+  line-height: 1;
+  text-align: left;
+}
+
+#view-favoritos .favorite-back-link svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+#view-favoritos .favorite-day-title small {
+  display: block;
+  margin: 0 0 5px;
+  color: var(--fav-green);
+  font-size: 11px;
+  font-weight: 790;
+  letter-spacing: .055em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+#view-favoritos .favorite-day-title h2 {
+  margin: 0;
+  color: var(--fav-ink);
+  font-size: clamp(30px, 9vw, 38px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+#view-favoritos .favorite-day-title span {
+  display: block;
+  margin-top: 8px;
+  color: var(--fav-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#view-favoritos .favorite-day-content {
+  width: 100%;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-favoritos .favorite-content-row {
+  display: grid;
+  grid-template-columns: 24px 58px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 78px;
+  padding: 10px 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--fav-line);
+  background: transparent;
+  box-shadow: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#view-favoritos .favorite-content-row:first-child {
+  border-top: 0;
+}
+
+#view-favoritos .favorite-content-row.is-native-pressed {
+  transform: scale(.995);
+}
+
+#view-favoritos .favorite-content-order {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fav-green-soft);
+  color: var(--fav-green);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+#view-favoritos .favorite-content-thumb,
+#view-favoritos .favorite-link-icon {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: var(--fav-brand-soft);
+  box-shadow: none;
+  color: var(--fav-brand);
+}
+
+#view-favoritos .favorite-content-thumb .favorite-folder-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+#view-favoritos .favorite-content-thumb .favorite-folder-play {
+  width: 28px;
+  height: 28px;
+}
+
+#view-favoritos .favorite-link-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+#view-favoritos .favorite-content-copy {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+#view-favoritos .favorite-content-copy strong {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  color: var(--fav-ink);
+  font-size: 14px;
+  font-weight: 720;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#view-favoritos .favorite-content-copy span {
+  display: block;
+  margin-top: 4px;
+  color: var(--fav-muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+#view-favoritos .favorite-row-remove {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-brand);
+}
+
+#view-favoritos .favorite-row-remove svg {
+  width: 21px;
+  height: 21px;
+}
+
+/* Búsqueda de Favoritos */
+#view-favoritos .favorites-search-panel {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 2px 1px 13px;
+  background: #fffdfa;
+}
+
+#view-favoritos .favorites-search-back {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--fav-brand);
+}
+
+#view-favoritos .favorites-search-back svg {
+  width: 20px;
+  height: 20px;
+}
+
+#view-favoritos .favorites-search-field {
+  min-width: 0;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--fav-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: none;
+}
+
+#view-favoritos .favorites-search-field > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--fav-muted);
+}
+
+#view-favoritos .favorites-search-field input {
+  min-width: 0;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--fav-ink);
+  font-size: 13px;
+}
+
+#view-favoritos .favorites-search-field input::placeholder {
+  color: #939aa1;
+}
+
+#view-favoritos .favorites-search-clear {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fav-brand-soft);
+  color: var(--fav-muted);
+  font-size: 18px;
+  line-height: 1;
+}
+
+#view-favoritos.favorites-searching > .app-page-header {
+  display: none;
+}
+
+#view-favoritos .favorite-day-filter-empty {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 28px 18px;
+  text-align: center;
+  color: var(--fav-muted);
+}
+
+#view-favoritos .favorite-day-filter-empty strong {
+  color: var(--fav-ink);
+  font-size: 14px;
+}
+
+#view-favoritos .favorite-day-filter-empty span {
+  max-width: 250px;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+#view-favoritos .empty-state {
+  border-color: #dfe2e4;
+  background: #fff;
+  color: var(--fav-muted);
+}
+
+#view-favoritos .saved-empty-icon {
+  background: var(--fav-brand-soft);
+  color: var(--fav-brand);
+}
+
+#view-favoritos .empty-state-cta {
+  background: var(--fav-brand);
+}
+
+@media (max-width: 360px) {
+  #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+    flex-basis: 108px;
+    width: 108px;
+    min-width: 108px;
+  }
+
+  #view-favoritos:not(.favorite-day-open)
+  .favorite-day-tile-preview.favorite-folder-preview {
+    flex-basis: 118px;
+    width: 108px;
+    min-width: 108px;
+    height: 118px;
+    min-height: 118px;
+  }
+
+  #view-favoritos .favorite-content-row {
+    grid-template-columns: 22px 52px minmax(0, 1fr) 38px;
+    gap: 8px;
+  }
+
+  #view-favoritos .favorite-content-thumb,
+  #view-favoritos .favorite-link-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  #view-favoritos .favorite-content-copy strong {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view-favoritos .favorite-day-screen {
+    animation: none !important;
+  }
+}

@@ -4,8 +4,8 @@
   "description": "Tu rutina diaria de acciones, materiales y favoritos.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fff9f5",
-  "theme_color": "#fff9f5",
+  "background_color": "#f7f8f7",
+  "theme_color": "#f7f8f7",
   "orientation": "portrait-primary",
   "icons": [
     {

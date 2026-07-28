@@ -1,0 +1,33 @@
+/* =========================================================
+   V52C · Design tokens canónicos
+   Una sola fuente para color, superficies, safe areas y aliases.
+   ========================================================= */
+:root {
+  --app-bg: #f6f7f9;
+  --app-surface: #ffffff;
+  --app-surface-soft: #f3f5f8;
+  --app-text: #17223d;
+  --app-muted: #78808c;
+  --app-accent: #304f9a;
+  --app-accent-dark: #233f82;
+  --app-accent-soft: #eef2fb;
+  --app-line: #e6eaf0;
+  --app-success: #7a9260;
+  --app-shadow: 0 16px 34px rgba(21, 33, 61, 0.06);
+
+  --nav-height: 72px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+
+  /* Aliases heredados: conservados para no romper componentes existentes. */
+  --bg: var(--app-bg);
+  --card: var(--app-surface);
+  --text: var(--app-text);
+  --muted: var(--app-muted);
+  --primary: var(--app-accent);
+  --primary-2: var(--app-accent-dark);
+  --primary-soft: var(--app-accent-soft);
+  --line: var(--app-line);
+  --success: var(--app-success);
+  --shadow: var(--app-shadow);
+}

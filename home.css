@@ -1,0 +1,254 @@
+/* =========================================================
+   V52C · Inicio canónico
+   Mis rutinas en una sola capa visual. Sin hero legado ni overrides históricos.
+   ========================================================= */
+
+#view-hoy {
+  --home-ink: #17223d;
+  --home-muted: #7f8794;
+  --home-line: #e9ebef;
+  --home-progress: #5149b8;
+  --home-progress-soft: #eeeffb;
+  padding-top: calc(34px + var(--safe-top));
+}
+
+.home-page-header {
+  align-items: flex-start;
+  padding: 6px 0 22px;
+}
+
+.home-page-header > div {
+  min-width: 0;
+}
+
+.home-greeting {
+  display: block;
+  margin-bottom: 12px;
+  color: #7f8794;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.home-page-header h1,
+#view-hoy .home-page-header h1 {
+  margin: 0;
+  color: var(--home-ink);
+  font-size: 28px;
+  font-weight: 680;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.home-routines {
+  display: grid;
+  gap: 13px;
+  margin-bottom: 8px;
+}
+
+.home-routine-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 15px;
+  min-height: 150px;
+  align-items: center;
+  overflow: hidden;
+  padding: 12px 13px;
+  border: 1px solid var(--home-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 9px 24px rgba(23, 34, 61, .045);
+}
+
+.home-routine-cover {
+  width: 104px;
+  min-width: 104px;
+  height: 126px;
+  min-height: 126px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f8f9f9 0%, #f1f3f4 100%);
+}
+
+.home-routine-cover img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  padding: 9px;
+}
+
+.home-routine-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home-routine-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+}
+
+.home-routine-heading h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--home-ink);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.home-routine-day {
+  margin: 5px 0 10px;
+  color: #7c8390;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.home-routine-progress-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.home-routine-progress {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  margin: 0;
+  border-radius: 999px;
+  background: #e9ebf1;
+}
+
+.home-routine-progress > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--home-progress);
+  transition: width 260ms cubic-bezier(.2, 0, 0, 1);
+}
+
+.home-routine-percent {
+  position: static;
+  flex: 0 0 auto;
+  color: #7f8794;
+  font-size: 10.5px;
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-routine-continue {
+  width: fit-content;
+  min-width: 0;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--home-progress-soft);
+  color: #4845aa;
+  box-shadow: none;
+  font-size: 11.5px;
+  font-weight: 620;
+  white-space: nowrap;
+  transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.home-routine-continue:active {
+  transform: scale(.98);
+  background: #e3e3f8;
+  color: #3f3c99;
+}
+
+.home-routine-continue-icon {
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  margin-left: 0;
+}
+
+.home-routine-continue-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.home-routine-progress-link {
+  display: none !important;
+}
+
+/* Próximamente: visible, pero claramente secundario frente a la rutina activa. */
+.home-routine-card-placeholder {
+  border-color: #eef0f3;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: none;
+}
+
+.home-routine-card-placeholder .home-routine-cover {
+  background: linear-gradient(180deg, #fafbfc 0%, #f5f6f7 100%);
+}
+
+.home-routine-card-placeholder .home-routine-cover img {
+  opacity: .62;
+  filter: saturate(.58);
+}
+
+.home-routine-card-placeholder .home-routine-heading h2 {
+  color: #68717f;
+  font-weight: 600;
+}
+
+.home-routine-card-placeholder .home-routine-day {
+  color: #969da8;
+}
+
+.home-routine-placeholder-label {
+  width: fit-content;
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid #e6e9ed;
+  border-radius: 999px;
+  background: #fafbfc;
+  color: #8d949e;
+  font-size: 10px;
+  font-weight: 520;
+}
+
+.home-routines-note {
+  display: none;
+}
+
+@media (max-width: 370px) {
+  #view-hoy {
+    padding-top: calc(30px + var(--safe-top));
+  }
+
+  .home-routine-card {
+    grid-template-columns: 94px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 140px;
+  }
+
+  .home-routine-cover {
+    width: 94px;
+    min-width: 94px;
+    height: 116px;
+    min-height: 116px;
+  }
+}
