@@ -1,45 +1,8 @@
 /* =========================================================
-   Rutina 30 Días · Favoritos · definición canónica
-   v36 · Paso 12K
-
-   Unifica en UN solo archivo:
-   - pantalla principal "De mis rutinas"
-   - carrusel de días
-   - detalle de un día
-   - guardados "Del Bot"
-   - filtros, búsqueda y estados vacíos
-
-   Evita depender de favorites-detail.css / favorites-main-fix.css
-   y elimina overrides duplicados que antes vivían en styles.css.
+   V61A · Favoritos canónico
+   Rutinas, días, detalle, filtros y recursos del Bot.
+   Refactor de cascada sin rediseño ni cambios de lógica.
    ========================================================= */
-
-#view-favoritos {
-  --fav-brand: #273f7a;
-  --fav-brand-strong: #1c315f;
-  --fav-brand-soft: #eef1f8;
-  --fav-green: #738b5d;
-  --fav-green-soft: #eef2e9;
-  --fav-ink: #17223d;
-  --fav-muted: #717984;
-  --fav-line: #e5e7e8;
-  padding-top: calc(17px + var(--safe-top));
-  background: #fffdfa;
-}
-
-#view-favoritos .app-page-header {
-  position: relative;
-  padding: 2px 0 15px;
-  margin: 0;
-  background: transparent;
-}
-
-#view-favoritos .app-page-header h1 {
-  margin: 0;
-  color: var(--fav-ink);
-  font-size: 30px;
-  font-weight: 820;
-  letter-spacing: -.045em;
-}
 
 #view-favoritos .icon-button {
   border: 0;
@@ -53,91 +16,22 @@
 }
 
 /* Filtros */
-#view-favoritos .saved-filter-bar {
-  position: relative;
-  top: auto;
-  z-index: 1;
-  display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  margin: 0 -16px 24px;
-  padding: 0 16px 2px;
-  border-radius: 0;
-  background: transparent;
-  scrollbar-width: none;
-}
 
 #view-favoritos .saved-filter-bar::-webkit-scrollbar,
 #view-favoritos .favorite-day-strip::-webkit-scrollbar {
   display: none;
 }
 
-#view-favoritos .saved-filter-btn {
-  min-height: 36px;
-  flex: 0 0 auto;
-  padding: 0 14px;
-  border: 1px solid #e2e4e6;
-  border-radius: 999px;
-  background: #fff;
-  color: #626b75;
-  font-size: 12px;
-  font-weight: 680;
-  box-shadow: none;
-}
-
-#view-favoritos .saved-filter-btn.active {
-  border-color: var(--fav-brand);
-  background: var(--fav-brand);
-  color: #fff;
-}
-
 /* Lista / agrupación */
+
 #view-favoritos .favorites-list {
   display: grid;
   gap: 10px;
   min-width: 0;
 }
 
-#view-favoritos .favorites-native-groups {
-  display: grid;
-  gap: 28px;
-}
-
 #view-favoritos .favorite-native-section {
   min-width: 0;
-}
-
-#view-favoritos .favorite-native-eyebrow {
-  margin: 0 0 12px;
-  color: var(--fav-ink);
-  font-size: 16px;
-  font-weight: 790;
-  line-height: 1.2;
-  letter-spacing: -.02em;
-  text-transform: none;
-}
-
-#view-favoritos .favorite-native-routine-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  color: var(--fav-ink);
-}
-
-#view-favoritos .favorite-native-routine-heading strong {
-  font-size: 15px;
-  font-weight: 790;
-}
-
-#view-favoritos .favorite-native-routine-icon {
-  width: 25px;
-  height: 25px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--fav-green-soft);
-  color: var(--fav-green);
 }
 
 #view-favoritos .favorite-native-routine-icon svg {
@@ -146,6 +40,7 @@
 }
 
 /* Preview compartido dentro de Favoritos */
+
 #view-favoritos .favorite-folder-preview {
   position: relative;
   display: grid;
@@ -188,48 +83,6 @@
 /* =========================================================
    Pantalla principal · carrusel de días
    ========================================================= */
-#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin: 0 -16px;
-  padding: 0 16px 6px;
-  scroll-snap-type: x proximity;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
-  appearance: none;
-  -webkit-appearance: none;
-  flex: 0 0 118px;
-  width: 118px;
-  min-width: 118px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--fav-ink);
-  font: inherit;
-  text-align: left;
-  vertical-align: top;
-  scroll-snap-align: start;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  transition: transform 150ms ease, opacity 150ms ease;
-}
 
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile:active,
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile.is-native-pressed {
@@ -266,19 +119,6 @@
   height: 38px;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy {
-  position: static;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0 2px;
-  transform: none;
-  opacity: 1;
-  line-height: 1.2;
-  pointer-events: none;
-}
-
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
   position: static;
@@ -290,46 +130,9 @@
   white-space: normal;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
-  margin: 0 0 3px;
-  color: var(--fav-ink);
-  font-size: 13px;
-  font-weight: 760;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
-  margin: 0;
-  color: var(--fav-muted);
-  font-size: 10.5px;
-  font-weight: 560;
-}
-
 /* =========================================================
    Favoritos guardados desde el Bot
    ========================================================= */
-#view-favoritos .favorite-native-bot {
-  padding-top: 3px;
-  border-top: 1px solid var(--fav-line);
-}
-
-#view-favoritos .favorite-native-bot .favorite-native-eyebrow {
-  margin-top: 21px;
-}
-
-#view-favoritos .bot-favorites-list {
-  overflow: hidden;
-  border: 1px solid var(--fav-line);
-  border-radius: 18px;
-  background: #fff;
-}
-
-#view-favoritos .bot-favorite-card {
-  min-height: 76px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 42px;
-  border-top: 1px solid var(--fav-line);
-  background: #fff;
-}
 
 #view-favoritos .bot-favorite-card:first-child {
   border-top: 0;
@@ -337,36 +140,6 @@
 
 #view-favoritos .bot-favorite-card.is-native-pressed {
   background: #fafafa;
-}
-
-#view-favoritos .bot-favorite-main {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 4px 9px 10px;
-  border: 0;
-  background: transparent;
-  color: var(--fav-ink);
-  text-align: left;
-  text-decoration: none;
-}
-
-#view-favoritos div.bot-favorite-main {
-  grid-template-columns: 58px minmax(0, 1fr);
-}
-
-#view-favoritos .bot-favorite-thumb {
-  position: relative;
-  width: 58px;
-  height: 58px;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  border-radius: 13px;
-  background: var(--fav-brand-soft);
-  color: var(--fav-brand);
 }
 
 #view-favoritos .bot-favorite-thumb img,
@@ -405,44 +178,10 @@
   min-width: 0;
 }
 
-#view-favoritos .bot-favorite-copy strong {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--fav-ink);
-  font-size: 13px;
-  font-weight: 760;
-  line-height: 1.25;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-#view-favoritos .bot-favorite-copy small {
-  display: block;
-  margin-top: 4px;
-  color: var(--fav-muted);
-  font-size: 10.5px;
-}
-
-
-#view-favoritos .bot-favorite-remove {
-  width: 42px;
-  min-height: 76px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--fav-brand);
-}
-
-#view-favoritos .bot-favorite-remove svg {
-  width: 18px;
-  height: 18px;
-}
-
 /* =========================================================
    Detalle de un día
    ========================================================= */
+
 #view-favoritos.favorite-day-open {
   padding-top: var(--safe-top);
 }
@@ -676,6 +415,7 @@
 }
 
 /* Búsqueda de Favoritos */
+
 #view-favoritos .favorites-search-panel {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr);
@@ -832,240 +572,65 @@
   }
 }
 
-
-/* =========================================================
-   V37 · Favoritos visual refresh
-   ========================================================= */
-#view-favoritos {
-  padding-top: calc(28px + var(--safe-top));
-  background: #fafbfd;
-}
-
 #view-favoritos .app-page-header {
+  position: relative;
+  padding: 2px 0 15px;
+  margin: 0;
+  background: transparent;
   padding-bottom: 20px;
 }
 
-#view-favoritos .app-page-header h1 {
-  font-size: 32px;
-}
-
-#view-favoritos .saved-filter-bar {
-  gap: 10px;
-  margin-bottom: 28px;
-  padding: 0 18px 2px;
-  margin-inline: -18px;
-}
-
-#view-favoritos .saved-filter-btn {
-  min-height: 42px;
-  padding: 0 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-#view-favoritos .favorites-native-groups {
-  gap: 34px;
-}
-
-#view-favoritos .favorite-native-eyebrow {
-  margin-bottom: 14px;
-  font-size: 18px;
-  font-weight: 800;
-}
-
 #view-favoritos .favorite-native-routine-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fav-ink);
   margin-bottom: 16px;
 }
 
-#view-favoritos .favorite-native-routine-heading strong {
-  font-size: 17px;
-}
-
 #view-favoritos .favorite-native-routine-icon {
+  display: grid;
+  place-items: center;
+  background: var(--fav-green-soft);
+  color: var(--fav-green);
   width: 32px;
   height: 32px;
   border-radius: 10px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
-  gap: 16px;
-  margin-inline: -18px;
-  padding: 0 18px 8px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
-  flex-basis: 132px;
-  width: 132px;
-  min-width: 132px;
-  gap: 10px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
-  flex-basis: 150px;
-  width: 132px;
-  height: 150px;
-  min-width: 132px;
-  min-height: 150px;
-  border-radius: 20px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy {
-  padding: 0 3px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
-  font-size: 14px;
-  font-weight: 760;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
-  font-size: 11px;
-}
-
-#view-favoritos .favorite-native-bot {
-  padding-top: 0;
-  border-top: 1px solid var(--fav-line);
 }
 
 #view-favoritos .favorite-native-bot .favorite-native-routine-heading {
   margin-top: 18px;
 }
 
-#view-favoritos .bot-favorites-list {
-  border-radius: 22px;
-  border-color: #e6eaf0;
-  box-shadow: 0 16px 32px rgba(20,34,61,.045);
-}
-
-#view-favoritos .bot-favorite-card {
-  min-height: 88px;
-}
-
-#view-favoritos .bot-favorite-main {
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 12px 6px 12px 12px;
-}
-
-#view-favoritos div.bot-favorite-main {
-  grid-template-columns: 64px minmax(0, 1fr);
-}
-
-#view-favoritos .bot-favorite-thumb {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-}
-
-#view-favoritos .bot-favorite-copy strong {
-  font-size: 14px;
-  font-weight: 760;
-}
-
-#view-favoritos .bot-favorite-copy small {
-  margin-top: 5px;
-  font-size: 11px;
-}
-
-
-/* =========================================================
-   V37B · Favorites feedback fixes
-   ========================================================= */
 #view-favoritos {
+  --fav-brand: #273f7a;
+  --fav-brand-strong: #1c315f;
+  --fav-brand-soft: #eef1f8;
+  --fav-green: #738b5d;
+  --fav-green-soft: #eef2e9;
+  --fav-ink: #17223d;
+  --fav-muted: #717984;
+  --fav-line: #e5e7e8;
+  background: #fafbfd;
   padding-top: calc(24px + var(--safe-top));
 }
 
-#view-favoritos .app-page-header h1 {
-  font-size: 30px;
-  font-weight: 760;
-  letter-spacing: -0.06em;
-}
-
-#view-favoritos .saved-filter-bar {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin-inline: 0;
-  padding: 0;
-  overflow: visible;
-}
-
-#view-favoritos .saved-filter-btn {
-  min-width: 0;
-  min-height: 40px;
-  padding: 0 8px;
-  font-size: 11px;
-  font-weight: 580;
-  white-space: nowrap;
-}
-
-#view-favoritos .saved-filter-btn.active {
-  font-weight: 670;
-}
-
 #view-favoritos .favorites-native-groups {
+  display: grid;
   gap: 30px;
 }
 
-#view-favoritos .favorite-native-eyebrow {
-  margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: 730;
-}
-
-#view-favoritos .favorite-native-routine-heading strong {
-  font-size: 15px;
-  font-weight: 680;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
-  gap: 14px;
-  margin-inline: 0;
-  padding: 0 2px 8px 2px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
-  flex-basis: 116px;
-  width: 116px;
-  min-width: 116px;
-  gap: 8px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
-  width: 116px;
-  min-width: 116px;
-  height: 136px;
-  min-height: 136px;
-  border-radius: 18px;
-}
-
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy {
+  position: static;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  transform: none;
+  opacity: 1;
+  line-height: 1.2;
+  pointer-events: none;
   padding: 0 2px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
-  font-size: 13px;
-  font-weight: 650;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
-  font-size: 10px;
-  font-weight: 500;
-}
-
-#view-favoritos .bot-favorites-list {
-  border-radius: 24px;
-}
-
-#view-favoritos .bot-favorite-copy strong {
-  font-size: 13px;
-  font-weight: 670;
-}
-
-#view-favoritos .bot-favorite-copy small {
-  font-size: 10px;
-  font-weight: 500;
 }
 
 @media (max-width: 370px) {
@@ -1075,16 +640,25 @@
   }
 }
 
-/* =========================================================
-   V52B · Favoritos · native list polish
-   Filtros claros y Del Bot simplificado, sin affordances redundantes.
-   ========================================================= */
 #view-favoritos .app-page-header h1 {
+  margin: 0;
+  color: var(--fav-ink);
+  letter-spacing: -0.06em;
   font-size: 28px;
   font-weight: 680;
 }
 
 #view-favoritos .saved-filter-bar {
+  position: relative;
+  top: auto;
+  z-index: 1;
+  overflow-x: auto;
+  border-radius: 0;
+  background: transparent;
+  scrollbar-width: none;
+  margin-bottom: 28px;
+  display: grid;
+  margin-inline: 0;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 7px;
   margin: 0 0 31px;
@@ -1093,6 +667,12 @@
 }
 
 #view-favoritos .saved-filter-btn {
+  flex: 0 0 auto;
+  border: 1px solid #e2e4e6;
+  box-shadow: none;
+  border-radius: 999px;
+  min-width: 0;
+  white-space: nowrap;
   min-height: 36px;
   padding: 0 6px;
   border-color: #dde2e8;
@@ -1108,10 +688,33 @@
   color: #fff;
   font-weight: 640;
 }
-#view-favoritos .favorite-native-eyebrow { font-size: 15px; font-weight: 650; }
-#view-favoritos .favorite-native-routine-heading strong { font-size: 14px; font-weight: 630; }
+
+#view-favoritos .favorite-native-eyebrow {
+  margin: 0 0 12px;
+  color: var(--fav-ink);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  text-transform: none;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+#view-favoritos .favorite-native-routine-heading strong {
+  font-size: 14px;
+  font-weight: 630;
+}
 
 #view-favoritos:not(.favorite-day-open) .favorite-day-strip {
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  margin-inline: 0;
   gap: 13px;
   margin: 0;
   padding: 0 2px 8px;
@@ -1119,12 +722,37 @@
 }
 
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-ink);
+  font: inherit;
+  text-align: left;
+  vertical-align: top;
+  scroll-snap-align: start;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 150ms ease, opacity 150ms ease;
+  gap: 8px;
   flex-basis: 112px;
   width: 112px;
   min-width: 112px;
 }
 
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
+  flex-basis: 150px;
   width: 112px;
   min-width: 112px;
   height: 132px;
@@ -1132,8 +760,19 @@
   border-radius: 18px;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong { font-size: 12px; font-weight: 600; }
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small { font-size: 9.8px; font-weight: 480; }
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
+  margin: 0 0 3px;
+  color: var(--fav-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  margin: 0;
+  color: var(--fav-muted);
+  font-size: 9.8px;
+  font-weight: 480;
+}
 
 #view-favoritos .favorite-native-bot {
   padding-top: 0;
@@ -1141,10 +780,13 @@
 }
 
 #view-favoritos .favorite-native-bot .favorite-native-eyebrow {
+  margin-top: 21px;
   margin: 22px 0 12px;
 }
 
 #view-favoritos .bot-favorites-list {
+  overflow: hidden;
+  border-color: #e6eaf0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1152,6 +794,8 @@
 }
 
 #view-favoritos .bot-favorite-card {
+  display: grid;
+  border-top: 1px solid var(--fav-line);
   min-height: 66px;
   grid-template-columns: minmax(0, 1fr) 40px;
   border-top-color: #e7e9ee;
@@ -1159,6 +803,14 @@
 }
 
 #view-favoritos .bot-favorite-main {
+  min-width: 0;
+  display: grid;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--fav-ink);
+  text-align: left;
+  text-decoration: none;
   grid-template-columns: 48px minmax(0, 1fr);
   gap: 11px;
   padding: 8px 4px 8px 0;
@@ -1169,24 +821,43 @@
 }
 
 #view-favoritos .bot-favorite-thumb {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--fav-brand-soft);
+  color: var(--fav-brand);
   width: 48px;
   height: 48px;
   border-radius: 13px;
 }
 
 #view-favoritos .bot-favorite-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--fav-ink);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   font-size: 12.5px;
   font-weight: 620;
   line-height: 1.28;
 }
 
 #view-favoritos .bot-favorite-copy small {
+  display: block;
+  color: var(--fav-muted);
   margin-top: 3px;
   font-size: 9.8px;
   font-weight: 480;
 }
 
 #view-favoritos .bot-favorite-remove {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fav-brand);
   width: 40px;
   min-height: 66px;
 }

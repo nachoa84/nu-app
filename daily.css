@@ -1,76 +1,13 @@
 /* =========================================================
-   V36 Step 12O · Día actual consolidado
-   Base + contenido diario + pasos + Native Clean.
+   V59A · Día actual canónico
+   Refactor de cascada sin rediseño.
+   Base única para hero, objetivo, pasos, materiales y completado.
    ========================================================= */
 
 /* Inicio */
+
 #view-hoy {
   padding-top: calc(17px + var(--safe-top));
-}
-
-.chat-wrap {
-  margin-top: 18px;
-}
-
-.chat-header {
-  display: none;
-}
-
-.daily-detail {
-  display: grid;
-  gap: 14px;
-}
-
-.daily-detail-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: 42px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  margin: -3px -2px 0;
-  padding: 8px 2px 13px;
-  background: linear-gradient(var(--app-bg) 78%, rgba(255,249,245,0));
-}
-
-.daily-back-btn {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid var(--app-line);
-  border-radius: 14px;
-  background: #fff;
-  color: var(--app-text);
-}
-
-.daily-back-btn svg {
-  width: 21px;
-  height: 21px;
-}
-
-.daily-detail-header h2 {
-  margin: 2px 0 0;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.daily-status {
-  display: block;
-  color: var(--app-accent-dark);
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.daily-progress-mini {
-  color: var(--app-accent-dark);
-  font-size: 12px;
-  font-weight: 800;
 }
 
 .objective-card,
@@ -81,13 +18,6 @@
   box-shadow: var(--app-shadow);
 }
 
-.objective-card,
-.native-section {
-  border-radius: 22px;
-  padding: 18px;
-}
-
-.native-card-title span,
 .native-section-heading > div > span {
   display: block;
   margin-bottom: 4px;
@@ -98,61 +28,8 @@
   text-transform: uppercase;
 }
 
-.objective-summary {
-  margin: 0;
-  color: var(--app-text);
-  font-size: 16px;
-  font-weight: 690;
-  line-height: 1.45;
-}
-
-.native-details {
-  margin-top: 14px;
-}
-
-.native-details summary {
-  width: fit-content;
-  min-height: 38px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 14px;
-  border-radius: 13px;
-  background: var(--app-accent-soft);
-  color: var(--app-accent-dark);
-  font-size: 12px;
-  font-weight: 760;
-  list-style: none;
-  cursor: pointer;
-}
-
 .native-details summary::-webkit-details-marker {
   display: none;
-}
-
-.native-details-body {
-  margin-top: 13px;
-  padding-top: 13px;
-  border-top: 1px solid var(--app-line);
-  color: #61534c;
-  font-size: 14px;
-  line-height: 1.65;
-  white-space: pre-line;
-}
-
-.native-section-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 13px;
-}
-
-.native-section-heading h3 {
-  margin: 0;
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
 }
 
 .native-section-heading small {
@@ -174,29 +51,8 @@
   gap: 8px;
 }
 
-.resource-link-main {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  padding: 0 13px;
-  border-radius: 13px;
-  background: var(--app-accent-soft);
-  color: var(--app-accent-dark);
-  font-size: 12px;
-  font-weight: 760;
-  text-decoration: none;
-}
-
-.resource-link-save {
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--app-line);
-  border-radius: 13px;
-  background: #fff;
-  color: var(--app-accent-dark);
-}
-
 /* Play badge compartido entre Materiales y Favoritos */
+
 .resource-play-badge,
 .favorite-folder-play {
   position: absolute;
@@ -218,14 +74,6 @@
   height: 15px;
 }
 
-.complete-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px;
-  border-radius: 20px;
-}
-
 .complete-card:not(.done) {
   display: grid;
 }
@@ -235,37 +83,12 @@
   display: none;
 }
 
-.complete-day-btn {
-  width: 100%;
-  min-height: 54px;
-  border-radius: 17px;
-  background: var(--app-accent);
-  font-size: 15px;
-}
-
 .complete-helper {
   display: block;
   margin-top: 8px;
   color: var(--app-muted);
   font-size: 10px;
   text-align: center;
-}
-
-.complete-card.done {
-  background: var(--app-accent-soft);
-  color: var(--app-accent-dark);
-}
-
-.complete-done-mark {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--app-accent);
-  color: #fff;
-  font-size: 20px;
 }
 
 .complete-done-copy h3,
@@ -284,15 +107,7 @@
   font-size: 10px;
 }
 
-
-/* --- Consolidado desde shared.css --- */
-
-#view-hoy.day-open {
-  padding-top: inherit;
-}
-
-#view-hoy.day-open > .app-page-header,
-#view-hoy.day-open > .hero-card {
+#view-hoy.day-open > .app-page-header {
   display: flex;
 }
 
@@ -309,22 +124,8 @@
 }
 
 .daily-detail {
+  display: grid;
   gap: 11px;
-}
-
-.daily-detail-header {
-  grid-template-columns: 38px 1fr auto;
-  padding: 5px 0 11px;
-}
-
-.daily-back-btn {
-  width: 37px;
-  height: 37px;
-  border-radius: 12px;
-}
-
-.daily-detail-header h2 {
-  font-size: 19px;
 }
 
 .day-plan-group {
@@ -379,6 +180,12 @@
 }
 
 .native-details summary {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 760;
+  list-style: none;
+  cursor: pointer;
   min-height: 30px;
   gap: 5px;
   padding: 0;
@@ -402,6 +209,8 @@
 }
 
 .native-details-body {
+  border-top: 1px solid var(--app-line);
+  color: #61534c;
   margin-top: 11px;
   padding-top: 11px;
   font-size: 13px;
@@ -444,10 +253,17 @@
 }
 
 .native-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 7px;
 }
 
 .native-section-heading h3 {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.1;
   font-size: 17px;
   letter-spacing: -0.025em;
 }
@@ -457,11 +273,23 @@
 }
 
 .resource-link-main {
+  display: flex;
+  align-items: center;
+  padding: 0 13px;
+  border-radius: 13px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  font-weight: 760;
+  text-decoration: none;
   min-height: 38px;
   font-size: 11px;
 }
 
 .resource-link-save {
+  border: 1px solid var(--app-line);
+  border-radius: 13px;
+  background: #fff;
+  color: var(--app-accent-dark);
   width: 38px;
   height: 38px;
   display: grid;
@@ -516,7 +344,7 @@
 
 .resource-row.is-native-pressed {
   transform: scale(.988);
-  background: rgba(214, 101, 63, .045);
+  background: var(--app-surface-soft);
 }
 
 .resource-order {
@@ -541,7 +369,7 @@
   padding: 0;
   border: 0;
   border-radius: 11px;
-  background: #eee5df;
+  background: #f0f1f2;
   corner-shape: squircle;
 }
 
@@ -646,28 +474,20 @@
 }
 
 .complete-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   border-radius: 17px;
   padding: 9px 12px;
   box-shadow: none;
-  border-color: rgba(92, 66, 55, 0.075);
-}
-
-.complete-day-btn {
-  min-height: 44px;
-  border-radius: 13px;
+  border-color: var(--app-line);
 }
 
 .complete-card.done {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
   padding: 10px 13px;
 }
-
-.complete-done-mark {
-  width: 30px;
-  height: 30px;
-  font-size: 16px;
-}
-
-/* --- Consolidado desde shared-before-notifications.css --- */
 
 /* =========================================================
    Pasos de hoy · definición canónica
@@ -677,7 +497,7 @@
 .day-plan-group .day-plan-steps {
   padding: 15px 14px 14px;
   border-top: 1px solid var(--app-line);
-  background: #fffaf7;
+  background: var(--app-surface);
 }
 
 .day-plan-steps .native-section-heading {
@@ -714,32 +534,25 @@
 .action-step,
 .action-step-static {
   overflow: hidden;
-  border: 1px solid #eaded7;
+  border: 1px solid var(--app-line);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.94);
 }
 
 .action-step {
-  box-shadow: 0 3px 12px rgba(86, 54, 40, 0.025);
-  transition:
-    background 0.18s ease,
+  box-shadow: 0 3px 12px rgba(23, 34, 61, .025);
+  transition: background 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease,
     transform 0.14s cubic-bezier(.32,.72,0,1);
 }
 
 .action-step:last-child {
-  border-bottom: 1px solid #eaded7;
+  border-bottom: 1px solid var(--app-line);
 }
 
 .action-step:active {
   transform: scale(0.992);
-}
-
-.action-step[open] {
-  border-color: rgba(214, 101, 63, 0.28);
-  background: #fff1e9;
-  box-shadow: 0 7px 20px rgba(133, 72, 48, 0.055);
 }
 
 .action-step summary {
@@ -763,7 +576,7 @@
 
 .action-step summary:active {
   transform: scale(.992);
-  background: rgba(214, 101, 63, .055);
+  background: #f3f5f8;
 }
 
 .action-step-number {
@@ -772,7 +585,7 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #fff0e7;
+  background: var(--app-accent-soft);
   color: var(--app-accent-dark);
   font-size: 12px;
   font-weight: 840;
@@ -781,12 +594,12 @@
 .action-step[open] .action-step-number {
   background: var(--app-accent);
   color: #fff;
-  box-shadow: 0 4px 10px rgba(197, 82, 48, 0.18);
+  box-shadow: 0 4px 10px rgba(48, 79, 154, .14);
 }
 
 .action-step-title {
   min-width: 0;
-  color: #332822;
+  color: var(--app-text);
   font-size: 15.5px;
   font-weight: 760;
   line-height: 1.34;
@@ -794,7 +607,7 @@
 }
 
 .action-step-arrow {
-  color: #927c70;
+  color: var(--app-muted);
   transition: transform .2s cubic-bezier(.22,.8,.24,1);
 }
 
@@ -809,11 +622,11 @@
 
 .action-step-body {
   margin: 0 12px 13px 54px;
-  padding: 4px 0 3px 12px;
-  border-left: 2px solid rgba(214, 101, 63, 0.36);
+  padding: 4px 0 3px;
+  border: 0;
   border-radius: 0;
   background: transparent;
-  color: #574940;
+  color: var(--app-muted);
   font-size: 14.5px;
   line-height: 1.58;
   white-space: normal;
@@ -822,7 +635,7 @@
 }
 
 .action-step-body .native-detail-paragraph {
-  color: #574940;
+  color: var(--app-muted);
   font-size: 14.5px;
   line-height: 1.58;
 }
@@ -833,7 +646,7 @@
 }
 
 .action-step-body .native-check-item {
-  color: #574940;
+  color: var(--app-muted);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -874,27 +687,8 @@
   }
 }
 
-
-/* --- Consolidado desde styles.css · V36 Step 3 --- */
-
-/* =========================================================
-   V36 Step 3 · Native Clean · Vista del día actual
-   Cambio visual acotado: subpantalla del día dentro de Inicio.
-   No modifica lógica de desbloqueo, progreso ni backend.
-   ========================================================= */
-
 #view-hoy:not(.day-open) > .chat-wrap {
   display: none;
-}
-
-#view-hoy.day-open {
-  --day-brand: #12345f;
-  --day-brand-strong: #0d284b;
-  --day-brand-soft: #eef3f8;
-  --day-olive: #738b5d;
-  --day-olive-soft: #eef2e9;
-  padding-top: var(--safe-top);
-  background: #fffdfa;
 }
 
 #view-hoy.day-open > .home-page-header,
@@ -927,25 +721,6 @@
   display: grid;
 }
 
-.daily-native-back,
-.daily-native-progress {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 13px;
-  background: transparent;
-  color: #172235;
-}
-
-.daily-native-back:active,
-.daily-native-progress:active {
-  background: #f1f2f1;
-  transform: scale(.96);
-}
-
 .daily-native-back svg,
 .daily-native-progress svg {
   width: 22px;
@@ -957,75 +732,6 @@
   display: grid;
   justify-items: center;
   line-height: 1.15;
-}
-
-.daily-native-title strong {
-  color: #162238;
-  font-size: 15.5px;
-  font-weight: 790;
-  letter-spacing: -0.015em;
-}
-
-.daily-native-title span {
-  margin-top: 3px;
-  color: #74787c;
-  font-size: 11.5px;
-  font-weight: 570;
-}
-
-.native-day-content {
-  display: block;
-  padding: 0 0 8px;
-}
-
-.native-day-intro {
-  position: relative;
-  padding: 25px 0 22px;
-  border-bottom: 1px solid #e7e7e2;
-}
-
-.native-day-intro > span {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--day-brand);
-  font-size: 11px;
-  font-weight: 820;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.native-day-intro h2 {
-  margin: 0;
-  color: #14223a;
-  font-size: 29px;
-  font-weight: 820;
-  line-height: 1.08;
-  letter-spacing: -0.045em;
-}
-
-.native-day-progress {
-  width: calc(100% - 76px);
-  height: 4px;
-  margin-top: 19px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #e7e8e6;
-}
-
-.native-day-progress > span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--day-brand);
-}
-
-.native-day-intro > small {
-  position: absolute;
-  right: 0;
-  bottom: 16px;
-  color: #7c7e7f;
-  font-size: 12px;
-  font-weight: 620;
 }
 
 #view-hoy.day-open .day-plan-group {
@@ -1043,23 +749,6 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-}
-
-#view-hoy.day-open .objective-card-header > div > span {
-  margin-bottom: 8px;
-  color: var(--day-olive);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .055em;
-}
-
-#view-hoy.day-open .objective-card-header h3 {
-  max-width: 92%;
-  color: #222a31;
-  font-size: 16px;
-  font-weight: 610;
-  line-height: 1.48;
-  letter-spacing: -0.012em;
 }
 
 #view-hoy.day-open .native-details summary {
@@ -1084,14 +773,6 @@
 #view-hoy.day-open .day-plan-steps .native-section-heading {
   align-items: center;
   margin-bottom: 7px;
-}
-
-#view-hoy.day-open .day-plan-steps .native-section-heading h3,
-#view-hoy.day-open .materials-section .native-section-heading h3 {
-  color: #182334;
-  font-size: 18px;
-  font-weight: 790;
-  letter-spacing: -0.025em;
 }
 
 #view-hoy.day-open .day-plan-steps .native-section-heading > small,
@@ -1166,21 +847,14 @@
   box-shadow: none;
 }
 
-#view-hoy.day-open .action-step-title {
-  color: #2c3032;
-  font-size: 14.5px;
-  font-weight: 570;
-  line-height: 1.4;
-}
-
 #view-hoy.day-open .action-step-arrow {
   color: #939796;
 }
 
 #view-hoy.day-open .action-step-body {
   margin: 0 0 12px 37px;
-  padding: 3px 0 4px 12px;
-  border-left: 2px solid #d9dfd1;
+  padding: 3px 0 4px;
+  border: 0;
   color: #5a5f60;
 }
 
@@ -1198,29 +872,8 @@
   margin-bottom: 12px;
 }
 
-#view-hoy.day-open .resource-sequence {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  margin-inline: -16px;
-  padding: 0 16px 5px;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
 #view-hoy.day-open .resource-sequence::-webkit-scrollbar {
   display: none;
-}
-
-#view-hoy.day-open .resource-row {
-  position: relative;
-  flex: 0 0 132px;
-  display: block;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  scroll-snap-align: start;
 }
 
 #view-hoy.day-open .resource-row.is-native-pressed {
@@ -1228,56 +881,8 @@
   background: transparent;
 }
 
-#view-hoy.day-open .resource-order {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  z-index: 3;
-  width: 23px;
-  height: 23px;
-  border: 1px solid rgba(255,255,255,.7);
-  background: rgba(18,52,95,.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-#view-hoy.day-open .resource-thumb {
-  width: 132px;
-  height: 132px;
-  border-radius: 16px;
-  background: #ecece8;
-  box-shadow: none;
-}
-
-#view-hoy.day-open .resource-play-badge {
-  width: 38px;
-  height: 38px;
-  background: rgba(20, 30, 40, .66);
-  color: #fff;
-  box-shadow: none;
-}
-
 #view-hoy.day-open .resource-main {
   display: block;
-}
-
-#view-hoy.day-open .resource-copy {
-  display: block;
-  margin-top: 8px;
-}
-
-#view-hoy.day-open .resource-copy strong {
-  min-height: 31px;
-  color: #272d32;
-  font-size: 12px;
-  font-weight: 690;
-  line-height: 1.3;
-}
-
-#view-hoy.day-open .resource-copy span {
-  margin-top: 3px;
-  color: #848787;
-  font-size: 10.5px;
 }
 
 #view-hoy.day-open .resource-disclosure,
@@ -1338,59 +943,10 @@
   height: 17px;
 }
 
-#view-hoy.day-open .complete-card {
-  display: block;
-  margin-top: 20px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-#view-hoy.day-open .complete-day-btn {
-  min-height: 52px;
-  border-radius: 13px;
-  background: var(--day-brand);
-  color: #fff;
-  box-shadow: none;
-  font-size: 14.5px;
-  font-weight: 760;
-}
-
 #view-hoy.day-open .complete-helper {
   margin-top: 7px;
   color: #8a8d8d;
   font-size: 10.5px;
-}
-
-#view-hoy.day-open .complete-card.done {
-  display: flex;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--day-olive-soft);
-  color: #415536;
-}
-
-#view-hoy.day-open .complete-done-mark {
-  background: var(--day-olive);
-}
-
-.native-day-progress-button {
-  width: 100%;
-  min-height: 48px;
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 20px;
-  align-items: center;
-  gap: 9px;
-  margin-top: 10px;
-  padding: 0 12px;
-  border: 1px solid #e2e3df;
-  border-radius: 13px;
-  background: #fff;
-  color: #1d2a3b;
-  text-align: left;
-  box-shadow: none;
 }
 
 .native-day-progress-button > span:first-child {
@@ -1407,16 +963,7 @@
   height: 18px;
 }
 
-.native-day-progress-button strong {
-  font-size: 13px;
-  font-weight: 690;
-}
-
 @media (max-width: 370px) {
-  .native-day-intro h2 {
-    font-size: 27px;
-  }
-
   #view-hoy.day-open .resource-row,
   #view-hoy.day-open .resource-thumb {
     width: 124px;
@@ -1425,8 +972,12 @@
 }
 
 /* --- Integración con Native Shell · propiedad del Día actual --- */
+
 .daily-native-back,
 .daily-native-progress {
+  display: grid;
+  place-items: center;
+  padding: 0;
   width: 42px;
   height: 42px;
   border: 1px solid var(--app-line);
@@ -1448,66 +999,10 @@
   box-shadow: none;
 }
 
-
-/* Step 12P · Demo: ajustes específicos sobre el botón secundario canónico. */
-.demo-advance-btn {
-  padding: 0 12px;
-  font-size: 11.5px;
-  white-space: nowrap;
-}
-
-
-/* =========================================================
-   V37 · Día visual refresh
-   ========================================================= */
-#view-hoy.day-open {
-  padding-top: calc(18px + var(--safe-top));
-}
-
 .native-day-content {
+  display: block;
+  padding: 0 0 8px;
   padding-bottom: 14px;
-}
-
-.native-day-intro {
-  padding: 14px 0 24px;
-  border-bottom: 1px solid #e8ebf0;
-}
-
-.native-day-intro > span {
-  margin-bottom: 2px;
-  color: #17223d;
-  font-size: 48px;
-  font-weight: 810;
-  line-height: .98;
-  letter-spacing: -0.07em;
-  text-transform: none;
-}
-
-.native-day-intro h2 {
-  color: #28344a;
-  font-size: 22px;
-  font-weight: 650;
-  line-height: 1.18;
-  letter-spacing: -0.028em;
-}
-
-.native-day-progress {
-  width: calc(100% - 82px);
-  height: 6px;
-  margin-top: 20px;
-  background: #e9edf3;
-}
-
-.native-day-progress > span {
-  background: linear-gradient(90deg, #3b4fa5, #4960c3);
-}
-
-.native-day-intro > small {
-  right: 2px;
-  bottom: 19px;
-  color: #8a90a0;
-  font-size: 15px;
-  font-weight: 720;
 }
 
 #view-hoy.day-open .day-plan-group .day-plan-objective,
@@ -1517,12 +1012,8 @@
   border-bottom-color: #e8ebf0;
 }
 
-#view-hoy.day-open .objective-card-header h3 {
-  font-size: 17px;
-  line-height: 1.5;
-}
-
 .complete-day-btn {
+  width: 100%;
   min-height: 56px;
   display: inline-flex;
   align-items: center;
@@ -1540,37 +1031,14 @@
   background: linear-gradient(180deg, #3d4ab0 0%, #33439f 100%);
 }
 
-.complete-day-btn-icon {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(255,255,255,.16);
-}
-
-.complete-day-btn-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
 #view-hoy.day-open .complete-card {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   margin-top: 22px;
-}
-
-#view-hoy.day-open .complete-card.done {
-  gap: 14px;
-  align-items: center;
-  padding: 16px 18px;
-  border-radius: 22px;
-  background: #eef4e9;
-  color: #485f3b;
-}
-
-#view-hoy.day-open .complete-done-mark {
-  width: 40px;
-  height: 40px;
-  background: #7c9464;
 }
 
 #view-hoy.day-open .complete-done-copy h3 {
@@ -1578,12 +1046,16 @@
   font-weight: 770;
 }
 
-#view-hoy.day-open .complete-done-copy p {
-  margin-top: 4px;
-  font-size: 12px;
-}
-
 .native-day-progress-button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #e2e3df;
+  color: #1d2a3b;
+  text-align: left;
+  box-shadow: none;
   min-height: 56px;
   margin-top: 14px;
   padding: 0 16px;
@@ -1592,26 +1064,9 @@
   background: rgba(255,255,255,.96);
 }
 
-.native-day-progress-button strong {
-  font-size: 15px;
-  font-weight: 720;
-}
-
-@media (max-width: 370px) {
-  .native-day-intro > span {
-    font-size: 42px;
-  }
-
-  .native-day-intro h2 {
-    font-size: 20px;
-  }
-}
-
-
-/* =========================================================
-   V52A · Día actual consolidado · system polish
-   ========================================================= */
 #view-hoy.day-open {
+  background: #fffdfa;
+  padding-top: calc(18px + var(--safe-top));
   --day-brand: #5149b8;
   --day-brand-strong: #403b9e;
   --day-brand-soft: #efeffd;
@@ -1620,16 +1075,22 @@
 }
 
 .daily-native-title strong {
+  color: #162238;
+  letter-spacing: -0.015em;
   font-size: 14px;
   font-weight: 620;
 }
 
 .daily-native-title span {
+  margin-top: 3px;
+  color: #74787c;
   font-size: 11px;
   font-weight: 500;
 }
 
 .native-day-intro {
+  position: relative;
+  border-bottom: 1px solid #e8ebf0;
   padding: 20px 0 18px;
 }
 
@@ -1684,6 +1145,8 @@
 }
 
 .native-day-progress {
+  overflow: hidden;
+  border-radius: 999px;
   width: 100%;
   height: 5px;
   margin-top: 0;
@@ -1691,6 +1154,9 @@
 }
 
 .native-day-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
   background: #5149b8;
 }
 
@@ -1702,12 +1168,18 @@
 }
 
 #view-hoy.day-open .objective-card-header h3 {
+  max-width: 92%;
+  color: #222a31;
+  letter-spacing: -0.012em;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.5;
 }
 
 #view-hoy.day-open .objective-card-header > div > span {
+  margin-bottom: 8px;
+  color: var(--day-olive);
+  letter-spacing: .055em;
   font-size: 10.5px;
   font-weight: 650;
 }
@@ -1720,6 +1192,8 @@
 
 #view-hoy.day-open .day-plan-steps .native-section-heading h3,
 #view-hoy.day-open .materials-section .native-section-heading h3 {
+  color: #182334;
+  letter-spacing: -0.025em;
   font-size: 17px;
   font-weight: 660;
 }
@@ -1741,11 +1215,19 @@
 }
 
 #view-hoy.day-open .action-step-title {
+  color: #2c3032;
+  line-height: 1.4;
   font-size: 13.5px;
   font-weight: 500;
 }
 
 #view-hoy.day-open .resource-sequence {
+  display: flex;
+  overflow-x: auto;
+  margin-inline: -16px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   gap: 12px;
   margin: 0 -20px 0 0;
   padding: 0 20px 8px 0;
@@ -1754,11 +1236,18 @@
 }
 
 #view-hoy.day-open .resource-row {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  scroll-snap-align: start;
   width: 102px;
   flex: 0 0 102px;
 }
 
 #view-hoy.day-open .resource-thumb {
+  box-shadow: none;
   width: 102px;
   height: 102px;
   border: 1px solid rgba(23, 34, 61, .045);
@@ -1767,6 +1256,12 @@
 }
 
 #view-hoy.day-open .resource-order {
+  position: absolute;
+  z-index: 3;
+  border: 1px solid rgba(255,255,255,.7);
+  background: rgba(18,52,95,.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   top: 6px;
   left: 6px;
   width: 22px;
@@ -1776,11 +1271,15 @@
 }
 
 #view-hoy.day-open .resource-play-badge {
+  background: rgba(20, 30, 40, .66);
+  color: #fff;
+  box-shadow: none;
   width: 31px;
   height: 31px;
 }
 
 #view-hoy.day-open .resource-copy {
+  display: block;
   width: 102px;
   margin-top: 8px;
   text-align: left;
@@ -1849,6 +1348,7 @@
 }
 
 #view-hoy.day-open .complete-card.done {
+  gap: 14px;
   display: flex;
   justify-content: center;
   align-items: center;

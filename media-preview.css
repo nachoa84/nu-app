@@ -277,8 +277,7 @@ body.preview-open #app {
   background: rgba(255,255,255,.98);
 }
 
-.media-preview-actions button.is-busy,
-.preview-share-action.is-busy {
+.media-preview-actions button.is-busy {
   opacity: .72;
   pointer-events: none;
 }

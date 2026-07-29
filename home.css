@@ -230,9 +230,6 @@
   font-weight: 520;
 }
 
-.home-routines-note {
-  display: none;
-}
 
 @media (max-width: 370px) {
   #view-hoy {

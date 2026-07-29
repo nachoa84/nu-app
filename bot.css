@@ -1,33 +1,13 @@
 /* =========================================================
-   Bot · definición canónica
-   Conversación, búsqueda libre por texto, composer y mensajes.
-   Teclado móvil, offline y multirrecursos permanecen separados.
+   V60A · Bot canónico
+   Conversación, búsqueda, recursos, composer y documentos.
+   Refactor de cascada sin rediseño ni cambios de lógica.
    ========================================================= */
-
-#view-bot {
-  --bot-brand: #273f7a;
-  --bot-brand-strong: #1c315f;
-  --bot-brand-soft: #eef1f8;
-  --bot-green: #738b5d;
-  --bot-green-soft: #eef2e9;
-  --bot-ink: #17223d;
-  --bot-muted: #717984;
-  --bot-line: #e5e7e8;
-  flex-direction: column;
-  min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
-  padding-top: calc(17px + var(--safe-top));
-  background: #fffdfa;
-}
 
 #view-bot.active {
   height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
   min-height: 0;
   overflow: hidden;
-}
-
-.bot-page-header {
-  flex: 0 0 auto;
-  padding-bottom: 5px;
 }
 
 .bot-page-header > div {
@@ -37,15 +17,6 @@
 
 .bot-page-header h1 {
   margin-top: 0;
-}
-
-.bot-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--app-muted);
-  font-size: 11px;
-  font-weight: 650;
 }
 
 .bot-status i {
@@ -228,40 +199,6 @@
   background: var(--app-bg);
 }
 
-.bot-card.has-conversation .bot-form {
-  border-top: 1px solid rgba(91, 67, 56, .07);
-  background: linear-gradient(to bottom, rgba(255,249,245,.90), var(--app-bg) 32%);
-}
-
-.bot-form input {
-  min-width: 0;
-  min-height: 46px;
-  padding: 0 16px;
-  border: 1px solid transparent;
-  border-radius: 17px;
-  outline: 0;
-  background: #f2e7e1;
-  color: var(--app-text);
-  font-size: 12px;
-}
-
-.bot-form input:focus {
-  border-color: rgba(214,101,63,0.2);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(214,101,63,0.07);
-}
-
-.bot-send {
-  width: 46px;
-  min-width: 46px;
-  height: 46px;
-  min-height: 46px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border-radius: 50%;
-}
-
 .bot-send svg {
   width: 21px;
   height: 21px;
@@ -273,10 +210,6 @@
     animation: none !important;
   }
 }
-
-/* =========================================================
-   V35.10 · BOT MULTIRRECURSO
-   ========================================================= */
 
 .bot-message-bot {
   width: 100%;
@@ -594,13 +527,6 @@ body.bot-document-open {
   }
 }
 
-/* =========================================================
-   v36 · Paso 6 Native Clean · Bot / Asistente
-   Solo capa visual. Conserva búsqueda, historial, recursos,
-   guardado, copiar y apertura de documentos existentes.
-   ========================================================= */
-
-
 #view-bot .bot-page-header {
   position: relative;
   min-height: 58px;
@@ -646,16 +572,6 @@ body.bot-document-open {
 #view-bot .icon-button:active {
   background: var(--bot-brand-soft);
   color: var(--bot-brand);
-}
-
-#view-bot .bot-card {
-  gap: 0;
-}
-
-#view-bot .bot-thread {
-  max-height: none;
-  padding: 12px 0 18px;
-  gap: 14px;
 }
 
 #view-bot .bot-card.has-conversation .bot-thread {
@@ -711,16 +627,6 @@ body.bot-document-open {
   line-height: 1.5;
 }
 
-#view-bot .bubble.user {
-  max-width: 78%;
-  padding: 10px 13px;
-  border: 1px solid #dfe4ef;
-  border-radius: 16px 16px 6px 16px;
-  background: var(--bot-brand-soft);
-  color: var(--bot-ink);
-  box-shadow: none;
-}
-
 #view-bot .bot-message-bot .bubble.bot,
 #view-bot .bot-response-stack .bubble.bot {
   width: 100%;
@@ -747,33 +653,12 @@ body.bot-document-open {
   padding-left: 0;
 }
 
-#view-bot .bot-message-action {
-  min-height: 34px;
-  padding: 0 2px;
-  color: var(--bot-muted);
-  font-size: 11px;
-  font-weight: 680;
-}
-
 #view-bot .bot-message-action.is-saved {
   color: var(--bot-brand);
 }
 
 #view-bot .bot-message-action.is-copied {
   color: var(--bot-green);
-}
-
-#view-bot .bot-resource-card {
-  min-height: 78px;
-  grid-template-columns: 52px minmax(0, 1fr) 24px;
-  gap: 11px;
-  padding: 10px 7px 10px 0;
-  border: 0;
-  border-top: 1px solid var(--bot-line);
-  border-radius: 0;
-  background: transparent;
-  color: var(--bot-ink);
-  box-shadow: none;
 }
 
 #view-bot .bot-resource-card:first-of-type {
@@ -785,37 +670,8 @@ body.bot-document-open {
   opacity: .9;
 }
 
-#view-bot .bot-resource-icon,
-#view-bot .bot-resource-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 13px;
-  background: var(--bot-brand-soft);
-  color: var(--bot-brand);
-}
-
 #view-bot .bot-resource-copy {
   gap: 4px;
-}
-
-#view-bot .bot-resource-copy small {
-  color: var(--bot-green);
-  font-size: 9.5px;
-  font-weight: 780;
-  letter-spacing: .055em;
-}
-
-#view-bot .bot-resource-copy strong {
-  color: var(--bot-ink);
-  font-size: 13px;
-  line-height: 1.3;
-  font-weight: 740;
-}
-
-#view-bot .bot-resource-copy span {
-  color: var(--bot-muted);
-  font-size: 10.5px;
-  line-height: 1.38;
 }
 
 #view-bot .bot-resource-arrow {
@@ -830,28 +686,9 @@ body.bot-document-open {
   background: rgba(23, 34, 61, .72);
 }
 
-#view-bot .bot-form {
-  grid-template-columns: 1fr 48px;
-  gap: 8px;
-  padding: 9px 0 6px;
-  border-top: 0;
-  background: #fffdfa;
-}
-
 #view-bot .bot-card.has-conversation .bot-form {
   border-top: 1px solid var(--bot-line);
   background: #fffdfa;
-}
-
-#view-bot .bot-form input {
-  min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid #dde1e5;
-  border-radius: 17px;
-  background: #fff;
-  color: var(--bot-ink);
-  font-size: 13px;
-  box-shadow: none;
 }
 
 #view-bot .bot-form input::placeholder {
@@ -862,18 +699,6 @@ body.bot-document-open {
   border-color: #bac5dd;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(39, 63, 122, .07);
-}
-
-#view-bot .bot-send {
-  width: 48px;
-  min-width: 48px;
-  height: 48px;
-  min-height: 48px;
-  border: 0;
-  border-radius: 16px;
-  background: var(--bot-brand);
-  color: #fff;
-  box-shadow: none;
 }
 
 #view-bot .bot-send:active {
@@ -910,37 +735,21 @@ body.bot-document-open {
   }
 }
 
-
-
-/* V37 · Bot visual tune */
-#view-bot {
-  padding-top: calc(28px + var(--safe-top));
-  background: #fafbfd;
-}
-
 .bot-page-header {
+  flex: 0 0 auto;
   padding-bottom: 12px;
 }
 
-.bot-status {
-  color: #8290a1;
-  font-size: 12px;
-}
-
 .bot-card.has-conversation .bot-form {
+  border-top: 1px solid rgba(91, 67, 56, .07);
   border-top-color: rgba(23,34,61,.06);
   background: linear-gradient(to bottom, rgba(250,251,253,.9), #fafbfd 34%);
 }
 
-.bot-form input {
-  min-height: 52px;
-  border-radius: 20px;
-  background: #fff;
-  border-color: #e5eaf0;
-  font-size: 14px;
-}
-
 .bot-send {
+  display: grid;
+  place-items: center;
+  padding: 0;
   width: 52px;
   min-width: 52px;
   height: 52px;
@@ -949,50 +758,35 @@ body.bot-document-open {
   box-shadow: 0 14px 26px rgba(48,79,154,.18);
 }
 
-
-/* =========================================================
-   V37B · Bot feedback fixes
-   ========================================================= */
 #view-bot {
+  --bot-brand: #273f7a;
+  --bot-brand-strong: #1c315f;
+  --bot-brand-soft: #eef1f8;
+  --bot-green: #738b5d;
+  --bot-green-soft: #eef2e9;
+  --bot-ink: #17223d;
+  --bot-muted: #717984;
+  --bot-line: #e5e7e8;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
+  background: #fafbfd;
   padding-top: calc(24px + var(--safe-top));
 }
 
-.bot-page-header h1,
-#view-bot .app-page-header h1 {
-  font-size: 30px;
-  font-weight: 760;
-  letter-spacing: -0.06em;
-}
-
-.bot-status {
-  font-size: 11px;
-  font-weight: 560;
-}
-
-#view-bot .bot-resource-copy small {
-  font-size: 9px;
-  font-weight: 690;
-}
-
-#view-bot .bot-resource-copy strong {
-  font-size: 12px;
-  font-weight: 670;
-}
-
-#view-bot .bot-resource-copy span {
-  font-size: 10px;
-  font-weight: 500;
-}
-
 .bot-form input {
+  min-width: 0;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  outline: 0;
+  color: var(--app-text);
+  min-height: 52px;
+  border-radius: 20px;
+  background: #fff;
+  border-color: #e5eaf0;
   font-size: 13px;
   font-weight: 520;
 }
 
-/* =========================================================
-   V52B · Bot · native empty-state polish
-   Composer preservado, bienvenida más intencional y sin chips rápidos.
-   ========================================================= */
 .bot-page-header h1,
 #view-bot .app-page-header h1 {
   font-size: 28px;
@@ -1000,9 +794,28 @@ body.bot-document-open {
   letter-spacing: -.04em;
 }
 
-.bot-status { font-size: 10.5px; font-weight: 520; }
-#view-bot .bot-card { width: 100%; min-width: 0; max-width: 100%; gap: 8px; }
-#view-bot .bot-thread { padding-top: 8px; }
+.bot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8290a1;
+  font-size: 10.5px;
+  font-weight: 520;
+}
+
+#view-bot .bot-card {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  gap: 8px;
+}
+
+#view-bot .bot-thread {
+  max-height: none;
+  padding: 12px 0 18px;
+  gap: 14px;
+  padding-top: 8px;
+}
 
 #view-bot .bubble.bot {
   border: 1px solid #e8eaf0;
@@ -1012,6 +825,10 @@ body.bot-document-open {
 }
 
 #view-bot .bubble.user {
+  max-width: 78%;
+  padding: 10px 13px;
+  border: 1px solid #dfe4ef;
+  box-shadow: none;
   border-radius: 18px 18px 7px 18px;
   background: #edf1f6;
   color: #26344b;
@@ -1019,6 +836,12 @@ body.bot-document-open {
 }
 
 #view-bot .bot-resource-card {
+  border: 0;
+  border-top: 1px solid var(--bot-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--bot-ink);
+  box-shadow: none;
   min-height: 72px;
   grid-template-columns: 48px minmax(0,1fr) 22px;
   gap: 10px;
@@ -1034,12 +857,38 @@ body.bot-document-open {
   color: #4e4ab4;
 }
 
-#view-bot .bot-resource-copy small { font-size: 8.8px; font-weight: 620; }
-#view-bot .bot-resource-copy strong { font-size: 12px; font-weight: 620; }
-#view-bot .bot-resource-copy span { font-size: 9.8px; font-weight: 480; }
-#view-bot .bot-message-action { font-size: 10px; font-weight: 560; }
+#view-bot .bot-resource-copy small {
+  color: var(--bot-green);
+  letter-spacing: .055em;
+  font-size: 8.8px;
+  font-weight: 620;
+}
+
+#view-bot .bot-resource-copy strong {
+  color: var(--bot-ink);
+  line-height: 1.3;
+  font-size: 12px;
+  font-weight: 620;
+}
+
+#view-bot .bot-resource-copy span {
+  color: var(--bot-muted);
+  line-height: 1.38;
+  font-size: 9.8px;
+  font-weight: 480;
+}
+
+#view-bot .bot-message-action {
+  min-height: 34px;
+  padding: 0 2px;
+  color: var(--bot-muted);
+  font-size: 10px;
+  font-weight: 560;
+}
 
 #view-bot .bot-form {
+  border-top: 0;
+  background: #fffdfa;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -1051,6 +900,10 @@ body.bot-document-open {
 }
 
 #view-bot .bot-form input {
+  padding: 0 16px;
+  border: 1px solid #dde1e5;
+  color: var(--bot-ink);
+  box-shadow: none;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -1063,6 +916,7 @@ body.bot-document-open {
 }
 
 #view-bot .bot-send {
+  border: 0;
   width: 46px;
   min-width: 46px;
   max-width: 46px;

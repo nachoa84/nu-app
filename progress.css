@@ -1,339 +1,9 @@
 /* =========================================================
-   V36 Step 12O · Progreso consolidado
-   Base + cabecera de subpantalla + mapa Native Clean.
+   V61B · Progreso canónico
+   Progreso, acción actual, semanas y días.
+   Refactor de cascada sin rediseño ni cambios de lógica.
    ========================================================= */
 
-/* =========================================================
-   Rutina · definición canónica
-   Una sola generación para progreso, día actual y semanas.
-   ========================================================= */
-
-#view-rutina {
-  padding-top: calc(14px + var(--safe-top));
-}
-
-#view-rutina .app-page-header {
-  padding-bottom: 14px;
-}
-
-.app-routine {
-  display: grid;
-  gap: 10px;
-}
-
-.app-progress-card {
-  padding: 15px;
-  border: 1px solid var(--app-line);
-  border-radius: 20px;
-  background: var(--app-surface);
-  box-shadow: 0 3px 14px rgba(86, 54, 40, 0.032);
-}
-
-.app-progress-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.app-label {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--app-accent-dark);
-  font-size: 10px;
-  font-weight: 820;
-  letter-spacing: 0.08em;
-}
-
-.app-progress-row strong {
-  display: block;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-}
-
-.app-progress-percent {
-  color: var(--app-accent-dark);
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.app-progress-track {
-  height: 7px;
-  margin-top: 13px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #eee4de;
-}
-
-.app-progress-fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--app-accent);
-  transition: width .58s cubic-bezier(.22,.8,.24,1);
-}
-
-.app-today-card {
-  overflow: hidden;
-  border-radius: 21px;
-  background: var(--app-accent);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(164, 66, 38, 0.11);
-}
-
-.app-today-main {
-  width: 100%;
-  min-height: 69px;
-  display: grid;
-  grid-template-columns: 48px 1fr 22px;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 14px;
-  border: 0;
-  background: transparent;
-  color: #fff;
-  text-align: left;
-}
-
-.app-today-icon {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.15);
-}
-
-.app-today-icon svg {
-  width: 22px;
-  height: 22px;
-}
-
-.app-today-copy strong,
-.app-today-copy small {
-  display: block;
-}
-
-.app-today-copy strong {
-  font-size: 18px;
-  font-weight: 790;
-}
-
-.app-today-copy small {
-  margin-top: 3px;
-  color: rgba(255,255,255,0.78);
-  font-size: 12px;
-}
-
-.app-today-arrow svg {
-  width: 21px;
-  height: 21px;
-}
-
-.app-checkin-area {
-  padding: 0 12px 12px;
-}
-
-.app-checkin-btn {
-  width: 100%;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border: 0;
-  border-radius: 14px;
-  background: #fffaf7;
-  color: var(--app-accent-dark);
-  font-size: 15px;
-  font-weight: 790;
-}
-
-.app-checkin-btn svg {
-  width: 20px;
-  height: 20px;
-}
-
-.app-checkin-btn.is-done {
-  opacity: 0.9;
-}
-
-.app-week-card {
-  padding: 13px;
-  border: 1px solid var(--app-line);
-  border-radius: 19px;
-  background: var(--app-surface);
-  box-shadow: 0 3px 14px rgba(86, 54, 40, 0.032);
-}
-
-.app-week-open-head strong,
-.app-week-open-head span {
-  display: block;
-}
-
-.app-week-open-head strong {
-  font-size: 16px;
-  font-weight: 780;
-}
-
-.app-week-open-head span {
-  margin-top: 3px;
-  color: var(--app-muted);
-  font-size: 11px;
-}
-
-.app-week-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 15px;
-}
-
-.app-day-dot {
-  aspect-ratio: 1;
-  min-width: 0;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid var(--app-line);
-  border-radius: 50%;
-  background: #fffaf7;
-  color: #695950;
-  font-size: 11px;
-  font-weight: 760;
-}
-
-.app-day-dot.is-complete {
-  border-color: #e7b39d;
-  background: var(--app-accent-soft);
-  color: var(--app-accent-dark);
-}
-
-.app-day-dot.is-current {
-  border-color: transparent;
-  background: var(--app-accent);
-  color: #fff;
-  box-shadow: 0 0 0 5px var(--app-accent-soft);
-}
-
-.app-day-dot.is-future {
-  opacity: 0.55;
-}
-
-.app-grouped-list {
-  display: grid;
-  overflow: hidden;
-  border-radius: 20px;
-  background: var(--app-surface);
-  box-shadow: var(--app-shadow);
-}
-
-.app-week-locked {
-  min-height: 69px;
-  display: grid;
-  grid-template-columns: 45px 1fr 23px;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 13px;
-  border: 1px solid var(--app-line);
-  border-radius: 19px;
-  background: rgba(255,255,255,.72);
-  color: #9b8f88;
-  opacity: .74;
-  box-shadow: 0 3px 14px rgba(86, 54, 40, 0.032);
-  transition: background 0.1s ease;
-  corner-shape: squircle;
-}
-
-.app-grouped-list .app-week-locked {
-  border-radius: 0;
-  box-shadow: none;
-  background: transparent;
-}
-
-.app-grouped-list .app-week-locked:not(:last-child) {
-  border-bottom: 1px solid var(--app-line);
-}
-
-.app-grouped-list .app-week-locked:active {
-  background: var(--app-surface-soft);
-}
-
-.app-week-number {
-  width: 45px;
-  height: 45px;
-  display: grid;
-  place-items: center;
-  border-radius: 15px;
-  background: var(--app-surface-soft);
-  color: #9a6653;
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.app-week-copy strong,
-.app-week-copy small {
-  display: block;
-}
-
-.app-week-copy strong {
-  font-size: 15px;
-  font-weight: 770;
-}
-
-.app-week-copy small {
-  margin-top: 3px;
-  color: var(--app-muted);
-  font-size: 11px;
-}
-
-.app-week-lock {
-  color: #a89489;
-}
-
-.app-week-lock svg {
-  width: 21px;
-  height: 21px;
-}
-
-.app-week-locked .app-week-copy strong {
-  color: #81766f;
-}
-
-.app-week-locked .app-week-copy small,
-.app-week-locked .app-week-lock {
-  color: #aa9e97;
-}
-
-.app-week-locked .app-week-number {
-  opacity: .78;
-}
-
-
-/* --- Consolidado desde shared.css --- */
-
-/* Paso 1 Native Clean: Rutina pasa a ser una subpantalla de Inicio. */
-.routine-page-header {
-  grid-template-columns: 42px minmax(0, 1fr);
-  justify-content: start;
-  gap: 10px;
-}
-
-.routine-page-header > div {
-  min-width: 0;
-}
-
-.routine-back-btn {
-  align-self: center;
-}
-
-/* --- Consolidado desde styles.css · V36 Step 7 --- */
-
-/* =========================================================
-   V36 Step 7 · Native Clean · Progreso 30 días
-   Refinamiento visual del mapa de progreso. No altera unlocks.
-   ========================================================= */
 #view-rutina {
   --progress-ink: #17223d;
   --progress-muted: #717987;
@@ -345,6 +15,20 @@
   --progress-surface: #ffffff;
   padding-top: var(--safe-top);
   background: #fffdfa;
+}
+
+.routine-page-header {
+  grid-template-columns: 42px minmax(0, 1fr);
+  justify-content: start;
+  gap: 10px;
+}
+
+.routine-page-header > div {
+  min-width: 0;
+}
+
+#view-rutina .app-page-header {
+  padding-bottom: 14px;
 }
 
 #view-rutina .routine-page-header {
@@ -376,6 +60,13 @@
   letter-spacing: -.035em;
 }
 
+.routine-back-btn {
+  width: 42px;
+  height: 42px;
+  align-self: center;
+  border-radius: 14px;
+}
+
 #view-rutina .routine-back-btn {
   border: 0;
   background: transparent;
@@ -383,8 +74,16 @@
   box-shadow: none;
 }
 
+.routine-back-btn:active {
+  transform: scale(.96);
+}
+
 #view-rutina .routine-back-btn:active {
   background: var(--progress-brand-soft);
+}
+
+.app-routine {
+  display: grid;
 }
 
 #view-rutina .app-routine {
@@ -400,6 +99,20 @@
   box-shadow: none;
 }
 
+.app-progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#view-rutina .app-progress-row {
+  align-items: center;
+}
+
+.app-label {
+  display: block;
+}
+
 #view-rutina .app-label {
   margin-bottom: 7px;
   color: var(--progress-olive);
@@ -408,8 +121,8 @@
   letter-spacing: .085em;
 }
 
-#view-rutina .app-progress-row {
-  align-items: center;
+.app-progress-row strong {
+  display: block;
 }
 
 #view-rutina .app-progress-row strong {
@@ -428,10 +141,22 @@
   text-align: right;
 }
 
+.app-progress-track {
+  overflow: hidden;
+  border-radius: 999px;
+}
+
 #view-rutina .app-progress-track {
   height: 5px;
   margin-top: 15px;
   background: #e8eaec;
+}
+
+.app-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .58s cubic-bezier(.22,.8,.24,1);
 }
 
 #view-rutina .app-progress-fill {
@@ -447,11 +172,26 @@
   box-shadow: 0 8px 24px rgba(23, 34, 61, .05);
 }
 
+.app-today-main {
+  width: 100%;
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
 #view-rutina .app-today-main {
   min-height: 72px;
   grid-template-columns: 44px minmax(0, 1fr) 22px;
   padding: 12px 14px;
   color: var(--progress-ink);
+}
+
+.app-today-icon {
+  display: grid;
+  place-items: center;
 }
 
 #view-rutina .app-today-icon {
@@ -460,6 +200,16 @@
   border-radius: 13px;
   background: var(--progress-brand-soft);
   color: var(--progress-brand);
+}
+
+.app-today-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app-today-copy strong,
+.app-today-copy small {
+  display: block;
 }
 
 #view-rutina .app-today-copy strong {
@@ -477,8 +227,21 @@
   color: #9ba1a8;
 }
 
-#view-rutina .app-checkin-area {
+.app-today-arrow svg {
+  width: 21px;
+  height: 21px;
+}
+
+.app-checkin-area {
   padding: 0 12px 12px;
+}
+
+.app-checkin-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
 }
 
 #view-rutina .app-checkin-btn {
@@ -489,6 +252,11 @@
   color: #403b8e;
   font-size: 13px;
   font-weight: 770;
+}
+
+.app-checkin-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 #view-rutina .app-checkin-btn.is-done {
@@ -505,12 +273,17 @@
   box-shadow: none;
 }
 
+.app-week-open-head strong,
+.app-week-open-head span {
+  display: block;
+}
+
 #view-rutina .app-week-open-head {
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 36px;
   padding: 0 1px;
 }
 
@@ -526,6 +299,10 @@
   font-size: 10.5px;
 }
 
+.app-week-days {
+  display: grid;
+}
+
 #view-rutina .app-week-days {
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 7px;
@@ -536,22 +313,25 @@
   background: var(--progress-surface);
 }
 
+.app-day-dot {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
 #view-rutina .app-day-dot {
   width: 100%;
   max-width: 43px;
   min-width: 0;
-  justify-self: center;
   aspect-ratio: 1;
+  justify-self: center;
   border: 1px solid #dfe2e6;
   background: #fff;
   color: #657080;
   font-size: 11px;
   font-weight: 760;
   box-shadow: none;
-}
-
-#view-rutina .app-day-dot:not(:disabled):active {
-  transform: scale(.94);
 }
 
 #view-rutina .app-day-dot.is-complete {
@@ -606,18 +386,6 @@
   background: rgba(255, 255, 255, .64);
 }
 
-@media (max-width: 360px) {
-  #view-rutina .app-week-days {
-    gap: 5px;
-    padding-inline: 7px;
-  }
-
-  #view-rutina .app-progress-row strong {
-    font-size: 25px;
-  }
-}
-
-/* --- Integración con Base/Native Shell · propiedad de Progreso --- */
 .app-today-main,
 .app-checkin-btn,
 .app-day-dot:not(:disabled) {
@@ -627,20 +395,16 @@
 .app-today-main:active,
 .app-checkin-btn:active,
 .app-day-dot:not(:disabled):active {
-  transform: scale(0.94);
+  transform: scale(.94);
 }
 
-.routine-back-btn {
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--app-line);
-  border-radius: 14px;
-  background: rgba(255,255,255,.92);
-  color: var(--app-text);
-  box-shadow: none;
-}
+@media (max-width: 360px) {
+  #view-rutina .app-week-days {
+    gap: 5px;
+    padding-inline: 7px;
+  }
 
-.routine-back-btn:active {
-  transform: scale(.96);
-  background: #f0f3f5;
+  #view-rutina .app-progress-row strong {
+    font-size: 25px;
+  }
 }

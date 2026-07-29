@@ -45,10 +45,6 @@
 
   const params = new URLSearchParams(window.location.search);
   const previewMode = params.get("preview") === "1";
-  const forceOnboarding =
-    params.get("newuser") === "1" ||
-    params.get("onboarding") === "1";
-
   function getProfile() {
     try {
       return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
@@ -267,7 +263,7 @@
                 ? `<button class="onboarding-back" id="onboardingBackBtn" type="button" aria-label="Volver">${icon("back")}</button>`
                 : `<div class="onboarding-back-spacer"></div>`
             }
-            <span class="onboarding-brand">Rutina 30 Días</span>
+            <span class="onboarding-brand">Nu App</span>
             <div class="onboarding-back-spacer"></div>
           </header>
 
@@ -379,6 +375,11 @@
                         aria-label="Año de nacimiento"
                       />
                     </div>
+
+                    <p class="onboarding-privacy-note">
+                      <span class="privacy-dot" aria-hidden="true"></span>
+                      <span>Tu fecha de nacimiento se usa solo durante este inicio y <strong>no se guarda</strong>.</span>
+                    </p>
                   </div>
                 `
             }
@@ -856,6 +857,17 @@
         return;
       }
 
+      const finishButton =
+        document.getElementById("finishOnboardingBtn");
+
+      if (finishButton?.disabled) return;
+
+      if (finishButton) {
+        finishButton.disabled = true;
+        finishButton.textContent =
+          isEdit ? "Guardando…" : "Preparando…";
+      }
+
       const firstProfile = !getProfile();
 
       const profile = {
@@ -975,49 +987,11 @@
     }
   }
 
-  function renderProfileSummary(profile) {
-    const sectionHead = document.querySelector("#view-rutina .section-head");
-    if (!sectionHead) return;
-
-    let summary = document.getElementById("profileSummary");
-
-    if (!summary) {
-      summary = document.createElement("div");
-      summary.id = "profileSummary";
-      summary.className = "profile-summary";
-      sectionHead.appendChild(summary);
-    }
-
-    summary.innerHTML = `
-      <div class="profile-summary-top">
-        <div>
-          <strong>${escapeHtml(profile.name)}</strong>
-          <span>${escapeHtml(profile.country)} · ${escapeHtml(profile.timezone)}</span>
-          ${
-            profile.objective
-              ? `<span>Objetivo: ${escapeHtml(getObjectiveLabel(profile.objective))}</span>`
-              : ""
-          }
-          <span>Hora preferida: ${escapeHtml(profile.notificationTime)}</span>
-        </div>
-        <button class="secondary" id="editProfileBtn" type="button">
-          Editar perfil
-        </button>
-      </div>
-    `;
-
-    document.getElementById("editProfileBtn")?.addEventListener(
-      "click",
-      () => openOnboarding({ mode: "edit" })
-    );
-  }
-
   function renderProfileUI() {
     const profile = getProfile();
     if (!profile) return;
 
     renderGreeting(profile);
-    renderProfileSummary(profile);
   }
 
   window.addEventListener("routine-profile-synced", event => {
@@ -1025,7 +999,6 @@
     if (!profile) return;
 
     renderGreeting(profile);
-    renderProfileSummary(profile);
   });
 
   function init() {
