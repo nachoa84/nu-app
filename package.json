@@ -1,8 +1,8 @@
 {
-  "name": "rutina-30-dias-pwa",
-  "version": "0.12.0",
+  "name": "nu-app-pwa",
+  "version": "0.62.0",
   "private": true,
-  "description": "PWA Rutina 30 Dias con backend PostgreSQL",
+  "description": "Nu App PWA con backend Node, PostgreSQL y Web Push",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

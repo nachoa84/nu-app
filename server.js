@@ -64,6 +64,12 @@ const ADMIN_TEST_ROUTES_ENABLED =
     ""
   ).toLowerCase() === "true";
 
+const DEMO_ROUTES_ENABLED =
+  String(
+    process.env.ENABLE_DEMO_ROUTES ||
+    ""
+  ).toLowerCase() === "true";
+
 const EXTRA_ALLOWED_ORIGINS =
   new Set(
     String(
@@ -463,6 +469,28 @@ function clampDay(value) {
   );
 }
 
+function parseRoutineDay(value) {
+  const day =
+    Number(value);
+
+  if (
+    !Number.isInteger(day) ||
+    day < 1 ||
+    day > MAX_DAY
+  ) {
+    const error =
+      new Error(
+        `Día inválido. Debe ser un entero entre 1 y ${MAX_DAY}.`
+      );
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  return day;
+}
+
 
 function assertPushConfigured() {
   if (!pushConfigured) {
@@ -480,6 +508,19 @@ function assertPushConfigured() {
 
 function assertAdminTestRoutesEnabled() {
   if (!ADMIN_TEST_ROUTES_ENABLED) {
+    const error =
+      new Error(
+        "Ruta no disponible."
+      );
+
+    error.status = 404;
+
+    throw error;
+  }
+}
+
+function assertDemoRoutesEnabled() {
+  if (!DEMO_ROUTES_ENABLED) {
     const error =
       new Error(
         "Ruta no disponible."
@@ -1628,7 +1669,7 @@ app.post(
         ).trim();
 
       const requestedDay =
-        clampDay(
+        parseRoutineDay(
           req.body.day
         );
 
@@ -1747,7 +1788,7 @@ app.post(
         ).trim();
 
       const day =
-        clampDay(
+        parseRoutineDay(
           req.body.day
         );
 
@@ -1856,6 +1897,8 @@ app.post(
   "/api/routine/demo-advance",
   async (req, res, next) => {
     try {
+      assertDemoRoutesEnabled();
+
       const userId =
         String(
           req.body.userId ||
@@ -2119,6 +2162,8 @@ app.post(
   pushTestLimiter,
   async (req, res, next) => {
     try {
+      assertAdminTestRoutesEnabled();
+      assertAdminTestToken(req);
       assertDatabase();
       assertPushConfigured();
 
@@ -2465,18 +2510,68 @@ app.post(
   }
 );
 
+function isBlockedPublicPath(requestPath) {
+  const normalizedPath =
+    String(requestPath || "")
+      .replace(/\\/g, "/")
+      .toLowerCase();
+
+  const segments =
+    normalizedPath
+      .split("/")
+      .filter(Boolean);
+
+  const extension =
+    path.posix.extname(
+      normalizedPath
+    );
+
+  const blockedFiles =
+    new Set([
+      "/server.js",
+      "/package.json",
+      "/package-lock.json",
+      "/schema.sql",
+      "/file-tree.txt"
+    ]);
+
+  const blockedExtensions =
+    new Set([
+      ".zip",
+      ".txt",
+      ".sql",
+      ".log",
+      ".bak",
+      ".backup"
+    ]);
+
+  const blockedDirectory =
+    segments.some(segment =>
+      segment === "node_modules" ||
+      segment === "attached_assets" ||
+      segment.startsWith(
+        "respaldo-"
+      )
+    );
+
+  return (
+    blockedFiles.has(
+      normalizedPath
+    ) ||
+    blockedExtensions.has(
+      extension
+    ) ||
+    blockedDirectory
+  );
+}
+
 app.use(
   (req, res, next) => {
-    const blocked =
-      req.path === "/server.js" ||
-      req.path === "/package.json" ||
-      req.path === "/package-lock.json" ||
-      req.path === "/schema.sql" ||
-      req.path.startsWith(
-        "/node_modules/"
-      );
-
-    if (blocked) {
+    if (
+      isBlockedPublicPath(
+        req.path
+      )
+    ) {
       return res
         .status(404)
         .end();
@@ -2498,15 +2593,40 @@ app.use(
 
 app.use(
   (error, req, res, next) => {
-    console.error(error);
+    const requestedStatus =
+      Number(
+        error?.status ||
+        error?.statusCode ||
+        500
+      );
+
+    const status =
+      Number.isInteger(
+        requestedStatus
+      ) &&
+      requestedStatus >= 400 &&
+      requestedStatus <= 599
+        ? requestedStatus
+        : 500;
+
+    console.error(
+      `[${req.method} ${req.originalUrl}]`,
+      error
+    );
+
+    const publicMessage =
+      status >= 500
+        ? "Error interno del servidor."
+        : (
+            error?.message ||
+            "No se pudo completar la solicitud."
+          );
 
     res.status(
-      error.status || 500
+      status
     ).json({
       ok: false,
-      error:
-        error.message ||
-        "Error interno del servidor."
+      error: publicMessage
     });
   }
 );
