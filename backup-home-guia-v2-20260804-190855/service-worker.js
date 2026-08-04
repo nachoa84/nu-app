@@ -1,4 +1,4 @@
-const CACHE="nuapp-v61e-guide-home-sections";
+const CACHE="nuapp-v61d-guide-header-fix";
 
 const CORE=[
   "./",
@@ -35,9 +35,9 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
-  "./guide.css?v=61e-guide-home-sections",
+  "./guide.css?v=61c-guide-prototype",
   "./guide-content.js?v=61c-guide-prototype",
-  "./guide-view.js?v=61e-guide-home-sections",
+  "./guide-view.js?v=61c-guide-prototype",
   "./manifest.webmanifest?v=61b-progress-canonical",
   "./assets/guide/logo-nu-comunidad-transparent.png",
   "./assets/guide/community/community-01.jpg",

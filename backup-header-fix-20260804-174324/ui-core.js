@@ -492,53 +492,21 @@ function setupMainNavigation() {
 
 function setupScrollCollapse() {
   let ticking = false;
-  let collapsed = document.body.classList.contains("is-scrolled");
-  let suppressUntil = 0;
-
-  const ENTER_THRESHOLD = 48;
-  const EXIT_THRESHOLD = 4;
-  const LAYOUT_SETTLE_MS = 220;
-
-  const getScrollTop = () => Math.max(
-    window.scrollY || 0,
-    document.documentElement.scrollTop || 0
-  );
-
-  const setCollapsed = (nextCollapsed) => {
-    if (nextCollapsed === collapsed) return;
-
-    collapsed = nextCollapsed;
-    suppressUntil = performance.now() + LAYOUT_SETTLE_MS;
-
-    document.body.classList.toggle("is-scrolled", collapsed);
-  };
 
   const update = () => {
     ticking = false;
-
-    if (performance.now() < suppressUntil) return;
-
-    const scrollTop = getScrollTop();
-
-    if (!collapsed && scrollTop > ENTER_THRESHOLD) {
-      setCollapsed(true);
-    } else if (collapsed && scrollTop <= EXIT_THRESHOLD) {
-      setCollapsed(false);
-    }
+    document.body.classList.toggle("is-scrolled", window.scrollY > 24);
   };
 
   window.addEventListener(
     "scroll",
     () => {
       if (ticking) return;
-
       ticking = true;
       requestAnimationFrame(update);
     },
     { passive: true }
   );
-
-  update();
 }
 
 function closeActionSheet() {

@@ -24,30 +24,18 @@ function guideProgressSummary() {
 
 function updateGuideHomeSummary() {
   const { completed, percent } = guideProgressSummary();
-  const total = GUIDE_STEPS.length;
-  const isComplete = completed === total;
-  const section = document.getElementById("homeGuideSection");
-  const kicker = document.getElementById("homeGuideKicker");
-  const description = document.getElementById("homeGuideDescription");
   const progressText = document.getElementById("homeGuideProgress");
   const progressFill = document.getElementById("homeGuideProgressFill");
   const percentText = document.getElementById("homeGuidePercent");
   const buttonLabel = document.getElementById("homeGuideButtonLabel");
 
-  if (section) section.classList.toggle("is-complete", isComplete);
-  if (kicker) kicker.textContent = isComplete ? "Guía completada" : "Empezá por acá";
-  if (description) {
-    description.textContent = isComplete
-      ? "Volvé a consultar cualquier etapa cuando necesites repasar un recurso."
-      : "Tus primeros pasos para comenzar con claridad y acompañamiento.";
-  }
-  if (progressText) progressText.textContent = `${completed} de ${total} etapas`;
+  if (progressText) progressText.textContent = `${completed} de ${GUIDE_STEPS.length} etapas`;
   if (progressFill) progressFill.style.width = `${percent}%`;
   if (percentText) percentText.textContent = `${percent}%`;
   if (buttonLabel) {
     buttonLabel.textContent = completed === 0
       ? "Comenzar"
-      : isComplete
+      : completed === GUIDE_STEPS.length
         ? "Ver guía"
         : "Continuar";
   }

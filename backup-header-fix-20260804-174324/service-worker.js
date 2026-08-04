@@ -1,4 +1,4 @@
-const CACHE="nuapp-v61e-guide-home-sections";
+const CACHE="nuapp-v61c-guide-prototype";
 
 const CORE=[
   "./",
@@ -19,7 +19,7 @@ const CORE=[
   "./bot.css?v=61b-progress-canonical",
   "./favorites.css?v=61b-progress-canonical",
   "./bot-content.js?v=61b-progress-canonical",
-  "./ui-core.js?v=61d-guide-header-fix",
+  "./ui-core.js?v=61b-progress-canonical",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
@@ -35,9 +35,9 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
-  "./guide.css?v=61e-guide-home-sections",
+  "./guide.css?v=61c-guide-prototype",
   "./guide-content.js?v=61c-guide-prototype",
-  "./guide-view.js?v=61e-guide-home-sections",
+  "./guide-view.js?v=61c-guide-prototype",
   "./manifest.webmanifest?v=61b-progress-canonical",
   "./assets/guide/logo-nu-comunidad-transparent.png",
   "./assets/guide/community/community-01.jpg",
