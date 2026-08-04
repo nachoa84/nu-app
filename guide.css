@@ -1,0 +1,689 @@
+/* =========================================================
+   Prototipo Guía de inicio · Integración nativa Nu App
+   Mantiene la paleta, tipografía, radios y jerarquía de V61B.
+   ========================================================= */
+
+.home-guide-card {
+  border-color: #dfe6f2;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f9fd 100%);
+}
+
+.home-guide-cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 72% 20%, rgba(122, 146, 96, .22), transparent 34%),
+    linear-gradient(145deg, #eef2fb 0%, #e8edf7 52%, #eef3e8 100%);
+}
+
+.home-guide-cover::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(48, 79, 154, .08);
+  border-radius: 14px;
+}
+
+.home-guide-cover img {
+  position: relative;
+  z-index: 1;
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  padding: 0;
+  filter: drop-shadow(0 8px 18px rgba(23, 34, 61, .11));
+}
+
+.home-guide-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #7a9260;
+  font-size: 9.5px;
+  font-weight: 760;
+  line-height: 1.2;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.home-guide-card .home-routine-progress > span {
+  background: linear-gradient(90deg, #304f9a, #7a9260);
+}
+
+.home-guide-open {
+  background: #edf2fb;
+  color: #304f9a;
+}
+
+#view-guia {
+  padding-top: calc(25px + var(--safe-top));
+}
+
+.guide-page-header {
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.guide-page-header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.guide-page-header h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guide-reset-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.guide-root {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 10px;
+}
+
+.guide-hero-card {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid #dfe5ef;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 91% 8%, rgba(122, 146, 96, .22), transparent 28%),
+    linear-gradient(145deg, #ffffff 0%, #f3f6fb 62%, #eef3e8 100%);
+  box-shadow: 0 14px 32px rgba(23, 34, 61, .06);
+}
+
+.guide-hero-brand {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(48, 79, 154, .1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.guide-hero-brand img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.guide-hero-copy > span,
+.guide-section-heading span,
+.guide-detail-intro small {
+  color: #7a9260;
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.guide-hero-copy strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--app-text);
+  font-size: 22px;
+  font-weight: 780;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+
+.guide-hero-copy p {
+  margin: 8px 0 0;
+  color: #747d8a;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.guide-hero-progress-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 17px;
+}
+
+.guide-hero-progress {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e6ed;
+}
+
+.guide-hero-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #304f9a, #7a9260);
+  transition: width 240ms cubic-bezier(.2, 0, 0, 1);
+}
+
+.guide-hero-progress-row b {
+  color: #5f6875;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.guide-hero-count {
+  display: block;
+  margin-top: 7px;
+  color: #8b929d;
+  font-size: 10.5px;
+  font-weight: 530;
+}
+
+.guide-primary-button,
+.guide-secondary-button {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 15px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.guide-primary-button {
+  border: 0;
+  background: #304f9a;
+  color: #fff;
+}
+
+.guide-primary-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.guide-hero-card > .guide-primary-button {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.guide-secondary-button {
+  border: 1px solid #dfe4eb;
+  background: #fff;
+  color: #596473;
+}
+
+.guide-primary-button:active,
+.guide-secondary-button:active,
+.guide-step-card:active,
+.guide-resource-row:active,
+.guide-complete-card button:active {
+  transform: scale(.985);
+}
+
+.guide-section-block {
+  display: grid;
+  gap: 12px;
+}
+
+.guide-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 2px;
+}
+
+.guide-section-heading h2 {
+  margin: 3px 0 0;
+  color: var(--app-text);
+  font-size: 19px;
+  font-weight: 760;
+  line-height: 1.15;
+  letter-spacing: -.032em;
+}
+
+.guide-section-heading > strong {
+  color: #7f8793;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.guide-step-list {
+  display: grid;
+  gap: 9px;
+}
+
+.guide-step-card {
+  width: 100%;
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 27px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--app-line);
+  border-radius: 19px;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  box-shadow: 0 7px 20px rgba(23, 34, 61, .035);
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.guide-step-card.is-done {
+  border-color: rgba(122, 146, 96, .28);
+  background: linear-gradient(135deg, #fff 0%, #f8faf5 100%);
+}
+
+.guide-step-number,
+.guide-detail-number {
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #eef2fb;
+  color: #304f9a;
+  font-size: 11px;
+  font-weight: 780;
+  font-variant-numeric: tabular-nums;
+}
+
+.guide-step-number {
+  width: 38px;
+  height: 38px;
+}
+
+.guide-step-card.is-done .guide-step-number {
+  background: #edf2e8;
+  color: #718755;
+}
+
+.guide-step-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.guide-step-copy small {
+  color: #8d949e;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.guide-step-copy strong {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 710;
+  line-height: 1.2;
+}
+
+.guide-step-copy > span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #7d8591;
+  font-size: 10.5px;
+  font-weight: 490;
+  line-height: 1.38;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.guide-step-status {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe4eb;
+  border-radius: 50%;
+  color: #7a9260;
+}
+
+.guide-step-status > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c8ced7;
+}
+
+.guide-step-status.is-done {
+  border: 0;
+  color: #7a9260;
+}
+
+.guide-step-status svg {
+  width: 24px;
+  height: 24px;
+}
+
+.guide-detail {
+  display: grid;
+  gap: 13px;
+}
+
+.guide-detail-intro {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: start;
+  gap: 13px;
+  padding: 5px 2px 2px;
+}
+
+.guide-detail-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+.guide-detail-intro h2 {
+  margin: 3px 0 5px;
+  color: var(--app-text);
+  font-size: 22px;
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+}
+
+.guide-detail-intro p {
+  margin: 0;
+  color: #737c89;
+  font-size: 12px;
+  line-height: 1.48;
+}
+
+.guide-highlight {
+  margin: 0;
+  padding: 15px 16px;
+  border: 1px solid #dce5d5;
+  border-left: 4px solid #7a9260;
+  border-radius: 17px;
+  background: #f5f8f1;
+  color: #45523b;
+  font-size: 13px;
+  font-weight: 670;
+  line-height: 1.48;
+}
+
+.guide-content-card,
+.guide-complete-card {
+  padding: 16px;
+  border: 1px solid var(--app-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 7px 22px rgba(23, 34, 61, .035);
+}
+
+.guide-content-card > h3 {
+  margin: 0 0 12px;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 730;
+  letter-spacing: -.02em;
+}
+
+.guide-paragraphs {
+  display: grid;
+  gap: 9px;
+}
+
+.guide-paragraphs p,
+.guide-note {
+  margin: 0;
+  color: #68717f;
+  font-size: 12px;
+  font-weight: 490;
+  line-height: 1.58;
+}
+
+.guide-paragraphs p:nth-child(2):only-child,
+.guide-paragraphs p:nth-child(2) {
+  color: #4d5664;
+}
+
+.guide-check-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-check-list li {
+  display: grid;
+  grid-template-columns: 23px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+}
+
+.guide-check-list li > span {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #edf2e8;
+  color: #718755;
+}
+
+.guide-check-list svg {
+  width: 14px;
+  height: 14px;
+}
+
+.guide-check-list p {
+  margin: 2px 0 0;
+  color: #68717f;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.guide-resource-list {
+  display: grid;
+  gap: 8px;
+}
+
+.guide-resource-row {
+  min-height: 51px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 19px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #e7eaf0;
+  border-radius: 15px;
+  background: #fafbfc;
+  color: #3d4d6a;
+  text-decoration: none;
+  transition: transform 140ms ease, background 140ms ease;
+}
+
+.guide-resource-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #eef2fb;
+  color: #304f9a;
+}
+
+.guide-resource-icon svg,
+.guide-resource-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+.guide-resource-row > span:nth-child(2) {
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.guide-resource-arrow {
+  color: #9aa1ab;
+}
+
+.guide-schedule-list {
+  display: grid;
+  gap: 9px;
+}
+
+.guide-schedule-card {
+  padding: 13px;
+  border-radius: 16px;
+  background: #f6f8fb;
+}
+
+.guide-schedule-card strong {
+  color: #31415e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.guide-schedule-card ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-schedule-card li {
+  color: #747d89;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.guide-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: #eef2fb;
+  color: #435a8a;
+  font-size: 10.5px;
+  font-weight: 620;
+}
+
+.guide-gallery-card {
+  overflow: hidden;
+}
+
+.guide-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 72%;
+  gap: 9px;
+  overflow-x: auto;
+  margin: 0 -16px -2px;
+  padding: 0 16px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.guide-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.guide-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+  scroll-snap-align: start;
+}
+
+.guide-complete-card {
+  display: grid;
+  gap: 13px;
+  border-color: #dfe5ef;
+  background: linear-gradient(135deg, #ffffff 0%, #f6f8fc 100%);
+}
+
+.guide-complete-card.is-done {
+  border-color: #dbe5d2;
+  background: linear-gradient(135deg, #ffffff 0%, #f4f8f0 100%);
+}
+
+.guide-complete-copy {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+.guide-complete-copy > span {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #eef2fb;
+  color: #304f9a;
+}
+
+.guide-complete-card.is-done .guide-complete-copy > span {
+  background: #edf2e8;
+  color: #7a9260;
+}
+
+.guide-complete-copy svg {
+  width: 20px;
+  height: 20px;
+}
+
+.guide-complete-copy strong {
+  display: block;
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 710;
+}
+
+.guide-complete-copy p {
+  margin: 3px 0 0;
+  color: #7e8692;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.guide-complete-card button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 13px;
+  background: #304f9a;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.guide-complete-card.is-done button {
+  background: #edf2e8;
+  color: #65794f;
+}
+
+.guide-detail-footer {
+  display: grid;
+  gap: 9px;
+  padding-top: 2px;
+}
+
+@media (max-width: 370px) {
+  .guide-step-card {
+    grid-template-columns: 34px minmax(0, 1fr) 24px;
+    gap: 9px;
+    padding: 11px;
+  }
+
+  .guide-step-number {
+    width: 34px;
+    height: 34px;
+  }
+
+  .guide-schedule-card ul {
+    grid-template-columns: 1fr;
+  }
+}

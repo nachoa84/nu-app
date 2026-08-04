@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
+  <link rel="stylesheet" href="guide.css?v=61c-guide-prototype" />
 </head>
 
 <body data-active-view="hoy">
@@ -107,6 +108,30 @@
             </div>
           </article>
 
+          <article class="home-routine-card home-guide-card">
+            <div class="home-routine-cover home-guide-cover" aria-hidden="true">
+              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" />
+            </div>
+
+            <div class="home-routine-body">
+              <span class="home-guide-kicker">Primeros pasos</span>
+              <div class="home-routine-heading">
+                <h2>Guía de inicio</h2>
+              </div>
+              <p id="homeGuideProgress" class="home-routine-day">0 de 9 etapas</p>
+              <div class="home-routine-progress-row">
+                <div class="home-routine-progress" aria-hidden="true">
+                  <span id="homeGuideProgressFill"></span>
+                </div>
+                <span id="homeGuidePercent" class="home-routine-percent">0%</span>
+              </div>
+              <button id="openGuideBtn" class="home-routine-continue home-guide-open" type="button">
+                <span id="homeGuideButtonLabel">Comenzar</span>
+                <span class="home-routine-continue-icon home-guide-open-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
           <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
             <div class="home-routine-cover" aria-hidden="true">
               <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
@@ -148,6 +173,18 @@
           </div>
           <div id="chat" class="chat"></div>
         </div>
+      </section>
+
+      <section id="view-guia" class="view">
+        <header class="app-page-header guide-page-header">
+          <button id="guideBackBtn" class="icon-button guide-back-btn" type="button" aria-label="Volver a Mis rutinas"></button>
+          <div>
+            <span id="guideHeaderKicker" class="page-kicker">Primeros pasos</span>
+            <h1 id="guideHeaderTitle">Guía de inicio</h1>
+          </div>
+          <button id="guideResetBtn" class="icon-button guide-reset-btn" type="button" aria-label="Reiniciar progreso" hidden></button>
+        </header>
+        <div id="guideRoot" class="guide-root"></div>
       </section>
 
       <section id="view-rutina" class="view">
@@ -347,6 +384,8 @@
   <script src="home-view.js?v=61b-progress-canonical"></script>
   <script src="daily-view.js?v=61b-progress-canonical"></script>
   <script src="progress-view.js?v=61b-progress-canonical"></script>
+  <script src="guide-content.js?v=61c-guide-prototype"></script>
+  <script src="guide-view.js?v=61c-guide-prototype"></script>
   <script src="app.js?v=61b-progress-canonical"></script>
   <script src="media-preview.js?v=61b-progress-canonical"></script>
   <script src="onboarding.js?v=61b-progress-canonical"></script>

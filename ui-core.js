@@ -296,8 +296,9 @@ function currentMainViewName() {
 }
 
 function nativeViewDirection(fromView, toView) {
-  const fromNav = fromView === "rutina" ? "hoy" : fromView;
-  const toNav = toView === "rutina" ? "hoy" : toView;
+  const homeChildViews = new Set(["rutina", "guia"]);
+  const fromNav = homeChildViews.has(fromView) ? "hoy" : fromView;
+  const toNav = homeChildViews.has(toView) ? "hoy" : toView;
   const fromIndex = MAIN_VIEW_ORDER.indexOf(fromNav);
   const toIndex = MAIN_VIEW_ORDER.indexOf(toNav);
   if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return 0;
@@ -384,7 +385,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   const previousTarget = document.getElementById(`view-${previousView}`);
   const changingView = previousView !== view;
   const direction = nativeViewDirection(previousView, view);
-  const navView = view === "rutina" ? "hoy" : view;
+  const navView = ["rutina", "guia"].includes(view) ? "hoy" : view;
   const activeNav = document.querySelector(`.nav-btn[data-view="${navView}"]`);
   const navWasActive = activeNav?.classList.contains("active") === true;
 

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v61b-progress-canonical";
+const CACHE="nuapp-v61c-guide-prototype";
 
 const CORE=[
   "./",
@@ -35,7 +35,16 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
+  "./guide.css?v=61c-guide-prototype",
+  "./guide-content.js?v=61c-guide-prototype",
+  "./guide-view.js?v=61c-guide-prototype",
   "./manifest.webmanifest?v=61b-progress-canonical",
+  "./assets/guide/logo-nu-comunidad-transparent.png",
+  "./assets/guide/community/community-01.jpg",
+  "./assets/guide/community/community-02.jpg",
+  "./assets/guide/community/community-03.jpg",
+  "./assets/guide/community/community-04.jpg",
+  "./assets/guide/community/community-05.jpg",
   "./assets/custom/nu-write-v2.mp4",
   "./assets/custom/nu-write-v2-poster.png",
   "./assets/custom/nu-app-word-v51.png",
