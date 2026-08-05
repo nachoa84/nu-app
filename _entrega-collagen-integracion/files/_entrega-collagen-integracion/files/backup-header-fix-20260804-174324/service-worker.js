@@ -1,4 +1,4 @@
-const CACHE="nuapp-v63-collagen-30";
+const CACHE="nuapp-v61c-guide-prototype";
 
 const CORE=[
   "./",
@@ -19,9 +19,8 @@ const CORE=[
   "./bot.css?v=61b-progress-canonical",
   "./favorites.css?v=61b-progress-canonical",
   "./bot-content.js?v=61b-progress-canonical",
-  "./ui-core.js?v=61d-guide-header-fix",
+  "./ui-core.js?v=61b-progress-canonical",
   "./routine-content.js?v=61b-progress-canonical",
-  "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
   "./bot.js?v=61b-progress-canonical",
@@ -29,16 +28,16 @@ const CORE=[
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=61b-progress-canonical",
-  "./progress-view.js?v=63-collagen-30",
+  "./progress-view.js?v=61b-progress-canonical",
   "./media-preview.js?v=61b-progress-canonical",
   "./app.js?v=61b-progress-canonical",
   "./backend-client.js?v=61b-progress-canonical",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
-  "./guide.css?v=61e-guide-home-sections",
+  "./guide.css?v=61c-guide-prototype",
   "./guide-content.js?v=61c-guide-prototype",
-  "./guide-view.js?v=61e-guide-home-sections",
+  "./guide-view.js?v=61c-guide-prototype",
   "./manifest.webmanifest?v=61b-progress-canonical",
   "./assets/guide/logo-nu-comunidad-transparent.png",
   "./assets/guide/community/community-01.jpg",
@@ -63,6 +62,7 @@ const CORE=[
   "./assets/D01_05_IMAGEN.jpg",
   "./assets/D01_06_IMAGEN.jpg",
   "./assets/D01_07_IMAGEN.jpg",
+  "./assets/D01_08_VIDEO.mp4",
   "./assets/D01_08_VIDEO_POSTER.webp",
 
   "./assets/D02_05_IMAGEN.jpg",
@@ -72,6 +72,7 @@ const CORE=[
   "./assets/D02_09_IMAGEN.jpg",
   "./assets/D02_10_IMAGEN.jpg",
   "./assets/D02_11_IMAGEN.jpg",
+  "./assets/D02_03_VIDEO.mp4",
   "./assets/D02_03_VIDEO_POSTER.webp",
 
   "./assets/D03_05_IMAGEN.jpg",
@@ -86,6 +87,7 @@ const CORE=[
   "./assets/D04_06_IMAGEN.jpg",
   "./assets/D04_07_IMAGEN.jpg",
   "./assets/D04_08_IMAGEN.jpg",
+  "./assets/D04_09_VIDEO.mp4",
   "./assets/D04_09_VIDEO_POSTER.webp",
 
   "./assets/D05_02_IMAGEN.jpg",
@@ -99,12 +101,15 @@ const CORE=[
   "./assets/D06_05_IMAGEN.jpg",
   "./assets/D06_06_IMAGEN.jpg",
   "./assets/D06_07_IMAGEN.jpg",
+  "./assets/D06_08_VIDEO.mp4",
   "./assets/D06_08_VIDEO_POSTER.webp",
 
   "./assets/D07_04_IMAGEN.jpg",
   "./assets/D07_05_IMAGEN.jpg",
   "./assets/D07_06_IMAGEN.jpg",
+  "./assets/D07_03_VIDEO.mp4",
   "./assets/D07_03_VIDEO_POSTER.webp",
+  "./assets/D07_07_VIDEO.mp4",
   "./assets/D07_07_VIDEO_POSTER.webp"
 ];
 
@@ -322,27 +327,7 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // Los videos se sirven bajo demanda y no se guardan automáticamente
-  // en Cache Storage. Esto evita que la PWA acumule cientos de MB.
-  const requestUrl = new URL(req.url);
-  const isVideoAsset = /\.(mp4|mov|m4v|webm)$/i.test(requestUrl.pathname);
-
-  if (isVideoAsset) {
-    event.respondWith(
-      fetch(req)
-        .catch(() => caches.match(req))
-        .then(response =>
-          response ||
-          new Response(null, {
-            status: 503,
-            statusText: "Media unavailable offline"
-          })
-        )
-    );
-    return;
-  }
-
-  // Para el resto de los assets usamos cache-first y guardamos lo que falte.
+  // Para assets usamos cache-first y guardamos lo que falte.
   event.respondWith(
     caches.match(req).then(cached=>
       cached ||

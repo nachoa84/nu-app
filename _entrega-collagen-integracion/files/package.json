@@ -1,0 +1,20 @@
+{
+  "name": "nu-app-pwa",
+  "version": "0.62.0",
+  "private": true,
+  "description": "Nu App PWA con backend Node, PostgreSQL y Web Push",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "luxon": "^3.0.0",
+    "pg": "^8.0.0",
+    "web-push": "^3.6.7"
+  }
+}

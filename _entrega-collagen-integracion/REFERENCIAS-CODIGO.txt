@@ -1,0 +1,261 @@
+=== REGISTRO DEL SERVICE WORKER ===
+/home/runner/workspace/respaldo-antes-terracota/app.js:2456:if ("serviceWorker" in navigator) {
+/home/runner/workspace/respaldo-antes-terracota/app.js:2458:    navigator.serviceWorker.register(
+/home/runner/workspace/push-client.js:39:      "serviceWorker" in navigator &&
+/home/runner/workspace/push-client.js:122:      !("serviceWorker" in navigator)
+/home/runner/workspace/push-client.js:130:      .serviceWorker
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:47:  if (!("serviceWorker" in navigator)) {
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:55:      navigator.serviceWorker
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:56:        .register("service-worker.js")
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:57:        .then(() => navigator.serviceWorker.ready)
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:68:  if (!("serviceWorker" in navigator)) {
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:79:    !("serviceWorker" in navigator) ||
+/home/runner/workspace/attached_assets/Pasted--Rutina-30-Dias-modulo-de-notificaciones-Extraido-sin-r_1785003756716.txt:263:  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+/home/runner/workspace/notifications.js:47:  if (!("serviceWorker" in navigator)) {
+/home/runner/workspace/notifications.js:55:      navigator.serviceWorker
+/home/runner/workspace/notifications.js:56:        .register("service-worker.js")
+/home/runner/workspace/notifications.js:57:        .then(() => navigator.serviceWorker.ready)
+/home/runner/workspace/notifications.js:68:  if (!("serviceWorker" in navigator)) {
+/home/runner/workspace/notifications.js:79:    !("serviceWorker" in navigator) ||
+/home/runner/workspace/notifications.js:263:  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+/home/runner/workspace/app.js:69:if ("serviceWorker" in navigator) {
+
+=== REFERENCIAS A ROUTINE CONTENT ===
+/home/runner/workspace/file-tree.txt:100:./routine-content.js
+/home/runner/workspace/index.html:394:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+/home/runner/workspace/nu-app-inventario-archivos.txt:110:    17.77 KB  routine-content.js
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:378:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:378:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+
+=== VERSIONES Y NOMBRES DE CACHÉ ===
+/home/runner/workspace/attached_assets/aplicar-home-guia-prioritaria-v2_1785870489783.py:12:CACHE_NAME = 'nuapp-v61e-guide-home-sections'
+/home/runner/workspace/attached_assets/aplicar-home-guia-prioritaria-v2_1785870489783.py:444:    f'const CACHE="{CACHE_NAME}";',
+/home/runner/workspace/attached_assets/aplicar-home-guia-prioritaria-v2_1785870489783.py:493:print(f'✅ Nueva caché: {CACHE_NAME}')
+/home/runner/workspace/file-tree.txt:59:./claude-nuapp-visual-audit.zip
+/home/runner/workspace/index.html:18:  <link rel="manifest" href="manifest.webmanifest?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:19:  <link rel="icon" type="image/png" sizes="32x32" href="icons/nuapp-favicon-32.png?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:20:  <link rel="icon" type="image/png" sizes="48x48" href="icons/nuapp-favicon-48.png?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:21:  <link rel="apple-touch-icon" sizes="180x180" href="icons/nuapp-apple-180.png?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:22:  <link rel="stylesheet" href="tokens.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:23:  <link rel="stylesheet" href="base.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:24:  <link rel="stylesheet" href="splash.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:25:  <link rel="stylesheet" href="navigation.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:26:  <link rel="stylesheet" href="daily.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:27:  <link rel="stylesheet" href="progress.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:28:  <link rel="stylesheet" href="shared.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:29:  <link rel="stylesheet" href="ui-core.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:30:  <link rel="stylesheet" href="notifications.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:31:  <link rel="stylesheet" href="home.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:32:  <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:33:  <link rel="stylesheet" href="media-preview.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:34:  <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:35:  <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:36:  <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
+/home/runner/workspace/index.html:389:  <script src="splash.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:390:  <script src="backend-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:391:  <script src="push-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:392:  <script src="bot-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:394:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:395:  <script src="routine-state.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:396:  <script src="routine-sync.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:397:  <script src="bot.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:398:  <script src="favorites.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:399:  <script src="notifications.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:400:  <script src="home-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:401:  <script src="daily-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:402:  <script src="progress-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:405:  <script src="app.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:406:  <script src="media-preview.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/index.html:407:  <script src="onboarding.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/service-worker.js:1:const CACHE="nuapp-v61e-guide-home-sections";
+/home/runner/workspace/service-worker.js:6:  "./tokens.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:7:  "./base.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:8:  "./splash.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:9:  "./splash.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:10:  "./navigation.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:11:  "./daily.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:12:  "./progress.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:13:  "./media-preview.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:14:  "./shared.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:15:  "./ui-core.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:16:  "./notifications.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:17:  "./home.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:18:  "./shell.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:19:  "./bot.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:20:  "./favorites.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:21:  "./bot-content.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:24:  "./routine-state.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:25:  "./routine-sync.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:26:  "./bot.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:27:  "./favorites.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:28:  "./notifications.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:29:  "./home-view.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:30:  "./daily-view.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:31:  "./progress-view.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:32:  "./media-preview.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:33:  "./app.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:34:  "./backend-client.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:35:  "./push-client.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:36:  "./onboarding.js?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:37:  "./onboarding.css?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:41:  "./manifest.webmanifest?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:52:  "./icons/nuapp-favicon-32.png?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:53:  "./icons/nuapp-favicon-48.png?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:54:  "./icons/nuapp-apple-180.png?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:55:  "./icons/nuapp-icon-192.png?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:56:  "./icons/nuapp-icon-512.png?v=61b-progress-canonical",
+/home/runner/workspace/service-worker.js:57:  "./icons/nuapp-maskable-512.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:18:  <link rel="manifest" href="manifest.webmanifest?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:19:  <link rel="icon" type="image/png" sizes="32x32" href="icons/nuapp-favicon-32.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:20:  <link rel="icon" type="image/png" sizes="48x48" href="icons/nuapp-favicon-48.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:21:  <link rel="apple-touch-icon" sizes="180x180" href="icons/nuapp-apple-180.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:22:  <link rel="stylesheet" href="tokens.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:23:  <link rel="stylesheet" href="base.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:24:  <link rel="stylesheet" href="splash.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:25:  <link rel="stylesheet" href="navigation.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:26:  <link rel="stylesheet" href="daily.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:27:  <link rel="stylesheet" href="progress.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:28:  <link rel="stylesheet" href="shared.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:29:  <link rel="stylesheet" href="ui-core.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:30:  <link rel="stylesheet" href="notifications.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:31:  <link rel="stylesheet" href="home.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:32:  <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:33:  <link rel="stylesheet" href="media-preview.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:34:  <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:35:  <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:36:  <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:373:  <script src="splash.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:374:  <script src="backend-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:375:  <script src="push-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:376:  <script src="bot-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:377:  <script src="ui-core.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:378:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:379:  <script src="routine-state.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:380:  <script src="routine-sync.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:381:  <script src="bot.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:382:  <script src="favorites.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:383:  <script src="notifications.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:384:  <script src="home-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:385:  <script src="daily-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:386:  <script src="progress-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:389:  <script src="app.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:390:  <script src="media-preview.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/index.html:391:  <script src="onboarding.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:1:const CACHE="nuapp-v61c-guide-prototype";
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:6:  "./tokens.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:7:  "./base.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:8:  "./splash.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:9:  "./splash.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:10:  "./navigation.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:11:  "./daily.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:12:  "./progress.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:13:  "./media-preview.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:14:  "./shared.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:15:  "./ui-core.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:16:  "./notifications.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:17:  "./home.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:18:  "./shell.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:19:  "./bot.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:20:  "./favorites.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:21:  "./bot-content.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:22:  "./ui-core.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:24:  "./routine-state.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:25:  "./routine-sync.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:26:  "./bot.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:27:  "./favorites.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:28:  "./notifications.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:29:  "./home-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:30:  "./daily-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:31:  "./progress-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:32:  "./media-preview.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:33:  "./app.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:34:  "./backend-client.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:35:  "./push-client.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:36:  "./onboarding.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:37:  "./onboarding.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:41:  "./manifest.webmanifest?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:52:  "./icons/nuapp-favicon-32.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:53:  "./icons/nuapp-favicon-48.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:54:  "./icons/nuapp-apple-180.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:55:  "./icons/nuapp-icon-192.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:56:  "./icons/nuapp-icon-512.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-header-fix-20260804-174324/service-worker.js:57:  "./icons/nuapp-maskable-512.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:18:  <link rel="manifest" href="manifest.webmanifest?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:19:  <link rel="icon" type="image/png" sizes="32x32" href="icons/nuapp-favicon-32.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:20:  <link rel="icon" type="image/png" sizes="48x48" href="icons/nuapp-favicon-48.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:21:  <link rel="apple-touch-icon" sizes="180x180" href="icons/nuapp-apple-180.png?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:22:  <link rel="stylesheet" href="tokens.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:23:  <link rel="stylesheet" href="base.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:24:  <link rel="stylesheet" href="splash.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:25:  <link rel="stylesheet" href="navigation.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:26:  <link rel="stylesheet" href="daily.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:27:  <link rel="stylesheet" href="progress.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:28:  <link rel="stylesheet" href="shared.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:29:  <link rel="stylesheet" href="ui-core.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:30:  <link rel="stylesheet" href="notifications.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:31:  <link rel="stylesheet" href="home.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:32:  <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:33:  <link rel="stylesheet" href="media-preview.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:34:  <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:35:  <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:36:  <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:373:  <script src="splash.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:374:  <script src="backend-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:375:  <script src="push-client.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:376:  <script src="bot-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:378:  <script src="routine-content.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:379:  <script src="routine-state.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:380:  <script src="routine-sync.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:381:  <script src="bot.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:382:  <script src="favorites.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:383:  <script src="notifications.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:384:  <script src="home-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:385:  <script src="daily-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:386:  <script src="progress-view.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:389:  <script src="app.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:390:  <script src="media-preview.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/index.html:391:  <script src="onboarding.js?v=61b-progress-canonical"></script>
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:1:const CACHE="nuapp-v61d-guide-header-fix";
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:6:  "./tokens.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:7:  "./base.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:8:  "./splash.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:9:  "./splash.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:10:  "./navigation.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:11:  "./daily.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:12:  "./progress.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:13:  "./media-preview.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:14:  "./shared.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:15:  "./ui-core.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:16:  "./notifications.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:17:  "./home.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:18:  "./shell.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:19:  "./bot.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:20:  "./favorites.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:21:  "./bot-content.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:23:  "./routine-content.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:24:  "./routine-state.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:25:  "./routine-sync.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:26:  "./bot.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:27:  "./favorites.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:28:  "./notifications.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:29:  "./home-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:30:  "./daily-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:31:  "./progress-view.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:32:  "./media-preview.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:33:  "./app.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:34:  "./backend-client.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:35:  "./push-client.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:36:  "./onboarding.js?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:37:  "./onboarding.css?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:41:  "./manifest.webmanifest?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:52:  "./icons/nuapp-favicon-32.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:53:  "./icons/nuapp-favicon-48.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:54:  "./icons/nuapp-apple-180.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:55:  "./icons/nuapp-icon-192.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:56:  "./icons/nuapp-icon-512.png?v=61b-progress-canonical",
+/home/runner/workspace/backup-home-guia-v2-20260804-190855/service-worker.js:57:  "./icons/nuapp-maskable-512.png?v=61b-progress-canonical",

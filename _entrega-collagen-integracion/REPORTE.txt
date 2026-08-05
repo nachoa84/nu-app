@@ -1,0 +1,20 @@
+=== RESUMEN DEL RECOLECTOR ===
+Fecha: 2026-08-05T02:12:08+00:00
+Raíz: /home/runner/workspace
+
+Archivos incluidos:
+28
+
+Tamaño de la entrega sin comprimir:
+760K	/home/runner/workspace/_entrega-collagen-integracion/files
+
+Material Collagen+ presente en el Remix:
+Cantidad de archivos:
+191
+Tamaño:
+338M	/home/runner/workspace/migration-collagen-assets-v1/assets/collagen
+
+IMPORTANTE:
+- Los binarios multimedia NO fueron incluidos.
+- No se incluyeron .env, secretos, node_modules ni .git.
+- Este script no modifica el código de Nu App.

@@ -19,7 +19,7 @@ const PORT =
   Number(process.env.PORT || 3000);
 
 const MAX_DAY =
-  Number(process.env.MAX_DAY || 30);
+  Number(process.env.MAX_DAY || 7);
 
 const SCHEDULER_INTERVAL_MS =
   Math.max(
@@ -2549,9 +2549,6 @@ function isBlockedPublicPath(requestPath) {
     segments.some(segment =>
       segment === "node_modules" ||
       segment === "attached_assets" ||
-      segment === "migration-collagen-assets-v1" ||
-      segment === "collagen-assets-downloader-v1" ||
-      segment.startsWith("_entrega-") ||
       segment.startsWith(
         "respaldo-"
       )

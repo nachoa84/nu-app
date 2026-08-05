@@ -89,106 +89,90 @@ function renderDays() {
     };
   }
 
-  const weeks = [
-    { number: 1, start: 1, end: 7 },
+  const weekOne = document.createElement("section");
+  weekOne.className = "app-week-card app-week-open";
+
+  const weekOneHead = document.createElement("div");
+  weekOneHead.className = "app-week-open-head";
+  weekOneHead.innerHTML = `
+    <div>
+      <strong>Semana 1</strong>
+      <span>Días 1–7</span>
+    </div>
+  `;
+
+  const weekOneDays = document.createElement("div");
+  weekOneDays.className = "app-week-days";
+
+  for (let day = 1; day <= 7; day++) {
+    const available = isPreviewMode || day <= state.currentDay;
+    const complete = isDayComplete(day);
+    const current = day === state.currentDay;
+
+    const dayButton = document.createElement("button");
+    dayButton.type = "button";
+    dayButton.className = "app-day-dot";
+    dayButton.textContent = String(day);
+    dayButton.setAttribute("aria-label", `Día ${day}`);
+
+    if (complete) dayButton.classList.add("is-complete");
+    if (current) dayButton.classList.add("is-current");
+
+    if (!available) {
+      dayButton.classList.add("is-future");
+      dayButton.disabled = true;
+    } else {
+      dayButton.onclick = () => {
+        selectDay(day, true);
+        renderDays();
+      };
+    }
+
+    weekOneDays.appendChild(dayButton);
+  }
+
+  weekOne.append(weekOneHead, weekOneDays);
+
+  const lockedWeeks = [
     { number: 2, start: 8, end: 14 },
     { number: 3, start: 15, end: 21 },
     { number: 4, start: 22, end: 30 }
-  ];
-
-  const weekCards = weeks.map(week => {
-    const weekHasAvailableDay =
-      isPreviewMode ||
-      week.start <= state.currentDay;
-
+  ].map(week => {
     const card = document.createElement("section");
-    card.className =
-      `app-week-card ${
-        weekHasAvailableDay
-          ? "app-week-open"
-          : "app-week-locked-card"
-      }`;
+    card.className = "app-week-card app-week-locked-card";
 
     const head = document.createElement("div");
-    head.className =
-      `app-week-open-head${
-        weekHasAvailableDay
-          ? ""
-          : " app-week-locked-head"
-      }`;
-
+    head.className = "app-week-open-head app-week-locked-head";
     head.innerHTML = `
       <div>
         <strong>Semana ${week.number}</strong>
         <span>Días ${week.start}–${week.end}</span>
       </div>
-      ${
-        weekHasAvailableDay
-          ? ""
-          : `<span class="app-week-lock" aria-label="Bloqueada">${ICONS.lock}</span>`
-      }
+      <span class="app-week-lock" aria-label="Bloqueada">${ICONS.lock}</span>
     `;
 
-    const weekDays = document.createElement("div");
-    weekDays.className =
-      `app-week-days${
-        weekHasAvailableDay
-          ? ""
-          : " app-week-days-locked"
-      }`;
+    const days = document.createElement("div");
+    days.className = "app-week-days app-week-days-locked";
 
     for (let day = week.start; day <= week.end; day++) {
-      const hasContent = Boolean(days[day]);
-      const available =
-        hasContent &&
-        (
-          isPreviewMode ||
-          day <= state.currentDay
-        );
-      const complete = isDayComplete(day);
-      const current = day === state.currentDay;
-
       const dayButton = document.createElement("button");
       dayButton.type = "button";
-      dayButton.className = "app-day-dot";
+      dayButton.className = "app-day-dot is-future is-locked";
       dayButton.textContent = String(day);
-      dayButton.setAttribute("aria-label", `Día ${day}`);
-
-      if (complete) {
-        dayButton.classList.add("is-complete");
-      }
-
-      if (current) {
-        dayButton.classList.add("is-current");
-      }
-
-      if (!available) {
-        dayButton.classList.add("is-future", "is-locked");
-        dayButton.disabled = true;
-        dayButton.setAttribute(
-          "aria-label",
-          hasContent
-            ? `Día ${day} bloqueado`
-            : `Día ${day} sin contenido`
-        );
-      } else {
-        dayButton.onclick = () => {
-          selectDay(day, true);
-          renderDays();
-        };
-      }
-
-      weekDays.appendChild(dayButton);
+      dayButton.disabled = true;
+      dayButton.setAttribute("aria-label", `Día ${day} bloqueado`);
+      days.appendChild(dayButton);
     }
 
-    card.append(head, weekDays);
+    card.append(head, days);
     return card;
   });
 
   grid.append(
     progressCard,
     todayCard,
-    ...weekCards
+    weekOne,
+    ...lockedWeeks
   );
 
   ensureDemoControls();

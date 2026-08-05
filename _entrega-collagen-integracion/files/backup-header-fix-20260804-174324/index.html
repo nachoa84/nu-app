@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
-  <link rel="stylesheet" href="guide.css?v=61e-guide-home-sections" />
+  <link rel="stylesheet" href="guide.css?v=61c-guide-prototype" />
 </head>
 
 <body data-active-view="hoy">
@@ -78,97 +78,81 @@
         <header class="app-page-header home-page-header">
           <div>
             <span id="homeGreeting" class="home-greeting">Hola</span>
-            <h1 id="homeDayTitle">Inicio</h1>
+            <h1 id="homeDayTitle">Mis rutinas</h1>
           </div>
           <button id="homeBellBtn" class="icon-button home-bell-btn" type="button" aria-label="Notificaciones"></button>
         </header>
 
-        <section id="homeGuideSection" class="home-guide-section" aria-labelledby="homeGuideTitle">
-          <article class="home-guide-feature">
-            <div class="home-guide-feature-copy">
-              <span id="homeGuideKicker" class="home-guide-kicker">Empezá por acá</span>
-              <h2 id="homeGuideTitle">Guía de inicio</h2>
-              <p id="homeGuideDescription" class="home-guide-description">
-                Tus primeros pasos para comenzar con claridad y acompañamiento.
-              </p>
-
-              <div class="home-guide-progress-row">
-                <div class="home-guide-progress-copy">
-                  <span id="homeGuideProgress">0 de 9 etapas</span>
-                  <strong id="homeGuidePercent">0%</strong>
-                </div>
-                <div class="home-guide-progress" aria-hidden="true">
-                  <span id="homeGuideProgressFill"></span>
-                </div>
-              </div>
-
-              <button id="openGuideBtn" class="home-guide-action home-guide-open" type="button">
-                <span id="homeGuideButtonLabel">Comenzar</span>
-                <span class="home-guide-open-icon" aria-hidden="true"></span>
-              </button>
+        <section class="home-routines" aria-labelledby="homeDayTitle">
+          <article class="home-routine-card home-routine-card-active">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
             </div>
 
-            <div class="home-guide-brand" aria-hidden="true">
-              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" />
+            <div class="home-routine-body">
+              <div class="home-routine-heading">
+                <h2>Collagen+</h2>
+              </div>
+              <p id="homeRoutineDay" class="home-routine-day">Día 1 de 30</p>
+              <div class="home-routine-progress-row">
+                <div class="home-routine-progress" aria-hidden="true">
+                  <span id="homeRoutineProgressFill"></span>
+                </div>
+                <span id="homeRoutinePercent" class="home-routine-percent">3%</span>
+              </div>
+              <button id="startDayBtn" class="home-routine-continue" type="button">
+                <span id="homeRoutineContinueLabel">Continuar Día 1</span>
+                <span class="home-routine-continue-icon" aria-hidden="true"></span>
+              </button>
+              <button id="openRoutineBtn" class="home-routine-progress-link" type="button" hidden>Ver progreso de 30 días</button>
             </div>
           </article>
-        </section>
 
-        <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
-          <div class="home-section-heading">
-            <div>
-              <span>Tu día a día</span>
-              <h2 id="homeRoutinesTitle">Mis rutinas</h2>
+          <article class="home-routine-card home-guide-card">
+            <div class="home-routine-cover home-guide-cover" aria-hidden="true">
+              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" />
             </div>
-          </div>
 
-          <div class="home-routines">
-            <article class="home-routine-card home-routine-card-active">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
+            <div class="home-routine-body">
+              <span class="home-guide-kicker">Primeros pasos</span>
+              <div class="home-routine-heading">
+                <h2>Guía de inicio</h2>
               </div>
-
-              <div class="home-routine-body">
-                <div class="home-routine-heading">
-                  <h2>Collagen+</h2>
+              <p id="homeGuideProgress" class="home-routine-day">0 de 9 etapas</p>
+              <div class="home-routine-progress-row">
+                <div class="home-routine-progress" aria-hidden="true">
+                  <span id="homeGuideProgressFill"></span>
                 </div>
-                <p id="homeRoutineDay" class="home-routine-day">Día 1 de 30</p>
-                <div class="home-routine-progress-row">
-                  <div class="home-routine-progress" aria-hidden="true">
-                    <span id="homeRoutineProgressFill"></span>
-                  </div>
-                  <span id="homeRoutinePercent" class="home-routine-percent">3%</span>
-                </div>
-                <button id="startDayBtn" class="home-routine-continue" type="button">
-                  <span id="homeRoutineContinueLabel">Continuar Día 1</span>
-                  <span class="home-routine-continue-icon" aria-hidden="true"></span>
-                </button>
-                <button id="openRoutineBtn" class="home-routine-progress-link" type="button" hidden>Ver progreso de 30 días</button>
+                <span id="homeGuidePercent" class="home-routine-percent">0%</span>
               </div>
-            </article>
+              <button id="openGuideBtn" class="home-routine-continue home-guide-open" type="button">
+                <span id="homeGuideButtonLabel">Comenzar</span>
+                <span class="home-routine-continue-icon home-guide-open-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
 
-            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>LumiSpa</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-                <span class="home-routine-placeholder-label">Nueva rutina</span>
-              </div>
-            </article>
+          <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
+            </div>
+            <div class="home-routine-body">
+              <div class="home-routine-heading"><h2>LumiSpa</h2></div>
+              <p class="home-routine-day">Próximamente</p>
+              <span class="home-routine-placeholder-label">Nueva rutina</span>
+            </div>
+          </article>
 
-            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>Suplementos</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-                <span class="home-routine-placeholder-label">Nueva rutina</span>
-              </div>
-            </article>
-          </div>
+          <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+            <div class="home-routine-cover" aria-hidden="true">
+              <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" />
+            </div>
+            <div class="home-routine-body">
+              <div class="home-routine-heading"><h2>Suplementos</h2></div>
+              <p class="home-routine-day">Próximamente</p>
+              <span class="home-routine-placeholder-label">Nueva rutina</span>
+            </div>
+          </article>
         </section>
 
         <div id="chatWrap" class="chat-wrap">
@@ -390,9 +374,8 @@
   <script src="backend-client.js?v=61b-progress-canonical"></script>
   <script src="push-client.js?v=61b-progress-canonical"></script>
   <script src="bot-content.js?v=61b-progress-canonical"></script>
-  <script src="ui-core.js?v=61d-guide-header-fix"></script>
+  <script src="ui-core.js?v=61b-progress-canonical"></script>
   <script src="routine-content.js?v=61b-progress-canonical"></script>
-  <script src="routine-content-collagen-8-30.js?v=63-collagen-30"></script>
   <script src="routine-state.js?v=61b-progress-canonical"></script>
   <script src="routine-sync.js?v=61b-progress-canonical"></script>
   <script src="bot.js?v=61b-progress-canonical"></script>
@@ -400,9 +383,9 @@
   <script src="notifications.js?v=61b-progress-canonical"></script>
   <script src="home-view.js?v=61b-progress-canonical"></script>
   <script src="daily-view.js?v=61b-progress-canonical"></script>
-  <script src="progress-view.js?v=63-collagen-30"></script>
+  <script src="progress-view.js?v=61b-progress-canonical"></script>
   <script src="guide-content.js?v=61c-guide-prototype"></script>
-  <script src="guide-view.js?v=61e-guide-home-sections"></script>
+  <script src="guide-view.js?v=61c-guide-prototype"></script>
   <script src="app.js?v=61b-progress-canonical"></script>
   <script src="media-preview.js?v=61b-progress-canonical"></script>
   <script src="onboarding.js?v=61b-progress-canonical"></script>
