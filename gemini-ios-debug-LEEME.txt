@@ -1,0 +1,9 @@
+ARCHIVOS GENERADOS PARA GEMINI
+Cantidad de partes: 4
+
+- gemini-ios-debug-part-01.txt
+- gemini-ios-debug-part-02.txt
+- gemini-ios-debug-part-03.txt
+- gemini-ios-debug-part-04.txt
+
+Pegarlos en orden.

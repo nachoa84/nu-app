@@ -15,15 +15,11 @@ let previewRenderToken = 0;
 const previewNeighborCache = new Map();
 
 function normalizePreviewItem(item) {
-  const mediaType = item.mediaType || "image";
-
   return {
     src: item.src,
     label: item.label || "Material",
-    mediaType,
-    poster: mediaType === "video"
-      ? resolveRoutineVideoPoster(item.src, item.poster)
-      : null,
+    mediaType: item.mediaType || "image",
+    poster: item.poster || null,
     favorite: item.favorite !== false,
     shareable: item.shareable !== false,
     url: item.url || null

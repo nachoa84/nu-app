@@ -50,20 +50,13 @@
   color: var(--fav-brand);
 }
 
-#view-favoritos .favorite-folder-preview > img,
-#view-favoritos .favorite-folder-preview > video {
-  position: absolute;
-  inset: 0;
+#view-favoritos .favorite-folder-preview img,
+#view-favoritos .favorite-folder-preview video {
   display: block;
   width: 100%;
   height: 100%;
-  min-width: 100%;
-  min-height: 100%;
   max-width: none;
-  max-height: none;
-  border-radius: inherit;
   object-fit: cover;
-  object-position: center;
   pointer-events: none;
   -webkit-user-drag: none;
   -webkit-user-select: none;

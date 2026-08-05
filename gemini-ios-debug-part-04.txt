@@ -1,3 +1,11 @@
+PARTE 4 DE 4
+No respondas todavía si faltan partes.
+Conservá este contenido para analizarlo junto con las demás partes.
+
+==== FIN ARCHIVO: service-worker.js =====
+
+
+===== INICIO ARCHIVO: index.html =====
 <!doctype html>
 <html lang="es">
 <head>
@@ -23,7 +31,7 @@
   <link rel="stylesheet" href="base.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="splash.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="navigation.css?v=61b-progress-canonical" />
-  <link rel="stylesheet" href="daily.css?v=63e-ios-thumbnails" />
+  <link rel="stylesheet" href="daily.css?v=63b-day-view-fix" />
   <link rel="stylesheet" href="progress.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="shared.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="ui-core.css?v=61b-progress-canonical" />
@@ -32,7 +40,7 @@
   <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="media-preview.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="bot.css?v=61b-progress-canonical" />
-  <link rel="stylesheet" href="favorites.css?v=63e-ios-thumbnails" />
+  <link rel="stylesheet" href="favorites.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="onboarding.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="guide.css?v=61e-guide-home-sections" />
 </head>
@@ -390,21 +398,133 @@
   <script src="backend-client.js?v=61b-progress-canonical"></script>
   <script src="push-client.js?v=61b-progress-canonical"></script>
   <script src="bot-content.js?v=61b-progress-canonical"></script>
-  <script src="ui-core.js?v=63e-ios-thumbnails"></script>
+  <script src="ui-core.js?v=61d-guide-header-fix"></script>
   <script src="routine-content.js?v=61b-progress-canonical"></script>
   <script src="routine-content-collagen-8-30.js?v=63-collagen-30"></script>
   <script src="routine-state.js?v=61b-progress-canonical"></script>
   <script src="routine-sync.js?v=61b-progress-canonical"></script>
   <script src="bot.js?v=61b-progress-canonical"></script>
-  <script src="favorites.js?v=63e-ios-thumbnails"></script>
+  <script src="favorites.js?v=61b-progress-canonical"></script>
   <script src="notifications.js?v=61b-progress-canonical"></script>
   <script src="home-view.js?v=61b-progress-canonical"></script>
-  <script src="daily-view.js?v=63e-ios-thumbnails"></script>
+  <script src="daily-view.js?v=63c-text-content-fix"></script>
   <script src="progress-view.js?v=63-collagen-30"></script>
   <script src="guide-content.js?v=61c-guide-prototype"></script>
   <script src="guide-view.js?v=61e-guide-home-sections"></script>
-  <script src="app.js?v=63e-ios-thumbnails"></script>
-  <script src="media-preview.js?v=63e-ios-thumbnails"></script>
+  <script src="app.js?v=63d-ios-media-fix"></script>
+  <script src="media-preview.js?v=61b-progress-canonical"></script>
   <script src="onboarding.js?v=61b-progress-canonical"></script>
 </body>
 </html>
+
+===== FIN ARCHIVO: index.html =====
+
+
+===== REFERENCIAS REALES DE VIDEOS =====
+assets/collagen/day-08/D08_002_VIDEO.mp4
+assets/collagen/day-08/D08_003_VIDEO.mp4
+assets/collagen/day-08/D08_004_VIDEO.mp4
+assets/collagen/day-09/D09_004_VIDEO.mp4
+assets/collagen/day-11/D11_001_VIDEO.mp4
+assets/collagen/day-12/D12_001_VIDEO.mp4
+assets/collagen/day-12/D12_002_VIDEO.mp4
+assets/collagen/day-12/D12_003_VIDEO.mp4
+assets/collagen/day-12/D12_004_VIDEO.mp4
+assets/collagen/day-12/D12_005_VIDEO.mp4
+assets/collagen/day-12/D12_006_VIDEO.mp4
+assets/collagen/day-12/D12_007_VIDEO.mp4
+assets/collagen/day-12/D12_008_VIDEO.mp4
+assets/collagen/day-12/D12_009_VIDEO.mp4
+assets/collagen/day-13/D13_001_VIDEO.mp4
+assets/collagen/day-13/D13_003_VIDEO.mp4
+assets/collagen/day-14/D14_002_VIDEO.mp4
+assets/collagen/day-14/D14_003_VIDEO.mp4
+assets/collagen/day-15/D15_001_VIDEO.mp4
+assets/collagen/day-15/D15_002_VIDEO.mp4
+assets/collagen/day-15/D15_003_VIDEO.mp4
+assets/collagen/day-15/D15_004_VIDEO.mp4
+assets/collagen/day-15/D15_006_VIDEO.mp4
+assets/collagen/day-16/D16_001_VIDEO.mp4
+assets/collagen/day-16/D16_002_VIDEO.mp4
+assets/collagen/day-16/D16_005_VIDEO.mp4
+assets/collagen/day-17/D17_004_VIDEO.mp4
+assets/collagen/day-17/D17_005_VIDEO.mp4
+assets/collagen/day-18/D18_002_VIDEO.mp4
+assets/collagen/day-18/D18_003_VIDEO.mp4
+assets/collagen/day-18/D18_004_VIDEO.mp4
+assets/collagen/day-18/D18_005_VIDEO.mp4
+assets/collagen/day-18/D18_006_VIDEO.mp4
+assets/collagen/day-19/D19_003_VIDEO.mp4
+assets/collagen/day-20/D20_001_VIDEO.mp4
+assets/collagen/day-20/D20_003_VIDEO.mp4
+assets/collagen/day-20/D20_005_VIDEO.mp4
+assets/collagen/day-20/D20_006_VIDEO.mp4
+assets/collagen/day-21/D21_001_VIDEO.mp4
+assets/collagen/day-21/D21_006_VIDEO.mp4
+assets/collagen/day-22/D22_005_VIDEO.mp4
+assets/collagen/day-23/D23_001_VIDEO.mp4
+assets/collagen/day-23/D23_006_VIDEO.mp4
+assets/collagen/day-24/D24_004_VIDEO.mp4
+assets/collagen/day-25/D25_001_VIDEO.mp4
+assets/collagen/day-25/D25_007_VIDEO.mp4
+assets/collagen/day-26/D26_001_VIDEO.mp4
+assets/collagen/day-28/D28_003_VIDEO.mp4
+assets/collagen/day-28/D28_004_VIDEO.mp4
+assets/collagen/day-28/D28_005_VIDEO.mp4
+assets/collagen/day-30/D30_004_VIDEO.mp4
+===== FIN REFERENCIAS DE VIDEOS =====
+
+
+===== INVENTARIO REAL DE POSTERS =====
+assets/collagen/day-08/D08_002_VIDEO.poster.jpg | 97308 bytes
+assets/collagen/day-08/D08_003_VIDEO.poster.jpg | 67053 bytes
+assets/collagen/day-08/D08_004_VIDEO.poster.jpg | 65087 bytes
+assets/collagen/day-09/D09_004_VIDEO.poster.jpg | 254977 bytes
+assets/collagen/day-11/D11_001_VIDEO.poster.jpg | 94889 bytes
+assets/collagen/day-12/D12_001_VIDEO.poster.jpg | 44244 bytes
+assets/collagen/day-12/D12_002_VIDEO.poster.jpg | 45122 bytes
+assets/collagen/day-12/D12_003_VIDEO.poster.jpg | 55491 bytes
+assets/collagen/day-12/D12_004_VIDEO.poster.jpg | 48538 bytes
+assets/collagen/day-12/D12_005_VIDEO.poster.jpg | 56859 bytes
+assets/collagen/day-12/D12_006_VIDEO.poster.jpg | 42937 bytes
+assets/collagen/day-12/D12_007_VIDEO.poster.jpg | 52466 bytes
+assets/collagen/day-12/D12_008_VIDEO.poster.jpg | 47656 bytes
+assets/collagen/day-12/D12_009_VIDEO.poster.jpg | 57543 bytes
+assets/collagen/day-13/D13_001_VIDEO.poster.jpg | 23580 bytes
+assets/collagen/day-13/D13_003_VIDEO.poster.jpg | 46484 bytes
+assets/collagen/day-14/D14_002_VIDEO.poster.jpg | 157353 bytes
+assets/collagen/day-14/D14_003_VIDEO.poster.jpg | 106014 bytes
+assets/collagen/day-15/D15_001_VIDEO.poster.jpg | 172286 bytes
+assets/collagen/day-15/D15_002_VIDEO.poster.jpg | 139675 bytes
+assets/collagen/day-15/D15_003_VIDEO.poster.jpg | 148626 bytes
+assets/collagen/day-15/D15_004_VIDEO.poster.jpg | 175166 bytes
+assets/collagen/day-15/D15_006_VIDEO.poster.jpg | 24983 bytes
+assets/collagen/day-16/D16_001_VIDEO.poster.jpg | 167328 bytes
+assets/collagen/day-16/D16_002_VIDEO.poster.jpg | 194889 bytes
+assets/collagen/day-16/D16_005_VIDEO.poster.jpg | 30713 bytes
+assets/collagen/day-17/D17_004_VIDEO.poster.jpg | 37632 bytes
+assets/collagen/day-17/D17_005_VIDEO.poster.jpg | 49319 bytes
+assets/collagen/day-18/D18_002_VIDEO.poster.jpg | 183393 bytes
+assets/collagen/day-18/D18_003_VIDEO.poster.jpg | 179010 bytes
+assets/collagen/day-18/D18_004_VIDEO.poster.jpg | 203497 bytes
+assets/collagen/day-18/D18_005_VIDEO.poster.jpg | 173503 bytes
+assets/collagen/day-18/D18_006_VIDEO.poster.jpg | 165375 bytes
+assets/collagen/day-19/D19_003_VIDEO.poster.jpg | 108898 bytes
+assets/collagen/day-20/D20_001_VIDEO.poster.jpg | 49593 bytes
+assets/collagen/day-20/D20_003_VIDEO.poster.jpg | 132944 bytes
+assets/collagen/day-20/D20_005_VIDEO.poster.jpg | 109688 bytes
+assets/collagen/day-20/D20_006_VIDEO.poster.jpg | 167767 bytes
+assets/collagen/day-21/D21_001_VIDEO.poster.jpg | 61655 bytes
+assets/collagen/day-21/D21_006_VIDEO.poster.jpg | 92876 bytes
+assets/collagen/day-22/D22_005_VIDEO.poster.jpg | 107961 bytes
+assets/collagen/day-23/D23_001_VIDEO.poster.jpg | 41799 bytes
+assets/collagen/day-23/D23_006_VIDEO.poster.jpg | 122950 bytes
+assets/collagen/day-24/D24_004_VIDEO.poster.jpg | 189279 bytes
+assets/collagen/day-25/D25_001_VIDEO.poster.jpg | 32733 bytes
+assets/collagen/day-25/D25_007_VIDEO.poster.jpg | 138855 bytes
+assets/collagen/day-26/D26_001_VIDEO.poster.jpg | 109975 bytes
+assets/collagen/day-28/D28_003_VIDEO.poster.jpg | 45051 bytes
+assets/collagen/day-28/D28_004_VIDEO.poster.jpg | 37859 bytes
+assets/collagen/day-28/D28_005_VIDEO.poster.jpg | 34146 bytes
+assets/collagen/day-30/D30_004_VIDEO.poster.jpg | 211982 bytes
+===== FIN INVENTARIO DE POSTERS =====

@@ -165,11 +165,7 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   preview.className = "resource-thumb";
   preview.setAttribute("aria-hidden", "true");
 
-  const videoPoster = block.mediaType === "video"
-    ? resolveRoutineVideoPoster(block.src, block.poster)
-    : null;
-  const usePosterImage = block.mediaType === "video" && Boolean(videoPoster);
-  const media = block.mediaType === "video" && !usePosterImage
+  const media = block.mediaType === "video"
     ? document.createElement("video")
     : document.createElement("img");
 
@@ -182,23 +178,18 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     preview.classList.add("is-error");
   };
 
-  if (block.mediaType === "video" && !usePosterImage) {
+  if (block.mediaType === "video") {
     media.preload = "metadata";
     media.muted = true;
     media.playsInline = true;
-    media.setAttribute("playsinline", "");
-    media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
-    media.src = block.src;
   } else {
     media.alt = "";
     media.loading = "lazy";
-    media.decoding = "async";
     media.addEventListener("load", thumbReady, { once: true });
-    media.src = usePosterImage ? videoPoster : block.src;
   }
-
   media.addEventListener("error", thumbFailed, { once: true });
+  media.src = block.src;
   preview.appendChild(media);
 
   if (block.mediaType === "video") {

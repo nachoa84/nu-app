@@ -32,40 +32,6 @@ const ICONS = {
   image: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m5 18 5-5 3.5 3.5 2.5-2.5 3 4"/></svg>`
 };
 
-function resolveRoutineVideoPoster(src, explicitPoster = null) {
-  const provided = String(explicitPoster || "").trim();
-  if (provided) return provided;
-
-  const rawSrc = String(src || "").trim();
-  const cleanSrc = rawSrc.split(/[?#]/)[0];
-  if (!cleanSrc) return null;
-
-  if (typeof days !== "undefined" && days) {
-    for (const day of Object.values(days)) {
-      const block = (day?.blocks || []).find(candidate => {
-        if (
-          candidate?.type !== "media" ||
-          candidate?.mediaType !== "video"
-        ) return false;
-
-        const candidateSrc = String(candidate.src || "").split(/[?#]/)[0];
-        return candidateSrc === cleanSrc;
-      });
-
-      if (block?.poster) return block.poster;
-    }
-  }
-
-  if (
-    /(?:^|\/)assets\/collagen\/day-\d+\//i.test(cleanSrc) &&
-    /\.(mp4|mov|m4v|webm)$/i.test(cleanSrc)
-  ) {
-    return cleanSrc.replace(/\.(mp4|mov|m4v|webm)$/i, ".poster.jpg");
-  }
-
-  return null;
-}
-
 function ensureToastHost() {
   let host = document.getElementById("appToastHost");
   if (host) return host;

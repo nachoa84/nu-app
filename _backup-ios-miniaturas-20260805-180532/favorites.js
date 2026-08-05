@@ -481,17 +481,16 @@ function favoritePreviewNode(favorite) {
     return wrap;
   }
 
-  const videoPoster = favorite.mediaType === "video"
-    ? resolveRoutineVideoPoster(favorite.src, favorite.poster)
-    : null;
-  const usePosterImage = favorite.mediaType === "video" && Boolean(videoPoster);
-  const media = favorite.mediaType === "video" && !usePosterImage
+  const media = favorite.mediaType === "video"
     ? document.createElement("video")
     : document.createElement("img");
 
   media.draggable = false;
   media.setAttribute("draggable", "false");
   media.addEventListener("dragstart", event => event.preventDefault());
+
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
 
   wrap.classList.add("is-loading");
   const favoriteReady = () => wrap.classList.remove("is-loading");
@@ -500,31 +499,23 @@ function favoritePreviewNode(favorite) {
     wrap.classList.add("is-error");
   };
 
-  if (favorite.mediaType === "video" && !usePosterImage) {
+  if (favorite.mediaType === "video") {
     media.preload = "metadata";
     media.muted = true;
     media.playsInline = true;
-    media.setAttribute("playsinline", "");
-    media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", favoriteReady, { once: true });
-    media.src = favorite.src;
-  } else {
-    media.alt = favorite.label || "";
-    media.loading = "lazy";
-    media.decoding = "async";
-    media.addEventListener("load", favoriteReady, { once: true });
-    media.src = usePosterImage ? videoPoster : favorite.src;
-  }
-
-  media.addEventListener("error", favoriteFailed, { once: true });
-  wrap.appendChild(media);
-
-  if (favorite.mediaType === "video") {
     const play = document.createElement("span");
     play.className = "favorite-folder-play";
     play.innerHTML = ICONS.play;
-    wrap.appendChild(play);
+    wrap.append(media, play);
+  } else {
+    media.alt = favorite.label;
+    media.loading = "lazy";
+    media.addEventListener("load", favoriteReady, { once: true });
+    wrap.appendChild(media);
   }
+  media.addEventListener("error", favoriteFailed, { once: true });
+  media.src = favorite.src;
 
   return wrap;
 }

@@ -1,0 +1,114 @@
+DIAGNÓSTICO PARA CLAUDE/GEMINI
+Fecha: 2026-08-05T17:34:01.982247
+Directorio del proyecto: /home/runner/workspace
+
+ARCHIVOS DE CÓDIGO INCLUIDOS:
+- .replit | 643 bytes
+- Multirutina.html | 59589 bytes
+- app.js | 5591 bytes
+- backend-client.js | 6620 bytes
+- base.css | 5714 bytes
+- bot-content.js | 11292 bytes
+- bot.css | 17331 bytes
+- bot.js | 35378 bytes
+- daily-view.js | 24003 bytes
+- daily.css | 27032 bytes
+- favorites.css | 17879 bytes
+- favorites.js | 31943 bytes
+- guide-content.js | 11560 bytes
+- guide-view.js | 12131 bytes
+- guide.css | 15130 bytes
+- home-view.js | 2121 bytes
+- home.css | 4808 bytes
+- index.html | 18791 bytes
+- media-preview.css | 9912 bytes
+- media-preview.js | 19936 bytes
+- navigation.css | 2651 bytes
+- notifications.css | 7688 bytes
+- notifications.js | 20328 bytes
+- onboarding.css | 19383 bytes
+- onboarding.js | 31473 bytes
+- package-lock.json | 42575 bytes
+- package.json | 399 bytes
+- progress-view.js | 5606 bytes
+- progress.css | 7473 bytes
+- push-client.js | 14278 bytes
+- push-test.html | 4032 bytes
+- replit.nix | 43 bytes
+- routine-content-collagen-8-30.js | 63835 bytes
+- routine-content.js | 18196 bytes
+- routine-state.js | 5441 bytes
+- routine-sync.js | 4300 bytes
+- server.js | 47856 bytes
+- service-worker.js | 12621 bytes
+- shared.css | 2933 bytes
+- shell.css | 2345 bytes
+- splash.css | 3265 bytes
+- splash.js | 1927 bytes
+- tokens.css | 1059 bytes
+- ui-core.css | 8856 bytes
+- ui-core.js | 24519 bytes
+
+POSTERS ENCONTRADOS: 51
+- assets/collagen/day-08/D08_002_VIDEO.poster.jpg | 97308 bytes
+- assets/collagen/day-08/D08_003_VIDEO.poster.jpg | 67053 bytes
+- assets/collagen/day-08/D08_004_VIDEO.poster.jpg | 65087 bytes
+- assets/collagen/day-09/D09_004_VIDEO.poster.jpg | 254977 bytes
+- assets/collagen/day-11/D11_001_VIDEO.poster.jpg | 94889 bytes
+- assets/collagen/day-12/D12_001_VIDEO.poster.jpg | 44244 bytes
+- assets/collagen/day-12/D12_002_VIDEO.poster.jpg | 45122 bytes
+- assets/collagen/day-12/D12_003_VIDEO.poster.jpg | 55491 bytes
+- assets/collagen/day-12/D12_004_VIDEO.poster.jpg | 48538 bytes
+- assets/collagen/day-12/D12_005_VIDEO.poster.jpg | 56859 bytes
+- assets/collagen/day-12/D12_006_VIDEO.poster.jpg | 42937 bytes
+- assets/collagen/day-12/D12_007_VIDEO.poster.jpg | 52466 bytes
+- assets/collagen/day-12/D12_008_VIDEO.poster.jpg | 47656 bytes
+- assets/collagen/day-12/D12_009_VIDEO.poster.jpg | 57543 bytes
+- assets/collagen/day-13/D13_001_VIDEO.poster.jpg | 23580 bytes
+- assets/collagen/day-13/D13_003_VIDEO.poster.jpg | 46484 bytes
+- assets/collagen/day-14/D14_002_VIDEO.poster.jpg | 157353 bytes
+- assets/collagen/day-14/D14_003_VIDEO.poster.jpg | 106014 bytes
+- assets/collagen/day-15/D15_001_VIDEO.poster.jpg | 172286 bytes
+- assets/collagen/day-15/D15_002_VIDEO.poster.jpg | 139675 bytes
+- assets/collagen/day-15/D15_003_VIDEO.poster.jpg | 148626 bytes
+- assets/collagen/day-15/D15_004_VIDEO.poster.jpg | 175166 bytes
+- assets/collagen/day-15/D15_006_VIDEO.poster.jpg | 24983 bytes
+- assets/collagen/day-16/D16_001_VIDEO.poster.jpg | 167328 bytes
+- assets/collagen/day-16/D16_002_VIDEO.poster.jpg | 194889 bytes
+- assets/collagen/day-16/D16_005_VIDEO.poster.jpg | 30713 bytes
+- assets/collagen/day-17/D17_004_VIDEO.poster.jpg | 37632 bytes
+- assets/collagen/day-17/D17_005_VIDEO.poster.jpg | 49319 bytes
+- assets/collagen/day-18/D18_002_VIDEO.poster.jpg | 183393 bytes
+- assets/collagen/day-18/D18_003_VIDEO.poster.jpg | 179010 bytes
+- assets/collagen/day-18/D18_004_VIDEO.poster.jpg | 203497 bytes
+- assets/collagen/day-18/D18_005_VIDEO.poster.jpg | 173503 bytes
+- assets/collagen/day-18/D18_006_VIDEO.poster.jpg | 165375 bytes
+- assets/collagen/day-19/D19_003_VIDEO.poster.jpg | 108898 bytes
+- assets/collagen/day-20/D20_001_VIDEO.poster.jpg | 49593 bytes
+- assets/collagen/day-20/D20_003_VIDEO.poster.jpg | 132944 bytes
+- assets/collagen/day-20/D20_005_VIDEO.poster.jpg | 109688 bytes
+- assets/collagen/day-20/D20_006_VIDEO.poster.jpg | 167767 bytes
+- assets/collagen/day-21/D21_001_VIDEO.poster.jpg | 61655 bytes
+- assets/collagen/day-21/D21_006_VIDEO.poster.jpg | 92876 bytes
+- assets/collagen/day-22/D22_005_VIDEO.poster.jpg | 107961 bytes
+- assets/collagen/day-23/D23_001_VIDEO.poster.jpg | 41799 bytes
+- assets/collagen/day-23/D23_006_VIDEO.poster.jpg | 122950 bytes
+- assets/collagen/day-24/D24_004_VIDEO.poster.jpg | 189279 bytes
+- assets/collagen/day-25/D25_001_VIDEO.poster.jpg | 32733 bytes
+- assets/collagen/day-25/D25_007_VIDEO.poster.jpg | 138855 bytes
+- assets/collagen/day-26/D26_001_VIDEO.poster.jpg | 109975 bytes
+- assets/collagen/day-28/D28_003_VIDEO.poster.jpg | 45051 bytes
+- assets/collagen/day-28/D28_004_VIDEO.poster.jpg | 37859 bytes
+- assets/collagen/day-28/D28_005_VIDEO.poster.jpg | 34146 bytes
+- assets/collagen/day-30/D30_004_VIDEO.poster.jpg | 211982 bytes
+
+IMÁGENES ORIGINALES DE EJEMPLO:
+- assets/collagen/day-08/D08_005_IMAGE.jpg | 921161 bytes
+- assets/collagen/day-08/D08_006_IMAGE.jpg | 958729 bytes
+- assets/collagen/day-08/D08_007_IMAGE.jpg | 339345 bytes
+- assets/collagen/day-15/D15_005_IMAGE.jpg | 92084 bytes
+
+IMPORTANTE:
+- Los videos no fueron incluidos para mantener pequeño el ZIP.
+- No se incluyeron .env, base de datos, node_modules ni backups.
+- Los posters sí fueron incluidos para comprobar nombres y rutas.

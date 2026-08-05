@@ -100,7 +100,3 @@ setupContinuousDayOpenTracking();
 renderDays();
 renderFavorites();
 ensureDemoControls();
-
-
-
-

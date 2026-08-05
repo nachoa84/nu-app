@@ -1,0 +1,2134 @@
+PARTE 1 DE 4
+No respondas todavía si faltan partes.
+Conservá este contenido para analizarlo junto con las demás partes.
+
+PAQUETE DE CÓDIGO PARA DIAGNÓSTICO IPHONE / WEBKIT
+Generado: 2026-08-05T17:47:43.691826
+Proyecto: /home/runner/workspace
+
+PROBLEMAS A RESOLVER:
+1. En iPhone los videos aparecen con tarjeta gris y sin poster.
+2. En Favoritos algunas imágenes dejan un espacio gris o quedan mal encuadradas.
+3. En Android ambos comportamientos funcionan correctamente.
+4. Ya existe un parche genérico con MutationObserver en app.js que no funcionó.
+5. Existen archivos .poster.jpg junto a los videos.
+
+IMPORTANTE:
+- Analizar las funciones y selectores reales.
+- No inventar clases.
+- No modificar backend, progreso ni contenido.
+- Eliminar el parche genérico anterior si corresponde.
+
+===== INICIO ARCHIVO: app.js =====
+const chat = document.getElementById("chat");
+const chatWrap = document.getElementById("chatWrap");
+const progressText = document.getElementById("progressText");
+const dailyNativeHeader = document.getElementById("dailyNativeHeader");
+const dailyNativeDayLabel = document.getElementById("dailyNativeDayLabel");
+const chatTitle = document.querySelector(".chat-header strong");
+
+const params = new URLSearchParams(window.location.search);
+const isPreviewMode = params.get("preview") === "1";
+const isDemoMode = params.get("demo") === "1";
+
+const initialRoutineState = getRoutineState();
+let selectedDay = isPreviewMode
+  ? Number(localStorage.getItem("selectedDay") || initialRoutineState.currentDay || "1")
+  : Number(initialRoutineState.currentDay || "1");
+if (!days[selectedDay]) selectedDay = 1;
+
+let revealIndex = 0;
+
+// Shared icons and UI helpers live in ui-core.js.
+
+
+// Backend sync, day-open coordination and demo controls live in routine-sync.js.
+
+if (!isPreviewMode) {
+  // El estado local solo refleja el último estado confirmado.
+  // PostgreSQL/backend es la única autoridad para desbloquear días.
+  const routineState = getRoutineState();
+
+  selectedDay = routineState.currentDay;
+
+  localStorage.setItem(
+    "selectedDay",
+    String(selectedDay)
+  );
+}
+
+
+// Shared UI, navigation and visual helpers live in ui-core.js.
+
+let deferredPrompt;
+
+const installBtn =
+  document.getElementById("installBtn");
+
+window.addEventListener(
+  "beforeinstallprompt",
+  e => {
+    e.preventDefault();
+
+    deferredPrompt = e;
+
+    installBtn?.classList.remove("hidden");
+  }
+);
+
+if (installBtn) installBtn.onclick = async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  await deferredPrompt.userChoice;
+
+  deferredPrompt = null;
+
+  installBtn?.classList.add("hidden");
+};
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    registerAppServiceWorker().catch(error => {
+      console.warn(
+        "No se pudo registrar el Service Worker:",
+        error
+      );
+    });
+  });
+}
+
+
+// Routine profile synchronization lives in routine-sync.js.
+
+
+// Zoom guards live in ui-core.js.
+setupZoomGuards();
+setupNotificationSettings();
+setupInterfaceChrome();
+setupNativeInteractionGuards();
+renderBotConversation();
+setupScrollCollapse();
+migrateOldDay1FavoritePaths();
+
+if (!isPreviewMode) {
+  selectedDay = getRoutineState().currentDay;
+}
+
+renderSelectedDayHeader();
+renderStructuredDayDetail();
+setupContinuousDayOpenTracking();
+renderDays();
+renderFavorites();
+ensureDemoControls();
+
+
+/* ===== Collagen+ iPhone media compatibility ===== */
+(function () {
+  if (window.__collagenIosMediaCompatibility) return;
+  window.__collagenIosMediaCompatibility = true;
+
+  function normalizeSrc(value) {
+    return String(value || "").split("#")[0].split("?")[0];
+  }
+
+  function isCollagenMedia(src) {
+    return /assets\/collagen\//i.test(String(src || ""));
+  }
+
+  function posterForVideoSrc(src) {
+    const normalized = normalizeSrc(src);
+    return normalized.replace(/\.(mp4|mov|m4v|webm)$/i, ".poster.jpg");
+  }
+
+  function getVideoSource(video) {
+    return (
+      video.currentSrc ||
+      video.getAttribute("src") ||
+      video.querySelector("source")?.getAttribute("src") ||
+      ""
+    );
+  }
+
+  function isFavoritesContext(element) {
+    let node = element;
+    while (node && node !== document.documentElement) {
+      const id = String(node.id || "").toLowerCase();
+      const cls = String(node.className || "").toLowerCase();
+
+      if (
+        id.includes("favorite") ||
+        id.includes("favorito") ||
+        cls.includes("favorite") ||
+        cls.includes("favorito")
+      ) {
+        return true;
+      }
+
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function styleFavoritesMedia(element) {
+    if (!isFavoritesContext(element)) return;
+
+    Object.assign(element.style, {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      display: "block"
+    });
+
+    const parent = element.parentElement;
+    if (parent) {
+      parent.style.overflow = "hidden";
+      parent.style.background = "#F3F4F6";
+    }
+  }
+
+  function applyToNode(node) {
+    if (!(node instanceof HTMLElement)) return;
+
+    if (node.tagName === "VIDEO") {
+      const src = getVideoSource(node);
+
+      if (isCollagenMedia(src)) {
+        if (!node.getAttribute("poster")) {
+          node.setAttribute("poster", posterForVideoSrc(src));
+        }
+
+        node.setAttribute("playsinline", "");
+        node.playsInline = true;
+
+        if (!node.preload || node.preload === "auto") {
+          node.preload = "metadata";
+        }
+      }
+
+      styleFavoritesMedia(node);
+    }
+
+    if (node.tagName === "IMG") {
+      styleFavoritesMedia(node);
+    }
+  }
+
+  function sweep(root) {
+    if (root instanceof HTMLElement && /^(VIDEO|IMG)$/i.test(root.tagName)) {
+      applyToNode(root);
+    }
+
+    const scope =
+      root && root.querySelectorAll
+        ? root
+        : document;
+
+    scope.querySelectorAll("video, img").forEach(applyToNode);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => sweep(document), { once: true });
+  } else {
+    sweep(document);
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          sweep(node);
+        }
+      });
+    }
+  });
+
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+})();
+/* ===== /Collagen+ iPhone media compatibility ===== */
+
+
+
+===== FIN ARCHIVO: app.js =====
+
+
+===== INICIO ARCHIVO: daily-view.js =====
+// Vista del día actual
+// Extraído de app.js sin reescribir la lógica.
+// Este archivo se carga antes de app.js; sus funciones se ejecutan
+// después de que app.js inicializa el estado y las referencias del DOM.
+
+const DAY_OBJECTIVES = {
+  1: "Conocé Collagen+ y prepará tu primer contenido.",
+  2: "Descargá Stela y conocé las herramientas clave.",
+  3: "Creá tu lista de contactos potenciales.",
+  4: "Organizá tu agenda y sostené acciones simples.",
+  5: "Mejorá tu contenido y tu conversación de venta.",
+  6: "Aprendé a asesorar mejor a cada cliente.",
+  7: "Cerrá tu primera semana con más ritmo y confianza."
+};
+function currentBlocks() {
+  return days[selectedDay].blocks;
+}
+function addLinks(container, links) {
+  if (!links || !links.length) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "resource-links";
+
+  links.forEach(link => {
+    const row = document.createElement("div");
+    row.className = "resource-link-row";
+
+    const a = document.createElement("a");
+    a.href = link.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = link.label;
+    a.className = "resource-link-main";
+
+    const favoriteKey = `link:${link.url}`;
+    const saved = isFavorite(favoriteKey, selectedDay);
+
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = `resource-link-save${saved ? " is-saved" : ""}`;
+    save.dataset.favoriteSrc = favoriteKey;
+    save.dataset.favoriteDay = String(selectedDay);
+    save.setAttribute(
+      "aria-label",
+      saved ? "Quitar enlace de favoritos" : "Guardar enlace en favoritos"
+    );
+    save.innerHTML = saved ? ICONS.bookmarkFilled : ICONS.bookmark;
+
+    save.onclick = () =>
+      saveFavorite(
+        favoriteKey,
+        link.label,
+        "link",
+        selectedDay,
+        link.url
+      );
+
+    row.append(a, save);
+    wrap.appendChild(row);
+  });
+
+  container.appendChild(wrap);
+}
+
+function createBlock(block) {
+  if (block.type === "action") {
+    const card = document.createElement("section");
+    card.className = "training-card";
+
+    const heading = document.createElement("div");
+    heading.className = "training-card-heading";
+    heading.innerHTML = `<span>Capacitación</span><strong>${block.label}</strong>`;
+
+    const btn = document.createElement("button");
+    btn.className = "training-card-open";
+    btn.type = "button";
+    btn.innerHTML = `<span>Abrir capacitación</span><span aria-hidden="true">${ICONS.arrow}</span>`;
+
+    if (block.url) {
+      btn.onclick = () => window.open(block.url, "_blank", "noopener");
+    } else {
+      btn.onclick = () =>
+        toast("Esta capacitación todavía está pendiente de cargar.");
+    }
+
+    card.append(heading, btn);
+    return card;
+  }
+
+  if (block.type === "complete") {
+    const card = document.createElement("div");
+    card.className = "complete-card";
+
+    const done = isDayComplete(selectedDay);
+
+    const renderDoneState = ({ animate = false } = {}) => {
+      card.classList.add("done");
+      card.classList.toggle("just-completed", animate && !prefersReducedMotion());
+      card.innerHTML = `
+        <div class="complete-done-copy">
+          <h3><span class="complete-done-inline-check" aria-hidden="true">${ICONS.check}</span><span>Hecho hoy</span></h3>
+          <p>Registrado.</p>
+        </div>
+      `;
+      if (animate) {
+        setTimeout(() => card.classList.remove("just-completed"), 620);
+      }
+    };
+
+    if (done) {
+      renderDoneState();
+      return card;
+    }
+
+    card.innerHTML = `
+      <h3>¿Lo hiciste?</h3>
+      <p>Registrá tu avance.</p>
+    `;
+
+    const btn = document.createElement("button");
+    btn.className = "primary complete-day-btn";
+    btn.innerHTML = `<span class="complete-action-check" aria-hidden="true">${ICONS.check}</span><span>Hoy lo hice</span>`;
+
+    const helper = document.createElement("small");
+    helper.className = "complete-helper";
+    helper.textContent = "Solo registra tu avance";
+
+    btn.onclick = () => {
+      setDayComplete(selectedDay, true);
+      if (navigator.vibrate) navigator.vibrate(12);
+      renderDoneState({ animate: true });
+      renderDays();
+
+      if (window.BackendAPI) {
+        window.BackendAPI
+          .completeDay(selectedDay)
+          .catch(error => {
+            console.warn(
+              "No se pudo sincronizar el completado con el backend.",
+              error
+            );
+          });
+      }
+    };
+
+    card.append(btn, helper);
+    return card;
+  }
+}
+
+function createCompactMediaItem(block, order, mediaBlocks) {
+  const item = document.createElement("article");
+  item.className = `resource-row resource-row-${block.mediaType}`;
+  item.tabIndex = 0;
+  item.setAttribute("role", "button");
+  item.setAttribute("aria-label", `Abrir ${block.label}`);
+
+  const openPreview = () => openMediaPreview(mediaBlocks, order - 1, selectedDay);
+
+  const orderBadge = document.createElement("span");
+  orderBadge.className = "resource-order";
+  orderBadge.textContent = String(order);
+
+  const preview = document.createElement("div");
+  preview.className = "resource-thumb";
+  preview.setAttribute("aria-hidden", "true");
+
+  const media = block.mediaType === "video"
+    ? document.createElement("video")
+    : document.createElement("img");
+
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
+  preview.classList.add("is-loading");
+  const thumbReady = () => preview.classList.remove("is-loading");
+  const thumbFailed = () => {
+    preview.classList.remove("is-loading");
+    preview.classList.add("is-error");
+  };
+
+  if (block.mediaType === "video") {
+    media.preload = "metadata";
+    media.muted = true;
+    media.playsInline = true;
+    media.addEventListener("loadedmetadata", thumbReady, { once: true });
+  } else {
+    media.alt = "";
+    media.loading = "lazy";
+    media.addEventListener("load", thumbReady, { once: true });
+  }
+  media.addEventListener("error", thumbFailed, { once: true });
+  media.src = block.src;
+  preview.appendChild(media);
+
+  if (block.mediaType === "video") {
+    const play = document.createElement("span");
+    play.className = "resource-play-badge";
+    play.innerHTML = ICONS.play;
+    preview.appendChild(play);
+  }
+
+  const main = document.createElement("div");
+  main.className = "resource-main";
+
+  const copy = document.createElement("div");
+  copy.className = "resource-copy";
+  copy.innerHTML = `
+    <strong>${block.label}</strong>
+    <span>${block.mediaType === "video" ? "Video" : "Imagen"}</span>
+  `;
+
+  const disclosure = document.createElement("span");
+  disclosure.className = "resource-disclosure";
+  disclosure.setAttribute("aria-hidden", "true");
+  disclosure.innerHTML = ICONS.arrow;
+
+  const actions = document.createElement("div");
+  actions.className = "resource-row-actions";
+
+  if (block.favorite) {
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "resource-action-btn";
+    save.dataset.favoriteSrc = block.src;
+    save.dataset.favoriteDay = String(selectedDay);
+    save.onclick = event => {
+      event.stopPropagation();
+      saveFavorite(
+        block.src,
+        block.label,
+        block.mediaType,
+        selectedDay
+      );
+    };
+    actions.appendChild(save);
+  }
+
+  if (block.shareable) {
+    const share = document.createElement("button");
+    share.type = "button";
+    share.className = "resource-action-btn";
+    share.innerHTML = `${ICONS.share}<span>Compartir</span>`;
+    share.onclick = event => {
+      event.stopPropagation();
+      shareAsset(block.src, block.label, block.mediaType, share);
+    };
+    actions.appendChild(share);
+  }
+
+  item.addEventListener("click", event => {
+    if (event.target.closest(".resource-action-btn")) return;
+    openPreview();
+  });
+  item.addEventListener("keydown", event => {
+    if ((event.key === "Enter" || event.key === " ") && !event.target.closest(".resource-action-btn")) {
+      event.preventDefault();
+      openPreview();
+    }
+  });
+
+  setupNativePressState(item, ".resource-action-btn");
+  main.append(copy, actions);
+  item.append(orderBadge, preview, main, disclosure);
+  updateFavoriteButtons();
+  return item;
+}
+
+function cleanLeadingSymbols(value) {
+  return String(value || "")
+    .replace(/^[\s✅☑️✔️✨🔥🚀🙌🏻🧡💛]+/u, "")
+    .trim();
+}
+
+function firstMeaningfulLine(content) {
+  const line = String(content || "")
+    .split(/\n+/)
+    .map(value => cleanLeadingSymbols(value))
+    .find(Boolean) || "Tu acción de hoy";
+
+  return line.length > 68 ? `${line.slice(0, 65)}…` : line;
+}
+
+function isImportedCollagenContentDay() {
+  return Number(selectedDay) >= 8;
+}
+
+function importedTextParts(content, { stripStepNumber = false } = {}) {
+  const normalized = String(content || "").replace(/\r\n?/g, "\n");
+  const lines = normalized.split("\n");
+  const firstIndex = lines.findIndex(line => cleanLeadingSymbols(line));
+
+  if (firstIndex === -1) {
+    return {
+      heading: "Tu acción de hoy",
+      body: ""
+    };
+  }
+
+  let heading = cleanLeadingSymbols(lines[firstIndex]);
+
+  // Elimina hashtags sueltos al inicio: #Texto o # Texto.
+  heading = heading
+    .replace(/^#+\s*/u, "")
+    .trim();
+
+  if (stripStepNumber) {
+    // Elimina numeraciones importadas como:
+    // 2️⃣ Texto, 2. Texto, 2) Texto, Paso 2: Texto.
+    heading = heading
+      .replace(/^\s*\d+\ufe0f?\u20e3\s*/u, "")
+      .replace(
+        /^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu,
+        ""
+      )
+      .trim();
+  }
+
+  // Conserva todo lo que viene después de la primera línea.
+  // No elimina el primer párrafo completo.
+  const body = lines
+    .slice(firstIndex + 1)
+    .join("\n")
+    .trim();
+
+  return {
+    heading: heading || "Tu acción de hoy",
+    body
+  };
+}
+
+function createImportedObjectiveCard(block) {
+  const {
+    heading,
+    body: detailText
+  } = importedTextParts(block.content);
+
+  const card = document.createElement("section");
+  card.className = "objective-card";
+
+  const header = document.createElement("div");
+  header.className = "objective-card-header";
+
+  const copy = document.createElement("div");
+
+  const eyebrow = document.createElement("span");
+  eyebrow.textContent = "Objetivo";
+
+  const title = document.createElement("h3");
+  title.textContent = heading;
+
+  copy.append(eyebrow, title);
+  header.appendChild(copy);
+  card.appendChild(header);
+
+  if (detailText || block.links?.length) {
+    const details = document.createElement("details");
+    details.className = "native-details";
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `
+      <span class="details-label">Ver detalles</span>
+      <span class="details-arrow">${ICONS.down}</span>
+    `;
+
+    const body = document.createElement("div");
+    body.className = "native-details-body";
+
+    appendFormattedContent(body, detailText);
+    addLinks(body, block.links);
+
+    details.addEventListener("toggle", () => {
+      const label = summary.querySelector(".details-label");
+
+      if (label) {
+        label.textContent = details.open
+          ? "Ocultar detalles"
+          : "Ver detalles";
+      }
+    });
+
+    details.append(summary, body);
+    setupAnimatedDetails(details);
+    card.appendChild(details);
+  }
+
+  return card;
+}
+
+function createImportedActionStep(block, index) {
+  const {
+    heading,
+    body: detailText
+  } = importedTextParts(
+    block.content,
+    { stripStepNumber: true }
+  );
+
+  const hasDetails =
+    Boolean(detailText) ||
+    Boolean(block.links?.length);
+
+  if (!hasDetails) {
+    const row = document.createElement("div");
+    row.className = "action-step action-step-static";
+
+    const inner = document.createElement("div");
+    inner.className = "action-step-static-row";
+
+    const number = document.createElement("span");
+    number.className = "action-step-number";
+    number.textContent = String(index);
+
+    const title = document.createElement("span");
+    title.className = "action-step-title";
+    title.textContent = heading;
+
+    inner.append(number, title);
+    row.appendChild(inner);
+
+    return row;
+  }
+
+  const details = document.createElement("details");
+  details.className = "action-step";
+
+  const summary = document.createElement("summary");
+
+  const number = document.createElement("span");
+  number.className = "action-step-number";
+  number.textContent = String(index);
+
+  const title = document.createElement("span");
+  title.className = "action-step-title";
+  title.textContent = heading;
+
+  const arrow = document.createElement("span");
+  arrow.className = "action-step-arrow";
+  arrow.innerHTML = ICONS.down;
+
+  summary.append(number, title, arrow);
+
+  const body = document.createElement("div");
+  body.className = "action-step-body";
+
+  appendFormattedContent(body, detailText);
+  addLinks(body, block.links);
+
+  details.append(summary, body);
+  setupAnimatedDetails(details);
+
+  return details;
+}
+
+function appendFormattedContent(container, content, options = {}) {
+  const { dropFirstParagraph = false } = options;
+  let paragraphs = String(content || "")
+    .split(/\n\s*\n/)
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  if (dropFirstParagraph) {
+    paragraphs = paragraphs.slice(1);
+  }
+
+  paragraphs.forEach(paragraph => {
+    const lines = paragraph
+      .split(/\n+/)
+      .map(value => value.trim())
+      .filter(Boolean);
+
+    lines.forEach(line => {
+      if (/^(✅|☑️|✔️)/u.test(line)) {
+        const check = document.createElement("div");
+        check.className = "native-check-item";
+        check.innerHTML = `
+          <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
+          <span>${line.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
+        `;
+        container.appendChild(check);
+        return;
+      }
+
+      const isLabel = line.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
+      const element = document.createElement(isLabel ? "div" : "p");
+      element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
+      element.textContent = line;
+      container.appendChild(element);
+    });
+  });
+}
+
+function createObjectiveCard(block) {
+  if (isImportedCollagenContentDay()) {
+    return createImportedObjectiveCard(block);
+  }
+
+  const card = document.createElement("section");
+  card.className = "objective-card";
+
+  const header = document.createElement("div");
+  header.className = "objective-card-header";
+  header.innerHTML = `
+    <div>
+      <span>Objetivo</span>
+      <h3>${DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content)}</h3>
+    </div>
+  `;
+
+  card.appendChild(header);
+
+  const fullText = String(block.content || "").trim();
+  if (fullText) {
+    const details = document.createElement("details");
+    details.className = "native-details";
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span class="details-label">Ver detalles</span><span class="details-arrow">${ICONS.down}</span>`;
+
+    const body = document.createElement("div");
+    body.className = "native-details-body";
+    appendFormattedContent(body, fullText, { dropFirstParagraph: true });
+    addLinks(body, block.links);
+
+    details.addEventListener("toggle", () => {
+      summary.querySelector(".details-label").textContent = details.open ? "Ocultar detalles" : "Ver detalles";
+    });
+
+    details.append(summary, body);
+    setupAnimatedDetails(details);
+    card.appendChild(details);
+  }
+
+  return card;
+}
+
+function createActionStep(block, index) {
+  if (isImportedCollagenContentDay()) {
+    return createImportedActionStep(block, index);
+  }
+
+  const paragraphs = String(block.content || "")
+    .split(/\n\s*\n/)
+    .map(value => value.trim())
+    .filter(Boolean);
+  const hasDetails = paragraphs.length > 1 || Boolean(block.links?.length);
+
+  if (!hasDetails) {
+    const row = document.createElement("div");
+    row.className = "action-step action-step-static";
+    row.innerHTML = `
+      <div class="action-step-static-row">
+        <span class="action-step-number">${index}</span>
+        <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
+      </div>
+    `;
+    return row;
+  }
+
+  const details = document.createElement("details");
+  details.className = "action-step";
+
+  const summary = document.createElement("summary");
+  summary.innerHTML = `
+    <span class="action-step-number">${index}</span>
+    <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
+    <span class="action-step-arrow">${ICONS.down}</span>
+  `;
+
+  const body = document.createElement("div");
+  body.className = "action-step-body";
+  appendFormattedContent(body, block.content, { dropFirstParagraph: true });
+  addLinks(body, block.links);
+
+  details.append(summary, body);
+  setupAnimatedDetails(details);
+  return details;
+}
+
+function renderStructuredDayDetail() {
+  const blocks = currentBlocks();
+  const textBlocks = blocks.filter(block => block.type === "text");
+  const mediaBlocks = blocks.filter(block => block.type === "media");
+  const actionBlocks = blocks.filter(block => block.type === "action");
+  const completeBlock = blocks.find(block => block.type === "complete");
+
+  chat.innerHTML = "";
+  chat.className = "daily-detail continuous-day-detail native-day-content";
+  chatWrap.classList.remove("hidden");
+
+  const intro = document.createElement("section");
+  intro.className = "native-day-intro";
+  intro.innerHTML = `
+    <div class="native-day-hero">
+      <div class="native-day-hero-copy">
+        <h2>Día ${selectedDay}</h2>
+        <p>Tu acción de hoy</p>
+      </div>
+      <div class="native-day-hero-media" aria-hidden="true">
+        <img src="assets/custom/collagen-day-hero.jpg" alt="" />
+      </div>
+    </div>
+    <div class="native-day-progress-row">
+      <div class="native-day-progress" aria-label="Progreso: ${selectedDay} de ${TOTAL_PROGRAM_DAYS}">
+        <span style="width:${Math.min(100, Math.round((selectedDay / TOTAL_PROGRAM_DAYS) * 100))}%"></span>
+      </div>
+      <small>${selectedDay} de ${TOTAL_PROGRAM_DAYS}</small>
+    </div>
+  `;
+  chat.appendChild(intro);
+
+  if (textBlocks.length) {
+    const planGroup = document.createElement("section");
+    planGroup.className = "day-plan-group";
+
+    const objective = createObjectiveCard(textBlocks[0]);
+    objective.classList.add("day-plan-objective");
+    planGroup.appendChild(objective);
+
+    if (textBlocks.length > 1) {
+      const steps = document.createElement("section");
+      steps.className = "native-section steps-section day-plan-steps";
+      steps.innerHTML = `
+        <div class="native-section-heading">
+          <div>
+            <h3>Pasos de hoy</h3>
+          </div>
+          <small class="section-count">${textBlocks.length - 1}</small>
+        </div>
+      `;
+
+      const list = document.createElement("div");
+      list.className = "action-step-list";
+      textBlocks.slice(1).forEach((block, index) => {
+        list.appendChild(createActionStep(block, index + 1));
+      });
+      steps.appendChild(list);
+      planGroup.appendChild(steps);
+    }
+
+    chat.appendChild(planGroup);
+  }
+
+  if (mediaBlocks.length) {
+    const materials = document.createElement("section");
+    materials.className = "native-section materials-section";
+    materials.innerHTML = `
+      <div class="native-section-heading">
+        <div>
+          <h3>Materiales para hoy</h3>
+        </div>
+        <small class="section-count">${mediaBlocks.length}</small>
+      </div>
+    `;
+
+    const list = document.createElement("div");
+    list.className = "resource-sequence";
+    mediaBlocks.forEach((block, index) => {
+      list.appendChild(createCompactMediaItem(block, index + 1, mediaBlocks));
+    });
+    materials.appendChild(list);
+    chat.appendChild(materials);
+  }
+
+  actionBlocks.forEach(block => chat.appendChild(createBlock(block)));
+
+  if (completeBlock) {
+    chat.appendChild(createBlock(completeBlock));
+  }
+
+  const progressButton = document.createElement("button");
+  progressButton.type = "button";
+  progressButton.className = "native-day-progress-button";
+  progressButton.innerHTML = `<span>${ICONS.calendar}</span><strong>Ver progreso de 30 días</strong><span aria-hidden="true">${ICONS.arrow}</span>`;
+  progressButton.onclick = () => activateMainView("rutina");
+  chat.appendChild(progressButton);
+
+  revealIndex = blocks.length;
+  updateProgress();
+  updateFavoriteButtons();
+}
+
+function scrollToTodayContent({ markOpened = true } = {}) {
+  if (markOpened) {
+    markCurrentDayOpened();
+  }
+
+  if (!chat.children.length) {
+    renderStructuredDayDetail();
+  }
+
+  const target =
+    chat.querySelector(".objective-card") ||
+    chat.querySelector(".native-section") ||
+    chatWrap;
+
+  target?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function setupContinuousDayOpenTracking() {
+  if (!("IntersectionObserver" in window) || !chatWrap) return;
+
+  let opened = false;
+
+  const observer = new IntersectionObserver(
+    entries => {
+      const entry = entries[0];
+      if (!entry?.isIntersecting || opened) return;
+
+      opened = true;
+      markCurrentDayOpened();
+      observer.disconnect();
+    },
+    {
+      threshold: 0.18,
+      rootMargin: "0px 0px -12% 0px"
+    }
+  );
+
+  observer.observe(chatWrap);
+}
+
+function updateProgress() {
+  const blocks = currentBlocks();
+  progressText.textContent =
+    `${Math.min(revealIndex, blocks.length)}/${blocks.length} bloques`;
+}
+
+function renderSelectedDayHeader() {
+  const day = days[selectedDay];
+
+  renderHomeRoutineSummary(selectedDay, day);
+
+  if (dailyNativeDayLabel) {
+    dailyNativeDayLabel.textContent = `Día ${selectedDay} de ${TOTAL_PROGRAM_DAYS}`;
+  }
+
+  if (chatTitle) chatTitle.textContent = day.title;
+
+  localStorage.setItem(
+    "selectedDay",
+    String(selectedDay)
+  );
+}
+
+function openNativeDayView({ markOpened = true } = {}) {
+  const homeView = document.getElementById("view-hoy");
+  homeView?.classList.add("day-open");
+  if (dailyNativeHeader) dailyNativeHeader.hidden = false;
+
+  if (markOpened) {
+    markCurrentDayOpened();
+  }
+
+  if (!chat.children.length) {
+    renderStructuredDayDetail();
+  }
+
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  requestAnimationFrame(() => {
+    if (!prefersReducedMotion() && chatWrap?.animate) {
+      chatWrap.animate(
+        [
+          { opacity: .74, transform: "translate3d(14px, 2px, 0)" },
+          { opacity: 1, transform: "translate3d(0, 0, 0)" }
+        ],
+        { duration: 220, easing: "cubic-bezier(.22,.8,.24,1)" }
+      );
+    }
+  });
+}
+
+function closeNativeDayView() {
+  const homeView = document.getElementById("view-hoy");
+  homeView?.classList.remove("day-open");
+  if (dailyNativeHeader) dailyNativeHeader.hidden = true;
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+  const homeHeader = homeView?.querySelector(".home-page-header");
+  const routines = homeView?.querySelector(".home-routines");
+  [homeHeader, routines].forEach((element, index) => {
+    if (!element || prefersReducedMotion() || !element.animate) return;
+    element.animate(
+      [
+        { opacity: .75, transform: "translate3d(-10px, 2px, 0)" },
+        { opacity: 1, transform: "translate3d(0, 0, 0)" }
+      ],
+      { duration: 190 + (index * 25), easing: "cubic-bezier(.22,.8,.24,1)" }
+    );
+  });
+}
+
+function startProgressive() {
+  openNativeDayView({ markOpened: true });
+}
+
+function selectDay(day, showImmediately = false) {
+  if (!days[day]) return;
+
+  if (!isPreviewMode) {
+    const state = getRoutineState();
+
+    if (day > state.currentDay) {
+      toast("Este día todavía no está disponible.");
+      return;
+    }
+  }
+
+  selectedDay = day;
+  renderSelectedDayHeader();
+
+  document
+    .querySelector('[data-view="hoy"]')
+    .click();
+
+  chat.innerHTML = "";
+  chat.className = "daily-detail continuous-day-detail";
+  revealIndex = 0;
+  renderStructuredDayDetail();
+
+  if (showImmediately) {
+    setTimeout(() => {
+      openNativeDayView({ markOpened: true });
+    }, 70);
+  }
+}
+
+===== FIN ARCHIVO: daily-view.js =====
+
+
+===== INICIO ARCHIVO: daily.css =====
+/* =========================================================
+   V59A · Día actual canónico
+   Refactor de cascada sin rediseño.
+   Base única para hero, objetivo, pasos, materiales y completado.
+   ========================================================= */
+
+/* Inicio */
+
+#view-hoy {
+  padding-top: calc(17px + var(--safe-top));
+}
+
+.objective-card,
+.native-section,
+.complete-card {
+  border: 1px solid var(--app-line);
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
+}
+
+.native-section-heading > div > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--app-accent-dark);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.native-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.native-section-heading small {
+  color: var(--app-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.resource-links {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.resource-link-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Play badge compartido entre Materiales y Favoritos */
+
+.resource-play-badge,
+.favorite-folder-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: var(--app-accent-dark);
+  box-shadow: 0 5px 16px rgba(0,0,0,0.12);
+}
+
+.resource-play-badge svg,
+.favorite-folder-play svg {
+  width: 15px;
+  height: 15px;
+}
+
+.complete-card:not(.done) {
+  display: grid;
+}
+
+.complete-card h3,
+.complete-card p {
+  display: none;
+}
+
+.complete-helper {
+  display: block;
+  margin-top: 8px;
+  color: var(--app-muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+.complete-done-copy h3,
+.complete-done-copy p {
+  display: block;
+  margin: 0;
+}
+
+.complete-done-copy h3 {
+  font-size: 15px;
+}
+
+.complete-done-copy p {
+  margin-top: 2px;
+  color: var(--app-muted);
+  font-size: 10px;
+}
+
+#view-hoy.day-open > .app-page-header {
+  display: flex;
+}
+
+.chat-wrap {
+  margin-top: 14px;
+}
+
+.chat-header {
+  display: none !important;
+}
+
+.continuous-day-detail {
+  gap: 10px;
+}
+
+.daily-detail {
+  display: grid;
+  gap: 11px;
+}
+
+.day-plan-group {
+  overflow: hidden;
+  border: 1px solid rgba(92, 66, 55, 0.085);
+  border-radius: 21px;
+  background: var(--app-surface);
+  box-shadow: 0 3px 14px rgba(86, 54, 40, 0.032);
+  corner-shape: squircle;
+}
+
+.day-plan-group .objective-card,
+.day-plan-group .native-section {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.day-plan-group .day-plan-objective {
+  padding: 15px 15px 13px;
+}
+
+.objective-card,
+.native-section {
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 3px 14px rgba(86, 54, 40, 0.032);
+}
+
+.objective-card-header > div > span,
+.native-section-heading > div > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--app-accent-dark);
+  font-size: 9.5px;
+  font-weight: 820;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+
+.objective-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 780;
+  line-height: 1.27;
+  letter-spacing: -0.025em;
+}
+
+.native-details {
+  margin-top: 11px;
+}
+
+.native-details summary {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 760;
+  list-style: none;
+  cursor: pointer;
+  min-height: 30px;
+  gap: 5px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--app-accent-dark);
+  font-size: 10.5px;
+}
+
+.details-arrow {
+  transition: transform .18s ease;
+}
+
+.details-arrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.native-details[open] .details-arrow {
+  transform: rotate(180deg);
+}
+
+.native-details-body {
+  border-top: 1px solid var(--app-line);
+  color: #61534c;
+  margin-top: 11px;
+  padding-top: 11px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+.native-detail-paragraph {
+  margin: 0 0 9px;
+  color: #62544d;
+}
+
+.native-detail-label {
+  margin: 12px 0 7px;
+  color: var(--app-muted);
+  font-size: 10px;
+  font-weight: 790;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.native-check-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  gap: 8px;
+  margin: 8px 0;
+  color: #62544d;
+}
+
+.native-check-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--app-accent);
+}
+
+.native-check-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.native-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+
+.native-section-heading h3 {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: 17px;
+  letter-spacing: -0.025em;
+}
+
+.native-section-heading > small {
+  font-size: 10px;
+}
+
+.resource-link-main {
+  display: flex;
+  align-items: center;
+  padding: 0 13px;
+  border-radius: 13px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  font-weight: 760;
+  text-decoration: none;
+  min-height: 38px;
+  font-size: 11px;
+}
+
+.resource-link-save {
+  border: 1px solid var(--app-line);
+  border-radius: 13px;
+  background: #fff;
+  color: var(--app-accent-dark);
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.resource-link-save svg {
+  width: 17px;
+  height: 17px;
+}
+
+.resource-link-save.is-saved {
+  color: var(--app-accent);
+}
+
+/* =========================================================
+   Materiales · definición canónica
+   Una sola generación para la secuencia "Para publicar".
+   ========================================================= */
+
+.materials-section {
+  padding: 13px 13px 3px;
+  border-color: rgba(92, 66, 55, 0.07);
+  box-shadow: none;
+}
+
+.resource-sequence {
+  display: grid;
+}
+
+.resource-row {
+  display: grid;
+  grid-template-columns: 23px 46px minmax(0, 1fr) 18px;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 7px;
+  padding: 8px 0;
+  border-top: 1px solid var(--app-line);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: background-color .1s ease, transform .1s ease;
+}
+
+.resource-row:first-child {
+  border-top: 0;
+}
+
+.resource-row.is-native-pressed {
+  transform: scale(.988);
+  background: var(--app-surface-soft);
+}
+
+.resource-order {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  align-self: start;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--app-accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 820;
+}
+
+.resource-thumb {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 11px;
+  background: #f0f1f2;
+  corner-shape: squircle;
+}
+
+.resource-thumb img,
+.resource-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.resource-main {
+  min-width: 0;
+  display: contents;
+}
+
+.resource-copy {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  min-width: 0;
+}
+
+.resource-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--app-text);
+  font-size: 11.7px;
+  font-weight: 760;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.resource-copy span {
+  display: block;
+  margin-top: 2px;
+  color: var(--app-muted);
+  font-size: 10px;
+}
+
+.resource-disclosure {
+  grid-column: 4;
+  grid-row: 1;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  color: #a59186;
+  pointer-events: none;
+}
+
+.resource-disclosure svg {
+  width: 16px;
+  height: 16px;
+}
+
+.resource-row-actions {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 3px 0 0;
+}
+
+.resource-action-btn {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #665a53;
+  font-size: 10px;
+  font-weight: 690;
+  box-shadow: none;
+  transition: transform 0.12s ease;
+}
+
+.resource-action-btn:active {
+  transform: scale(0.94);
+}
+
+.resource-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.resource-action-btn.is-saved {
+  color: var(--app-accent-dark);
+  font-weight: 780;
+}
+
+.resource-action-btn:not(.is-saved):active {
+  color: var(--app-accent-dark);
+}
+
+.resource-action-btn.is-saved svg .icon-fill {
+  fill: currentColor;
+}
+
+.complete-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 17px;
+  padding: 9px 12px;
+  box-shadow: none;
+  border-color: var(--app-line);
+}
+
+.complete-card.done {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  padding: 10px 13px;
+}
+
+/* =========================================================
+   Pasos de hoy · definición canónica
+   Una sola generación de estilos para pasos expandibles y estáticos.
+   ========================================================= */
+
+.day-plan-group .day-plan-steps {
+  padding: 15px 14px 14px;
+  border-top: 1px solid var(--app-line);
+  background: var(--app-surface);
+}
+
+.day-plan-steps .native-section-heading {
+  margin-bottom: 11px;
+}
+
+.day-plan-steps .native-section-heading > div > span {
+  margin-bottom: 4px;
+  font-size: 10px;
+  letter-spacing: 0.085em;
+}
+
+.day-plan-steps .native-section-heading h3 {
+  font-size: 19px;
+  font-weight: 810;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+.day-plan-steps .native-section-heading > small {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  font-size: 10px;
+  font-weight: 760;
+}
+
+.action-step-list {
+  display: grid;
+  gap: 8px;
+}
+
+.action-step,
+.action-step-static {
+  overflow: hidden;
+  border: 1px solid var(--app-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.action-step {
+  box-shadow: 0 3px 12px rgba(23, 34, 61, .025);
+  transition: background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.14s cubic-bezier(.32,.72,0,1);
+}
+
+.action-step:last-child {
+  border-bottom: 1px solid var(--app-line);
+}
+
+.action-step:active {
+  transform: scale(0.992);
+}
+
+.action-step summary {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 11px;
+  min-height: 65px;
+  margin-inline: -5px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  list-style: none;
+  cursor: pointer;
+  transition: background .16s ease, transform .16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-step summary::-webkit-details-marker {
+  display: none;
+}
+
+.action-step summary:active {
+  transform: scale(.992);
+  background: #f3f5f8;
+}
+
+.action-step-number {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  font-size: 12px;
+  font-weight: 840;
+}
+
+.action-step[open] .action-step-number {
+  background: var(--app-accent);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(48, 79, 154, .14);
+}
+
+.action-step-title {
+  min-width: 0;
+  color: var(--app-text);
+  font-size: 15.5px;
+  font-weight: 760;
+  line-height: 1.34;
+  letter-spacing: -0.015em;
+}
+
+.action-step-arrow {
+  color: var(--app-muted);
+  transition: transform .2s cubic-bezier(.22,.8,.24,1);
+}
+
+.action-step-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+.action-step[open] .action-step-arrow {
+  transform: rotate(180deg);
+}
+
+.action-step-body {
+  margin: 0 12px 13px 54px;
+  padding: 4px 0 3px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 14.5px;
+  line-height: 1.58;
+  white-space: normal;
+  transform-origin: top;
+  will-change: height, opacity, transform;
+}
+
+.action-step-body .native-detail-paragraph {
+  color: var(--app-muted);
+  font-size: 14.5px;
+  line-height: 1.58;
+}
+
+.action-step-body .native-detail-paragraph,
+.action-step-body .native-check-item {
+  margin-block: 7px;
+}
+
+.action-step-body .native-check-item {
+  color: var(--app-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.action-step-body .resource-links {
+  margin-top: 11px;
+}
+
+.action-step-body .resource-link-main {
+  min-height: 43px;
+  font-size: 12.5px;
+  font-weight: 720;
+}
+
+.action-step-static-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  min-height: 63px;
+  padding: 11px 12px;
+}
+
+@media (max-width: 370px) {
+  .action-step-title {
+    font-size: 15px;
+  }
+
+  .action-step-body,
+  .action-step-body .native-detail-paragraph {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-step {
+    transition: none;
+  }
+}
+
+#view-hoy:not(.day-open) > .chat-wrap {
+  display: none;
+}
+
+#view-hoy.day-open > .home-page-header,
+#view-hoy.day-open > .home-guide-section,
+#view-hoy.day-open > .home-routines-section {
+  display: none !important;
+}
+
+#view-hoy.day-open > .chat-wrap {
+  display: block;
+  margin-top: 0;
+}
+
+.daily-native-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+  min-height: 66px;
+  margin: 0 -16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e8e8e4;
+  background: rgba(255, 253, 250, 0.94);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+#view-hoy.day-open .daily-native-header:not([hidden]) {
+  display: grid;
+}
+
+.daily-native-back svg,
+.daily-native-progress svg {
+  width: 22px;
+  height: 22px;
+}
+
+.daily-native-title {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  line-height: 1.15;
+}
+
+#view-hoy.day-open .day-plan-group {
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-objective {
+  padding: 22px 0 20px;
+  border: 0;
+  border-bottom: 1px solid #e7e7e2;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .native-details summary {
+  min-height: 38px;
+  margin-top: 4px;
+  color: var(--day-brand);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#view-hoy.day-open .native-details-body {
+  border-top-color: #e7e7e2;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-steps {
+  padding: 22px 0 18px;
+  border: 0;
+  border-bottom: 1px solid #e7e7e2;
+  background: transparent;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading {
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading > small,
+#view-hoy.day-open .materials-section .native-section-heading > small {
+  min-width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  background: #f1f2ef;
+  color: #777b7c;
+  font-size: 10px;
+  font-weight: 720;
+}
+
+#view-hoy.day-open .action-step-list {
+  gap: 0;
+}
+
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  overflow: visible;
+  border: 0;
+  border-bottom: 1px solid #e8e8e4;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .action-step:last-child,
+#view-hoy.day-open .action-step-static:last-child {
+  border-bottom: 0;
+}
+
+#view-hoy.day-open .action-step[open] {
+  border-color: #e8e8e4;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-static-row {
+  min-height: 52px;
+  margin: 0;
+  padding: 9px 0;
+  border-radius: 0;
+}
+
+#view-hoy.day-open .action-step summary {
+  grid-template-columns: 27px minmax(0, 1fr) 20px;
+  gap: 10px;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  grid-template-columns: 27px minmax(0, 1fr);
+  gap: 10px;
+}
+
+#view-hoy.day-open .action-step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--day-olive);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 790;
+}
+
+#view-hoy.day-open .action-step[open] .action-step-number {
+  background: var(--day-olive);
+  box-shadow: none;
+}
+
+#view-hoy.day-open .action-step-arrow {
+  color: #939796;
+}
+
+#view-hoy.day-open .action-step-body {
+  margin: 0 0 12px 37px;
+  padding: 3px 0 4px;
+  border: 0;
+  color: #5a5f60;
+}
+
+#view-hoy.day-open .materials-section {
+  padding: 22px 0 19px;
+  border: 0;
+  border-bottom: 1px solid #e7e7e2;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .materials-section .native-section-heading {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#view-hoy.day-open .resource-sequence::-webkit-scrollbar {
+  display: none;
+}
+
+#view-hoy.day-open .resource-row.is-native-pressed {
+  transform: scale(.985);
+  background: transparent;
+}
+
+#view-hoy.day-open .resource-main {
+  display: block;
+}
+
+#view-hoy.day-open .resource-disclosure,
+#view-hoy.day-open .resource-row-actions {
+  display: none;
+}
+
+#view-hoy.day-open .training-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e7e7e2;
+}
+
+.training-card-heading {
+  min-width: 0;
+}
+
+.training-card-heading span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--day-olive, #738b5d);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+
+.training-card-heading strong {
+  display: block;
+  overflow: hidden;
+  color: #222b35;
+  font-size: 14px;
+  font-weight: 720;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.training-card-open {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px 0 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--day-brand, #12345f);
+  font-size: 11.5px;
+  font-weight: 720;
+}
+
+.training-card-open > span:last-child svg {
+  width: 17px;
+  height: 17px;
+}
+
+#view-hoy.day-open .complete-helper {
+  margin-top: 7px;
+  color: #8a8d8d;
+  font-size: 10.5px;
+}
+
+.native-day-progress-button > span:first-child {
+  color: var(--day-olive, #738b5d);
+}
+
+.native-day-progress-button > span:last-child {
+  justify-self: end;
+  color: #8d9292;
+}
+
+.native-day-progress-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .resource-row,
+  #view-hoy.day-open .resource-thumb {
+    width: 124px;
+    flex-basis: 124px;
+  }
+}
+
+/* --- Integración con Native Shell · propiedad del Día actual --- */
+
+.daily-native-back,
+.daily-native-progress {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.92);
+  color: var(--app-text);
+  box-shadow: none;
+}
+
+.daily-native-back:active,
+.daily-native-progress:active {
+  transform: scale(.96);
+  background: #f0f3f5;
+}
+
+.action-step[open] {
+  border-color: #d9e2ec;
+  background: #f7f9fb;
+  box-shadow: none;
+}
+
+.native-day-content {
+  display: block;
+  padding: 0 0 8px;
+  padding-bottom: 14px;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-objective,
+#view-hoy.day-open .day-plan-group .day-plan-steps,
+#view-hoy.day-open .materials-section,
+#view-hoy.day-open .training-card {
+  border-bottom-color: #e8ebf0;
+}
+
+.complete-day-btn {
+  width: 100%;
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #4b5ac8 0%, #404fb9 100%);
+  box-shadow: 0 16px 28px rgba(63,80,189,.20);
+  font-size: 16px;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.complete-day-btn:active {
+  background: linear-gradient(180deg, #3d4ab0 0%, #33439f 100%);
+}
+
+#view-hoy.day-open .complete-card {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  margin-top

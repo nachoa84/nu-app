@@ -165,11 +165,7 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   preview.className = "resource-thumb";
   preview.setAttribute("aria-hidden", "true");
 
-  const videoPoster = block.mediaType === "video"
-    ? resolveRoutineVideoPoster(block.src, block.poster)
-    : null;
-  const usePosterImage = block.mediaType === "video" && Boolean(videoPoster);
-  const media = block.mediaType === "video" && !usePosterImage
+  const media = block.mediaType === "video"
     ? document.createElement("video")
     : document.createElement("img");
 
@@ -182,23 +178,18 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     preview.classList.add("is-error");
   };
 
-  if (block.mediaType === "video" && !usePosterImage) {
+  if (block.mediaType === "video") {
     media.preload = "metadata";
     media.muted = true;
     media.playsInline = true;
-    media.setAttribute("playsinline", "");
-    media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
-    media.src = block.src;
   } else {
     media.alt = "";
     media.loading = "lazy";
-    media.decoding = "async";
     media.addEventListener("load", thumbReady, { once: true });
-    media.src = usePosterImage ? videoPoster : block.src;
   }
-
   media.addEventListener("error", thumbFailed, { once: true });
+  media.src = block.src;
   preview.appendChild(media);
 
   if (block.mediaType === "video") {
@@ -289,177 +280,6 @@ function firstMeaningfulLine(content) {
   return line.length > 68 ? `${line.slice(0, 65)}…` : line;
 }
 
-function isImportedCollagenContentDay() {
-  return Number(selectedDay) >= 8;
-}
-
-function importedTextParts(content, { stripStepNumber = false } = {}) {
-  const normalized = String(content || "").replace(/\r\n?/g, "\n");
-  const lines = normalized.split("\n");
-  const firstIndex = lines.findIndex(line => cleanLeadingSymbols(line));
-
-  if (firstIndex === -1) {
-    return {
-      heading: "Tu acción de hoy",
-      body: ""
-    };
-  }
-
-  let heading = cleanLeadingSymbols(lines[firstIndex]);
-
-  // Elimina hashtags sueltos al inicio: #Texto o # Texto.
-  heading = heading
-    .replace(/^#+\s*/u, "")
-    .trim();
-
-  if (stripStepNumber) {
-    // Elimina numeraciones importadas como:
-    // 2️⃣ Texto, 2. Texto, 2) Texto, Paso 2: Texto.
-    heading = heading
-      .replace(/^\s*\d+\ufe0f?\u20e3\s*/u, "")
-      .replace(
-        /^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu,
-        ""
-      )
-      .trim();
-  }
-
-  // Conserva todo lo que viene después de la primera línea.
-  // No elimina el primer párrafo completo.
-  const body = lines
-    .slice(firstIndex + 1)
-    .join("\n")
-    .trim();
-
-  return {
-    heading: heading || "Tu acción de hoy",
-    body
-  };
-}
-
-function createImportedObjectiveCard(block) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(block.content);
-
-  const card = document.createElement("section");
-  card.className = "objective-card";
-
-  const header = document.createElement("div");
-  header.className = "objective-card-header";
-
-  const copy = document.createElement("div");
-
-  const eyebrow = document.createElement("span");
-  eyebrow.textContent = "Objetivo";
-
-  const title = document.createElement("h3");
-  title.textContent = heading;
-
-  copy.append(eyebrow, title);
-  header.appendChild(copy);
-  card.appendChild(header);
-
-  if (detailText || block.links?.length) {
-    const details = document.createElement("details");
-    details.className = "native-details";
-
-    const summary = document.createElement("summary");
-    summary.innerHTML = `
-      <span class="details-label">Ver detalles</span>
-      <span class="details-arrow">${ICONS.down}</span>
-    `;
-
-    const body = document.createElement("div");
-    body.className = "native-details-body";
-
-    appendFormattedContent(body, detailText);
-    addLinks(body, block.links);
-
-    details.addEventListener("toggle", () => {
-      const label = summary.querySelector(".details-label");
-
-      if (label) {
-        label.textContent = details.open
-          ? "Ocultar detalles"
-          : "Ver detalles";
-      }
-    });
-
-    details.append(summary, body);
-    setupAnimatedDetails(details);
-    card.appendChild(details);
-  }
-
-  return card;
-}
-
-function createImportedActionStep(block, index) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(
-    block.content,
-    { stripStepNumber: true }
-  );
-
-  const hasDetails =
-    Boolean(detailText) ||
-    Boolean(block.links?.length);
-
-  if (!hasDetails) {
-    const row = document.createElement("div");
-    row.className = "action-step action-step-static";
-
-    const inner = document.createElement("div");
-    inner.className = "action-step-static-row";
-
-    const number = document.createElement("span");
-    number.className = "action-step-number";
-    number.textContent = String(index);
-
-    const title = document.createElement("span");
-    title.className = "action-step-title";
-    title.textContent = heading;
-
-    inner.append(number, title);
-    row.appendChild(inner);
-
-    return row;
-  }
-
-  const details = document.createElement("details");
-  details.className = "action-step";
-
-  const summary = document.createElement("summary");
-
-  const number = document.createElement("span");
-  number.className = "action-step-number";
-  number.textContent = String(index);
-
-  const title = document.createElement("span");
-  title.className = "action-step-title";
-  title.textContent = heading;
-
-  const arrow = document.createElement("span");
-  arrow.className = "action-step-arrow";
-  arrow.innerHTML = ICONS.down;
-
-  summary.append(number, title, arrow);
-
-  const body = document.createElement("div");
-  body.className = "action-step-body";
-
-  appendFormattedContent(body, detailText);
-  addLinks(body, block.links);
-
-  details.append(summary, body);
-  setupAnimatedDetails(details);
-
-  return details;
-}
-
 function appendFormattedContent(container, content, options = {}) {
   const { dropFirstParagraph = false } = options;
   let paragraphs = String(content || "")
@@ -499,10 +319,6 @@ function appendFormattedContent(container, content, options = {}) {
 }
 
 function createObjectiveCard(block) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedObjectiveCard(block);
-  }
-
   const card = document.createElement("section");
   card.className = "objective-card";
 
@@ -543,10 +359,6 @@ function createObjectiveCard(block) {
 }
 
 function createActionStep(block, index) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedActionStep(block, index);
-  }
-
   const paragraphs = String(block.content || "")
     .split(/\n\s*\n/)
     .map(value => value.trim())
