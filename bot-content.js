@@ -670,78 +670,162 @@
     "keywords": [
       "tramites",
       "comisiones",
-      "documentacion",
+      "RUC",
+      "SUNAT",
+      "detracciones",
+      "acuerdo afiliado",
+      "deposito comisiones",
+      "cuestionario",
       "factura",
       "Perú"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estos son los pasos cargados en ManyChat para cobrar comisiones en Perú."
+        "content": "Para cobrar tus comisiones en Perú, completá estas seis etapas. La guía inicial te ayudará a preparar tu RUC, tu cuenta de detracciones y la documentación requerida."
       },
       {
         "type": "document",
-        "title": "Trámites · Perú",
+        "kicker": "ETAPA 1 DE 6",
+        "title": "Proceso de Cobro de Comisiones",
+        "description": "Revisá la guía completa antes de preparar los documentos.",
         "sections": [
           {
-            "title": "Paso 1",
-            "body": "🇵🇪🇵🇪🇵🇪 Trámites para PERÚ🇵🇪🇵🇪🇵🇪\n\nTrámites administrativos para cobrar las comisiones en tu cuenta bancaria.\n\nAquí te dejamos un paso a paso de cómo generar tu cuenta de detracciones y qué regimen es el conveniente para tu RUC.\n\nLuego vas a completar\nel acuerdo de afiliado y el documento de cobro de comisiones con los datos brindados por el BN y SUNAT.\n\nEnvía los siguientes documentos:\n\n1.Descarga, Imprime y completa el acuerdo de afiliado de marca.\n\nLuego hazle una foto.\n\n2. Descarga, Imprime y completa el formato de depósito de comisiones.\n\nLuego hazle una foto.\n\nEnvía estos 2 documentos a la siguiente dirección de correo:\n\ndocumentos@nuskin.com\n\nINDICANDO en el asunto del correo, tu numero de ID (PE….)\n\nEnvío documentación para el cobro de comisiones.\n\nEnvía tus facturas a la siguiente dirección de correo.\n\nperufacturas@nuskin.com\n\nINDICANDO en el asunto del correo, tu número de ID (PE….)\n\nUna vez Nu Skin recibida tu factura, en 24hs hábiles, tendrás las comisiones depositadas en tu cuenta bancaria."
+            "title": "Qué incluye la guía",
+            "body": "La guía explica los documentos que tenés que presentar, los regímenes de SUNAT, la generación de la cuenta de detracciones, el envío de documentos y las capacitaciones del Centro de Aprendizaje."
           },
           {
-            "title": "Paso 2",
-            "body": "3️⃣ Desde tu oficina virtual debes ingresar al apartado Entrenamientos y tomar el curso llamado \"Conceptos Básicos de las Políticas\", el cual consta de un video y un cuestionario de 4 preguntas que debe responder correctamente para que pueda ser considerado como aprobado.\n\ny aquí a continuación tienes las afirmaciones correctas a cumplimentar!"
+            "title": "Antes de continuar",
+            "body": "Generá tu cuenta de detracciones y verificá qué régimen corresponde a tu RUC. Utilizarás los datos proporcionados por el Banco de la Nación y SUNAT para completar los documentos siguientes."
           }
         ],
-        "description": "Paso a paso importado del Bot de ManyChat."
+        "actions": [
+          {
+            "title": "Abrir guía del proceso de cobro",
+            "description": "Proceso completo para Perú",
+            "url": "/api/bot-assets/5bc97737202e7bace3f0415cbaa3ccde57ef8b720e828ee6b25f838fa877791c.pdf"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir recurso",
-        "url": "/api/bot-assets/f65f14d01b558c33558d31103fedfc627b4c119328ea2df96af2c01e6bbf7f2a.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 6",
+        "title": "Acuerdo de Afiliado de Marca",
+        "description": "Descargá, imprimí y completá el acuerdo.",
+        "sections": [
+          {
+            "title": "Prepará el acuerdo",
+            "body": "Descargá el Acuerdo de Afiliado de Marca, imprimilo y completalo con los datos correspondientes. Cuando termines, tomá una fotografía clara del documento."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Descargar Acuerdo de Afiliado",
+            "description": "Documento oficial para Perú",
+            "url": "/api/bot-assets/f65f14d01b558c33558d31103fedfc627b4c119328ea2df96af2c01e6bbf7f2a.pdf"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Proceso de Cobro de comisiones Perú - 2023.pdf",
-        "url": "/api/bot-assets/5bc97737202e7bace3f0415cbaa3ccde57ef8b720e828ee6b25f838fa877791c.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
+        "type": "document",
+        "kicker": "ETAPA 3 DE 6",
+        "title": "Formato de depósito de comisiones",
+        "description": "Completá el formulario con los datos bancarios y tributarios.",
+        "sections": [
+          {
+            "title": "Cómo completarlo",
+            "body": "Descargá e imprimí el formato. Completalo utilizando los datos brindados por el Banco de la Nación y SUNAT. Cuando termines, tomá una fotografía clara del documento."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Descargar formato de depósito",
+            "description": "Formulario para completar",
+            "url": "/api/bot-assets/1c492a85c8e7eb48b6ebd1302f0fa4b67819d50c9f7d54eba5246df7e3f14fea.pdf"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "pe_formato_deposito_comisiones.pdf",
-        "url": "/api/bot-assets/1c492a85c8e7eb48b6ebd1302f0fa4b67819d50c9f7d54eba5246df7e3f14fea.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
+        "type": "document",
+        "kicker": "ETAPA 4 DE 6",
+        "title": "Enviar la documentación",
+        "description": "Enviá los dos documentos completos a Nu Skin.",
+        "sections": [
+          {
+            "title": "Documentos que tenés que enviar",
+            "body": "Adjuntá la fotografía del Acuerdo de Afiliado de Marca y la fotografía del Formato de depósito de comisiones."
+          },
+          {
+            "title": "Dirección de envío",
+            "body": "documentos@nuskin.com"
+          },
+          {
+            "title": "Asunto y cuerpo del correo",
+            "body": "En el asunto indicá tu número de ID PE…\n\nEn el cuerpo escribí: “Envío documentación para el cobro de comisiones”."
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir Nu Skin",
-        "url": "https://www.nuskin.com/vgclient/#/trainings",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
+        "type": "document",
+        "kicker": "ETAPA 5 DE 6",
+        "title": "Pon a prueba tus conocimientos",
+        "description": "Capacitación y cuestionario obligatorios antes de facturar.",
+        "sections": [
+          {
+            "title": "Capacitación obligatoria",
+            "body": "Ingresá a la Oficina Virtual, abrí Entrenamientos y completá el curso “Conceptos Básicos de las Políticas”. El curso incluye un video."
+          },
+          {
+            "title": "Cuestionario obligatorio",
+            "body": "Después del video, completá y aprobá el cuestionario solicitado por Nu Skin. Revisá las tres capturas como guía para responderlo correctamente."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ingresar a la Oficina Virtual",
+            "description": "Abrir capacitaciones de Nu Skin",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ],
+        "galleryKicker": "CUESTIONARIO OBLIGATORIO",
+        "galleryTitle": "Ver cuestionario y respuestas",
+        "items": [
+          {
+            "src": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
+            "label": "Cuestionario · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
+            "label": "Cuestionario · Parte 2",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
+            "label": "Cuestionario · Parte 3",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.42.jpeg",
-        "url": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.42 (1).jpeg",
-        "url": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.43.jpeg",
-        "url": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Perú"
+        "type": "document",
+        "kicker": "ETAPA 6 DE 6",
+        "title": "Enviar tus facturas",
+        "description": "Enviá tu factura cuando hayas completado las etapas anteriores.",
+        "sections": [
+          {
+            "title": "Dirección de envío",
+            "body": "perufacturas@nuskin.com"
+          },
+          {
+            "title": "Asunto del correo",
+            "body": "Indicá tu número de ID PE… en el asunto."
+          },
+          {
+            "title": "Acreditación",
+            "body": "Una vez que Nu Skin reciba tu factura, el depósito de las comisiones se realiza dentro de las 24 horas hábiles indicadas."
+          }
+        ]
       }
     ],
     "country": "Perú",
