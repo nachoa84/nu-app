@@ -129,84 +129,123 @@
       "comisiones",
       "documentacion",
       "factura",
+      "monotributo",
+      "ARCA",
+      "cuestionario",
       "Argentina"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estos son los pasos cargados en ManyChat para cobrar comisiones en Argentina."
+        "content": "Para habilitar el cobro de comisiones en Argentina, completá estas cuatro etapas. Necesitás tener monotributo activo y una cuenta bancaria a tu nombre. No se admiten cuentas digitales como Mercado Pago."
       },
       {
         "type": "document",
-        "title": "Trámites · Argentina",
+        "kicker": "ETAPA 1 DE 4",
+        "title": "Acuerdo de Afiliado de Marca",
+        "description": "Completá el formulario y adjuntá tu constancia de inscripción en ARCA.",
         "sections": [
           {
-            "title": "Paso 1",
-            "body": "🇦🇷🇦🇷🇦🇷 Trámites para ARGENTINA 🇦🇷🇦🇷🇦🇷\n\nA continuación trámites administrativos para cobrar las comisiones en tu cuenta bancaria.\n\n🚨 El afiliado debe contar con el monotributo activo.🚨\n\nEnvía los siguientes documentos:\n\n1️⃣ Completa el siguiente formulario de afiliado de marca.\n\nIMPORTANTE: Sólo se admiten cuentas bancarias, las cuentas digitales como Mercado Pago no son admitidas para el pago de comisiones.\n\n2️⃣ El afiliado deberá descargar y la constancia de monotributo de ARCA. Para adjuntarla en ese mismo link en donde estás completando el formulario\n\n3️⃣ Desde tu oficina virtual debes ingresar al apartado Entrenamientos y tomar el curso llamado \"Conceptos Básicos de las Políticas\", el cual consta de un video y un cuestionario de 4 preguntas que debe responder correctamente para que pueda ser considerado como aprobado."
+            "title": "Requisitos",
+            "body": "Tenés que contar con monotributo activo y una cuenta bancaria a tu nombre. Las cuentas digitales, como Mercado Pago, no se admiten para el pago de comisiones."
           },
           {
-            "title": "Paso 2",
-            "body": "y aquí a continuación tienes las afirmaciones correctas a cumplimentar!\n\nGenial!\n\nHabiendo cumplido estos pasos,\nen pocos días hábiles ya estarás autorizad@ para enviar tus facturas y que te hagan el pago de tus comisiones en la cuenta bancaria!!\n\n¿Hasta aquí todo ok?\n\nAhora vamos a Cómo Facturar y ENVIAR TU FACTURA"
-          },
-          {
-            "title": "Paso 3",
-            "body": "Para ver las comisiones vas a ingresar a la app de Stela con tu usuario y vas a poder verlas en la opción\n\n>> documentos, impuestos o tax documents\n\ny ahí tienes todos los datos para hacer tu factura en ARCA.\n\nRevisa el siguiente PDF para el paso a paso!\n\nEnvía tus facturas a la siguiente dirección de correo:\n\nfacturas@nuskin.com\n\nINDICANDO en el asunto del correo, tu número de ID (AR….)\n\nUna vez que Nu Skin reciba tu factura, en 72hs hábiles, tendrás las comisiones depositadas en tu cuenta bancaria.\n\nQuieres que te indique como facturar en ARCA?"
-          },
-          {
-            "title": "Paso 4",
-            "body": "PASOS PARA FACTURAR\n\nEntrar a ARCA con la  clave fiscal\n\nComprobantes en línea\n\nClick en nuestro nombre\n\nGenerar comprobante\n\nPunto de venta a utilizar: se le da de alta el numero 1 con nuestra dirección\n\nTipo de comprobante: C (monotributistas)\n\nFecha del comprobante: (el día que se hace la fc)\n\nConceptos a incluir: servicios\n\nDesde: 01/XX/2025 hasta 31/xx/2025\n\nVto para el pago: fecha de la factura\n\n... continuar\n\nCondición frente al IVA: Responsable inscripto\n\nCUIT: 30690833030  (y ahí nos van a aparecer los datos de Nuskin)\n\nCondiciones de venta: contado\n\nDonde habla de remito no ponemos nada y le damos continuar\n\ny llenamos la parte del cuerpo de la factura:\n\n- Cod: 001\n\n- Producto: COPIAR LO QUE DICE LA FACTURA EN TAX DOCUMENTS\n\n- Cantidad: 1\n\n- Unidad de medida: unidad\n\n- Precio unitario: importe total de nuestra comisión.\n\n....continuar\n\nChequea los datos, si te equivocaste en algo podes ir para atrás\n\ny luego confirmas...\n\nTe hace un PDF y ahí volves a confirmar datos,\n\nLuego lo descargar como para imprimir\n\nY NO OLVIDES:\n\nEnvía tus facturas a la siguiente dirección de correo:\n\nfacturas@nuskin.com\n\nINDICANDO en el asunto del correo, tu número de ID (AR….)\n\nY como Cuerpo del mail: buenos días, envío factura del AR…..\n\nUna vez que Nu Skin reciba tu factura, en 72hs hábiles, tendrás las comisiones depositadas en tu cuenta bancaria."
+            "title": "Documentación",
+            "body": "Completá el formulario de afiliado de marca, descargá tu constancia de inscripción en ARCA y adjuntala dentro del mismo formulario."
           }
         ],
-        "description": "Paso a paso importado del Bot de ManyChat."
+        "actions": [
+          {
+            "title": "Completar formulario",
+            "description": "Acuerdo de Afiliado de Marca",
+            "url": "https://nuskin.jotform.com/220546195814054"
+          },
+          {
+            "title": "Obtener constancia en ARCA",
+            "description": "Constancia de inscripción",
+            "url": "https://seti.afip.gob.ar/padron-puc-constancia-internet/ConsultaConstanciaAction.do"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Formulario",
-        "url": "https://nuskin.jotform.com/220546195814054",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 4",
+        "title": "Oficina Virtual",
+        "description": "Realizá la capacitación obligatoria de Nu Skin.",
+        "sections": [
+          {
+            "title": "Conceptos Básicos de las Políticas",
+            "body": "Ingresá a la Oficina Virtual de Nu Skin, abrí la sección Entrenamientos y completá el curso “Conceptos Básicos de las Políticas”. El curso incluye un video y un cuestionario obligatorio."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ingresar a la Oficina Virtual",
+            "description": "Abrir capacitaciones de Nu Skin",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir recurso",
-        "url": "https://seti.afip.gob.ar/padron-puc-constancia-internet/ConsultaConstanciaAction.do",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
+        "type": "document",
+        "kicker": "ETAPA 3 DE 4",
+        "title": "Pon a prueba tus conocimientos",
+        "description": "Cuestionario obligatorio para habilitar el cobro de comisiones.",
+        "sections": [
+          {
+            "title": "Requisito de Nu Skin",
+            "body": "Después de realizar la capacitación, Nu Skin te solicitará completar y aprobar el cuestionario “Pon a prueba tus conocimientos”. Este requisito es necesario para quedar habilitado para cobrar tus comisiones."
+          },
+          {
+            "title": "Guía de respuestas",
+            "body": "Revisá las tres capturas como guía para responder correctamente el cuestionario."
+          }
+        ],
+        "galleryTitle": "Ver cuestionario y respuestas",
+        "items": [
+          {
+            "src": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
+            "label": "Cuestionario · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/8ea6987080e225bf4380bd791c3456e927806830678fb24b2ef5b67dcadd778d.jpeg",
+            "label": "Cuestionario · Parte 2",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/556a43ff951dc5e311edca673d87336ff6a6b5527f47d0cecbe6760619e59669.jpeg",
+            "label": "Cuestionario · Parte 3",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir recurso",
-        "url": "https://www.nuskin.com/vgclient/#/trainings",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
-      },
-      {
-        "type": "link",
-        "title": "Captura de pantalla 2023-02-21 a la(s) 16.02.41.png",
-        "url": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-01-08 at 16.49.47.jpeg",
-        "url": "/api/bot-assets/8ea6987080e225bf4380bd791c3456e927806830678fb24b2ef5b67dcadd778d.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-01-08 at 16.49.47 (1).jpeg",
-        "url": "/api/bot-assets/556a43ff951dc5e311edca673d87336ff6a6b5527f47d0cecbe6760619e59669.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
-      },
-      {
-        "type": "link",
-        "title": "ar16.17.pdf",
-        "url": "/api/bot-assets/3fcf843de2056a6fbfb65a3227c1ab74865368071985349366a1763d7d75cd6e.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Argentina"
+        "type": "document",
+        "kicker": "ETAPA 4 DE 4",
+        "title": "Cómo emitir y enviar tu factura",
+        "description": "Facturá cuando hayas completado las etapas anteriores.",
+        "sections": [
+          {
+            "title": "Prepará los datos",
+            "body": "Consultá tu comisión en Stela, dentro de Documentos, Impuestos o Tax Documents. Allí encontrarás la descripción y el importe que necesitás para confeccionar la factura."
+          },
+          {
+            "title": "Emití la factura",
+            "body": "Ingresá a ARCA con clave fiscal, abrí Comprobantes en línea y generá una factura C por servicios.\n\nCUIT de Nu Skin: 30-69083303-0\nCondición frente al IVA: Responsable inscripto\nCondición de venta: contado\n\nUsá la descripción indicada en Tax Documents y colocá el importe total de tu comisión."
+          },
+          {
+            "title": "Enviá la factura",
+            "body": "Descargá la factura en PDF y enviala a facturas@nuskin.com. Indicá tu número de ID AR… en el asunto del correo.\n\nUna vez recibida, el pago se acredita aproximadamente dentro de las 72 horas hábiles."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Abrir guía para emitir y enviar tu factura",
+            "description": "Guía paso a paso en PDF",
+            "url": "/api/bot-assets/3fcf843de2056a6fbfb65a3227c1ab74865368071985349366a1763d7d75cd6e.pdf"
+          }
+        ]
       }
     ],
     "country": "Argentina",

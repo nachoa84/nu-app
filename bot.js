@@ -388,7 +388,7 @@ function openBotDocument(documentBlock) {
   const heading = document.createElement("div");
 
   const kicker = document.createElement("small");
-  kicker.textContent = "DOCUMENTO";
+  kicker.textContent = documentBlock.kicker || "DOCUMENTO";
 
   const title = document.createElement("h2");
   title.textContent = documentBlock.title || "Guía";
@@ -430,6 +430,93 @@ function openBotDocument(documentBlock) {
 
     body.appendChild(sectionEl);
   });
+
+  if (Array.isArray(documentBlock.actions) && documentBlock.actions.length) {
+    const actions = document.createElement("div");
+    actions.className = "bot-document-actions";
+
+    documentBlock.actions.forEach(action => {
+      if (!action?.url) return;
+
+      const link = document.createElement("a");
+      link.className = "bot-document-action";
+      link.href = action.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      const copy = document.createElement("span");
+
+      const actionTitle = document.createElement("strong");
+      actionTitle.textContent = action.title || "Abrir recurso";
+      copy.appendChild(actionTitle);
+
+      if (action.description) {
+        const actionDescription = document.createElement("small");
+        actionDescription.textContent = action.description;
+        copy.appendChild(actionDescription);
+      }
+
+      const arrow = document.createElement("span");
+      arrow.className = "bot-document-action-arrow";
+      arrow.innerHTML = ICONS.arrow;
+
+      link.append(copy, arrow);
+      actions.appendChild(link);
+    });
+
+    body.appendChild(actions);
+  }
+
+  if (Array.isArray(documentBlock.items) && documentBlock.items.length) {
+    const gallery = document.createElement("button");
+    gallery.type = "button";
+    gallery.className = "bot-document-gallery";
+
+    const preview = document.createElement("span");
+    preview.className = "bot-document-gallery-preview";
+
+    documentBlock.items.slice(0, 3).forEach(item => {
+      const image = document.createElement("img");
+      image.src = item.src;
+      image.alt = item.label || "";
+      image.loading = "lazy";
+      preview.appendChild(image);
+    });
+
+    const galleryCopy = document.createElement("span");
+    galleryCopy.className = "bot-document-gallery-copy";
+
+    const galleryKind = document.createElement("small");
+    galleryKind.textContent = "CUESTIONARIO OBLIGATORIO";
+
+    const galleryTitle = document.createElement("strong");
+    galleryTitle.textContent =
+      documentBlock.galleryTitle || "Ver imágenes";
+
+    galleryCopy.append(galleryKind, galleryTitle);
+
+    const arrow = document.createElement("span");
+    arrow.className = "bot-document-action-arrow";
+    arrow.innerHTML = ICONS.arrow;
+
+    gallery.append(preview, galleryCopy, arrow);
+
+    gallery.onclick = () => {
+      const media = documentBlock.items.map(item => ({
+        src: item.src,
+        label: item.label || "Cuestionario",
+        mediaType: item.mediaType || "image",
+        poster: item.poster || null,
+        shareable: item.shareable !== false,
+        favorite: false
+      }));
+
+      cleanup();
+      openMediaPreview(media, 0, selectedDay);
+    };
+
+    body.appendChild(gallery);
+  }
 
   sheet.append(grabber, header, body);
   layer.append(backdrop, sheet);
@@ -510,7 +597,7 @@ function createBotResourceCard(block) {
     copy.className = "bot-resource-copy";
 
     const kind = document.createElement("small");
-    kind.textContent = "Documento";
+    kind.textContent = block.kicker || "Documento";
 
     const title = document.createElement("strong");
     title.textContent = block.title || "Abrir guía";
