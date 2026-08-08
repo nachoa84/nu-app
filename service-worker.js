@@ -1,4 +1,4 @@
-const CACHE="nuapp-v73-colageno-europa";
+const CACHE="nuapp-v74-como-usar";
 
 const CORE=[
   "./",
@@ -18,7 +18,7 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=67-tramites-argentina",
   "./favorites.css?v=63e-ios-thumbnails",
-  "./bot-content.js?v=73-colageno-europa",
+  "./bot-content.js?v=74-como-usar",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",

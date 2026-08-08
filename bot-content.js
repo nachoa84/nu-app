@@ -1177,38 +1177,44 @@
       "como usar",
       "Boost",
       "boost",
-      "ageloc boost"
+      "ageloc boost",
+      "serum"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Guía cargada en ManyChat para usar Boost."
+        "content": "Prepará tu ageLOC Boost y seguí esta guía para realizar correctamente una sesión de 2 minutos."
       },
       {
         "type": "document",
-        "title": "Cómo usar · Boost",
+        "kicker": "GUÍA DE USO",
+        "title": "ageLOC Boost",
+        "description": "Preparación, aplicación y cuidados importantes.",
         "sections": [
           {
-            "title": "✨ CÓMO USAR TU BOOST✨",
-            "body": "✨ CÓMO USAR TU BOOST✨\n\nMi primer recomendación importante es que te tomes FOTOS de tu Rostro 📸 ANTES del 1er uso !!! y luego a los días, y semanas , para que puedas ver lo linda que te va dejando la piel ☺️🙌🏻\n\nEl Boost ya viene con su instructivo 👍🏻 Y es super simple de usar! 😃 Lo primero que debes hacer es ponerlo a cargar hasta que deje de parpadear la luz ( tal vez te tome de 10 a 14 horas) y una vez que ya este totalmente cargado, lo puedes empezar a usar !\n\nFORMA DE USO 😊👇🏻\n\nMira este video para tener la práctica de los movimientos:"
+            "title": "Antes del primer uso",
+            "body": "Podés tomarte fotografías del rostro antes de comenzar y repetirlas con el paso de los días para observar los cambios.\n\nCargá completamente el dispositivo hasta que la luz deje de parpadear. La carga inicial puede demorar entre 10 y 14 horas."
           },
           {
-            "title": "Siempre con la cara limpia",
-            "body": "Siempre con la cara limpia\n\n1️⃣ Haces Swipe-up (pasando el dedo por la máquina para prenderla, como muestro en el video!)\n\n2️⃣ coloca 3 gotas de SERUM en el cabezal\n\n3️⃣ desparrama el serum en mitad de rostro\n\n4️⃣ vuelve a darle Swipe-up para que comience a funcionar (comenzará a vibrar 1 vez por segundo aprox! 🙌🏻)\n\n5️⃣ lo pasas 1 min. en mitad de rostro, hasta que deja de vibrar\n\n6️⃣ repites el mismo procedimiento desde el punto 2 (colocar 3 gotas/desparramar mitad rostro/swipe-up/ pasar hasta que se apaga)"
+            "title": "Aplicación",
+            "body": "Usalo sobre el rostro limpio, después del tónico.\n\n1. Deslizá el dedo hacia arriba sobre el dispositivo para encenderlo.\n2. Colocá 3 gotas de serum en el cabezal.\n3. Distribuí el serum sobre una mitad del rostro.\n4. Volvé a deslizar el dedo hacia arriba para iniciar la sesión.\n5. Trabajá esa mitad durante 1 minuto, hasta que deje de vibrar.\n6. Repetí el procedimiento en la otra mitad del rostro."
           },
           {
-            "title": "Ten en cuenta 6 cosas importantes ! 👇🏻👇🏻",
-            "body": "Ten en cuenta 6 cosas importantes ! 👇🏻👇🏻\n\n1️⃣ Se usa LUEGO de tu limpieza facial (ya sea por la mañana o por la noche, como prefieras) y luego del tónico.\n2️⃣ se usa sólo 1 vez al dia, en 2 minutos (1 min. en c/ mitad de rostro 😉)\n3️⃣ El serum NO se retira! Luego de usarlo, solo haces masajes y se absorbe en tu piel 🥰 y después sigues con tu rutina normal (colocas tu hidratante/crema/factor solar si es de dia)\n4️⃣ al usarlo emite una vibración (casi 1 por segundo!) asi que la vas a sentir y escuchar 😊👍🏻\n5️⃣no es sumergible!! Asi que no lo debes mojar 💦\n6️⃣ si acaso cuando lo estés pasando por tu piel, se frena, seguramente sea porque colocaste Poco serum☝🏻 (ten en cuenta que para que la máquina funcione correctamente, el cabezal debe tener serum)\n\n——-\nListo hermosa!!\nLuego cuéntame cómo te fue y qué te pareció !!! 😃 y pregúntame lo que necesites claro 🙌🏻 Aquí quedo a disposición 🤍"
+            "title": "Después de la sesión",
+            "body": "No retires el serum. Masajeá suavemente hasta que se absorba y continuá con tu rutina habitual: hidratante y, durante el día, protector solar.\n\nUsalo una vez por día. La sesión completa dura 2 minutos."
+          },
+          {
+            "title": "Cuidados importantes",
+            "body": "El dispositivo vibra durante el uso. No es sumergible: no lo mojes ni lo sumerjas.\n\nSi se detiene mientras lo deslizás, verificá que el cabezal tenga suficiente serum para mantener el contacto con la piel."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver video de uso",
+            "description": "Movimientos y aplicación de Boost",
+            "url": "https://youtu.be/wNyuhIH03u4"
           }
         ]
-      },
-      {
-        "type": "link",
-        "title": "Ver el Video",
-        "url": "https://youtu.be/wNyuhIH03u4?si=pHWRCZmvO2jlglga",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · Boost",
-        "resourceKind": "video"
       }
     ],
     "sourceFlow": "COMO USAR",
@@ -1240,34 +1246,40 @@
       "LumiSpa",
       "lumi spa",
       "lumispa",
-      "lumi"
+      "lumi",
+      "carga"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Guía cargada en ManyChat para usar LumiSpa."
+        "content": "Prepará tu ageLOC LumiSpa y consultá los videos para aprender los movimientos y la forma correcta de uso."
       },
       {
         "type": "document",
-        "title": "Cómo usar · LumiSpa",
+        "kicker": "GUÍA DE USO",
+        "title": "ageLOC LumiSpa",
+        "description": "Carga inicial, seguimiento y videos explicativos.",
         "sections": [
           {
-            "title": "✨ CÓMO USAR TU LUMI ✨",
-            "body": "✨ CÓMO USAR TU LUMI ✨\n\nMi primera recomendación IMPORTANTE es que te saques fotos ANTES del 1er uso 📸 (de frente y de ambos lados).\nLuego vuelve a tomarte fotos después de usarla, a los días y a las semanas. Así juntas vamos a poder ver los cambios y avances 🙌🏻💖"
+            "title": "Antes del primer uso",
+            "body": "Podés tomarte fotografías del rostro de frente y de ambos lados antes de comenzar. Repetilas después de los primeros usos, a los días y a las semanas, para observar el progreso."
           },
           {
-            "title": "🔋 Carga inicial:",
-            "body": "🔋 Carga inicial:\n•\tConéctala hasta que la luz deje de parpadear (puede tardar entre 10 y 14 horas).\n•\tDespués, no hace falta cargarla todos los días. Vas a notar que al cabo de 2 a 4 semanas se enciende una luz naranja 🔶: recién ahí es cuando debes volver a cargarla.\n\n📲 Forma de uso paso a paso:\nAquí tienes el link con videos explicativos para que veas cómo utilizarla correctamente:\n\n👉🏼"
+            "title": "Carga inicial",
+            "body": "Conectá el dispositivo hasta que la luz deje de parpadear. La primera carga puede tardar entre 10 y 14 horas."
+          },
+          {
+            "title": "Cuándo volver a cargarlo",
+            "body": "No hace falta cargarlo todos los días. Cuando se encienda la luz naranja, normalmente después de varias semanas de uso, volvé a realizar una carga completa."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver videos de uso",
+            "description": "Lista de reproducción de LumiSpa",
+            "url": "https://www.youtube.com/playlist?list=PLUWelFQi1Qz4fSnq78FGfhUm4bvz6xZXD"
           }
         ]
-      },
-      {
-        "type": "link",
-        "title": "Ver el Video",
-        "url": "https://youtube.com/playlist?list=PLUWelFQi1Qz4fSnq78FGfhUm4bvz6xZXD&si=69EVbjR2c-NwO7V3",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · LumiSpa",
-        "resourceKind": "video"
       }
     ],
     "sourceFlow": "COMO USAR",
@@ -1299,38 +1311,48 @@
       "Facial Spa",
       "facial spa",
       "galvanica facial",
-      "galvanic facial"
+      "galvanic facial",
+      "geles faciales"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Guía cargada en ManyChat para usar Facial Spa."
+        "content": "Seguí esta guía para preparar, utilizar y limpiar tu ageLOC Facial Spa."
       },
       {
         "type": "document",
-        "title": "Cómo usar · Facial Spa",
+        "kicker": "GUÍA DE USO",
+        "title": "ageLOC Facial Spa",
+        "description": "Preparación, funcionamiento y cuidados.",
         "sections": [
           {
-            "title": "✨CÓMO USAR TU GALVANICA FACIAL  ✨",
-            "body": "✨CÓMO USAR TU GALVANICA FACIAL  ✨\n\nMi primera recomendación\n\nIMPORTANTE es:\n\n1. tomate FOTOS 📸 de todas las zonas que vayas a tratar (de frente, de los cachetes, de los ojos donde están las líneas de expresión si es que las hay ) ANTES de comenzar a usarla!! y luego de hacer tu 1er sesión (y a los días, y semanas..) para poder juntas ir viendo tu progreso ☺️🙌🏻\n\nAqui te comparto la página en donde encontrarás nuestro MANUAL DE USO !! allí tienes los tutoriales paso a paso de TODAS las tecnologías!! preguntas frecuentes y también productos complementarios\n\nPágina ➡️"
+            "title": "Antes de comenzar",
+            "body": "Podés fotografiar las zonas que vas a tratar antes de la primera sesión y repetir las fotos con el paso de los días para observar el progreso."
           },
           {
-            "title": "Por último un par de TIPS importantes para tener en cuenta con el tratamiento FA",
-            "body": "Por último un par de TIPS importantes para tener en cuenta con el tratamiento FACIAL ❕❕ 👇🏻\n\n- tomar 2 o 2 y 1/2 Lts. de AGUA 💧 por dia! Ya que es una tecnología drenante y no funciona si estamos deshidratados 😅☝🏻\n\n- ser Constante ☝🏻 usar 2-3 veces por semana (por ejemplo Lun, Mie y Vier) la máquina junto con la caja de geles faciales ( el transparente y el azul)\n\n- pasados los 3 meses de tratamiento, puedes comenzarla a usar de forma menos constante ( osea: 1 vez cada 5 - 7 días 😄👍🏻) ya que comienzas la etapa que llamamos “mantenimiento” (aunque si quieres mantener la frecuencia de 2-3 veces por semana, Genial !!)\n\n- La máquina no vibra y no emite calor (ni arde ni duele ni nada!!😄) entonces, Cómo darte cuenta que está prendida y funcionando bien?? 👍🏻\n\n✔️ porque emite un ruido (“beep”) cada 10 segundos (pasados los 5 min hará un Beep mas largo y se apaga sola)\n✔️ porque la LUZ de la pantalla está prendida\n\n✔️ Entonces: para usarla, debes agarrarla con la mano ✋🏻 HUMEDA desde los bordes plateados, y SOLO funcionará cuando la apoyes en tu piel humedecida\n\n❌ si la luz se apaga, o parpadea, o no escuchas el “beep” , probablemente no se esté usando correctamente ☝🏻"
+            "title": "Frecuencia y preparación",
+            "body": "Utilizá el dispositivo junto con los geles faciales transparente y azul. La guía recomienda realizar el tratamiento de 2 a 3 veces por semana y mantener una buena hidratación."
           },
           {
-            "title": "➡️ PLUS: y si deseo hacerle el tratamiento a otra persona?? 👫  en ese caso, debe",
-            "body": "➡️ PLUS: y si deseo hacerle el tratamiento a otra persona?? 👫  en ese caso, deberás:\n\n- mojar la mano con la que agarras la máquina ✋🏻\n- Mojar tu otra mano también ✋🏻 y TOCAR a la otra persona en cualquier zona de su PIEL durante todo el tratamiento (ya que 2 personas son 2 circuitos diferentes, entonces para favorecer la conductividad de la corriente, debes cerrar el circuito, sino la máquina NO funcionará 😉🙌🏻)\n\n🧽 cómo la LIMPIO luego de su uso?? Con un paño / trapito húmedo para retirar el excedente de gel, se seca con una toalla limpia y LISTO 👌🏻\n\n——-\n\nListo hermosa!!\nLuego cuéntame cómo te fue con el tratamiento y qué te pareció !!! 😃\n\ny pregúntame lo que necesites claro 🙌🏻 te voy a acompañar en todo para que tengas los mejores resultados ☺️"
+            "title": "Cómo saber si está funcionando",
+            "body": "El dispositivo no vibra ni emite calor. Durante la sesión produce un sonido cada 10 segundos; después de 5 minutos emite un sonido más largo y se apaga.\n\nLa pantalla debe permanecer encendida. Sujetá los bordes plateados con la mano húmeda y utilizalo sobre la piel humedecida para mantener el contacto."
+          },
+          {
+            "title": "Uso en otra persona",
+            "body": "Si realizás el tratamiento a otra persona, mantené húmeda la mano que sostiene el dispositivo y tocá su piel con la otra mano durante toda la sesión para cerrar el circuito."
+          },
+          {
+            "title": "Limpieza",
+            "body": "Después de usarlo, retirá el excedente de gel con un paño húmedo y secá el dispositivo con una toalla limpia."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver video de uso",
+            "description": "Tutorial de Facial Spa",
+            "url": "https://youtu.be/g8C-j9PfueQ"
           }
         ]
-      },
-      {
-        "type": "link",
-        "title": "Video · Facial Spa",
-        "url": "https://youtu.be/g8C-j9PfueQ?si=z4IqlfYdn3C4Yblf",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · Facial Spa",
-        "resourceKind": "video"
       }
     ],
     "sourceFlow": "COMO USAR",
