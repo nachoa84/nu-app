@@ -138,3 +138,26 @@ body.keyboard-open .bot-form {
 body.keyboard-open .bot-page-header {
   padding-bottom: 4px;
 }
+
+/* =========================================================
+   V87 · Legibilidad de acciones compartidas
+   Escala tipográfica sin cambios de comportamiento.
+   ========================================================= */
+
+.app-action-sheet-copy strong {
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.app-action-sheet-copy span {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.app-action-sheet-action,
+.app-action-sheet-cancel {
+  min-height: 52px;
+  font-size: 14.5px;
+  font-weight: 760;
+}

@@ -396,3 +396,33 @@ body.native-view-switching {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   V87 · Legibilidad de avisos compartidos
+   Toasts y estado de conexión, sin cambios de lógica.
+   ========================================================= */
+
+.toast-host .toast {
+  min-height: 50px;
+  font-size: 13.5px;
+}
+
+.toast-status {
+  font-size: 13px;
+}
+
+.toast-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.toast-action {
+  min-height: 34px;
+  font-size: 12.5px;
+}
+
+.network-banner {
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
