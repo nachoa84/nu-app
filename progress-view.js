@@ -76,7 +76,7 @@ function renderDays() {
       setDayComplete(state.currentDay, true);
       renderDays();
 
-      if (window.BackendAPI) {
+      if (window.BackendAPI && isBackendManagedRoutine()) {
         window.BackendAPI
           .completeDay(state.currentDay)
           .catch(error => {
@@ -89,12 +89,10 @@ function renderDays() {
     };
   }
 
-  const weeks = [
-    { number: 1, start: 1, end: 7 },
-    { number: 2, start: 8, end: 14 },
-    { number: 3, start: 15, end: 21 },
-    { number: 4, start: 22, end: 30 }
-  ];
+  const weeks = [];
+  for (let start = 1, number = 1; start <= TOTAL_PROGRAM_DAYS; start += 7, number += 1) {
+    weeks.push({ number, start, end: Math.min(start + 6, TOTAL_PROGRAM_DAYS) });
+  }
 
   const weekCards = weeks.map(week => {
     const weekHasAvailableDay =
@@ -143,6 +141,7 @@ function renderDays() {
         hasContent &&
         (
           isPreviewMode ||
+          !isBackendManagedRoutine() ||
           day <= state.currentDay
         );
       const complete = isDayComplete(day);

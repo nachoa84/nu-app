@@ -1,0 +1,25 @@
+/* NU APP · MULTIRUTINA V92 */
+.home-routine-selector{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+.home-routine-selector::-webkit-scrollbar{display:none}
+.home-routine-selector button{flex:0 0 auto;border:1px solid rgba(45,42,39,.14);border-radius:999px;background:#fff;color:#514b46;padding:9px 14px;font:700 13px/1.2 inherit;box-shadow:0 3px 10px rgba(53,43,35,.05)}
+.home-routine-selector button.is-active{background:#3d3834;color:#fff;border-color:#3d3834}
+
+/* NU APP · AJUSTE MULTIRUTINA V92A */
+.home-routine-selector{display:none!important}
+.home-routine-card-choice{background:#fff;border:1px solid rgba(24,39,69,.09);box-shadow:0 8px 22px rgba(24,39,69,.045)}
+.home-routine-card-choice .home-routine-cover img{opacity:1;filter:none}
+.home-routine-card-choice .home-routine-heading h2{color:#17233f}
+.home-routine-card-choice .home-routine-day{color:#6d7481}
+.home-routine-open{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:max-content;max-width:100%;margin-top:14px;padding:10px 16px;border:1px solid rgba(86,72,190,.16);border-radius:999px;background:#f2f0ff;color:#5146b8;font:700 15px/1.2 inherit;cursor:pointer}
+.home-routine-open:active{transform:scale(.98)}
+.home-routine-open:focus-visible{outline:3px solid rgba(86,72,190,.24);outline-offset:2px}
+
+/* NU APP · CORRECCIÓN MULTIRUTINA V92B */
+.home-routine-card-fixed{background:#fff;border:1px solid rgba(24,39,69,.09);box-shadow:0 8px 22px rgba(24,39,69,.045)}
+.home-routine-card-fixed .home-routine-cover img{opacity:1;filter:none}
+.home-routine-card-fixed .home-routine-heading h2{color:#17233f}
+.home-routine-card-fixed .home-routine-day{color:#6d7481}
+.home-routine-card-fixed .home-routine-progress-row{display:flex}
+.home-routine-card-fixed .home-routine-continue{display:inline-flex}
+.home-routine-card-fixed[data-selected="true"]{border-color:rgba(86,72,190,.18)}
+

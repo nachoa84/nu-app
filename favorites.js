@@ -7,8 +7,8 @@ let favoriteSearchOpen = false;
 let favoriteSearchQuery = "";
 
 const FAVORITE_SOURCE_ROUTINE = "routine";
-const CURRENT_ROUTINE_ID = "collagen-30";
-const CURRENT_ROUTINE_TITLE = "Collagen+";
+let CURRENT_ROUTINE_ID = getActiveRoutineId();
+let CURRENT_ROUTINE_TITLE = getActiveRoutineConfig().title;
 
 function migrateOldDay1FavoritePaths() {
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");

@@ -36,7 +36,7 @@ function renderHomeRoutineSummary(dayNumber, dayData) {
   }
 
   if (homeRoutineImage) {
-    homeRoutineImage.src = "assets/custom/routine-collagen-home.png";
+    homeRoutineImage.src = getActiveRoutineConfig().cover;
   }
 }
 

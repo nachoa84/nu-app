@@ -1,4 +1,4 @@
-const CACHE="nuapp-v88-onboarding-legibility";
+const CACHE="nuapp-v92d-material-titles";
 
 const CORE=[
   "./",
@@ -22,13 +22,15 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
+  "./routine-products-v92.js?v=92c-multiroutine-polish",
+  "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
   "./bot.js?v=68-tramites-espana",
   "./favorites.js?v=63e-ios-thumbnails",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
-  "./daily-view.js?v=63e-ios-thumbnails",
+  "./daily-view.js?v=92d-material-titles",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=63e-ios-thumbnails",
   "./app.js?v=63e-ios-thumbnails",

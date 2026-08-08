@@ -3,8 +3,8 @@
 // La sincronización con backend permanece coordinada desde app.js.
 
 const DEFAULT_UNLOCK_HOUR = 9;
-const TOTAL_PROGRAM_DAYS = 30;
-const ROUTINE_STATE_STORAGE_KEY = "routineState";
+let TOTAL_PROGRAM_DAYS = getActiveRoutineConfig().totalDays;
+function getRoutineStateStorageKey() { return isBackendManagedRoutine() ? "routineState" : `routineState:${getActiveRoutineId()}`; }
 
 function getRoutineState() {
   const fallback = {
@@ -16,7 +16,7 @@ function getRoutineState() {
 
   try {
     const saved = JSON.parse(
-      localStorage.getItem(ROUTINE_STATE_STORAGE_KEY) || "null"
+      localStorage.getItem(getRoutineStateStorageKey()) || "null"
     );
 
     if (!saved) return fallback;
@@ -35,13 +35,13 @@ function getRoutineState() {
 
 function saveRoutineState(state) {
   localStorage.setItem(
-    ROUTINE_STATE_STORAGE_KEY,
+    getRoutineStateStorageKey(),
     JSON.stringify(state)
   );
 }
 
 function getDayCompleteStorageKey(day) {
-  return `day${Number(day)}Complete`;
+  return isBackendManagedRoutine() ? `day${Number(day)}Complete` : `day:${getActiveRoutineId()}:${Number(day)}:complete`;
 }
 
 function isDayComplete(day) {

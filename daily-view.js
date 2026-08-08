@@ -131,7 +131,7 @@ function createBlock(block) {
       renderDoneState({ animate: true });
       renderDays();
 
-      if (window.BackendAPI) {
+      if (window.BackendAPI && isBackendManagedRoutine()) {
         window.BackendAPI
           .completeDay(selectedDay)
           .catch(error => {
@@ -149,11 +149,15 @@ function createBlock(block) {
 }
 
 function createCompactMediaItem(block, order, mediaBlocks) {
+  // NU APP · MATERIALES MULTIRUTINA V92D
+  const materialTitle = getActiveRoutineId() === "collagen-30"
+    ? block.label
+    : `Historia ${order} de ${mediaBlocks.length}`;
   const item = document.createElement("article");
   item.className = `resource-row resource-row-${block.mediaType}`;
   item.tabIndex = 0;
   item.setAttribute("role", "button");
-  item.setAttribute("aria-label", `Abrir ${block.label}`);
+  item.setAttribute("aria-label", `Abrir ${materialTitle}`);
 
   const openPreview = () => openMediaPreview(mediaBlocks, order - 1, selectedDay);
 
@@ -214,7 +218,7 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   const copy = document.createElement("div");
   copy.className = "resource-copy";
   copy.innerHTML = `
-    <strong>${block.label}</strong>
+    <strong>${materialTitle}</strong>
     <span>${block.mediaType === "video" ? "Video" : "Imagen"}</span>
   `;
 
@@ -290,7 +294,7 @@ function firstMeaningfulLine(content) {
 }
 
 function isImportedCollagenContentDay() {
-  return Number(selectedDay) >= 8;
+  return getActiveRoutineId() === "collagen-30" && Number(selectedDay) >= 8;
 }
 
 function importedTextParts(content, { stripStepNumber = false } = {}) {
@@ -511,7 +515,7 @@ function createObjectiveCard(block) {
   header.innerHTML = `
     <div>
       <span>Objetivo</span>
-      <h3>${DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content)}</h3>
+      <h3>${getRoutineDayObjectiveV92a(selectedDay, DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content))}</h3>
     </div>
   `;
 
@@ -605,7 +609,7 @@ function renderStructuredDayDetail() {
         <p>Tu acción de hoy</p>
       </div>
       <div class="native-day-hero-media" aria-hidden="true">
-        <img src="assets/custom/collagen-day-hero.jpg" alt="" />
+        <img src="${getRoutineHeroV92a()}" alt="" />
       </div>
     </div>
     <div class="native-day-progress-row">
@@ -679,7 +683,7 @@ function renderStructuredDayDetail() {
   const progressButton = document.createElement("button");
   progressButton.type = "button";
   progressButton.className = "native-day-progress-button";
-  progressButton.innerHTML = `<span>${ICONS.calendar}</span><strong>Ver progreso de 30 días</strong><span aria-hidden="true">${ICONS.arrow}</span>`;
+  progressButton.innerHTML = `<span>${ICONS.calendar}</span><strong>Ver progreso de ${TOTAL_PROGRAM_DAYS} días</strong><span aria-hidden="true">${ICONS.arrow}</span>`;
   progressButton.onclick = () => activateMainView("rutina");
   chat.appendChild(progressButton);
 
@@ -786,19 +790,6 @@ function closeNativeDayView() {
   homeView?.classList.remove("day-open");
   if (dailyNativeHeader) dailyNativeHeader.hidden = true;
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-
-  const homeHeader = homeView?.querySelector(".home-page-header");
-  const routines = homeView?.querySelector(".home-routines");
-  [homeHeader, routines].forEach((element, index) => {
-    if (!element || prefersReducedMotion() || !element.animate) return;
-    element.animate(
-      [
-        { opacity: .75, transform: "translate3d(-10px, 2px, 0)" },
-        { opacity: 1, transform: "translate3d(0, 0, 0)" }
-      ],
-      { duration: 190 + (index * 25), easing: "cubic-bezier(.22,.8,.24,1)" }
-    );
-  });
 }
 
 function startProgressive() {
@@ -808,7 +799,7 @@ function startProgressive() {
 function selectDay(day, showImmediately = false) {
   if (!days[day]) return;
 
-  if (!isPreviewMode) {
+  if (!isPreviewMode && isBackendManagedRoutine()) {
     const state = getRoutineState();
 
     if (day > state.currentDay) {

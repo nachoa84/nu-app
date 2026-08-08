@@ -6,7 +6,7 @@
 let pendingOpenDay = null;
 
 function applyBackendRoutineState(serverState) {
-  if (!serverState) return;
+  if (!serverState || !isBackendManagedRoutine()) return;
 
   const localState =
     getRoutineState();
@@ -74,7 +74,7 @@ window.addEventListener(
 );
 
 function markCurrentDayOpened() {
-  if (isPreviewMode) return;
+  if (isPreviewMode || !isBackendManagedRoutine()) return;
 
   const state = getRoutineState();
   const currentDay =

@@ -2642,6 +2642,75 @@ app.use(
   }
 );
 
+// NU APP · MULTIRUTINA V92
+app.use(
+  "/api/routine-assets",
+  async (req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return res.status(405).set("Allow", "GET, HEAD").end();
+    }
+
+    try {
+      const relativePath = decodeURIComponent(req.path)
+        .replace(/^\/+/, "");
+
+      if (
+        !relativePath ||
+        relativePath.includes("..") ||
+        relativePath.includes("\\") ||
+        !/^[A-Za-z0-9._/-]+$/.test(relativePath)
+      ) {
+        return res.status(400).end();
+      }
+
+      const objectName = "routines/active/" + relativePath;
+      const result = await botAssetStorage.downloadAsBytes(objectName);
+
+      if (!result?.ok) {
+        console.warn("[routine-assets] No disponible:", objectName, result?.error || "");
+        return res.status(404).end();
+      }
+
+      const rawBytes =
+        Array.isArray(result.value)
+          ? result.value[0]
+          : result.value;
+      const buffer = Buffer.from(rawBytes);
+      const totalSize = buffer.length;
+      const range = parseBotAssetRange(req.headers.range, totalSize);
+
+      res.set({
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": botAssetContentType(objectName),
+        "ETag": `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`
+      });
+
+      if (req.headers.range) {
+        if (!range || range.unsatisfiable) {
+          return res
+            .status(416)
+            .set("Content-Range", `bytes */${totalSize}`)
+            .end();
+        }
+
+        const chunk = buffer.subarray(range.start, range.end + 1);
+        res.status(206).set({
+          "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
+          "Content-Length": String(chunk.length)
+        });
+
+        return req.method === "HEAD" ? res.end() : res.send(chunk);
+      }
+
+      res.set("Content-Length", String(totalSize));
+      return req.method === "HEAD" ? res.end() : res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 function isBlockedPublicPath(requestPath) {
   const normalizedPath =
     String(requestPath || "")
