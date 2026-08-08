@@ -122,7 +122,11 @@
       "como cobro en Argentina",
       "como cobrar comisiones en Argentina",
       "tramites para cobrar en Argentina",
-      "que necesito para cobrar en Argentina"
+      "que necesito para cobrar en Argentina",
+      "como facturar en Argentina",
+      "como emitir factura en Argentina",
+      "como enviar factura en Argentina",
+      "como hacer una factura en Argentina"
     ],
     "keywords": [
       "tramites",
@@ -132,7 +136,10 @@
       "monotributo",
       "ARCA",
       "cuestionario",
-      "Argentina"
+      "Argentina",
+      "facturar",
+      "emitir factura",
+      "enviar factura"
     ],
     "blocks": [
       {
@@ -883,80 +890,121 @@
       "contacto nuskin argentina",
       "codigos de productos argentina",
       "seguimiento de pedido argentina",
-      "como facturar en argentina"
+      "catalogo argentina",
+      "flyers argentina"
     ],
     "keywords": [
       "argentina",
       "catalogo",
       "pedidos",
       "andreani",
-      "facturar",
-      "cuit",
+      "contacto",
       "call center",
-      "productos"
+      "productos",
+      "flyers"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Información del mercado de Argentina: productos, pedidos, contactos, catálogo, flyers y facturación."
+        "content": "Encontrá información útil del mercado de Argentina: seguimiento de pedidos, contactos de Nu Skin, códigos de productos, catálogo y materiales de venta."
       },
       {
         "type": "document",
-        "title": "Info Argentina",
+        "kicker": "PEDIDOS",
+        "title": "Seguimiento de pedidos",
+        "description": "Consultá el número de guía y seguí el envío.",
         "sections": [
           {
-            "title": "Seguimiento de pedidos",
-            "body": "✨ ¿Querés saber por dónde va tu envío?\n\n1️⃣ Ingresá a nuskin.com con el usuario y contraseña de la persona que realizó el pedido.\n\n2️⃣ Entrá al perfil (donde aparece su nombre).\n\n3️⃣ Hacé clic en ”Historial de pedidos”.\nAhí vas a ver el pedido y, entre 72 y 96 hs después de hacerlo, se habilita el número de guía.\n\n4️⃣ Con ese número, ingresá a la página de Andreani.com para seguir el estado del envío:\n\nLink directo al seguimiento...\n\n✅ ¡Listo! Ahí verás en qué etapa está tu pedido y cuándo llega."
+            "title": "Obtené el número de guía",
+            "body": "Ingresá a nuskin.com con el usuario y contraseña de la persona que realizó el pedido. Abrí su perfil y elegí Historial de pedidos."
           },
           {
-            "title": "Contacto y datos de Nu Skin",
-            "body": "Call Center: +54 115 984 1871\nLun a vier 11:00 AM – 9:00 PM\n\nChat con operador:\n\nEnvío Documentos: documentos@nuskin.com\n\nCobro comisiones: facturas@nuskin.com\n\nCentro de aprendizaje\n\nCUIT NUSKIN 30690833030"
-          },
-          {
-            "title": "Códigos de productos",
-            "body": "En suscripción : 23002344\n\nPack 3 colágenos : 23130445\n\nPack 6 colágenos: 23130446\n\nPack 12 colágenos : 23130440\n\nLumiSpa RoseGold: 23130436\n\nLumiSpa: 23130433\n\nKIT INICIO 500 : 23130433 + 23130446"
-          },
-          {
-            "title": "Cómo facturar",
-            "body": "PASOS PARA FACTURAR\n\nEntrar a ARCA con la  clave fiscal\n\nComprobantes en línea\n\nClick en nuestro nombre\n\nGenerar comprobante\n\nPunto de venta a utilizar: se le da de alta el numero 1 con nuestra dirección\n\nTipo de comprobante: C (monotributistas)\n\nFecha del comprobante: (el día que se hace la fc)\n\nConceptos a incluir: servicios\n\nDesde: 01/XX/2025 hasta 31/xx/2025\n\nVto para el pago: fecha de la factura\n\n... continuar\n\nCondición frente al IVA: Responsable inscripto\n\nCUIT: 30690833030  (y ahí nos van a aparecer los datos de Nuskin)\n\nCondiciones de venta: contado\n\nDonde habla de remito no ponemos nada y le damos continuar\n\ny llenamos la parte del cuerpo de la factura:\n\n- Cod: 001\n\n- Producto: COPIAR LO QUE DICE LA FACTURA EN TAX DOCUMENTS\n\n- Cantidad: 1\n\n- Unidad de medida: unidad\n\n- Precio unitario: importe total de nuestra comisión.\n\n....continuar\n\nChequea los datos, si te equivocaste en algo podes ir para atrás\n\ny luego confirmas...\n\nTe hace un PDF y ahí volves a confirmar datos,\n\nLuego lo descargar como para imprimir\n\nY NO OLVIDES:\n\nEnvía tus facturas a la siguiente dirección de correo:\n\nfacturas@nuskin.com\n\nINDICANDO en el asunto del correo, tu número de ID (AR….)\n\nY como Cuerpo del mail: buenos días, envío factura del AR…..\n\nUna vez que Nu Skin reciba tu factura, en 72hs hábiles, tendrás las comisiones depositadas en tu cuenta bancaria."
+            "title": "Seguí el envío",
+            "body": "El número de guía suele habilitarse entre 72 y 96 horas después de realizar el pedido. Copialo e ingresalo en el sitio de Andreani para consultar el estado y la fecha estimada de entrega."
           }
         ],
-        "description": "Información importada del Bot de ManyChat."
+        "actions": [
+          {
+            "title": "Seguir pedido en Andreani",
+            "description": "Abrir el sitio oficial",
+            "url": "https://www.andreani.com/"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Seguimiento Andreani",
-        "url": "https://www.andreani.com/?gad_source=1&gad_campaignid=22621933320&gbraid=0AAAAADO9JOPH2qLe6mFn9ZrY-B-PJpT9i#!/pymes/carta-documento",
-        "actionLabel": "Abrir",
-        "description": "Info Argentina"
+        "type": "document",
+        "kicker": "CONTACTOS",
+        "title": "Nu Skin Argentina",
+        "description": "Teléfonos, correos y accesos útiles.",
+        "sections": [
+          {
+            "title": "Call Center",
+            "body": "+54 11 5984-1871\nLunes a viernes, de 11:00 a 21:00."
+          },
+          {
+            "title": "Envío de documentación",
+            "body": "documentos@nuskin.com"
+          },
+          {
+            "title": "Facturas y cobro de comisiones",
+            "body": "facturas@nuskin.com"
+          },
+          {
+            "title": "CUIT de Nu Skin",
+            "body": "30-69083303-0"
+          }
+        ],
+        "actions": [
+          {
+            "title": "Chatear con un operador",
+            "description": "Ayuda de Nu Skin Argentina",
+            "url": "https://www.nuskin.com/content/nuskin/es_AR/corporate/help/chat.html"
+          },
+          {
+            "title": "Ingresar al Centro de Aprendizaje",
+            "description": "Capacitaciones de Nu Skin",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Chat con operador",
-        "url": "https://www.nuskin.com/content/nuskin/es_AR/corporate/help/chat.html",
-        "actionLabel": "Abrir",
-        "description": "Info Argentina"
+        "type": "document",
+        "kicker": "PRODUCTOS",
+        "title": "Códigos de productos",
+        "description": "Códigos rápidos para pedidos y suscripciones.",
+        "sections": [
+          {
+            "title": "Collagen+",
+            "body": "Suscripción: 23002344\nPack de 3: 23130445\nPack de 6: 23130446\nPack de 12: 23130440"
+          },
+          {
+            "title": "LumiSpa",
+            "body": "LumiSpa RoseGold: 23130436\nLumiSpa: 23130433"
+          },
+          {
+            "title": "Kit Inicio 500",
+            "body": "LumiSpa 23130433 + Pack de 6 Collagen+ 23130446"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Centro de aprendizaje",
-        "url": "https://www.nuskin.com/vgclient/#/trainings",
-        "actionLabel": "Abrir",
-        "description": "Info Argentina"
-      },
-      {
-        "type": "link",
-        "title": "Catálogo Argentina",
-        "url": "https://catalogo.nuskin.com/argentina/catalogo-argentina-2025/",
-        "actionLabel": "Abrir",
-        "description": "Info Argentina"
-      },
-      {
-        "type": "link",
-        "title": "Flyers con precios",
-        "url": "https://photos.google.com/share/AF1QipMm7cIg5467sYlFZTOj3QvkgjtfHzBAtNlW3XLvQ2UBEnrO4ODa9jl9cqoNZVWtoQ?key=ejk3Z1dfcnV5VFo1MmIySy03V19JejFBVTVXR3F3",
-        "actionLabel": "Abrir",
-        "description": "Info Argentina"
+        "type": "document",
+        "kicker": "MATERIALES",
+        "title": "Materiales de venta",
+        "description": "Consultá flyers con precios para compartir.",
+        "sections": [
+          {
+            "title": "Flyers con precios",
+            "body": "Abrí la colección de materiales para consultar productos y compartir información con tus clientes."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver flyers con precios",
+            "description": "Materiales para compartir",
+            "url": "https://photos.google.com/share/AF1QipMm7cIg5467sYlFZTOj3QvkgjtfHzBAtNlW3XLvQ2UBEnrO4ODa9jl9cqoNZVWtoQ?key=ejk3Z1dfcnV5VFo1MmIySy03V19JejFBVTVXR3F3"
+          }
+        ]
       }
     ],
     "country": "Argentina",
