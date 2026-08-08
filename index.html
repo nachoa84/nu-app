@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="home.css?v=81-home-navigation-legibility" />
   <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="media-preview.css?v=85a-media-legibility" />
-  <link rel="stylesheet" href="bot.css?v=80-bot-legibility" />
+  <link rel="stylesheet" href="bot.css?v=95-quick-access" />
   <link rel="stylesheet" href="favorites.css?v=94-bot-folders" />
   <link rel="stylesheet" href="multiroutine-v92.css?v=92c-multiroutine-polish">
   <link rel="stylesheet" href="onboarding.css?v=88-onboarding-legibility" />
@@ -234,7 +234,10 @@
             <h1>Asistente</h1>
             <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
           </div>
-          <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
+          <div class="bot-header-actions" aria-label="Acciones del asistente">
+            <button id="botShortcutsBtn" class="icon-button" type="button" aria-label="Abrir accesos rápidos"></button>
+            <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
+          </div>
         </header>
 
         <div class="bot-card">
@@ -398,6 +401,7 @@
   <script src="routine-state.js?v=61b-progress-canonical"></script>
   <script src="routine-sync.js?v=61b-progress-canonical"></script>
   <script src="bot.js?v=94-favorite-folders"></script>
+  <script src="bot-shortcuts-v95.js?v=95b-clean-labels"></script>
   <script src="favorites.js?v=94-bot-folders"></script>
   <script src="notifications.js?v=61b-progress-canonical"></script>
   <script src="home-view.js?v=61b-progress-canonical"></script>

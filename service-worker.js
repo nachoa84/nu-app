@@ -1,4 +1,4 @@
-const CACHE="nuapp-v94-bot-favorite-folders";
+const CACHE="nuapp-v95b-clean-quick-access-labels";
 
 const CORE=[
   "./",
@@ -16,7 +16,7 @@ const CORE=[
   "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=80-bot-legibility",
+  "./bot.css?v=95-quick-access",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
@@ -27,6 +27,7 @@ const CORE=[
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
   "./bot.js?v=94-favorite-folders",
+  "./bot-shortcuts-v95.js?v=95b-clean-labels",
   "./favorites.js?v=94-bot-folders",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
