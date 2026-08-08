@@ -288,7 +288,7 @@
 .guide-section-heading span,
 .guide-detail-intro small {
   color: #7a9260;
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 760;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -307,7 +307,7 @@
 .guide-hero-copy p {
   margin: 8px 0 0;
   color: #747d8a;
-  font-size: 12.5px;
+  font-size: 14.5px;
   font-weight: 500;
   line-height: 1.55;
 }
@@ -337,7 +337,7 @@
 
 .guide-hero-progress-row b {
   color: #5f6875;
-  font-size: 11px;
+  font-size: 12.5px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -345,7 +345,7 @@
   display: block;
   margin-top: 7px;
   color: #8b929d;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 530;
 }
 
@@ -358,7 +358,7 @@
   gap: 7px;
   padding: 0 15px;
   border-radius: 14px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 720;
 }
 
@@ -416,7 +416,7 @@
 
 .guide-section-heading > strong {
   color: #7f8793;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 650;
 }
 
@@ -477,7 +477,7 @@
 
 .guide-step-copy small {
   color: #8d949e;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: .045em;
   text-transform: uppercase;
@@ -494,7 +494,7 @@
   display: -webkit-box;
   overflow: hidden;
   color: #7d8591;
-  font-size: 10.5px;
+  font-size: 13px;
   font-weight: 490;
   line-height: 1.38;
   -webkit-line-clamp: 2;
@@ -560,7 +560,7 @@
 .guide-detail-intro p {
   margin: 0;
   color: #737c89;
-  font-size: 12px;
+  font-size: 14.5px;
   line-height: 1.48;
 }
 
@@ -603,7 +603,7 @@
 .guide-note {
   margin: 0;
   color: #68717f;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 490;
   line-height: 1.58;
 }
@@ -646,7 +646,7 @@
 .guide-check-list p {
   margin: 2px 0 0;
   color: #68717f;
-  font-size: 11.5px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -687,7 +687,7 @@
 }
 
 .guide-resource-row > span:nth-child(2) {
-  font-size: 11.5px;
+  font-size: 14px;
   font-weight: 650;
   line-height: 1.35;
 }
@@ -709,7 +709,7 @@
 
 .guide-schedule-card strong {
   color: #31415e;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -724,7 +724,7 @@
 
 .guide-schedule-card li {
   color: #747d89;
-  font-size: 10px;
+  font-size: 13.5px;
   line-height: 1.35;
 }
 
@@ -734,7 +734,7 @@
   border-radius: 13px;
   background: #eef2fb;
   color: #435a8a;
-  font-size: 10.5px;
+  font-size: 14px;
   font-weight: 620;
 }
 
@@ -815,7 +815,7 @@
 .guide-complete-copy p {
   margin: 3px 0 0;
   color: #7e8692;
-  font-size: 10.5px;
+  font-size: 13.5px;
   line-height: 1.4;
 }
 
@@ -825,7 +825,7 @@
   border-radius: 13px;
   background: #304f9a;
   color: #fff;
-  font-size: 11.5px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 

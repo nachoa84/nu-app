@@ -1,4 +1,4 @@
-const CACHE="nuapp-v81-home-navigation-legibility";
+const CACHE="nuapp-v82-guide-legibility";
 
 const CORE=[
   "./",
@@ -36,7 +36,7 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
-  "./guide.css?v=81-home-navigation-legibility",
+  "./guide.css?v=82-guide-legibility",
   "./guide-content.js?v=61c-guide-prototype",
   "./guide-view.js?v=61e-guide-home-sections",
   "./manifest.webmanifest?v=61b-progress-canonical",
