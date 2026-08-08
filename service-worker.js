@@ -1,4 +1,4 @@
-const CACHE="nuapp-v87-shared-ui-legibility";
+const CACHE="nuapp-v88-onboarding-legibility";
 
 const CORE=[
   "./",
@@ -35,7 +35,7 @@ const CORE=[
   "./backend-client.js?v=61b-progress-canonical",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
-  "./onboarding.css?v=61b-progress-canonical",
+  "./onboarding.css?v=88-onboarding-legibility",
   "./guide.css?v=82-guide-legibility",
   "./guide-content.js?v=61c-guide-prototype",
   "./guide-view.js?v=61e-guide-home-sections",

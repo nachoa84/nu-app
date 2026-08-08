@@ -1061,3 +1061,59 @@ body.onboarding-open {
     transition: none !important;
   }
 }
+
+/* =========================================================
+   V88 · Cierre tipográfico del onboarding
+   Ayudas y textos secundarios, sin cambios de lógica.
+   ========================================================= */
+
+.onboarding-progress-labels {
+  font-size: 11.5px;
+}
+
+.onboarding-eyebrow {
+  font-size: 11.5px;
+}
+
+.onboarding-input-copy small,
+.onboarding-birth-head small {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.onboarding-privacy-note {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.objective-copy small {
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.time-card-copy small {
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.onboarding-time-help {
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.onboarding-error {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.time-sheet-note {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+@media (max-height: 720px) {
+  .onboarding-heading p {
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+}
