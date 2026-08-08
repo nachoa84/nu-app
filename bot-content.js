@@ -502,85 +502,147 @@
     "keywords": [
       "tramites",
       "comisiones",
-      "documentacion",
+      "acuerdo afiliado",
+      "SAT",
+      "constancia fiscal",
+      "cuestionario",
       "factura",
       "México"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estos son los pasos cargados en ManyChat para cobrar comisiones en México."
+        "content": "Para habilitar el cobro de comisiones en México, completá estas cinco etapas. Necesitás una cuenta bancaria a tu nombre; no se admiten cuentas digitales para el pago de comisiones."
       },
       {
         "type": "document",
-        "title": "Trámites · México",
+        "kicker": "ETAPA 1 DE 5",
+        "title": "Descargar el Acuerdo de Afiliado",
+        "description": "Obtené el documento oficial de Nu Skin.",
         "sections": [
           {
-            "title": "Paso 1",
-            "body": "🇲🇽🇲🇽🇲🇽 Trámites para MÉXICO 🇲🇽🇲🇽🇲🇽\n\nA continuación trámites administrativos para cobrar las comisiones en tu cuenta bancaria.\n\nEnvía los siguientes documentos:\n\n1️⃣ Descarga, Imprime y completa el acuerdo de afiliado de marca. Luego hazle una foto.\n\nIMPORTANTE 1: Sólo se admiten cuentas bancarias, las cuentas digitales, no son admitidas para el pago de comisiones.\n\nIMPORTANTE 2:  En el siguiente PDF tienes indicaciones claras para completar correctamente el acuerdo y te lo aprueben en la primera vez que lo envíes!!\n\n2️⃣  Ingresa a la página del SAT y descarga la constancia de situación fiscal actualizada.\n\nEnvía estos 2 documentos\n\n- Acuerdo al afiliado y Constancia, a la siguiente dirección de correo:\n\ndocumentos@nuskin.com\n\nINDICANDO en el asunto del correo,\n\ntu numero de ID (MX...) y en el cuerpo del correo, Envío documentación para el cobro de comisiones.\n\n3️⃣ Desde tu oficina virtual debes ingresar al apartado Entrenamientos y tomar el curso llamado \"Conceptos Básicos de las Políticas\", el cual consta de un video y un cuestionario de 4 preguntas que debe responder correctamente para que pueda ser considerado como aprobado.\n\ny aquí a continuación tienes las afirmaciones correctas a cumplimentar!\n\nGenial!\n\nHabiendo cumplido estos pasos,\nen pocos días hábiles ya estarás autorizad@ para enviar tus facturas y que te hagan el pago de tus comisiones en la cuenta bancaria!!\n\n¿Hasta aquí todo ok?\n\nAhora vamos a Cómo Facturar y ENVIAR TU FACTURA"
-          },
-          {
-            "title": "Paso 2",
-            "body": "Para ver las comisiones vas a ingresar a la app de Stela con tu usuario y vas a poder verlas en la opción\n\n>> documentos, impuestos o tax documents\n\ny ahí tienes todos los datos para hacer tu FACTURA.\n\nRevisa el siguiente PDF para el paso a paso!\n\nEnvía tus facturas a la siguiente dirección de correo:\n\nfcomisionesmex@nuskin.com\n\nINDICANDO en el asunto del correo, tu número de ID (MX….)\n\nAhora si, a esperar las comisiones..."
+            "title": "Acuerdo de Afiliado de Marca",
+            "body": "Descargá e imprimí el Acuerdo de Afiliado de Marca. En la siguiente etapa encontrarás una guía para completarlo correctamente."
           }
         ],
-        "description": "Paso a paso importado del Bot de ManyChat."
+        "actions": [
+          {
+            "title": "Descargar Acuerdo de Afiliado",
+            "description": "Documento oficial de Nu Skin",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/MX/es/business_materials/mx_acuerdo_del_afiliado.pdf"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir Nu Skin",
-        "url": "https://www.nuskin.com/content/dam/office/s_america/MX/es/business_materials/mx_acuerdo_del_afiliado.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 5",
+        "title": "Completar correctamente el acuerdo",
+        "description": "Seguí la guía para facilitar su aprobación.",
+        "sections": [
+          {
+            "title": "Cómo completarlo",
+            "body": "Consultá la guía antes de llenar el acuerdo. Completá todos los campos, firmalo y tomá una fotografía clara del documento terminado."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Abrir guía para completar el acuerdo",
+            "description": "Instrucciones paso a paso",
+            "url": "/api/bot-assets/97bec3ced436dde87eb27ff20cb674cf2870c8667b94aac35dffac824e22c646.pdf"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir recurso",
-        "url": "https://www.sat.gob.mx/aplicacion/login/53027/genera-tu-constancia-de-situacion-fiscal",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
+        "type": "document",
+        "kicker": "ETAPA 3 DE 5",
+        "title": "Pon a prueba tus conocimientos",
+        "description": "Capacitación y cuestionario obligatorios para cobrar comisiones.",
+        "sections": [
+          {
+            "title": "Capacitación obligatoria",
+            "body": "Ingresá a la Oficina Virtual, abrí Entrenamientos y completá el curso “Conceptos Básicos de las Políticas”. El curso incluye un video."
+          },
+          {
+            "title": "Cuestionario obligatorio",
+            "body": "Después del video, respondé correctamente las cuatro preguntas para que el curso sea considerado aprobado. Este requisito debe completarse antes de enviar la documentación. Revisá las tres capturas como guía."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ingresar a la Oficina Virtual",
+            "description": "Abrir capacitaciones de Nu Skin",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ],
+        "galleryKicker": "CUESTIONARIO OBLIGATORIO",
+        "galleryTitle": "Ver cuestionario y respuestas",
+        "items": [
+          {
+            "src": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
+            "label": "Cuestionario · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
+            "label": "Cuestionario · Parte 2",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
+            "label": "Cuestionario · Parte 3",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir Nu Skin",
-        "url": "https://www.nuskin.com/vgclient/#/trainings",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
+        "type": "document",
+        "kicker": "ETAPA 4 DE 5",
+        "title": "Constancia de Situación Fiscal",
+        "description": "Descargá la constancia y enviá la documentación.",
+        "sections": [
+          {
+            "title": "Obtené la constancia",
+            "body": "Ingresá al portal del SAT y descargá tu Constancia de Situación Fiscal actualizada."
+          },
+          {
+            "title": "Documentos que tenés que enviar",
+            "body": "Enviá el Acuerdo de Afiliado completo y la Constancia de Situación Fiscal a:\n\ndocumentos@nuskin.com"
+          },
+          {
+            "title": "Asunto y cuerpo del correo",
+            "body": "En el asunto indicá tu número de ID MX…\n\nEn el cuerpo escribí: “Envío documentación para el cobro de comisiones”."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Obtener constancia en el SAT",
+            "description": "Abrir portal oficial del SAT",
+            "url": "https://www.sat.gob.mx/aplicacion/login/53027/genera-tu-constancia-de-situacion-fiscal"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "MX66.67.pdf",
-        "url": "/api/bot-assets/97bec3ced436dde87eb27ff20cb674cf2870c8667b94aac35dffac824e22c646.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.42.jpeg",
-        "url": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.42 (1).jpeg",
-        "url": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2026-05-20 at 22.46.43.jpeg",
-        "url": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
-      },
-      {
-        "type": "link",
-        "title": "MX68.70.pdf",
-        "url": "/api/bot-assets/4e8b85077caa8a85108c961bfee2a92a2cc99f11fd56b55e3eaf9202d18f86a9.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · México"
+        "type": "document",
+        "kicker": "ETAPA 5 DE 5",
+        "title": "Cómo emitir y enviar tu factura",
+        "description": "Facturá después de completar los requisitos anteriores.",
+        "sections": [
+          {
+            "title": "Prepará la factura",
+            "body": "Consultá tus comisiones en Stela, dentro de Documentos, Impuestos o Tax Documents. Allí encontrarás los datos necesarios para emitir la factura."
+          },
+          {
+            "title": "Enviá la factura",
+            "body": "Consultá la guía para emitir y enviar correctamente tu factura.\n\nEnviála a:\n\nfcomisionesmex@nuskin.com\n\nEn el asunto indicá tu número de ID MX…"
+          }
+        ],
+        "actions": [
+          {
+            "title": "Abrir guía para enviar tu factura",
+            "description": "Instrucciones paso a paso en PDF",
+            "url": "/api/bot-assets/4e8b85077caa8a85108c961bfee2a92a2cc99f11fd56b55e3eaf9202d18f86a9.pdf"
+          }
+        ]
       }
     ],
     "country": "México",
