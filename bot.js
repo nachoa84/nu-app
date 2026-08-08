@@ -672,7 +672,7 @@ function renderBotConversation({ scroll = false } = {}) {
       title.textContent = "Preguntame lo que necesites";
 
       const text = document.createElement("p");
-      text.textContent = "Podés buscar presentaciones, productos, comisiones o materiales para trabajar tu negocio.";
+      text.textContent = "Podés escribir un comando como “loi”, “tramites” o “box colageno”, o preguntarme con tus palabras.";
 
       welcome.append(mark, title, text);
       thread.appendChild(welcome);
@@ -927,10 +927,31 @@ function botBlockSearchText(block) {
   return normalizeBotText(chunks.filter(Boolean).join(" "));
 }
 
+function botTopicIntentTerms(topic) {
+  return [
+    topic?.command,
+    ...(Array.isArray(topic?.commands) ? topic.commands : []),
+    ...(Array.isArray(topic?.aliases) ? topic.aliases : []),
+    ...(Array.isArray(topic?.phrases) ? topic.phrases : [])
+  ]
+    .map(normalizeBotText)
+    .filter(Boolean);
+}
+
+function findExactBotTopic(library, query) {
+  const normalized = normalizeBotText(query);
+  if (!normalized) return null;
+
+  return (Array.isArray(library) ? library : []).find(topic =>
+    botTopicIntentTerms(topic).includes(normalized)
+  ) || null;
+}
+
 function botTopicSearchText(topic) {
   const chunks = [
     topic?.title,
     ...(topic?.keywords || []),
+    ...botTopicIntentTerms(topic),
     ...botItemCountries(topic)
   ];
 
@@ -1007,7 +1028,10 @@ function scoreBotTopic(topic, queryContext) {
   } = queryContext;
 
   const title = normalizeBotText(topic?.title);
-  const keywords = (topic?.keywords || []).map(normalizeBotText).filter(Boolean);
+  const keywords = [
+    ...(topic?.keywords || []),
+    ...botTopicIntentTerms(topic)
+  ].map(normalizeBotText).filter(Boolean);
   const searchable = botTopicSearchText(topic);
   const topicCountries = botItemCountries(topic);
   const matchingBlocks = (topic?.blocks || []).filter(block =>
@@ -1110,6 +1134,24 @@ function searchBotLibrary(query) {
     explicitCountry,
     profileCountry
   };
+
+  // Prioridad absoluta al comando/alias/frase exacta. El normalizador elimina
+  // signos como el punto inicial, por eso ".loi" y "loi" llegan al mismo lugar.
+  const exactTopic = findExactBotTopic(library, normalizedQuery);
+  if (exactTopic) {
+    return {
+      ...queryContext,
+      results: [{
+        topic: exactTopic,
+        score: 10000,
+        matchedTerms: terms.length,
+        hasExplicitMarketMatch: Boolean(
+          explicitCountry &&
+          botItemMatchesCountry(exactTopic, explicitCountry)
+        )
+      }]
+    };
+  }
 
   const results = library
     .map(topic => scoreBotTopic(topic, queryContext))

@@ -12,6 +12,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@replit/object-storage": "^1.0.0",
     "express": "^5.0.0",
     "luxon": "^3.0.0",
     "pg": "^8.0.0",

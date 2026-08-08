@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const { Client: ObjectStorageClient } = require("@replit/object-storage");
 const { Pool } = require("pg");
 const webpush = require("web-push");
 const {
@@ -2504,6 +2505,137 @@ app.post(
         userId: row.user_id,
         name: row.name
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+
+
+// NU APP · MANYCHAT APP STORAGE V65
+// Sirve únicamente objetos rescatados bajo bot-library/_archive-manychat.
+// Mantiene soporte HTTP Range para video y evita exponer rutas arbitrarias.
+const botAssetStorage = new ObjectStorageClient();
+const BOT_ASSET_STORAGE_PREFIX = "bot-library/_archive-manychat/";
+
+function botAssetContentType(objectName) {
+  const extension = path.posix.extname(objectName).toLowerCase();
+  const types = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+    ".gif": "image/gif",
+    ".pdf": "application/pdf",
+    ".mp4": "video/mp4",
+    ".mov": "video/quicktime",
+    ".m4v": "video/x-m4v",
+    ".webm": "video/webm",
+    ".json": "application/json; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8"
+  };
+
+  return types[extension] || "application/octet-stream";
+}
+
+function parseBotAssetRange(rangeHeader, totalSize) {
+  const match = /^bytes=(\d*)-(\d*)$/i.exec(String(rangeHeader || "").trim());
+  if (!match || totalSize <= 0) return null;
+
+  const rawStart = match[1];
+  const rawEnd = match[2];
+  let start;
+  let end;
+
+  if (!rawStart) {
+    const suffixLength = Number(rawEnd);
+    if (!Number.isInteger(suffixLength) || suffixLength <= 0) return null;
+    start = Math.max(totalSize - suffixLength, 0);
+    end = totalSize - 1;
+  } else {
+    start = Number(rawStart);
+    end = rawEnd ? Number(rawEnd) : totalSize - 1;
+  }
+
+  if (
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start < 0 ||
+    start >= totalSize ||
+    end < start
+  ) {
+    return { unsatisfiable: true };
+  }
+
+  return {
+    start,
+    end: Math.min(end, totalSize - 1)
+  };
+}
+
+app.use(
+  "/api/bot-assets",
+  async (req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return res.status(405).set("Allow", "GET, HEAD").end();
+    }
+
+    try {
+      const relativePath = decodeURIComponent(req.path)
+        .replace(/^\/+/, "");
+
+      if (
+        !relativePath ||
+        relativePath.includes("..") ||
+        relativePath.includes("\\") ||
+        !/^[A-Za-z0-9._/-]+$/.test(relativePath)
+      ) {
+        return res.status(400).end();
+      }
+
+      const objectName = BOT_ASSET_STORAGE_PREFIX + relativePath;
+      const result = await botAssetStorage.downloadAsBytes(objectName);
+
+      if (!result?.ok) {
+        console.warn("[bot-assets] No disponible:", objectName, result?.error || "");
+        return res.status(404).end();
+      }
+
+      const rawBytes =
+        Array.isArray(result.value)
+          ? result.value[0]
+          : result.value;
+      const buffer = Buffer.from(rawBytes);
+      const totalSize = buffer.length;
+      const range = parseBotAssetRange(req.headers.range, totalSize);
+
+      res.set({
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": botAssetContentType(objectName),
+        "ETag": `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`
+      });
+
+      if (req.headers.range) {
+        if (!range || range.unsatisfiable) {
+          return res
+            .status(416)
+            .set("Content-Range", `bytes */${totalSize}`)
+            .end();
+        }
+
+        const chunk = buffer.subarray(range.start, range.end + 1);
+        res.status(206).set({
+          "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
+          "Content-Length": String(chunk.length)
+        });
+
+        return req.method === "HEAD" ? res.end() : res.send(chunk);
+      }
+
+      res.set("Content-Length", String(totalSize));
+      return req.method === "HEAD" ? res.end() : res.send(buffer);
     } catch (error) {
       next(error);
     }
