@@ -1,4 +1,4 @@
-const CACHE="nuapp-v92d-material-titles";
+const CACHE="nuapp-v93c-compact-favorite-days";
 
 const CORE=[
   "./",
@@ -17,7 +17,7 @@ const CORE=[
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=80-bot-legibility",
-  "./favorites.css?v=84-favorites-legibility",
+  "./favorites.css?v=93c-compact-day-grid",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
@@ -27,7 +27,7 @@ const CORE=[
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
   "./bot.js?v=68-tramites-espana",
-  "./favorites.js?v=63e-ios-thumbnails",
+  "./favorites.js?v=93b-routine-hierarchy",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=92d-material-titles",

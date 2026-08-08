@@ -3,6 +3,7 @@
 
 let savedFilter = "all";
 let favoriteOpenDay = null;
+let favoriteOpenRoutine = null;
 let favoriteSearchOpen = false;
 let favoriteSearchQuery = "";
 
@@ -245,7 +246,15 @@ function animateFavoriteTargets(src, day, saved = true) {
   });
 }
 
-function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
+function saveFavorite(
+  src,
+  label,
+  mediaType,
+  day = selectedDay,
+  url = null,
+  routineId = CURRENT_ROUTINE_ID,
+  routineTitle = ROUTINE_CATALOG[routineId]?.title || CURRENT_ROUTINE_TITLE
+) {
   if (navigator.vibrate) navigator.vibrate(10);
   const favs = getFavorites();
   const normalizedDay = Number(day);
@@ -253,7 +262,7 @@ function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
   const idx = favs.findIndex(
     favorite =>
       favorite.source === FAVORITE_SOURCE_ROUTINE &&
-      favorite.routineId === CURRENT_ROUTINE_ID &&
+      favorite.routineId === routineId &&
       favorite.src === src &&
       Number(favorite.day) === normalizedDay
   );
@@ -292,8 +301,8 @@ function saveFavorite(src, label, mediaType, day = selectedDay, url = null) {
 
   const draft = {
     source: FAVORITE_SOURCE_ROUTINE,
-    routineId: CURRENT_ROUTINE_ID,
-    routineTitle: CURRENT_ROUTINE_TITLE,
+    routineId,
+    routineTitle,
     src,
     label,
     mediaType,
@@ -368,7 +377,7 @@ function favoriteMatchesSearch(favorite, query) {
     "imagen imagenes foto fotos";
 
   const haystack = normalizeFavoriteSearch(
-    `${favorite.label || ""} ${typeLabel} dia ${day} día ${day} ${favorite.src || ""}`
+    `${favorite.routineTitle || ""} ${favorite.label || ""} ${typeLabel} dia ${day} día ${day} ${favorite.src || ""}`
   );
 
   return haystack.includes(needle);
@@ -425,6 +434,7 @@ function ensureFavoritesSearchPanel() {
 function openFavoritesSearch() {
   favoriteSearchOpen = true;
   favoriteOpenDay = null;
+  favoriteOpenRoutine = null;
 
   const view = document.getElementById("view-favoritos");
   const panel = ensureFavoritesSearchPanel();
@@ -561,7 +571,9 @@ function createFavoriteContentRow(favorite, order, allItems, day) {
       favorite.label,
       favorite.mediaType,
       day,
-      favorite.url
+      favorite.url,
+      favorite.routineId,
+      favorite.routineTitle
     );
 
     row.append(orderBadge, icon, copy, remove);
@@ -596,7 +608,9 @@ function createFavoriteContentRow(favorite, order, allItems, day) {
     favorite.label,
     favorite.mediaType,
     day,
-    favorite.url
+    favorite.url,
+    favorite.routineId,
+    favorite.routineTitle
   );
 
   row.append(orderBadge, preview, copy, remove);
@@ -797,7 +811,7 @@ function createBotFavoriteCard(saved) {
   return card;
 }
 
-function createFavoriteDayTile(day, items, allDayItems, favoritesView) {
+function createFavoriteDayTile(day, items, allDayItems, favoritesView, routineId) {
   const tile = document.createElement("button");
   tile.type = "button";
   tile.className = "favorite-day-tile";
@@ -815,7 +829,8 @@ function createFavoriteDayTile(day, items, allDayItems, favoritesView) {
 
   tile.append(preview, copy);
   tile.onclick = () => {
-    favoriteOpenDay = day;
+    favoriteOpenRoutine = routineId;
+    favoriteOpenDay = { routineId, day };
     favoriteSearchOpen = false;
     favoriteSearchQuery = "";
     const panel = document.getElementById("favoritesSearchPanel");
@@ -829,9 +844,45 @@ function createFavoriteDayTile(day, items, allDayItems, favoritesView) {
   return tile;
 }
 
+
+
+function createFavoriteRoutineTileV93b(routineId, visibleItems, allItems) {
+  const config = ROUTINE_CATALOG[routineId] || {};
+  const title = config.title || allItems[0]?.routineTitle || "Rutina";
+  const dayCount = new Set(allItems.map(item => Number(item.day) || 1)).size;
+  const tile = document.createElement("button");
+  tile.type = "button";
+  tile.className = "favorite-routine-tile";
+  tile.innerHTML = `
+    <span class="favorite-routine-cover">
+      <img src="${config.cover || ""}" alt="" loading="lazy" />
+    </span>
+    <span class="favorite-routine-copy">
+      <strong>${title}</strong>
+      <small>${allItems.length} material${allItems.length === 1 ? "" : "es"}</small>
+      <em>${dayCount} día${dayCount === 1 ? "" : "s"} con favoritos</em>
+    </span>
+    <span class="favorite-routine-arrow" aria-hidden="true">${ICONS.arrow}</span>`;
+  tile.setAttribute("aria-label", `Abrir favoritos de ${title}`);
+  tile.onclick = () => {
+    favoriteOpenRoutine = routineId;
+    favoriteOpenDay = null;
+    favoriteSearchOpen = false;
+    favoriteSearchQuery = "";
+    const panel = document.getElementById("favoritesSearchPanel");
+    if (panel) panel.hidden = true;
+    renderFavorites();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+  setupNativePressState(tile);
+  return tile;
+}
+
 function renderFavorites() {
   const list = document.getElementById("favoritesList");
-  const routineFavs = getRoutineFavorites();
+  const routineFavs = getFavorites().filter(favorite =>
+    favorite.source === FAVORITE_SOURCE_ROUTINE
+  );
   const botFavs = getSavedBotResponses();
   if (!list) return;
 
@@ -871,10 +922,82 @@ function renderFavorites() {
     return;
   }
 
+
+
+  if (favoriteOpenRoutine && !favoriteOpenDay) {
+    const routineId = favoriteOpenRoutine;
+    const config = ROUTINE_CATALOG[routineId] || {};
+    const rawRoutineItems = routineFavs.filter(favorite => favorite.routineId === routineId);
+    const visibleRoutineItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
+    if (!rawRoutineItems.length) {
+      favoriteOpenRoutine = null;
+      return renderFavorites();
+    }
+
+    list.innerHTML = "";
+    list.className = "favorites-list favorite-routine-screen";
+    const header = document.createElement("header");
+    header.className = "favorite-day-header favorite-routine-screen-header";
+    header.innerHTML = `
+      <button type="button" class="favorite-back-link" aria-label="Volver a Favoritos">
+        ${ICONS.back}<span>Favoritos</span>
+      </button>
+      <div class="favorite-day-title">
+        <small>De mis rutinas</small>
+        <h2>${config.title || rawRoutineItems[0]?.routineTitle || "Rutina"}</h2>
+        <span>${rawRoutineItems.length} material${rawRoutineItems.length === 1 ? "" : "es"} guardado${rawRoutineItems.length === 1 ? "" : "s"}</span>
+      </div>`;
+    header.querySelector("button").onclick = () => {
+      favoriteOpenRoutine = null;
+      savedFilter = "all";
+      renderFavorites();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+
+    const content = document.createElement("div");
+    content.className = "favorite-routine-days";
+    if (!visibleRoutineItems.length) {
+      content.innerHTML = `
+        <div class="favorite-day-filter-empty">
+          <strong>No hay materiales con este filtro</strong>
+          <span>Podés volver a ver todos los días guardados.</span>
+          <button type="button" class="empty-state-cta">Ver todos</button>
+        </div>`;
+      content.querySelector("button").onclick = () => {
+        savedFilter = "all";
+        renderFavorites();
+      };
+    } else {
+      const grouped = {};
+      visibleRoutineItems.forEach(favorite => {
+        const day = Number(favorite.day) || 1;
+        (grouped[day] ||= []).push(favorite);
+      });
+      Object.keys(grouped).map(Number).sort((a, b) => a - b).forEach(day => {
+        const items = sortFavoritesForDay(grouped[day], day);
+        const allDayItems = sortFavoritesForDay(
+          rawRoutineItems.filter(favorite => (Number(favorite.day) || 1) === day),
+          day
+        );
+        content.appendChild(createFavoriteDayTile(day, items, allDayItems, favoritesView, routineId));
+      });
+    }
+    list.append(header, content);
+    return;
+  }
+
   if (favoriteOpenDay) {
-    const day = Number(favoriteOpenDay);
+    const openFolder = typeof favoriteOpenDay === "object"
+      ? favoriteOpenDay
+      : { routineId: CURRENT_ROUTINE_ID, day: Number(favoriteOpenDay) };
+    const day = Number(openFolder.day);
+    const folderRoutineId = openFolder.routineId || CURRENT_ROUTINE_ID;
+    const folderRoutineTitle = ROUTINE_CATALOG[folderRoutineId]?.title || "Rutina";
     const rawDayItems = sortFavoritesForDay(
-      routineFavs.filter(favorite => (Number(favorite.day) || 1) === day),
+      routineFavs.filter(favorite =>
+        favorite.routineId === folderRoutineId &&
+        (Number(favorite.day) || 1) === day
+      ),
       day
     );
 
@@ -884,7 +1007,10 @@ function renderFavorites() {
     }
 
     const visibleItems = sortFavoritesForDay(
-      filteredRoutine.filter(favorite => (Number(favorite.day) || 1) === day),
+      filteredRoutine.filter(favorite =>
+        favorite.routineId === folderRoutineId &&
+        (Number(favorite.day) || 1) === day
+      ),
       day
     );
 
@@ -898,7 +1024,7 @@ function renderFavorites() {
         ${ICONS.back}<span>Favoritos</span>
       </button>
       <div class="favorite-day-title">
-        <small>${CURRENT_ROUTINE_TITLE}</small>
+        <small>${folderRoutineTitle}</small>
         <h2>Día ${day}</h2>
         <span>${rawDayItems.length} favorito${rawDayItems.length === 1 ? "" : "s"}</span>
       </div>
@@ -989,42 +1115,23 @@ function renderFavorites() {
   list.className = "favorites-list favorites-native-groups";
 
   if (filteredRoutine.length) {
+    // NU APP · JERARQUÍA DE FAVORITOS V93B
+    const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
+    const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
+      .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
     const routineSection = document.createElement("section");
-    routineSection.className = "favorite-native-section favorite-native-routine";
-
+    routineSection.className = "favorite-native-section favorite-native-routine favorite-routine-library";
     const sectionLabel = document.createElement("p");
     sectionLabel.className = "favorite-native-eyebrow";
     sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "De mis rutinas";
-
-    const routineHeader = document.createElement("div");
-    routineHeader.className = "favorite-native-routine-heading";
-    routineHeader.innerHTML = `
-      <span class="favorite-native-routine-icon">${ICONS.folder}</span>
-      <strong>${CURRENT_ROUTINE_TITLE}</strong>
-    `;
-
-    const grouped = {};
-    filteredRoutine.forEach(favorite => {
-      const day = Number(favorite.day) || 1;
-      (grouped[day] ||= []).push(favorite);
-    });
-
     const strip = document.createElement("div");
-    strip.className = "favorite-day-strip";
-
-    Object.keys(grouped)
-      .map(Number)
-      .sort((a, b) => a - b)
-      .forEach(day => {
-        const items = sortFavoritesForDay(grouped[day], day);
-        const allDayItems = sortFavoritesForDay(
-          routineFavs.filter(favorite => (Number(favorite.day) || 1) === day),
-          day
-        );
-        strip.appendChild(createFavoriteDayTile(day, items, allDayItems, favoritesView));
-      });
-
-    routineSection.append(sectionLabel, routineHeader, strip);
+    strip.className = "favorite-routine-strip";
+    visibleRoutineIds.forEach(routineId => {
+      const visibleItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
+      const allItems = routineFavs.filter(favorite => favorite.routineId === routineId);
+      strip.appendChild(createFavoriteRoutineTileV93b(routineId, visibleItems, allItems));
+    });
+    routineSection.append(sectionLabel, strip);
     list.appendChild(routineSection);
   }
 
