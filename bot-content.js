@@ -1031,34 +1031,68 @@
       "collagen",
       "15 descuento",
       "stela",
-      "pack 3"
+      "pack 3",
+      "oferta"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estrategia de ManyChat para crear una oferta de 3 Collagen+ en Europa mediante Stela."
+        "content": "Creá en Stela una oferta de 3 Collagen+ con un 15 % de descuento y compartila con tu cliente."
       },
       {
         "type": "document",
-        "title": "Estrategia Colágeno Europa",
+        "kicker": "ETAPA 1 DE 3",
+        "title": "Producto y descuento",
+        "description": "Prepará la oferta de 3 Collagen+.",
         "sections": [
           {
-            "title": "Cómo se arma la oferta",
-            "body": "Que bueno que tienes vendido un pack de 3 colágenos en Europa con nuestra estrategia del 15% de descuento por Stela por comprar el pack de 3 unidades.\n\nEs importante que sepas que como tal no existe ese pack de 3 colágenos en la pagina de Nu skin, entonces lo que hacemos es armar una oferta en Stela creándola con 3 colágenos y aplicándole el 15% off.   El codigo de producto que debes elegir cuando armes tu oferta es : 85892208 (en España)\n\nA continuación te dejamos un video tutorial."
+            "title": "Cómo funciona",
+            "body": "El pack de 3 Collagen+ no existe como producto independiente en la tienda de Nu Skin. Para ofrecerlo, tenés que crear en Stela una oferta con 3 unidades y aplicar un 15 % de descuento."
           },
           {
-            "title": "Cómo enviarla al cliente",
-            "body": "Recuerda primero pedirle su nombre, mail y teléfono para darle de alta como cliente tu, luego que tienes su usuario y contraseña, le creas el link de oferta y se lo envías...\n\nIndicandole a que INGRESE CON EL USUARIO Y CONTRASEÑA QUE LE ESTAS PASANDO que acabas de crear!\n\nSi la persona ya es cliente de antes porque por ejemplo te compro la lumispa, le pasas el link de la oferta y le indicas que ingrese con su usuario y contraseña que ya tiene y ahí vera el descuento en los colágenos, siempre que entre desde EL LINK DE LA OFERTA QUE LE ENVIASTE."
+            "title": "Código para España",
+            "body": "Seleccioná el producto con el código 85892208."
           }
         ]
       },
       {
-        "type": "link",
-        "title": "Video tutorial",
-        "url": "https://youtube.com/shorts/NYtC3fUyHz8?feature=share",
-        "actionLabel": "Abrir",
-        "description": "Estrategia Collagen+ Europa",
-        "resourceKind": "video"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 3",
+        "title": "Crear la oferta en Stela",
+        "description": "Configurá las unidades y aplicá el descuento.",
+        "sections": [
+          {
+            "title": "Configuración",
+            "body": "Creá una nueva oferta, agregá 3 unidades de Collagen+ y aplicá el 15 % de descuento. Al finalizar, generá el enlace de la oferta."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver video tutorial",
+            "description": "Cómo crear la oferta en Stela",
+            "url": "https://youtube.com/shorts/NYtC3fUyHz8?feature=share"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "ETAPA 3 DE 3",
+        "title": "Enviar la oferta al cliente",
+        "description": "Compartí el enlace y explicá cómo ingresar.",
+        "sections": [
+          {
+            "title": "Cliente nuevo",
+            "body": "Pedile su nombre, correo y teléfono para completar el alta de su cuenta. Luego compartile el enlace de la oferta y las indicaciones para ingresar."
+          },
+          {
+            "title": "Cliente existente",
+            "body": "Si ya tiene una cuenta, enviale el enlace de la oferta e indicá que ingrese con sus credenciales habituales."
+          },
+          {
+            "title": "Importante",
+            "body": "El descuento se mostrará cuando la persona ingrese desde el enlace específico de la oferta que le enviaste."
+          }
+        ]
       }
     ],
     "sourceFlow": "Estrategia Colageno Europa"
