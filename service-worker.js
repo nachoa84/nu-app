@@ -1,4 +1,4 @@
-const CACHE="nuapp-v82-guide-legibility";
+const CACHE="nuapp-v83-routine-progress-legibility";
 
 const CORE=[
   "./",
@@ -8,8 +8,8 @@ const CORE=[
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
-  "./daily.css?v=63e-ios-thumbnails",
-  "./progress.css?v=61b-progress-canonical",
+  "./daily.css?v=83-routine-progress-legibility",
+  "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=61b-progress-canonical",
   "./shared.css?v=61b-progress-canonical",
   "./ui-core.css?v=61b-progress-canonical",

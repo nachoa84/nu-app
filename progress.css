@@ -47,7 +47,7 @@
 #view-rutina .routine-page-header .page-kicker {
   margin-bottom: 2px;
   color: var(--progress-muted);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 760;
   letter-spacing: .07em;
 }
@@ -116,7 +116,7 @@
 #view-rutina .app-label {
   margin-bottom: 7px;
   color: var(--progress-olive);
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 820;
   letter-spacing: .085em;
 }
@@ -220,7 +220,7 @@
 #view-rutina .app-today-copy small {
   margin-top: 4px;
   color: var(--progress-muted);
-  font-size: 11.5px;
+  font-size: 13.5px;
 }
 
 #view-rutina .app-today-arrow {
@@ -250,7 +250,7 @@
   border-radius: 14px;
   background: var(--progress-brand-soft);
   color: #403b8e;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 770;
 }
 
@@ -296,7 +296,7 @@
 #view-rutina .app-week-open-head span {
   margin-top: 3px;
   color: var(--progress-muted);
-  font-size: 10.5px;
+  font-size: 12.5px;
 }
 
 .app-week-days {
@@ -329,7 +329,7 @@
   border: 1px solid #dfe2e6;
   background: #fff;
   color: #657080;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 760;
   box-shadow: none;
 }
