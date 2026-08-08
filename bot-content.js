@@ -407,39 +407,74 @@
     "keywords": [
       "tramites",
       "comisiones",
-      "documentacion",
-      "factura",
+      "acuerdo distribuidor",
+      "cuestionario",
+      "cuenta bancaria",
+      "formulario bancario",
       "Italia"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estos son los pasos cargados en ManyChat para cobrar comisiones en Italia."
+        "content": "Para habilitar el cobro de comisiones en Italia, completá estas tres etapas: aceptar el Acuerdo al Distribuidor, responder el cuestionario y enviar tus datos bancarios a Nu Skin."
       },
       {
         "type": "document",
-        "title": "Trámites · Italia",
+        "kicker": "ETAPA 1 DE 3",
+        "title": "Aceptar el Acuerdo al Distribuidor",
+        "description": "Aceptá el acuerdo desde tu cuenta de Nu Skin.",
         "sections": [
           {
-            "title": "Paso 1",
-            "body": "🇮🇹🇮🇹🇮🇹 Trámites para Italia 🇮🇹🇮🇹🇮🇹\n\nA continuación trámites administrativos para cobrar comisiones en cuenta bancaria\n\n🚨El afiliado debe contar con cuenta bancaria a su nombre\n\nPaso 1️⃣ ACEPTAR EL ACUERDO AL DISTRIBUIDOR\n\nIngresar al link con usuario y clave de la cuenta 👇🏽\n\nPaso 2️⃣ RESPONDER LAS PREGUNTAS (están en inglés)\n\nPaso 3️⃣ ENVIAR CUENTA BANCARIA POR MAIL (Adjunto el pdf)\n\nwesteurope@nuskin.com\n\nMODELO CUERPO DE MAIL 👇🏽\n\nGentile team Nu Skin,\ncon la presente desidero richiedere l’aggiornamento dei miei dati bancari per la ricezione dei pagamenti delle provvigioni. In allegato troverete il modulo compilato per la vostra elaborazione.\nVi chiedo gentilmente di confermare l’avvenuto aggiornamento o, in caso contrario, di indicarmi eventuali ulteriori informazioni necessarie.\nGrazie per la collaborazione.\nCordiali saluti,\n\n[Nombre y apellido]\n[Número ID]"
+            "title": "Acuerdo obligatorio",
+            "body": "Ingresá a tu cuenta de Nu Skin con tu usuario y contraseña. Buscá el Acuerdo al Distribuidor y aceptá sus términos para continuar con la habilitación del cobro de comisiones."
           }
         ],
-        "description": "Paso a paso importado del Bot de ManyChat."
+        "actions": [
+          {
+            "title": "Ingresar a Nu Skin",
+            "description": "Aceptar el Acuerdo al Distribuidor",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Abrir Nu Skin",
-        "url": "https://www.nuskin.com/vgclient/#/trainings",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Italia"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 3",
+        "title": "Completar el cuestionario",
+        "description": "Respondé las preguntas obligatorias, que se encuentran en inglés.",
+        "sections": [
+          {
+            "title": "Preguntas obligatorias",
+            "body": "Después de aceptar el Acuerdo al Distribuidor, completá y aprobá las preguntas solicitadas por Nu Skin. El cuestionario para Italia se presenta en inglés."
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "form-mci-it-IT.pdf",
-        "url": "/api/bot-assets/4a426b83e09ebe4fcaa79e02e6b72308aaa88a06508340a44591a885329fc779.pdf",
-        "actionLabel": "Abrir",
-        "description": "Trámites · Italia"
+        "type": "document",
+        "kicker": "ETAPA 3 DE 3",
+        "title": "Enviar tus datos bancarios",
+        "description": "Completá el formulario y envialo por correo a Nu Skin.",
+        "sections": [
+          {
+            "title": "Formulario bancario",
+            "body": "Descargá el formulario, completalo con tus datos bancarios y adjuntalo al correo."
+          },
+          {
+            "title": "Dirección de envío",
+            "body": "westeurope@nuskin.com"
+          },
+          {
+            "title": "Modelo de correo",
+            "body": "Gentile team Nu Skin,\n\ncon la presente desidero richiedere l’aggiornamento dei miei dati bancari per la ricezione dei pagamenti delle provvigioni. In allegato troverete il modulo compilato per la vostra elaborazione.\n\nVi chiedo gentilmente di confermare l’avvenuto aggiornamento o, in caso contrario, di indicarmi eventuali ulteriori informazioni necessarie.\n\nGrazie per la collaborazione.\nCordiali saluti,\n\n[Nombre y apellido]\n[Número ID]"
+          }
+        ],
+        "actions": [
+          {
+            "title": "Descargar formulario bancario",
+            "description": "Formulario para completar en PDF",
+            "url": "/api/bot-assets/4a426b83e09ebe4fcaa79e02e6b72308aaa88a06508340a44591a885329fc779.pdf"
+          }
+        ]
       }
     ],
     "country": "Italia",
