@@ -1,4 +1,4 @@
-const CACHE="nuapp-v93c-compact-favorite-days";
+const CACHE="nuapp-v94-bot-favorite-folders";
 
 const CORE=[
   "./",
@@ -17,7 +17,7 @@ const CORE=[
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=80-bot-legibility",
-  "./favorites.css?v=93c-compact-day-grid",
+  "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
@@ -26,8 +26,8 @@ const CORE=[
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
-  "./bot.js?v=68-tramites-espana",
-  "./favorites.js?v=93b-routine-hierarchy",
+  "./bot.js?v=94-favorite-folders",
+  "./favorites.js?v=94-bot-folders",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=92d-material-titles",

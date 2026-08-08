@@ -4,6 +4,7 @@
 let savedFilter = "all";
 let favoriteOpenDay = null;
 let favoriteOpenRoutine = null;
+let favoriteOpenBot = null;
 let favoriteSearchOpen = false;
 let favoriteSearchQuery = "";
 
@@ -435,6 +436,7 @@ function openFavoritesSearch() {
   favoriteSearchOpen = true;
   favoriteOpenDay = null;
   favoriteOpenRoutine = null;
+  favoriteOpenBot = null;
 
   const view = document.getElementById("view-favoritos");
   const panel = ensureFavoritesSearchPanel();
@@ -635,6 +637,7 @@ function botSavedDisplayData(saved) {
   const firstLine = text.split(/\n+/).map(line => line.trim()).find(Boolean) || "Respuesta guardada";
 
   const title =
+    saved?.topicTitle ||
     block?.title ||
     (block?.type === "text" ? String(block.content || "").trim().split(/\n+/)[0] : "") ||
     firstLine;
@@ -668,6 +671,56 @@ function botSavedDisplayData(saved) {
   };
 }
 
+
+
+function botSavedResourceCountV94(saved) {
+  return (Array.isArray(saved?.blocks) ? saved.blocks : [])
+    .filter(block => block && block.type !== "text")
+    .length;
+}
+
+function createSavedBotBlockV94(block, index) {
+  if (block.type === "text") {
+    const section = document.createElement("section");
+    section.className = "bot-folder-text";
+    String(block.content || "")
+      .split(/\n\s*\n/u)
+      .map(value => value.trim())
+      .filter(Boolean)
+      .forEach(value => {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = value;
+        section.appendChild(paragraph);
+      });
+    return section;
+  }
+
+  const row = document.createElement(block.type === "link" ? "a" : "button");
+  if (row.tagName === "BUTTON") row.type = "button";
+  row.className = `bot-folder-resource bot-folder-${block.type}`;
+  const title = block.title || block.description || `Recurso ${index}`;
+  const kind =
+    block.type === "document" ? "Documento" :
+    block.type === "link" ? (block.resourceKind === "video" ? "Video" : "Enlace") :
+    block.mediaType === "video" ? "Video" : "Imagen";
+  row.innerHTML = `
+    <span class="bot-folder-resource-icon">${block.type === "document" ? ICONS.folder : block.type === "media" && block.mediaType === "video" ? ICONS.play : ICONS.arrow}</span>
+    <span class="bot-folder-resource-copy">
+      <strong>${title}</strong>
+      <small>${[block.country, kind].filter(Boolean).join(" · ") || kind}</small>
+      ${block.description ? `<em>${block.description}</em>` : ""}
+    </span>
+    <span class="bot-folder-resource-arrow" aria-hidden="true">${ICONS.arrow}</span>`;
+  if (block.type === "link") {
+    row.href = block.url || "#";
+    row.target = "_blank";
+    row.rel = "noopener";
+  } else {
+    row.onclick = () => openSavedBotBlockV94(block);
+  }
+  return row;
+}
+
 function botSavedMatchesSearch(saved, query) {
   const needle = normalizeFavoriteSearch(query);
   if (!needle) return true;
@@ -690,26 +743,24 @@ function botSavedMatchesSearch(saved, query) {
 
 function botSavedMatchesFilter(saved, filter) {
   if (filter === "all") return true;
-  const data = botSavedDisplayData(saved);
-  return data.filterType === filter;
+  return (saved?.blocks || []).some(block =>
+    (filter === "image" && block?.type === "media" && block.mediaType === "image") ||
+    (filter === "video" && ((block?.type === "media" && block.mediaType === "video") || (block?.type === "link" && block.resourceKind === "video"))) ||
+    (filter === "link" && block?.type === "link")
+  );
 }
 
-function openSavedBotFavorite(saved) {
-  const data = botSavedDisplayData(saved);
-  const block = data.block;
+function openSavedBotBlockV94(block) {
   if (!block) return;
-
   if (block.type === "document") {
     openBotDocument(block);
     return;
   }
-
   if (block.type === "link") {
     const url = block.url || "";
     if (url) window.open(url, "_blank", "noopener,noreferrer");
     return;
   }
-
   if (block.type === "media" && block.src) {
     const sourceDay = botResourceRoutineDay(block);
     openMediaPreview(
@@ -725,6 +776,16 @@ function openSavedBotFavorite(saved) {
       sourceDay || selectedDay
     );
   }
+}
+
+function openSavedBotFavorite(saved) {
+  favoriteOpenBot = saved?.favoriteKey || botFavoriteKey(saved);
+  favoriteOpenRoutine = null;
+  favoriteOpenDay = null;
+  favoriteSearchOpen = false;
+  favoriteSearchQuery = "";
+  renderFavorites();
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function removeSavedBotFavorite(savedItem) {
@@ -787,7 +848,8 @@ function createBotFavoriteCard(saved) {
   title.textContent = data.title;
 
   const meta = document.createElement("small");
-  meta.textContent = [data.country, data.kind].filter(Boolean).join(" · ") || data.kind;
+  const resourceCount = botSavedResourceCountV94(saved);
+  meta.textContent = `${resourceCount} recurso${resourceCount === 1 ? "" : "s"}`;
 
   copy.append(title, meta);
   main.append(thumb, copy);
@@ -923,6 +985,43 @@ function renderFavorites() {
   }
 
 
+
+
+
+  if (favoriteOpenBot) {
+    const saved = botFavs.find(item => item.favoriteKey === favoriteOpenBot);
+    if (!saved) {
+      favoriteOpenBot = null;
+      return renderFavorites();
+    }
+    const title = saved.topicTitle || botSavedDisplayData(saved).title || "Respuesta guardada";
+    const blocks = Array.isArray(saved.blocks) ? saved.blocks.filter(Boolean) : [];
+    const resourceCount = botSavedResourceCountV94(saved);
+    list.innerHTML = "";
+    list.className = "favorites-list bot-folder-screen";
+    const header = document.createElement("header");
+    header.className = "favorite-day-header bot-folder-header";
+    header.innerHTML = `
+      <button type="button" class="favorite-back-link" aria-label="Volver a Favoritos">
+        ${ICONS.back}<span>Favoritos</span>
+      </button>
+      <div class="favorite-day-title">
+        <small>Del Bot</small>
+        <h2>${title}</h2>
+        <span>${resourceCount} recurso${resourceCount === 1 ? "" : "s"}</span>
+      </div>`;
+    header.querySelector("button").onclick = () => {
+      favoriteOpenBot = null;
+      savedFilter = "all";
+      renderFavorites();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+    const content = document.createElement("div");
+    content.className = "bot-folder-content";
+    blocks.forEach((block, index) => content.appendChild(createSavedBotBlockV94(block, index + 1)));
+    list.append(header, content);
+    return;
+  }
 
   if (favoriteOpenRoutine && !favoriteOpenDay) {
     const routineId = favoriteOpenRoutine;

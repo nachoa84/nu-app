@@ -88,12 +88,16 @@ function botFavoriteIdentityBlock(block) {
 }
 
 function botFavoriteKey(message) {
+  // NU APP · CARPETAS FAVORITAS DEL BOT V94
+  const topicId = normalizeBotText(message?.topicId || "");
+  if (topicId) return `bot-topic:${topicId}`;
+
   const blocks = Array.isArray(message?.blocks)
     ? message.blocks.map(botFavoriteIdentityBlock).filter(Boolean)
     : [];
 
   return JSON.stringify({
-    topicId: normalizeBotText(message?.topicId || ""),
+    topicId,
     text: normalizeBotText(botMessagePlainText(message)),
     blocks
   });
