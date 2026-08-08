@@ -1,4 +1,4 @@
-const CACHE="nuapp-v80-bot-legibility";
+const CACHE="nuapp-v81-home-navigation-legibility";
 
 const CORE=[
   "./",
@@ -7,14 +7,14 @@ const CORE=[
   "./base.css?v=61b-progress-canonical",
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
-  "./navigation.css?v=61b-progress-canonical",
+  "./navigation.css?v=81-home-navigation-legibility",
   "./daily.css?v=63e-ios-thumbnails",
   "./progress.css?v=61b-progress-canonical",
   "./media-preview.css?v=61b-progress-canonical",
   "./shared.css?v=61b-progress-canonical",
   "./ui-core.css?v=61b-progress-canonical",
   "./notifications.css?v=61b-progress-canonical",
-  "./home.css?v=61b-progress-canonical",
+  "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=80-bot-legibility",
   "./favorites.css?v=63e-ios-thumbnails",
@@ -36,7 +36,7 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=61b-progress-canonical",
-  "./guide.css?v=61e-guide-home-sections",
+  "./guide.css?v=81-home-navigation-legibility",
   "./guide-content.js?v=61c-guide-prototype",
   "./guide-view.js?v=61e-guide-home-sections",
   "./manifest.webmanifest?v=61b-progress-canonical",
