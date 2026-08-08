@@ -340,3 +340,37 @@ Object.values(PRODUCT_ROUTINE_DAYS).forEach(routine => {
   });
 });
 
+// NU APP · NOMBRES CANÓNICOS DE MATERIALES V96
+function canonicalRoutineDocumentLabelV96(routineId, block) {
+  if (routineId === "wellspa-10") return "Información técnica de WellSpa";
+  if (routineId === "lumispa-10") return "Información técnica de LumiSpa";
+  if (routineId === "galvanicspa-10") {
+    return /preguntas frecuentes/iu.test(String(block?.label || ""))
+      ? "Preguntas frecuentes de Galvanic Spa"
+      : "Información técnica de Galvanic Spa";
+  }
+  return block?.label || "Documento";
+}
+
+function normalizeRoutineDayMaterialNamesV96(routineId, day) {
+  const media = (day?.blocks || []).filter(block => block?.type === "media");
+  media.forEach((block, index) => {
+    block.label = `Historia ${index + 1} de ${media.length}`;
+  });
+  (day?.blocks || []).forEach(block => {
+    if (block?.type === "action" && block.resourceKind === "document") {
+      block.label = canonicalRoutineDocumentLabelV96(routineId, block);
+    }
+  });
+}
+
+Object.entries(PRODUCT_ROUTINE_DAYS).forEach(([routineId, routine]) => {
+  Object.values(routine.days || {}).forEach(day => {
+    normalizeRoutineDayMaterialNamesV96(routineId, day);
+  });
+});
+
+Object.values(COLLAGEN_ROUTINE_DAYS).forEach(day => {
+  normalizeRoutineDayMaterialNamesV96("collagen-30", day);
+});
+

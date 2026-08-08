@@ -585,17 +585,24 @@ function createFavoriteContentRow(favorite, order, allItems, day) {
 
   const mediaItems = allItems.filter(item => item.mediaType !== "link");
   const mediaIndex = mediaItems.findIndex(item => item.src === favorite.src);
+  // NU APP · NOMBRES CANÓNICOS DE MATERIALES V96
+  const normalizedMediaIndex = Math.max(mediaIndex, 0);
+  const displayLabel = `Historia ${normalizedMediaIndex + 1} de ${mediaItems.length}`;
+  const previewItems = mediaItems.map((item, index) => ({
+    ...item,
+    label: `Historia ${index + 1} de ${mediaItems.length}`
+  }));
 
   const preview = document.createElement("button");
   preview.type = "button";
   preview.className = "favorite-content-thumb";
   preview.appendChild(favoritePreviewNode(favorite));
-  preview.onclick = () => openMediaPreview(mediaItems, Math.max(mediaIndex, 0), day);
+  preview.onclick = () => openMediaPreview(previewItems, normalizedMediaIndex, day);
 
   const copy = document.createElement("button");
   copy.type = "button";
   copy.className = "favorite-content-copy";
-  copy.innerHTML = `<strong>${favorite.label}</strong><span>${favorite.mediaType === "video" ? "Video" : "Imagen"}</span>`;
+  copy.innerHTML = `<strong>${displayLabel}</strong><span>${favorite.mediaType === "video" ? "Video" : "Imagen"}</span>`;
   copy.onclick = preview.onclick;
 
   const remove = document.createElement("button");

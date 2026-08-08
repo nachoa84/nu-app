@@ -1,4 +1,4 @@
-const CACHE="nuapp-v95b-clean-quick-access-labels";
+const CACHE="nuapp-v96-routine-material-names";
 
 const CORE=[
   "./",
@@ -22,13 +22,13 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=92c-multiroutine-polish",
+  "./routine-products-v92.js?v=96-material-names",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
   "./bot.js?v=94-favorite-folders",
   "./bot-shortcuts-v95.js?v=95b-clean-labels",
-  "./favorites.js?v=94-bot-folders",
+  "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=92d-material-titles",
