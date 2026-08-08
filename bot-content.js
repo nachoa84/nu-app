@@ -1389,87 +1389,128 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Guía cargada en ManyChat para usar WellSpa."
+        "content": "Prepará tu ageLOC WellSpa iO y elegí la rutina que querés realizar: Revitaliza, Recupera o Restablece."
       },
       {
         "type": "document",
-        "title": "Cómo usar · WellSpa",
+        "kicker": "ANTES DE COMENZAR",
+        "title": "Preparación y seguimiento",
+        "description": "Registrá tu punto de partida y conocé el dispositivo.",
         "sections": [
           {
-            "title": "✨CÓMO USAR TU WELL SPA ✨",
-            "body": "✨CÓMO USAR TU WELL SPA ✨"
+            "title": "Fotografías",
+            "body": "Antes de comenzar, podés fotografiar las zonas que vas a tratar: de frente, de ambos costados y de espalda. Repetí las fotos después de las primeras sesiones y con el paso de las semanas para observar el progreso."
           },
           {
-            "title": "Mis primeras 2  recomendaciones IMPORTANTES son:",
-            "body": "Mis primeras 2  recomendaciones IMPORTANTES son:\n\n1. tomate FOTOS 📸 de todas las zonas que vayas a tratar (de frente, de ambos costados y de espaldas) ANTES de comenzar a usarla!! y luego de hacer tu 1er sesión (y a los días, y semanas..) para poder ir evaluando tu progreso ☺️🙌🏻\n\n2. MIDETE con un centímetro (midete las partes más finas y más anchas del abdomen/piernas/brazos/caderas) y toma nota de esas medidas📝! Para que puedas comparar luego 😃👍🏻"
+            "title": "Medidas",
+            "body": "También podés medir y anotar distintas zonas del abdomen, piernas, brazos y caderas para compararlas más adelante."
           },
           {
-            "title": "Tienes 3 tipos de “rutinas” que puedes hacer con este dispositivo:",
-            "body": "Tienes 3 tipos de “rutinas” que puedes hacer con este dispositivo:"
-          },
+            "title": "Tres rutinas",
+            "body": "WellSpa iO permite realizar tres rutinas diferentes. Cada una utiliza movimientos y productos específicos."
+          }
+        ],
+        "actions": [
           {
-            "title": "1️⃣ REVITALIZA:",
-            "body": "1️⃣ REVITALIZA:\n\n(usas la máquina con el producto: “Body SERUM”) esta función sirve para obtener basicamente los mismos beneficios que la galvanica Corporal : tonifica, reduce piel de naranja, alisa la piel y la hidrata ✔️"
-          },
-          {
-            "title": "2️⃣ RECUPERA:",
-            "body": "2️⃣ RECUPERA:\n\n(usas la máquina con producto: “Body Activating gel”) esto es lo Mas nuevo que nos trae la WellSpa iO ! Esta rutina nos ayuda a recuperar y preparar mejor el cuerpo para antes y después de ejercitarnos, de tener un largo dia. Proporciona un masaje previo al entrenamiento que ayuda a despertar/accionar esos músculos que se van a sentir estimulados y listos para funcionar . Y luego de entrenar nos proporciona un masaje para relajar los músculos cansados, fomentando la relajación, la recuperación y la frescura. Ayuda a aumentar la MOVILIDAD CORPORAL ya que disminuye la tensión que queda en los músculos luego de entrenar!"
-          },
-          {
-            "title": "3️⃣ REESTABLECE:",
-            "body": "3️⃣ REESTABLECE:\n\n(nuevamente, la máquina la usas junto al “Body Activating gel”) trabaja el bienestar INTERIOR , ayuda a que nos sintamos mas RELAJADOS. Reduce la inflamación y favorece el movimiento de fluidos en conjunto a determinados movimientos, ayudando a que las extremidades se sientan más ligeras"
+            "title": "Ver video de uso",
+            "description": "Tutorial de WellSpa iO",
+            "url": "https://youtu.be/kEaTX6b0RMk"
           }
         ]
       },
       {
-        "type": "link",
-        "title": "VER VIDEO",
-        "url": "https://youtu.be/kEaTX6b0RMk?si=vPanoEq8jUjf6WnU",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa",
-        "resourceKind": "video"
+        "type": "document",
+        "kicker": "RUTINA 1",
+        "title": "Revitaliza",
+        "description": "Rutina con Body Serum para el cuidado de la piel.",
+        "sections": [
+          {
+            "title": "Producto",
+            "body": "Utilizá WellSpa iO junto con Body Serum."
+          },
+          {
+            "title": "Objetivo de la rutina",
+            "body": "Esta rutina está orientada a mejorar la apariencia, suavidad e hidratación de la piel mediante el masaje corporal."
+          }
+        ],
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver rutina Revitaliza",
+        "items": [
+          {
+            "src": "/api/bot-assets/f6bd35061252b46cfcc9251a4cc40d22feb17693114bf84e73f737cdcddea451.jpeg",
+            "label": "Revitaliza · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/beb348862f8007d482e02995e31ea49ab2f0f538e2a80abb04ce06be30e8f869.jpeg",
+            "label": "Revitaliza · Parte 2",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.54.jpeg",
-        "url": "/api/bot-assets/f6bd35061252b46cfcc9251a4cc40d22feb17693114bf84e73f737cdcddea451.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
+        "type": "document",
+        "kicker": "RUTINA 2",
+        "title": "Recupera",
+        "description": "Masaje corporal antes o después de la actividad física.",
+        "sections": [
+          {
+            "title": "Producto",
+            "body": "Utilizá WellSpa iO junto con Body Activating Gel."
+          },
+          {
+            "title": "Antes de ejercitarte",
+            "body": "Realizá el masaje como preparación previa a la actividad física."
+          },
+          {
+            "title": "Después de ejercitarte",
+            "body": "Utilizá la rutina como masaje posterior para favorecer una sensación de relajación y recuperación en los músculos trabajados."
+          }
+        ],
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver rutina Recupera",
+        "items": [
+          {
+            "src": "/api/bot-assets/c83b726135bff0061c10e0f308bdfef82c97c6d1fcd4724b2ae66206fa6b2316.jpeg",
+            "label": "Recupera · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/3964f2995396cf8f55cf4a2c1a5c838137b49b4c5dc239cc9be879dbb1385faf.jpeg",
+            "label": "Recupera · Parte 2",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.54 (1).jpeg",
-        "url": "/api/bot-assets/beb348862f8007d482e02995e31ea49ab2f0f538e2a80abb04ce06be30e8f869.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.55.jpeg",
-        "url": "/api/bot-assets/c83b726135bff0061c10e0f308bdfef82c97c6d1fcd4724b2ae66206fa6b2316.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.55 (1).jpeg",
-        "url": "/api/bot-assets/3964f2995396cf8f55cf4a2c1a5c838137b49b4c5dc239cc9be879dbb1385faf.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.55 (2).jpeg",
-        "url": "/api/bot-assets/1442bc74657d4103065a8f00b4c51c0ebefc50dfb85d08427a524e892277b685.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.54.56.jpeg",
-        "url": "/api/bot-assets/9122c8bdac58759ac1df1ef8764b32958aa502fc43599dd8bdf2a7c7b808550f.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · WellSpa"
+        "type": "document",
+        "kicker": "RUTINA 3",
+        "title": "Restablece",
+        "description": "Rutina de masaje orientada al bienestar y la relajación.",
+        "sections": [
+          {
+            "title": "Producto",
+            "body": "Utilizá WellSpa iO junto con Body Activating Gel."
+          },
+          {
+            "title": "Objetivo de la rutina",
+            "body": "Esta rutina combina movimientos de masaje orientados a favorecer la relajación, el bienestar y una sensación de ligereza corporal."
+          }
+        ],
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver rutina Restablece",
+        "items": [
+          {
+            "src": "/api/bot-assets/1442bc74657d4103065a8f00b4c51c0ebefc50dfb85d08427a524e892277b685.jpeg",
+            "label": "Restablece · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/9122c8bdac58759ac1df1ef8764b32958aa502fc43599dd8bdf2a7c7b808550f.jpeg",
+            "label": "Restablece · Parte 2",
+            "mediaType": "image"
+          }
+        ]
       }
     ],
     "sourceFlow": "COMO USAR",
@@ -1501,14 +1542,28 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Guía cargada en ManyChat para usar Face Wash 180."
+        "content": "Consultá esta guía visual para aprender a utilizar Face Wash 180 correctamente."
       },
       {
-        "type": "link",
-        "title": "WhatsApp Image 2025-10-16 at 21.55.57.jpeg",
-        "url": "/api/bot-assets/2f547148a45fc71700942a8cee95b7e2b0d72f3c66d7f1101fc78164d7b1caf9.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Cómo usar · Face Wash 180"
+        "type": "document",
+        "kicker": "GUÍA DE USO",
+        "title": "Face Wash 180",
+        "description": "Instrucciones visuales de aplicación.",
+        "sections": [
+          {
+            "title": "Cómo utilizarlo",
+            "body": "Abrí la guía visual y seguí las indicaciones de aplicación paso a paso."
+          }
+        ],
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver instrucciones de uso",
+        "items": [
+          {
+            "src": "/api/bot-assets/2f547148a45fc71700942a8cee95b7e2b0d72f3c66d7f1101fc78164d7b1caf9.jpeg",
+            "label": "Cómo usar Face Wash 180",
+            "mediaType": "image"
+          }
+        ]
       }
     ],
     "sourceFlow": "COMO USAR",
