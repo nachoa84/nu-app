@@ -1,4 +1,4 @@
-const CACHE="nuapp-v85a-media-preview-legibility";
+const CACHE="nuapp-v86-notifications-legibility";
 
 const CORE=[
   "./",
@@ -13,7 +13,7 @@ const CORE=[
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=61b-progress-canonical",
   "./ui-core.css?v=61b-progress-canonical",
-  "./notifications.css?v=61b-progress-canonical",
+  "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=80-bot-legibility",

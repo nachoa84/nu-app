@@ -393,3 +393,48 @@ body.notification-settings-open {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   V86 · Legibilidad de Notificaciones
+   Tipografía y contraste, sin cambios en la lógica push.
+   ========================================================= */
+
+.notification-settings-intro {
+  color: #66707c;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.notification-settings-copy span {
+  color: #68717c;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.notification-enable-btn {
+  font-size: 13.5px;
+  font-weight: 780;
+}
+
+.notification-change-time-btn {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.notification-time-picker-labels {
+  color: #727b87;
+  font-size: 12px;
+}
+
+.notification-time-option {
+  opacity: .44;
+}
+
+.notification-time-option.is-selected {
+  opacity: 1;
+}
+
+.notification-time-actions button {
+  font-size: 14px;
+  font-weight: 760;
+}
