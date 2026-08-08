@@ -26,7 +26,7 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Perfecto!\nEnviar la carta LOI, es la forma de avisarle a Nu Skin que inicias el camino para convertirte en Representante de Marca, es un paso muy simple pero obligatorio que se hace desde la oficina virtual.\nDesde que dispositivo prefieres hacerlo:\n\nDesde el MOVIL\n\nDesde el PC"
+        "content": "¡Perfecto!\nEnviar la carta LOI es la forma de avisarle a Nu Skin que iniciás el camino para convertirte en Representante de Marca. Es un paso muy simple, pero obligatorio, que se realiza desde la oficina virtual."
       },
       {
         "type": "link",
@@ -2133,7 +2133,7 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Te comparto este tutorial para aprender a navegar la página web, a encontrar los precios, a saber si hay Stock, cuántos puntos da un producto, etc.\n\n😉 espero que te sirva!!!"
+        "content": "Te comparto este tutorial para aprender a navegar la página web, a encontrar los precios, a saber si hay stock, cuántos puntos da un producto, etc.\n\n¡Espero que te sirva!"
       },
       {
         "type": "link",
