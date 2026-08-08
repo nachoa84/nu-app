@@ -2513,11 +2513,11 @@ app.post(
 
 
 
-// NU APP · MANYCHAT APP STORAGE V65
-// Sirve únicamente objetos rescatados bajo bot-library/_archive-manychat.
+// NU APP · BOT ACTIVE APP STORAGE V66
+// Sirve únicamente recursos canónicos publicados bajo bot/active/.
 // Mantiene soporte HTTP Range para video y evita exponer rutas arbitrarias.
 const botAssetStorage = new ObjectStorageClient();
-const BOT_ASSET_STORAGE_PREFIX = "bot-library/_archive-manychat/";
+const BOT_ASSET_STORAGE_PREFIX = "bot/active/";
 
 function botAssetContentType(objectName) {
   const extension = path.posix.extname(objectName).toLowerCase();
@@ -2674,7 +2674,10 @@ function isBlockedPublicPath(requestPath) {
       ".sql",
       ".log",
       ".bak",
-      ".backup"
+      ".backup",
+      ".py",
+      ".sh",
+      ".tgz"
     ]);
 
   const blockedDirectory =
@@ -2683,6 +2686,8 @@ function isBlockedPublicPath(requestPath) {
       segment === "attached_assets" ||
       segment === "migration-collagen-assets-v1" ||
       segment === "collagen-assets-downloader-v1" ||
+      segment === "_archive-manychat" ||
+      segment.startsWith("_backup-") ||
       segment.startsWith("_entrega-") ||
       segment.startsWith(
         "respaldo-"

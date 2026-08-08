@@ -169,42 +169,42 @@
       {
         "type": "link",
         "title": "Abrir recurso",
-        "url": "https://mc.ht/s/zgxLOO-",
+        "url": "https://seti.afip.gob.ar/padron-puc-constancia-internet/ConsultaConstanciaAction.do",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       },
       {
         "type": "link",
         "title": "Abrir recurso",
-        "url": "https://mc.ht/s/ml0UZDS",
+        "url": "https://www.nuskin.com/vgclient/#/trainings",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       },
       {
         "type": "link",
         "title": "Captura de pantalla 2023-02-21 a la(s) 16.02.41.png",
-        "url": "/api/bot-assets/raw/images/19191495852f__big_de34be27a8868afb6a87a713a7209686.png",
+        "url": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-01-08 at 16.49.47.jpeg",
-        "url": "/api/bot-assets/raw/images/b32a6e8119cd__big_a5a031e4cf9f027f17d17fb72707fce6.jpeg",
+        "url": "/api/bot-assets/8ea6987080e225bf4380bd791c3456e927806830678fb24b2ef5b67dcadd778d.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-01-08 at 16.49.47 (1).jpeg",
-        "url": "/api/bot-assets/raw/images/180165c8f467__big_bb42b3c29c20f9c044722699d9507959.jpeg",
+        "url": "/api/bot-assets/556a43ff951dc5e311edca673d87336ff6a6b5527f47d0cecbe6760619e59669.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       },
       {
         "type": "link",
         "title": "ar16.17.pdf",
-        "url": "/api/bot-assets/raw/files/15a7ce4a7a4a__ar16.17.pdf",
+        "url": "/api/bot-assets/3fcf843de2056a6fbfb65a3227c1ab74865368071985349366a1763d7d75cd6e.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · Argentina"
       }
@@ -265,42 +265,42 @@
       {
         "type": "link",
         "title": "Vol.png",
-        "url": "/api/bot-assets/raw/images/c687aacd2c0c__big_798ffcb9c7b6a23603ca1102731fb0ea.png",
+        "url": "/api/bot-assets/7b7aee3922cc9de41b4901879868b78584129d99fdb7875b38e4597ff70365f0.png",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       },
       {
         "type": "link",
         "title": "depo.png",
-        "url": "/api/bot-assets/raw/images/8aa72948e09d__big_61e4d1e30e6351d4e0c8b49aee9e8246.png",
+        "url": "/api/bot-assets/4e1e95518e5cc9ef65ad6f4f18e637661cc9773a937f39da8cac4260db8e20b5.png",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-12-15 at 21.34.00.jpeg",
-        "url": "/api/bot-assets/raw/images/3100f31abb0c__big_2b76eeb005716941a6557879e1928609.jpeg",
+        "url": "/api/bot-assets/4e96e32fc7c29285ab3297118ef024341e38e45cb4240e10bf121b0c87e364d0.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-12-15 at 21.34.37.jpeg",
-        "url": "/api/bot-assets/raw/images/21f481730735__big_fbab2381a14a6d6ffda623480414a2c0.jpeg",
+        "url": "/api/bot-assets/5f78109e3e6a4ba832116c6997b0007f4dfc1038c9befb76b4e1f55070956da3.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       },
       {
         "type": "link",
         "title": "Captura de pantalla 2023-02-21 a la(s) 16.02.41.png",
-        "url": "/api/bot-assets/raw/images/19191495852f__big_de34be27a8868afb6a87a713a7209686.png",
+        "url": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       },
       {
         "type": "link",
         "title": "Captura de pantalla 2023-02-21 a la(s) 16.05.22.png",
-        "url": "/api/bot-assets/raw/images/d5bbcd7fdabe__big_b40401cae7fc8514c22d3b01eefa7b2c.png",
+        "url": "/api/bot-assets/daa9e4e0b6f44f444d3bd854d5b90bd2e7d45dbdd9ba84e3a4c642322ff2c47c.png",
         "actionLabel": "Abrir",
         "description": "Trámites · España"
       }
@@ -360,7 +360,7 @@
       {
         "type": "link",
         "title": "form-mci-it-IT.pdf",
-        "url": "/api/bot-assets/raw/files/999b0183c70e__form-mci-it-IT.pdf",
+        "url": "/api/bot-assets/4a426b83e09ebe4fcaa79e02e6b72308aaa88a06508340a44591a885329fc779.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · Italia"
       }
@@ -438,35 +438,35 @@
       {
         "type": "link",
         "title": "MX66.67.pdf",
-        "url": "/api/bot-assets/raw/files/bb1dc0202839__MX66.67.pdf",
+        "url": "/api/bot-assets/97bec3ced436dde87eb27ff20cb674cf2870c8667b94aac35dffac824e22c646.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · México"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.42.jpeg",
-        "url": "/api/bot-assets/raw/images/81f996a1c7ff__big_474830d3cd0b715cd5609fc466bf0e89.jpeg",
+        "url": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · México"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.42 (1).jpeg",
-        "url": "/api/bot-assets/raw/images/83f473b2064d__big_091ec8a7a7ae7440952779b30b8bb151.jpeg",
+        "url": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · México"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.43.jpeg",
-        "url": "/api/bot-assets/raw/images/32322446c918__big_3eaf1655fa291214dfb26546e7295a81.jpeg",
+        "url": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · México"
       },
       {
         "type": "link",
         "title": "MX68.70.pdf",
-        "url": "/api/bot-assets/raw/files/e9f3d1790f6a__MX68.70.pdf",
+        "url": "/api/bot-assets/4e8b85077caa8a85108c961bfee2a92a2cc99f11fd56b55e3eaf9202d18f86a9.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · México"
       }
@@ -523,21 +523,21 @@
       {
         "type": "link",
         "title": "Abrir recurso",
-        "url": "https://mc.ht/s/-ekrJW_",
+        "url": "/api/bot-assets/f65f14d01b558c33558d31103fedfc627b4c119328ea2df96af2c01e6bbf7f2a.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       },
       {
         "type": "link",
         "title": "Proceso de Cobro de comisiones Perú - 2023.pdf",
-        "url": "/api/bot-assets/raw/files/c948bd82fdd0__Proceso_de_Cobro_de_comisiones_Per-_-_2023.pdf",
+        "url": "/api/bot-assets/5bc97737202e7bace3f0415cbaa3ccde57ef8b720e828ee6b25f838fa877791c.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       },
       {
         "type": "link",
         "title": "pe_formato_deposito_comisiones.pdf",
-        "url": "/api/bot-assets/raw/files/3555d42191d9__pe_formato_deposito_comisiones.pdf",
+        "url": "/api/bot-assets/1c492a85c8e7eb48b6ebd1302f0fa4b67819d50c9f7d54eba5246df7e3f14fea.pdf",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       },
@@ -551,21 +551,21 @@
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.42.jpeg",
-        "url": "/api/bot-assets/raw/images/81f996a1c7ff__big_474830d3cd0b715cd5609fc466bf0e89.jpeg",
+        "url": "/api/bot-assets/bdf261c1fe50022c0855e527a77ee44b0524076bf360a370117af055239064ea.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.42 (1).jpeg",
-        "url": "/api/bot-assets/raw/images/83f473b2064d__big_091ec8a7a7ae7440952779b30b8bb151.jpeg",
+        "url": "/api/bot-assets/4012d11483ab4d3bbcc5b3a30db4c99feb949cf9c9b0e5fbd9fbd3b33e40cbf2.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2026-05-20 at 22.46.43.jpeg",
-        "url": "/api/bot-assets/raw/images/32322446c918__big_3eaf1655fa291214dfb26546e7295a81.jpeg",
+        "url": "/api/bot-assets/c4027d70de068e1ba045ea66e61d48cb5d791ba54449ad6bdf33bfcd9736b2ed.jpeg",
         "actionLabel": "Abrir",
         "description": "Trámites · Perú"
       }
@@ -1070,42 +1070,42 @@
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.54.jpeg",
-        "url": "/api/bot-assets/raw/images/f5508031509e__big_d0f4b3cfed910a3ac637db282c0702cd.jpeg",
+        "url": "/api/bot-assets/f6bd35061252b46cfcc9251a4cc40d22feb17693114bf84e73f737cdcddea451.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.54 (1).jpeg",
-        "url": "/api/bot-assets/raw/images/c09f5142ef0c__big_6bbe15d2a5caf8d7c1a4cee8d7227534.jpeg",
+        "url": "/api/bot-assets/beb348862f8007d482e02995e31ea49ab2f0f538e2a80abb04ce06be30e8f869.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.55.jpeg",
-        "url": "/api/bot-assets/raw/images/4fcd17325264__big_9615071182ddc56c5935ee3ef0de7311.jpeg",
+        "url": "/api/bot-assets/c83b726135bff0061c10e0f308bdfef82c97c6d1fcd4724b2ae66206fa6b2316.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.55 (1).jpeg",
-        "url": "/api/bot-assets/raw/images/f494ac7e6bd0__big_7d3294ea9dd7b8ac5159dd8912ab57c3.jpeg",
+        "url": "/api/bot-assets/3964f2995396cf8f55cf4a2c1a5c838137b49b4c5dc239cc9be879dbb1385faf.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.55 (2).jpeg",
-        "url": "/api/bot-assets/raw/images/df35a5dd34d4__big_60497a3185678883484952869bc2c8ef.jpeg",
+        "url": "/api/bot-assets/1442bc74657d4103065a8f00b4c51c0ebefc50dfb85d08427a524e892277b685.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       },
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.54.56.jpeg",
-        "url": "/api/bot-assets/raw/images/9cf04dee8a86__big_f13b16d8d63e3251fee8cce3a79040e5.jpeg",
+        "url": "/api/bot-assets/9122c8bdac58759ac1df1ef8764b32958aa502fc43599dd8bdf2a7c7b808550f.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · WellSpa"
       }
@@ -1144,7 +1144,7 @@
       {
         "type": "link",
         "title": "WhatsApp Image 2025-10-16 at 21.55.57.jpeg",
-        "url": "/api/bot-assets/raw/images/775b26433139__big_af6c64ddcdbdee6cfbaeb7239fc5166f.jpeg",
+        "url": "/api/bot-assets/2f547148a45fc71700942a8cee95b7e2b0d72f3c66d7f1101fc78164d7b1caf9.jpeg",
         "actionLabel": "Abrir",
         "description": "Cómo usar · Face Wash 180"
       }
@@ -1287,28 +1287,28 @@
       {
         "type": "link",
         "title": "Ficha técnica LATAM",
-        "url": "/api/bot-assets/raw/files/e321cf2a8276__22e48bd02a90c7ea19ce0e117e8eb94a.pdf",
+        "url": "/api/bot-assets/6ad525fc49b180e60b1da0b1e5b6637979ecd66f98918d060ae832ac9d3aca45.pdf",
         "actionLabel": "Abrir",
         "description": "(AR) Beauty-Focus-Collagen Plus-PIP.pdf"
       },
       {
         "type": "link",
         "title": "Ficha técnica Europa",
-        "url": "/api/bot-assets/raw/files/8528d83e96f8__beauty-focus-collagen-plus-pip-es.pdf",
+        "url": "/api/bot-assets/a2032b0a402fbb73742f1f864c791b7585c1c01ca933e33fc832a9eac20c0798.pdf",
         "actionLabel": "Abrir",
         "description": "beauty-focus-collagen-plus-pip-es.pdf"
       },
       {
         "type": "link",
         "title": "Paper científico en inglés",
-        "url": "/api/bot-assets/raw/files/b9b22cc5a6a1__d22ff0f03eedd71f97d0d3d17fc46d21.pdf",
+        "url": "/api/bot-assets/ac22f70433e35e0e104bcb1e030a313ac37a47913b920f34977ef2631c5c46a2.pdf",
         "actionLabel": "Abrir",
         "description": "NS - Estudio Científico Collagen+.pdf"
       },
       {
         "type": "link",
         "title": "Estudio en español",
-        "url": "/api/bot-assets/raw/files/102cc0116c63__beauty-focus-collagen-plus-clinical-bulletin-spanish.pdf",
+        "url": "/api/bot-assets/0b8e1af100bb4914db51b7ef889664777844ccb6f662d211e708ffcac39a2930.pdf",
         "actionLabel": "Abrir",
         "description": "beauty-focus-collagen-plus-clinical-bulletin-spanish.pdf"
       }
@@ -1377,7 +1377,7 @@
       {
         "type": "link",
         "title": "Placa de apoyo LumiSpa",
-        "url": "/api/bot-assets/raw/images/a81743128a0e__big_13fe13e2d1972c1e87939ccb2abf066a.jpeg",
+        "url": "/api/bot-assets/77fa3276fe668110c078d3ee34db2a26a812bf918d2b72eeba4434dea7985f7b.jpeg",
         "actionLabel": "Abrir",
         "description": "WhatsApp Image 2025-12-03 at 13.13.22.jpeg"
       },
@@ -1569,7 +1569,7 @@
       {
         "type": "link",
         "title": "Tutorial · Crear una oferta",
-        "url": "https://mc.ht/s/2dY9fO5",
+        "url": "https://www.youtube.com/watch?v=rRPg_-xCEzo&feature=youtu.be",
         "actionLabel": "Abrir",
         "description": "El ejemplo usa LumiSpa, pero el procedimiento puede aplicarse a otros productos.",
         "resourceKind": "video"
@@ -1607,7 +1607,7 @@
       {
         "type": "link",
         "title": "Tutorial · Crear nuevo ID",
-        "url": "/api/bot-assets/raw/files/1c8fe7f28b2f__WhatsApp_Video_2024-10-28_at_23.36.28.mp4",
+        "url": "/api/bot-assets/03730b48c8edecdce583e806d3d7f435e482ea58ac158982f8e7a69977c2a265.mp4",
         "actionLabel": "Abrir",
         "description": "Alta de cliente, miembro o afiliado",
         "resourceKind": "video"

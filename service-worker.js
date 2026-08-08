@@ -1,4 +1,4 @@
-const CACHE="nuapp-v65-manychat-storage";
+const CACHE="nuapp-v66-bot-active-storage";
 
 const CORE=[
   "./",
@@ -18,7 +18,7 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=61b-progress-canonical",
   "./favorites.css?v=63e-ios-thumbnails",
-  "./bot-content.js?v=65-manychat-storage",
+  "./bot-content.js?v=66-bot-active-storage",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
