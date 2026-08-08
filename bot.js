@@ -487,7 +487,7 @@ function openBotDocument(documentBlock) {
     galleryCopy.className = "bot-document-gallery-copy";
 
     const galleryKind = document.createElement("small");
-    galleryKind.textContent = "CUESTIONARIO OBLIGATORIO";
+    galleryKind.textContent = documentBlock.galleryKicker || "GALERÍA";
 
     const galleryTitle = document.createElement("strong");
     galleryTitle.textContent =

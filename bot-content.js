@@ -273,75 +273,113 @@
     "keywords": [
       "tramites",
       "comisiones",
-      "documentacion",
-      "factura",
+      "cuenta bancaria",
+      "deposito directo",
+      "acuerdo distribuidor",
+      "cuestionario",
       "España"
     ],
     "blocks": [
       {
         "type": "text",
-        "content": "Estos son los pasos cargados en ManyChat para cobrar comisiones en España."
+        "content": "Para habilitar el cobro de comisiones en España, completá estas tres etapas. Necesitás una cuenta bancaria a tu nombre de un banco nacional. No se admiten cuentas digitales como N26, Revolut, Wise o similares."
       },
       {
         "type": "document",
-        "title": "Trámites · España",
+        "kicker": "ETAPA 1 DE 3",
+        "title": "Aceptar el Acuerdo al Distribuidor",
+        "description": "Aceptá las políticas y condiciones desde tu cuenta de Nu Skin.",
         "sections": [
           {
-            "title": "Paso 1",
-            "body": "🇪🇸🇪🇸🇪🇸 Trámites para ESPAÑA 🇪🇸🇪🇸🇪🇸\n\nA continuación trámites administrativos para cobrar las comisiones en tu cuenta bancaria.\n\n🚨 El afiliado debe contar con cuenta bancaria a su nombre.\n\n🚨 Tiene que ser un banco Nacional, no se admiten cuentas digitales (N26, REVOLUT, WISE, o similares).\n\nSon solo 3 sencillos pasos.\n\n1️⃣ ACEPTAR EL ACUERDO AL DISTRIBUIDOR\n\n- ingresa en...\n\nVolumenes y My Workspace\n\n- Ingresar en tu cuenta de Nu Skin, luego haz click sobre tu nombre,\n\n- Acepta la Ventana emergente con políticas y condiciones!  ✅"
-          },
-          {
-            "title": "Paso 2",
-            "body": "2️⃣ Informa a Nu Skin tu cuenta bancaria.\n\n- Ingresar en tu cuenta de Nu Skin, luego haz click sobre tu nombre.\n\n- Elige Perfil\n- Luego Depósito Directo\n- Completa los datos de tu Banco y código IBAN.\n\n3️⃣ Completar Preguntas sobre las políticas y procedimientos.\n\n- Ingresar en tu cuenta de Nu Skin, luego haz click sobre tu nombre.\n\n- Dirígete a Volúmenes y My Workspace.\n\n- Luego elige Formaciones y selecciona el Curso que se llama \"Conceptos Básicos sobre Normas\"\n\ny aquí a continuación tienes las afirmaciones correctas a cumplimentar!"
-          },
-          {
-            "title": "Paso 3",
-            "body": "Genial!\n\nHabiendo cumplido estos pasos,\nen pocos días hábiles recibirás automáticamente las comisiones en tu cuenta bancaria."
+            "title": "Dónde encontrarlo",
+            "body": "Ingresá a tu cuenta de Nu Skin y abrí Volúmenes y My Workspace. Luego tocá tu nombre y aceptá la ventana emergente con las políticas y condiciones."
           }
         ],
-        "description": "Paso a paso importado del Bot de ManyChat."
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver dónde aceptar el acuerdo",
+        "items": [
+          {
+            "src": "/api/bot-assets/7b7aee3922cc9de41b4901879868b78584129d99fdb7875b38e4597ff70365f0.png",
+            "label": "Aceptar el Acuerdo al Distribuidor",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Vol.png",
-        "url": "/api/bot-assets/7b7aee3922cc9de41b4901879868b78584129d99fdb7875b38e4597ff70365f0.png",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
+        "type": "document",
+        "kicker": "ETAPA 2 DE 3",
+        "title": "Registrar la cuenta bancaria",
+        "description": "Informá la cuenta donde recibirás tus comisiones.",
+        "sections": [
+          {
+            "title": "Requisitos de la cuenta",
+            "body": "La cuenta bancaria debe estar a tu nombre y pertenecer a un banco nacional. No se admiten cuentas digitales como N26, Revolut, Wise o similares."
+          },
+          {
+            "title": "Depósito directo",
+            "body": "Ingresá a tu cuenta de Nu Skin, tocá tu nombre y abrí Perfil. Luego elegí Depósito Directo y completá los datos de tu banco y el código IBAN."
+          }
+        ],
+        "galleryKicker": "GUÍA VISUAL",
+        "galleryTitle": "Ver cómo registrar la cuenta",
+        "items": [
+          {
+            "src": "/api/bot-assets/4e1e95518e5cc9ef65ad6f4f18e637661cc9773a937f39da8cac4260db8e20b5.png",
+            "label": "Registrar cuenta bancaria",
+            "mediaType": "image"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "depo.png",
-        "url": "/api/bot-assets/4e1e95518e5cc9ef65ad6f4f18e637661cc9773a937f39da8cac4260db8e20b5.png",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-12-15 at 21.34.00.jpeg",
-        "url": "/api/bot-assets/4e96e32fc7c29285ab3297118ef024341e38e45cb4240e10bf121b0c87e364d0.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
-      },
-      {
-        "type": "link",
-        "title": "WhatsApp Image 2025-12-15 at 21.34.37.jpeg",
-        "url": "/api/bot-assets/5f78109e3e6a4ba832116c6997b0007f4dfc1038c9befb76b4e1f55070956da3.jpeg",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
-      },
-      {
-        "type": "link",
-        "title": "Captura de pantalla 2023-02-21 a la(s) 16.02.41.png",
-        "url": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
-      },
-      {
-        "type": "link",
-        "title": "Captura de pantalla 2023-02-21 a la(s) 16.05.22.png",
-        "url": "/api/bot-assets/daa9e4e0b6f44f444d3bd854d5b90bd2e7d45dbdd9ba84e3a4c642322ff2c47c.png",
-        "actionLabel": "Abrir",
-        "description": "Trámites · España"
+        "type": "document",
+        "kicker": "ETAPA 3 DE 3",
+        "title": "Pon a prueba tus conocimientos",
+        "description": "Capacitación y cuestionario obligatorios para cobrar comisiones.",
+        "sections": [
+          {
+            "title": "Capacitación obligatoria",
+            "body": "Ingresá a Volúmenes y My Workspace, abrí Formaciones y seleccioná el curso “Conceptos Básicos sobre Normas”."
+          },
+          {
+            "title": "Cuestionario",
+            "body": "Después de la capacitación, Nu Skin te solicitará completar y aprobar el cuestionario. Este requisito es necesario para habilitar el cobro de tus comisiones. Revisá las cuatro capturas como guía para responderlo correctamente."
+          },
+          {
+            "title": "Finalización",
+            "body": "Cuando hayas completado las tres etapas, Nu Skin procesará la habilitación y las comisiones se depositarán automáticamente en tu cuenta bancaria."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ingresar a la Oficina Virtual",
+            "description": "Abrir formaciones de Nu Skin",
+            "url": "https://www.nuskin.com/vgclient/#/trainings"
+          }
+        ],
+        "galleryKicker": "CUESTIONARIO OBLIGATORIO",
+        "galleryTitle": "Ver cuestionario y respuestas",
+        "items": [
+          {
+            "src": "/api/bot-assets/4e96e32fc7c29285ab3297118ef024341e38e45cb4240e10bf121b0c87e364d0.jpeg",
+            "label": "Cuestionario · Parte 1",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/5f78109e3e6a4ba832116c6997b0007f4dfc1038c9befb76b4e1f55070956da3.jpeg",
+            "label": "Cuestionario · Parte 2",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/09875bdd9145c1b6ffa9ad97852f6ce8aa27b5e0726d2a3b1527210138684e59.png",
+            "label": "Cuestionario · Parte 3",
+            "mediaType": "image"
+          },
+          {
+            "src": "/api/bot-assets/daa9e4e0b6f44f444d3bd854d5b90bd2e7d45dbdd9ba84e3a4c642322ff2c47c.png",
+            "label": "Cuestionario · Parte 4",
+            "mediaType": "image"
+          }
+        ]
       }
     ],
     "country": "España",

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v67-tramites-argentina";
+const CACHE="nuapp-v68-tramites-espana";
 
 const CORE=[
   "./",
@@ -18,13 +18,13 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=67-tramites-argentina",
   "./favorites.css?v=63e-ios-thumbnails",
-  "./bot-content.js?v=67-tramites-argentina",
+  "./bot-content.js?v=68-tramites-espana",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
-  "./bot.js?v=67-tramites-argentina",
+  "./bot.js?v=68-tramites-espana",
   "./favorites.js?v=63e-ios-thumbnails",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
