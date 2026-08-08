@@ -873,3 +873,108 @@
   width: 17px;
   height: 17px;
 }
+
+/* =========================================================
+   V84 · Legibilidad de Favoritos
+   Escala tipográfica y contraste, sin cambios de estructura.
+   ========================================================= */
+
+#view-favoritos {
+  --fav-muted: #626c79;
+}
+
+#view-favoritos .favorite-back-link {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+#view-favoritos .favorite-day-title small {
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+#view-favoritos .favorite-day-title span {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+#view-favoritos .favorite-content-order {
+  font-size: 11px;
+}
+
+#view-favoritos .favorite-content-copy strong {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+#view-favoritos .favorite-content-copy span {
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+#view-favoritos .favorites-search-field input {
+  font-size: 16px;
+}
+
+#view-favoritos .favorite-day-filter-empty strong,
+#view-favoritos .favorites-list.empty-state strong {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+#view-favoritos .favorite-day-filter-empty span,
+#view-favoritos .favorites-list.empty-state span {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+#view-favoritos .favorites-list.empty-state .empty-state-cta {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#view-favoritos .saved-filter-btn {
+  font-size: 12px;
+  font-weight: 620;
+  line-height: 1.2;
+}
+
+#view-favoritos .favorite-native-routine-heading strong {
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  font-size: 12px;
+  font-weight: 520;
+  line-height: 1.35;
+}
+
+#view-favoritos .bot-favorite-copy strong {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+#view-favoritos .bot-favorite-copy small {
+  font-size: 12px;
+  font-weight: 520;
+  line-height: 1.35;
+}
+
+@media (max-width: 370px) {
+  #view-favoritos .saved-filter-btn {
+    font-size: 11.5px;
+  }
+
+  #view-favoritos .favorite-content-copy strong {
+    font-size: 14.5px;
+  }
+}

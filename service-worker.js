@@ -1,4 +1,4 @@
-const CACHE="nuapp-v83-routine-progress-legibility";
+const CACHE="nuapp-v84-favorites-legibility";
 
 const CORE=[
   "./",
@@ -17,7 +17,7 @@ const CORE=[
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=80-bot-legibility",
-  "./favorites.css?v=63e-ios-thumbnails",
+  "./favorites.css?v=84-favorites-legibility",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
