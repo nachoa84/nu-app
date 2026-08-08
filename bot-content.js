@@ -1774,48 +1774,105 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Mini manual de ManyChat para acompañar una conversación de asesoramiento de LumiSpa."
+        "content": "Mini manual para acompañar una conversación de asesoramiento de LumiSpa."
       },
       {
         "type": "document",
-        "title": "Cómo asesorar LumiSpa",
+        "kicker": "MENSAJE 1 DE 5",
+        "title": "Iniciar la conversación",
+        "description": "Conocé a la clienta y su rutina actual.",
         "sections": [
           {
-            "title": "MINI MANUAL LUMISPA 🫶🏼💙",
-            "body": "MINI MANUAL LUMISPA 🫶🏼💙\n\nMensaje 1 — Inicio\nIniciar conversación, saber más de la clienta, si tiene una rutina de limpieza ahora mismo. Por qué le interesó?\n\nEjemplo:\nHola hermosa! 💙 Antes de pasarte todo, contame:\n¿Tenés alguna rutina de limpieza ahora?\n¿Y qué te gustaría mejorar de tu piel en este momento? ✨\n\n⸻ ((enseguida le podes mandar Info técnica para que tenga para leer)) 😉"
+            "title": "Objetivo",
+            "body": "Iniciá la conversación para saber más de la clienta: si actualmente tiene una rutina de limpieza y por qué le interesó LumiSpa."
           },
           {
-            "title": "Mensaje 2 — Info esencial del LumiSpa",
-            "body": "Mensaje 2 — Info esencial del LumiSpa\n\nEjemplo:\nMientras me respondés, te dejo lo básico del LumiSpa 💦✨\n\nEs un dispositivo que:\nLimpia y trata la piel en 2 minutos\nSe usa bajo la ducha\nMejora textura, poros y luminosidad\nEs suave, práctico e higiénico\nDa resultados visibles desde la primera semana\nTiene 8 beneficios en 1 solo paso\n(este msj placa con beneficios que te envío más abajo)\n\n⸻ ESPERAR RESPUESTA ‼️"
+            "title": "Mensaje sugerido",
+            "body": "¡Hola, hermosa! 💙 Antes de pasarte toda la información, contame:\n\n¿Tenés alguna rutina de limpieza ahora?\n¿Qué te gustaría mejorar de tu piel en este momento? ✨"
           },
           {
-            "title": "Mensaje 3 — Antes y después",
-            "body": "Mensaje 3 — Antes y después\n🔥 Te dejo antes/después real de clientas para que veas la diferencia.\n\nEn este DRIVE encontrarás un montón de antes y después que podes usar para enviar a tus clientes\n\n⸻"
+            "title": "Siguiente paso",
+            "body": "Enseguida podés enviarle información técnica para que tenga material para leer."
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "MENSAJE 2 DE 5",
+        "title": "Información esencial de LumiSpa",
+        "description": "Compartí los beneficios principales y esperá su respuesta.",
+        "sections": [
+          {
+            "title": "Mensaje sugerido",
+            "body": "Mientras me respondés, te dejo lo básico de LumiSpa 💦✨\n\nEs un dispositivo que:\n\n• Limpia y trata la piel en 2 minutos.\n• Se usa bajo la ducha.\n• Mejora la textura, los poros y la luminosidad.\n• Es suave, práctico e higiénico.\n• Da resultados visibles desde la primera semana.\n• Tiene 8 beneficios en un solo paso."
           },
           {
-            "title": "Mensaje 4 —",
-            "body": "Mensaje 4 —\n\nCierre + Asesoramiento\n¿Tenés alguna duda hasta acá?\n\nSino ya te paso la promo que tengo vigente ahora mismo  🫶🏼\n\n⸻ ESPERAS RESPUESTA Y LUEGO ENVÍAS PROMO CORRESPONDIENTE AL PAÍS"
-          },
-          {
-            "title": "Mensaje 5 — Enviar promo y pregunta de Cierre",
-            "body": "Mensaje 5 — Enviar promo y pregunta de Cierre\n\nTIPS IMPORTANTES ‼️\n\n- Enviar flyer con precio.\n\n- Remarcar que es la promo que tenés ahora por 24/48hs, por el fin de semana etc como quieras.\n\n- Resaltar las facilidades de pago de tu país.\n\n- Hacer pregunta de cierre:\nqué te parece hermosa? querés aprovechar la promo? Cómo te quedaría cómodo pagarlo?"
+            "title": "Importante",
+            "body": "Después de enviar la información y la placa con los beneficios, esperá su respuesta antes de continuar."
           }
         ],
-        "description": "Secuencia de mensajes y cierre."
+        "actions": [
+          {
+            "title": "Ver placa de apoyo LumiSpa",
+            "description": "Beneficios de LumiSpa",
+            "url": "/api/bot-assets/77fa3276fe668110c078d3ee34db2a26a812bf918d2b72eeba4434dea7985f7b.jpeg"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Placa de apoyo LumiSpa",
-        "url": "/api/bot-assets/77fa3276fe668110c078d3ee34db2a26a812bf918d2b72eeba4434dea7985f7b.jpeg",
-        "actionLabel": "Abrir",
-        "description": "WhatsApp Image 2025-12-03 at 13.13.22.jpeg"
+        "type": "document",
+        "kicker": "MENSAJE 3 DE 5",
+        "title": "Antes y después",
+        "description": "Compartí experiencias y materiales de clientas.",
+        "sections": [
+          {
+            "title": "Mensaje sugerido",
+            "body": "🔥 Te comparto algunos antes y después reales de clientas para que puedas ver la diferencia."
+          },
+          {
+            "title": "Material disponible",
+            "body": "En esta carpeta encontrarás distintos antes y después que podés utilizar para compartir con tus clientes."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver antes y después de LumiSpa",
+            "description": "Testimonios y materiales",
+            "url": "https://drive.google.com/drive/folders/13PaUpi3_zxfYLDrg2rpfew1ARqDS7bzu?usp=sharing"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Antes y después de LumiSpa",
-        "url": "https://drive.google.com/drive/folders/13PaUpi3_zxfYLDrg2rpfew1ARqDS7bzu?usp=sharing",
-        "actionLabel": "Abrir",
-        "description": "Drive con testimonios y materiales"
+        "type": "document",
+        "kicker": "MENSAJE 4 DE 5",
+        "title": "Resolver dudas",
+        "description": "Esperá la respuesta antes de enviar la promoción.",
+        "sections": [
+          {
+            "title": "Mensaje sugerido",
+            "body": "¿Tenés alguna duda hasta acá?\n\nSi no, ya te paso la promoción que tengo vigente ahora mismo 🫶🏼"
+          },
+          {
+            "title": "Siguiente paso",
+            "body": "Esperá su respuesta y luego enviá la promoción correspondiente a su país."
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "MENSAJE 5 DE 5",
+        "title": "Enviar la promoción y cerrar",
+        "description": "Compartí el precio y realizá una pregunta de cierre.",
+        "sections": [
+          {
+            "title": "Consejos importantes",
+            "body": "• Enviar el flyer con el precio.\n\n• Remarcar que es la promoción que tenés disponible por 24/48 horas, por el fin de semana, etc., como quieras.\n\n• Resaltar las facilidades de pago disponibles en tu país."
+          },
+          {
+            "title": "Preguntas de cierre",
+            "body": "¿Qué te parece, hermosa?\n¿Querés aprovechar la promoción?\n¿Cómo te quedaría cómodo pagarlo?"
+          }
+        ]
       }
     ],
     "sourceFlow": "Como asesorar Lumi Spa"
