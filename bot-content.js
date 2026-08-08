@@ -1602,132 +1602,144 @@
     "blocks": [
       {
         "type": "text",
-        "content": "📦 BOX de COLÁGENO: acá tenés reunidos los materiales principales de Beauty Focus Collagen+ que estaban en ManyChat."
+        "content": "Encontrá en un solo lugar los principales materiales de Beauty Focus Collagen+: capacitación, asesoramiento, precios, testimonios, ganancias y documentación técnica."
       },
       {
         "type": "document",
-        "title": "Capacitación de producto",
+        "kicker": "CAPACITACIÓN",
+        "title": "Conocé el producto",
+        "description": "Aprendé las características principales de Collagen+.",
         "sections": [
           {
             "title": "Capacitación de producto",
-            "body": "¿Quieres saber más del colágeno? 🧐\n\nTe recomiendo que veas esta capacitación 👇🏻"
-          }
-        ]
-      },
-      {
-        "type": "link",
-        "title": "Capacitación de producto",
-        "url": "https://youtu.be/QJvzYmBs1Hg",
-        "actionLabel": "Abrir",
-        "description": "Beauty Focus Collagen+",
-        "resourceKind": "video"
-      },
-      {
-        "type": "document",
-        "title": "Guía para asesorar",
-        "sections": [
-          {
-            "title": "Guía para asesorar",
-            "body": "Aquí te comparto una guía para asesorar y automatizar tus respuestas en whatsapp business"
-          }
-        ]
-      },
-      {
-        "type": "link",
-        "title": "Guía para asesorar",
-        "url": "https://docs.google.com/document/d/1mznuJzMyEgFuHVSLfDE32-vxFWlSQdq8kuZ6RXB9gdc/edit?usp=sharing",
-        "actionLabel": "Abrir",
-        "description": "Guía para asesorar y automatizar respuestas en WhatsApp Business"
-      },
-      {
-        "type": "document",
-        "title": "Precios por mercado",
-        "sections": [
-          {
-            "title": "Precios por mercado",
-            "body": "Aquí te comparto el link con los precios de colágeno por países.\n\nTe recomiendo antes de enviar el valor, dar un asesoramiento previo y preguntarle a la persona que es lo que quiere mejorar.\n\n(Como te explicamos en la sección Como asesorar)\n\nUna vez enviado el flyer con el valor hacer una pregunta de cierre de venta:\n\n❓Que te parece hermosa?\n\n❓Te gustaría aprovechar a tu también la promo?\n\nSi necesitas ayuda para las primeras respuestas, consultale a la persona que te invitó o en la comunidad de whapp\n\nFLYERS POR MERCADO"
-          }
-        ]
-      },
-      {
-        "type": "link",
-        "title": "Precios por mercado",
-        "url": "https://photos.app.goo.gl/dsjn9iJgwsVJMtw86",
-        "actionLabel": "Abrir",
-        "description": "Flyers con precios por país"
-      },
-      {
-        "type": "document",
-        "title": "Antes y después",
-        "sections": [
-          {
-            "title": "Antes y después",
-            "body": "Aquí te comparto un link con antes y después/testimonios.\n\nTe recomiendo que a medida que los vayas necesitando los descargues en tu celular y los compartas desde allí,\n\nno directamente desde el link.\n\nPuedes crear un Álbum en tu teléfono\n\nque se llame: Antes y después colágeno así ya los vas ordenando."
-          }
-        ]
-      },
-      {
-        "type": "link",
-        "title": "Antes y después",
-        "url": "https://drive.google.com/drive/folders/1TnsiJtMO7R-yIkVvy9wIE7Qj0Zc-5hM7?usp=sharing",
-        "actionLabel": "Abrir",
-        "description": "Testimonios, fotos y videos"
-      },
-      {
-        "type": "document",
-        "title": "Ganancias por mercado",
-        "sections": [
-          {
-            "title": "Ganancias por mercado",
-            "body": "Aquí encontrarás las 💰 ganancias de colágeno según el país que estás trabajando."
-          }
-        ]
-      },
-      {
-        "type": "link",
-        "title": "Ganancias por mercado",
-        "url": "https://photos.app.goo.gl/UMpnxp2bqD5M5qSb9",
-        "actionLabel": "Abrir",
-        "description": "Ganancias de Collagen+ según país"
-      },
-      {
-        "type": "document",
-        "title": "Estudios y fichas técnicas",
-        "sections": [
-          {
-            "title": "Papers científicos",
-            "body": "Te comparto dos estudios Clínicos:\n\n✔️ El papers en ingles es una auditoria externa al producto, realizada por un laboratorio que no es el de Nu Skin, que comprueba los resultados, y emite un informe.\n\n✔️ El estudio en español es un informe realizado por Nu Skin"
+            "body": "Mirá esta capacitación para conocer mejor Beauty Focus Collagen+ antes de comenzar a asesorar."
           }
         ],
-        "description": "Documentación técnica de Collagen+."
+        "actions": [
+          {
+            "title": "Ver capacitación",
+            "description": "Video de Beauty Focus Collagen+",
+            "url": "https://youtu.be/QJvzYmBs1Hg"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Ficha técnica LATAM",
-        "url": "/api/bot-assets/6ad525fc49b180e60b1da0b1e5b6637979ecd66f98918d060ae832ac9d3aca45.pdf",
-        "actionLabel": "Abrir",
-        "description": "(AR) Beauty-Focus-Collagen Plus-PIP.pdf"
+        "type": "document",
+        "kicker": "ASESORAMIENTO",
+        "title": "Guía para asesorar",
+        "description": "Organizá tus respuestas y conversaciones con clientes.",
+        "sections": [
+          {
+            "title": "WhatsApp Business",
+            "body": "Consultá esta guía para acompañar una conversación de asesoramiento y organizar respuestas en WhatsApp Business."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Consultar guía para asesorar",
+            "description": "Documento de trabajo",
+            "url": "https://docs.google.com/document/d/1mznuJzMyEgFuHVSLfDE32-vxFWlSQdq8kuZ6RXB9gdc/edit?usp=sharing"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Ficha técnica Europa",
-        "url": "/api/bot-assets/a2032b0a402fbb73742f1f864c791b7585c1c01ca933e33fc832a9eac20c0798.pdf",
-        "actionLabel": "Abrir",
-        "description": "beauty-focus-collagen-plus-pip-es.pdf"
+        "type": "document",
+        "kicker": "PRECIOS",
+        "title": "Precios por mercado",
+        "description": "Consultá flyers con precios organizados por país.",
+        "sections": [
+          {
+            "title": "Antes de compartir un precio",
+            "body": "Primero preguntale a la persona qué le gustaría mejorar y realizá un asesoramiento breve. Después compartí el flyer correspondiente a su mercado."
+          },
+          {
+            "title": "Cierre de la conversación",
+            "body": "Luego de enviar el precio, podés preguntar: “¿Qué te parece?” o “¿Te gustaría aprovechar la promoción?”."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver precios por mercado",
+            "description": "Flyers organizados por país",
+            "url": "https://photos.app.goo.gl/dsjn9iJgwsVJMtw86"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Paper científico en inglés",
-        "url": "/api/bot-assets/ac22f70433e35e0e104bcb1e030a313ac37a47913b920f34977ef2631c5c46a2.pdf",
-        "actionLabel": "Abrir",
-        "description": "NS - Estudio Científico Collagen+.pdf"
+        "type": "document",
+        "kicker": "TESTIMONIOS",
+        "title": "Antes y después",
+        "description": "Fotos, videos y testimonios para consultar.",
+        "sections": [
+          {
+            "title": "Cómo organizarlos",
+            "body": "Descargá únicamente los materiales que necesites y guardalos en un álbum de tu teléfono, por ejemplo “Antes y después · Collagen+”."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver testimonios",
+            "description": "Fotos, videos y antes/después",
+            "url": "https://drive.google.com/drive/folders/1TnsiJtMO7R-yIkVvy9wIE7Qj0Zc-5hM7?usp=sharing"
+          }
+        ]
       },
       {
-        "type": "link",
-        "title": "Estudio en español",
-        "url": "/api/bot-assets/0b8e1af100bb4914db51b7ef889664777844ccb6f662d211e708ffcac39a2930.pdf",
-        "actionLabel": "Abrir",
-        "description": "beauty-focus-collagen-plus-clinical-bulletin-spanish.pdf"
+        "type": "document",
+        "kicker": "GANANCIAS",
+        "title": "Ganancias por mercado",
+        "description": "Consultá la información correspondiente a cada país.",
+        "sections": [
+          {
+            "title": "Mercados disponibles",
+            "body": "Seleccioná el país en el que estás trabajando para consultar la información de ganancias de Collagen+."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ver ganancias por mercado",
+            "description": "Información organizada por país",
+            "url": "https://photos.app.goo.gl/UMpnxp2bqD5M5qSb9"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "DOCUMENTACIÓN",
+        "title": "Fichas técnicas y estudios",
+        "description": "Documentación técnica disponible de Collagen+.",
+        "sections": [
+          {
+            "title": "Fichas técnicas",
+            "body": "Consultá las fichas de producto correspondientes a Latinoamérica y Europa."
+          },
+          {
+            "title": "Estudios",
+            "body": "También podés consultar el informe científico disponible en inglés y el boletín clínico en español."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Ficha técnica · Latinoamérica",
+            "description": "Información del producto",
+            "url": "/api/bot-assets/6ad525fc49b180e60b1da0b1e5b6637979ecd66f98918d060ae832ac9d3aca45.pdf"
+          },
+          {
+            "title": "Ficha técnica · Europa",
+            "description": "Información del producto en español",
+            "url": "/api/bot-assets/a2032b0a402fbb73742f1f864c791b7585c1c01ca933e33fc832a9eac20c0798.pdf"
+          },
+          {
+            "title": "Informe científico · Inglés",
+            "description": "Documentación científica disponible",
+            "url": "/api/bot-assets/ac22f70433e35e0e104bcb1e030a313ac37a47913b920f34977ef2631c5c46a2.pdf"
+          },
+          {
+            "title": "Boletín clínico · Español",
+            "description": "Informe clínico en español",
+            "url": "/api/bot-assets/0b8e1af100bb4914db51b7ef889664777844ccb6f662d211e708ffcac39a2930.pdf"
+          }
+        ]
       }
     ],
     "sourceFlow": "BOX COLAGENO OK"
