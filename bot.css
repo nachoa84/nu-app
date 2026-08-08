@@ -423,25 +423,25 @@ button.bot-resource-card {
   display: block;
   margin-bottom: 5px;
   color: var(--app-accent-dark);
-  font-size: 9px;
-  font-weight: 820;
-  letter-spacing: .09em;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .075em;
   text-transform: uppercase;
 }
 
 .bot-document-header h2 {
   margin: 0;
   color: var(--app-text);
-  font-size: 20px;
-  line-height: 1.12;
-  letter-spacing: -.03em;
+  font-size: 22px;
+  line-height: 1.16;
+  letter-spacing: -.025em;
 }
 
 .bot-document-header p {
-  margin: 6px 0 0;
-  color: var(--app-muted);
-  font-size: 11.5px;
-  line-height: 1.45;
+  margin: 7px 0 0;
+  color: #626b78;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .bot-document-close {
@@ -485,17 +485,18 @@ button.bot-resource-card {
 }
 
 .bot-document-section h3 {
-  margin: 0 0 7px;
+  margin: 0 0 9px;
   color: var(--app-text);
-  font-size: 13px;
-  line-height: 1.3;
+  font-size: 15px;
+  line-height: 1.35;
 }
 
 .bot-document-section p {
   margin: 0;
-  color: #6f5b51;
-  font-size: 12px;
-  line-height: 1.58;
+  color: #3f4857;
+  font-size: 15.5px;
+  line-height: 1.65;
+  letter-spacing: -.006em;
   white-space: pre-line;
 }
 
@@ -533,15 +534,15 @@ button.bot-resource-card {
 
 .bot-document-action strong,
 .bot-document-gallery strong {
-  font-size: 13px;
-  line-height: 1.3;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .bot-document-action small,
 .bot-document-gallery small {
-  color: #7d7069;
-  font-size: 10px;
-  line-height: 1.3;
+  color: #626b78;
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 .bot-document-action-arrow {
@@ -623,8 +624,8 @@ body.bot-document-open {
 
 #view-bot .bot-status {
   gap: 6px;
-  color: var(--bot-muted);
-  font-size: 10.5px;
+  color: #626b78;
+  font-size: 12px;
   font-weight: 620;
 }
 
@@ -688,16 +689,16 @@ body.bot-document-open {
 }
 
 .bot-native-welcome p {
-  max-width: 318px;
-  margin: 9px 0 0;
-  color: var(--bot-muted);
-  font-size: 13px;
-  line-height: 1.52;
+  max-width: 330px;
+  margin: 10px 0 0;
+  color: #626b78;
+  font-size: 14.5px;
+  line-height: 1.55;
 }
 
 #view-bot .bubble {
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: 14.5px;
+  line-height: 1.55;
 }
 
 #view-bot .bot-message-bot .bubble.bot,
@@ -710,8 +711,8 @@ body.bot-document-open {
   background: transparent;
   color: var(--bot-ink);
   box-shadow: none;
-  font-size: 14px;
-  line-height: 1.58;
+  font-size: 15px;
+  line-height: 1.62;
 }
 
 #view-bot .bot-response-stack {
@@ -931,32 +932,32 @@ body.bot-document-open {
 }
 
 #view-bot .bot-resource-copy small {
-  color: var(--bot-green);
-  letter-spacing: .055em;
-  font-size: 8.8px;
-  font-weight: 620;
+  color: #5f774b;
+  letter-spacing: .045em;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 #view-bot .bot-resource-copy strong {
   color: var(--bot-ink);
-  line-height: 1.3;
-  font-size: 12px;
-  font-weight: 620;
+  line-height: 1.35;
+  font-size: 14px;
+  font-weight: 650;
 }
 
 #view-bot .bot-resource-copy span {
-  color: var(--bot-muted);
-  line-height: 1.38;
-  font-size: 9.8px;
-  font-weight: 480;
+  color: #626b78;
+  line-height: 1.45;
+  font-size: 12.5px;
+  font-weight: 500;
 }
 
 #view-bot .bot-message-action {
-  min-height: 34px;
+  min-height: 38px;
   padding: 0 2px;
-  color: var(--bot-muted);
-  font-size: 10px;
-  font-weight: 560;
+  color: #626b78;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 #view-bot .bot-form {
@@ -984,8 +985,8 @@ body.bot-document-open {
   box-sizing: border-box;
   border-radius: 18px;
   background: #f6f7fb;
-  font-size: 12.5px;
-  font-weight: 480;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 #view-bot .bot-send {

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v79-loi-navegacion";
+const CACHE="nuapp-v80-bot-legibility";
 
 const CORE=[
   "./",
@@ -16,7 +16,7 @@ const CORE=[
   "./notifications.css?v=61b-progress-canonical",
   "./home.css?v=61b-progress-canonical",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=67-tramites-argentina",
+  "./bot.css?v=80-bot-legibility",
   "./favorites.css?v=63e-ios-thumbnails",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
