@@ -1,5 +1,5 @@
 (() => {
-  // Biblioteca activa del Bot · migrada desde THE NEW BOT de ManyChat.
+  // Biblioteca activa del Bot.
   // Los comandos visibles conservan los nombres conocidos, sin necesitar el punto inicial.
   window.BotContent = [
   {
@@ -1151,7 +1151,7 @@
             "body": "Escribí: como usar face wash 180"
           }
         ],
-        "description": "Contenido migrado del menú “COMO USAR” de ManyChat."
+        "description": "Guías prácticas para aprender a usar cada tecnología o producto."
       }
     ],
     "sourceFlow": "COMO USAR"
