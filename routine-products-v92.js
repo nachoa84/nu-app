@@ -374,3 +374,70 @@ Object.values(COLLAGEN_ROUTINE_DAYS).forEach(day => {
   normalizeRoutineDayMaterialNamesV96("collagen-30", day);
 });
 
+// NU APP · CORRECCIÓN CONSERVADORA DE TEXTOS V97
+function polishImportedRoutineTextV97(value, routineId) {
+  let text = String(value || "")
+    .replace(/\bA\s+demás\b/giu, "Además")
+    .replace(/\bWhatapp\b/giu, "WhatsApp")
+    .replace(/\bInstragram\b/giu, "Instagram")
+    .replace(/\btíps\b/giu, "tips")
+    .replace(/\bpreguntes\b/giu, "preguntas")
+    .replace(/\bcuentes\b/giu, "clientes")
+    .replace(/\bprocupan\b/giu, "preocupan")
+    .replace(/\bexpeciencia\b/giu, "experiencia")
+    .replace(/\bpracticas y efectivas\b/giu, "prácticas y efectivas")
+    .replace(/\bmas poder\b/giu, "más poder")
+    .replace(/\btransformo tu piel\b/giu, "transformó tu piel")
+    .replace(/\bHack de venta lll\b/gu, "Hack de venta III")
+    .replace(/\bHack de venta lV\b/gu, "Hack de venta IV")
+    .replace(/\bSi, de 2 años\b/gu, "Sí, de 2 años")
+    .replace(/[ \t]{2,}/gu, " ")
+    .replace(/!{2,}/gu, "!")
+    .replace(/\?{2,}/gu, "?");
+
+  if (routineId === "galvanicspa-10") {
+    text = text.replace(/#WELLSPAIO10/gu, "#GALVANICSPA10");
+  }
+
+  return text;
+}
+
+Object.entries(PRODUCT_ROUTINE_DAYS).forEach(([routineId, routine]) => {
+  Object.values(routine.days || {}).forEach(day => {
+    day.title = polishImportedRoutineTextV97(day.title, routineId);
+    day.hero = polishImportedRoutineTextV97(day.hero, routineId);
+    day.description = polishImportedRoutineTextV97(day.description, routineId);
+    (day.blocks || []).forEach(block => {
+      if (block?.type === "text" && block.content) {
+        block.content = polishImportedRoutineTextV97(block.content, routineId);
+      }
+    });
+  });
+});
+
+// NU APP · RETIRO DE BIENVENIDAS MANYCHAT V97A
+const MANYCHAT_WELCOME_TAGS_V97A = {
+  "lumispa-10": "10LumiSpaIO",
+  "wellspa-10": "WELLSPAIO10",
+  "galvanicspa-10": "GALVANICSPA10"
+};
+
+Object.entries(MANYCHAT_WELCOME_TAGS_V97A).forEach(([routineId, tag]) => {
+  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.["1"];
+  const firstTextBlock = (day?.blocks || []).find(block => block?.type === "text");
+  if (!firstTextBlock?.content) return;
+
+  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const welcomePattern = new RegExp(
+    String.raw`\s*Al\s+_?Challenge\s+#${escapedTag}_?\s*\n+\s*Te recomendamos tener este número agendado como\.\.\.\s*\n+\s*MI NEGOCIO DE NU SKIN\s*\n+\s*Para recibir el contenido y los Links de forma correcta\.?`,
+    "iu"
+  );
+
+  const before = String(firstTextBlock.content);
+  const after = before.replace(welcomePattern, "").trim();
+  if (after !== before.trim()) {
+    firstTextBlock.content = after;
+    firstTextBlock.hideObjectiveDetailsV97a = true;
+  }
+});
+

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v96-routine-material-names";
+const CACHE="nuapp-v97a-remove-manychat-welcome";
 
 const CORE=[
   "./",
@@ -22,7 +22,7 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=96-material-names",
+  "./routine-products-v92.js?v=97a-remove-manychat-welcome",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=61b-progress-canonical",
   "./routine-sync.js?v=61b-progress-canonical",
@@ -31,7 +31,7 @@ const CORE=[
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
-  "./daily-view.js?v=92d-material-titles",
+  "./daily-view.js?v=97a-remove-manychat-welcome",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=63e-ios-thumbnails",
   "./app.js?v=63e-ios-thumbnails",

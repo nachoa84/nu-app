@@ -522,7 +522,7 @@ function createObjectiveCard(block) {
   card.appendChild(header);
 
   const fullText = String(block.content || "").trim();
-  if (fullText) {
+  if (fullText && !block.hideObjectiveDetailsV97a) {
     const details = document.createElement("details");
     details.className = "native-details";
 
