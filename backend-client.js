@@ -183,6 +183,10 @@
     );
 
     publishState(payload.state);
+    await bootstrapProductRoutinesV98().catch(error => {
+      console.warn("Las rutinas de producto continúan en modo local.", error);
+      return null;
+    });
 
     emit(
       "backend-status",
@@ -317,11 +321,79 @@
     return request("/api/health");
   }
 
+
+
+  // NU APP · SINCRONIZACIÓN MULTIRUTINA V98
+  const PRODUCT_ROUTINE_IDS_V98 = ["lumispa-10", "wellspa-10", "galvanicspa-10"];
+
+  function getLocalProductRoutinesV98() {
+    const routines = {};
+    PRODUCT_ROUTINE_IDS_V98.forEach(routineId => {
+      let local = { currentDay: 1, openedDays: {} };
+      try {
+        local = JSON.parse(localStorage.getItem(`routineState:${routineId}`) || "null") || local;
+      } catch (error) { void error; }
+      const completedDays = [];
+      for (let day = 1; day <= 10; day++) {
+        if (localStorage.getItem(`day:${routineId}:${day}:complete`) === "1") completedDays.push(day);
+      }
+      routines[routineId] = {
+        currentDay: Math.max(1, Math.min(10, Number(local.currentDay || 1))),
+        openedDays: local.openedDays || {},
+        completedDays
+      };
+    });
+    return routines;
+  }
+
+  function publishProductRoutineStatesV98(state) {
+    if (state) emit("product-routines-state-updated", state);
+  }
+
+  async function bootstrapProductRoutinesV98() {
+    const profile = ensureUserId();
+    if (!profile?.userId) return null;
+    const payload = await request("/api/product-routines/bootstrap", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: profile.userId,
+        routines: getLocalProductRoutinesV98()
+      })
+    });
+    publishProductRoutineStatesV98(payload.state);
+    return payload.state;
+  }
+
+  async function openProductRoutineDay(routineId, day) {
+    const profile = ensureUserId();
+    if (!profile?.userId) return null;
+    const payload = await request("/api/product-routines/open", {
+      method: "POST",
+      body: JSON.stringify({ userId: profile.userId, routineId, day })
+    });
+    publishProductRoutineStatesV98(payload.state);
+    return payload.state;
+  }
+
+  async function completeProductRoutineDay(routineId, day) {
+    const profile = ensureUserId();
+    if (!profile?.userId) return null;
+    const payload = await request("/api/product-routines/complete", {
+      method: "POST",
+      body: JSON.stringify({ userId: profile.userId, routineId, day })
+    });
+    publishProductRoutineStatesV98(payload.state);
+    return payload.state;
+  }
+
   window.BackendAPI = {
     bootstrapFromLocal,
     getState,
     openDay,
     completeDay,
+    bootstrapProductRoutinesV98,
+    openProductRoutineDay,
+    completeProductRoutineDay,
     updateProfile,
     demoAdvance,
     health,

@@ -1439,3 +1439,53 @@
     height: 96px;
   }
 }
+
+/* NU APP · DÍA 2 RESPONSIVO V98A
+   Textos y enlaces importados de LumiSpa, WellSpa y Galvanic Spa. */
+#view-hoy.day-open .day-plan-group,
+#view-hoy.day-open .day-plan-steps,
+#view-hoy.day-open .action-step-list,
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-title,
+#view-hoy.day-open .action-step-body,
+#view-hoy.day-open .resource-links,
+#view-hoy.day-open .resource-link-row,
+#view-hoy.day-open .resource-link-main {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#view-hoy.day-open .action-step-title,
+#view-hoy.day-open .action-step-body,
+#view-hoy.day-open .native-detail-paragraph,
+#view-hoy.day-open .native-check-item {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+#view-hoy.day-open .resource-link-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+}
+
+#view-hoy.day-open .resource-link-main {
+  width: 100%;
+  padding: 9px 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+#view-hoy.day-open .resource-link-save {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .action-step-body {
+    margin-left: 34px;
+  }
+}

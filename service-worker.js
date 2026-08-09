@@ -1,4 +1,4 @@
-const CACHE="nuapp-v97a-remove-manychat-welcome";
+const CACHE="nuapp-v98a-responsive-day2";
 
 const CORE=[
   "./",
@@ -8,7 +8,7 @@ const CORE=[
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
-  "./daily.css?v=83-routine-progress-legibility",
+  "./daily.css?v=98a-responsive-day2",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
@@ -22,10 +22,10 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=97a-remove-manychat-welcome",
+  "./routine-products-v92.js?v=98a-responsive-day2",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
-  "./routine-state.js?v=61b-progress-canonical",
-  "./routine-sync.js?v=61b-progress-canonical",
+  "./routine-state.js?v=98-multiroutine-sync",
+  "./routine-sync.js?v=98-multiroutine-sync",
   "./bot.js?v=94-favorite-folders",
   "./bot-shortcuts-v95.js?v=95b-clean-labels",
   "./favorites.js?v=96-material-names",
@@ -35,7 +35,7 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=63e-ios-thumbnails",
   "./app.js?v=63e-ios-thumbnails",
-  "./backend-client.js?v=61b-progress-canonical",
+  "./backend-client.js?v=98-multiroutine-sync",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",

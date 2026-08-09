@@ -2006,6 +2006,189 @@ app.post(
 );
 
 
+
+
+// NU APP · SINCRONIZACIÓN MULTIRUTINA V98
+const PRODUCT_ROUTINE_IDS_V98 = new Set([
+  "lumispa-10",
+  "wellspa-10",
+  "galvanicspa-10"
+]);
+
+function parseProductRoutineIdV98(value) {
+  const routineId = String(value || "").trim();
+  if (!PRODUCT_ROUTINE_IDS_V98.has(routineId)) {
+    const error = new Error("Rutina no válida.");
+    error.status = 400;
+    throw error;
+  }
+  return routineId;
+}
+
+function parseProductRoutineDayV98(value) {
+  const day = Number(value);
+  if (!Number.isInteger(day) || day < 1 || day > 10) {
+    const error = new Error("Día de rutina no válido.");
+    error.status = 400;
+    throw error;
+  }
+  return day;
+}
+
+async function assertProductRoutineUserV98(client, userId) {
+  const result = await client.query("SELECT id FROM users WHERE id = $1", [userId]);
+  if (!result.rowCount) {
+    const error = new Error("Usuario no encontrado.");
+    error.status = 404;
+    throw error;
+  }
+}
+
+async function getProductRoutineStatesV98(client, userId) {
+  await assertProductRoutineUserV98(client, userId);
+  const states = await client.query(
+    `SELECT routine_id, current_day FROM product_routine_states
+     WHERE user_id = $1 ORDER BY routine_id`,
+    [userId]
+  );
+  const progress = await client.query(
+    `SELECT routine_id, day, opened_at, completed_at
+     FROM product_routine_day_progress
+     WHERE user_id = $1 ORDER BY routine_id, day`,
+    [userId]
+  );
+  const routines = {};
+  for (const id of PRODUCT_ROUTINE_IDS_V98) {
+    routines[id] = { initialized: false, currentDay: 1, openedDays: {}, completedDays: [] };
+  }
+  for (const row of states.rows) {
+    if (routines[row.routine_id]) {
+      routines[row.routine_id].initialized = true;
+      routines[row.routine_id].currentDay = Number(row.current_day);
+    }
+  }
+  for (const row of progress.rows) {
+    const routine = routines[row.routine_id];
+    if (!routine) continue;
+    if (row.opened_at) routine.openedDays[row.day] = new Date(row.opened_at).getTime();
+    if (row.completed_at) routine.completedDays.push(Number(row.day));
+  }
+  return { userId, routines };
+}
+
+app.post("/api/product-routines/bootstrap", async (req, res, next) => {
+  try {
+    const userId = String(req.body.userId || "").trim();
+    const localRoutines = req.body.routines && typeof req.body.routines === "object"
+      ? req.body.routines : {};
+    const state = await withTransaction(async client => {
+      await assertProductRoutineUserV98(client, userId);
+      for (const routineId of PRODUCT_ROUTINE_IDS_V98) {
+        const local = localRoutines[routineId] || {};
+        const currentDay = parseProductRoutineDayV98(local.currentDay || 1);
+        await client.query(
+          `INSERT INTO product_routine_states (user_id, routine_id, current_day)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, routine_id) DO UPDATE
+           SET updated_at = NOW()`,
+          [userId, routineId, currentDay]
+        );
+        for (const [rawDay, rawTimestamp] of Object.entries(local.openedDays || {})) {
+          const day = parseProductRoutineDayV98(rawDay);
+          const openedAt = new Date(Number(rawTimestamp));
+          if (Number.isNaN(openedAt.getTime())) continue;
+          await client.query(
+            `INSERT INTO product_routine_day_progress
+             (user_id, routine_id, day, opened_at)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (user_id, routine_id, day) DO UPDATE
+             SET opened_at = COALESCE(product_routine_day_progress.opened_at, EXCLUDED.opened_at),
+                 updated_at = NOW()`,
+            [userId, routineId, day, openedAt]
+          );
+        }
+        for (const rawDay of Array.isArray(local.completedDays) ? local.completedDays : []) {
+          const day = parseProductRoutineDayV98(rawDay);
+          await client.query(
+            `INSERT INTO product_routine_day_progress
+             (user_id, routine_id, day, completed_at)
+             VALUES ($1, $2, $3, NOW())
+             ON CONFLICT (user_id, routine_id, day) DO UPDATE
+             SET completed_at = COALESCE(product_routine_day_progress.completed_at, EXCLUDED.completed_at),
+                 updated_at = NOW()`,
+            [userId, routineId, day]
+          );
+        }
+      }
+      return getProductRoutineStatesV98(client, userId);
+    });
+    res.json({ ok: true, state });
+  } catch (error) { next(error); }
+});
+
+app.get("/api/product-routines/state/:userId", async (req, res, next) => {
+  try {
+    const userId = String(req.params.userId || "").trim();
+    const state = await withTransaction(client => getProductRoutineStatesV98(client, userId));
+    res.json({ ok: true, state });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/product-routines/open", async (req, res, next) => {
+  try {
+    const userId = String(req.body.userId || "").trim();
+    const routineId = parseProductRoutineIdV98(req.body.routineId);
+    const day = parseProductRoutineDayV98(req.body.day);
+    const state = await withTransaction(async client => {
+      await assertProductRoutineUserV98(client, userId);
+      await client.query(
+        `INSERT INTO product_routine_states (user_id, routine_id, current_day)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (user_id, routine_id) DO UPDATE
+         SET current_day = EXCLUDED.current_day, updated_at = NOW()`,
+        [userId, routineId, day]
+      );
+      await client.query(
+        `INSERT INTO product_routine_day_progress (user_id, routine_id, day, opened_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (user_id, routine_id, day) DO UPDATE
+         SET opened_at = COALESCE(product_routine_day_progress.opened_at, EXCLUDED.opened_at),
+             updated_at = NOW()`,
+        [userId, routineId, day]
+      );
+      return getProductRoutineStatesV98(client, userId);
+    });
+    res.json({ ok: true, state });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/product-routines/complete", async (req, res, next) => {
+  try {
+    const userId = String(req.body.userId || "").trim();
+    const routineId = parseProductRoutineIdV98(req.body.routineId);
+    const day = parseProductRoutineDayV98(req.body.day);
+    const state = await withTransaction(async client => {
+      await assertProductRoutineUserV98(client, userId);
+      await client.query(
+        `INSERT INTO product_routine_states (user_id, routine_id, current_day)
+         VALUES ($1, $2, $3) ON CONFLICT (user_id, routine_id) DO NOTHING`,
+        [userId, routineId, day]
+      );
+      await client.query(
+        `INSERT INTO product_routine_day_progress (user_id, routine_id, day, completed_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (user_id, routine_id, day) DO UPDATE
+         SET completed_at = COALESCE(product_routine_day_progress.completed_at, EXCLUDED.completed_at),
+             updated_at = NOW()`,
+        [userId, routineId, day]
+      );
+      return getProductRoutineStatesV98(client, userId);
+    });
+    res.json({ ok: true, state });
+  } catch (error) { next(error); }
+});
+
+
 app.get(
   "/api/push/public-key",
   (req, res, next) => {

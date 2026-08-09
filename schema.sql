@@ -63,3 +63,30 @@ CREATE INDEX IF NOT EXISTS idx_notification_jobs_pending
 CREATE INDEX IF NOT EXISTS idx_notification_jobs_user
   ON notification_jobs(user_id, cycle, day);
 
+-- NU APP · SINCRONIZACIÓN MULTIRUTINA V98
+-- Collagen+ conserva users/day_progress. Estas tablas son sólo para
+-- LumiSpa, WellSpa y Galvanic Spa.
+CREATE TABLE IF NOT EXISTS product_routine_states (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  routine_id TEXT NOT NULL,
+  current_day INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, routine_id),
+  CHECK (current_day BETWEEN 1 AND 10)
+);
+
+CREATE TABLE IF NOT EXISTS product_routine_day_progress (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  routine_id TEXT NOT NULL,
+  day INTEGER NOT NULL,
+  opened_at TIMESTAMPTZ NULL,
+  completed_at TIMESTAMPTZ NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, routine_id, day),
+  CHECK (day BETWEEN 1 AND 10)
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_routine_progress_user
+  ON product_routine_day_progress(user_id, routine_id, day);
+

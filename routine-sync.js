@@ -198,3 +198,36 @@ window.addEventListener(
     }
   }
 );
+
+// NU APP · SINCRONIZACIÓN MULTIRUTINA V98
+window.addEventListener("product-routines-state-updated", event => {
+  const routines = event.detail?.routines || {};
+  Object.entries(routines).forEach(([routineId, serverState]) => {
+    if (!ROUTINE_CATALOG[routineId] || ROUTINE_CATALOG[routineId].backend) return;
+    if (serverState.initialized !== true) return;
+    const localState = {
+      currentDay: Math.max(1, Math.min(10, Number(serverState.currentDay || 1))),
+      openedDays: serverState.openedDays || {},
+      nextUnlockAt: null,
+      scheduleProfileSignature: null
+    };
+    localStorage.setItem(`routineState:${routineId}`, JSON.stringify(localState));
+    for (let day = 1; day <= 10; day++) {
+      const key = `day:${routineId}:${day}:complete`;
+      if ((serverState.completedDays || []).includes(day)) localStorage.setItem(key, "1");
+      else localStorage.removeItem(key);
+    }
+  });
+
+  const active = routines[getActiveRoutineId()];
+  if (active?.initialized === true && !isBackendManagedRoutine() && !isPreviewMode) {
+    selectedDay = Math.max(1, Math.min(TOTAL_PROGRAM_DAYS, Number(active.currentDay || 1)));
+    localStorage.setItem(`selectedDay:${getActiveRoutineId()}`, String(selectedDay));
+    applyActiveRoutineContent();
+    renderSelectedDayHeader();
+    renderStructuredDayDetail();
+    renderDays();
+    renderFavorites();
+  }
+  if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
+});

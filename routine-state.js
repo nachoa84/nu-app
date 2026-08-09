@@ -38,6 +38,10 @@ function saveRoutineState(state) {
     getRoutineStateStorageKey(),
     JSON.stringify(state)
   );
+  if (!isBackendManagedRoutine() && window.BackendAPI) {
+    window.BackendAPI.openProductRoutineDay(getActiveRoutineId(), Number(state.currentDay || 1))
+      .catch(error => console.warn("No se pudo sincronizar la selección de rutina.", error));
+  }
 }
 
 function getDayCompleteStorageKey(day) {
@@ -57,6 +61,10 @@ function setDayComplete(day, complete = true) {
     localStorage.setItem(key, "1");
   } else {
     localStorage.removeItem(key);
+  }
+  if (complete && !isBackendManagedRoutine() && window.BackendAPI) {
+    window.BackendAPI.completeProductRoutineDay(getActiveRoutineId(), Number(day))
+      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
   }
 }
 

@@ -441,3 +441,14 @@ Object.entries(MANYCHAT_WELCOME_TAGS_V97A).forEach(([routineId, tag]) => {
   }
 });
 
+// NU APP · DÍA 2 RESPONSIVO V98A
+["lumispa-10", "wellspa-10", "galvanicspa-10"].forEach(routineId => {
+  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.["2"];
+  const tutorial = (day?.blocks || []).find(block =>
+    block?.type === "text" && /^\s*2\)\s*Te compartimos estos 2 tutoriales:/iu.test(String(block.content || ""))
+  );
+  if (tutorial) {
+    tutorial.content = String(tutorial.content).replace(/^\s*2\)\s*/u, "");
+  }
+});
+
