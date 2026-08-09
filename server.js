@@ -2119,6 +2119,28 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
             [userId, routineId, day]
           );
         }
+        await client.query(
+          `UPDATE product_routine_states
+           SET current_day = COALESCE(
+             (
+               SELECT candidate.day
+               FROM generate_series(1, 10) AS candidate(day)
+               WHERE NOT EXISTS (
+                 SELECT 1
+                 FROM product_routine_day_progress progress
+                 WHERE progress.user_id = $1
+                   AND progress.routine_id = $2
+                   AND progress.day = candidate.day
+                   AND progress.completed_at IS NOT NULL
+               )
+               ORDER BY candidate.day
+               LIMIT 1
+             ),
+             10
+           ), updated_at = NOW()
+           WHERE user_id = $1 AND routine_id = $2`,
+          [userId, routineId]
+        );
       }
       return getProductRoutineStatesV98(client, userId);
     });
@@ -2145,8 +2167,8 @@ app.post("/api/product-routines/open", async (req, res, next) => {
         `INSERT INTO product_routine_states (user_id, routine_id, current_day)
          VALUES ($1, $2, $3)
          ON CONFLICT (user_id, routine_id) DO UPDATE
-         SET current_day = EXCLUDED.current_day, updated_at = NOW()`,
-        [userId, routineId, day]
+         SET updated_at = NOW()`,
+        [userId, routineId, 1]
       );
       await client.query(
         `INSERT INTO product_routine_day_progress (user_id, routine_id, day, opened_at)
@@ -2181,6 +2203,28 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
          SET completed_at = COALESCE(product_routine_day_progress.completed_at, EXCLUDED.completed_at),
              updated_at = NOW()`,
         [userId, routineId, day]
+      );
+      await client.query(
+        `UPDATE product_routine_states
+         SET current_day = COALESCE(
+           (
+             SELECT candidate.day
+             FROM generate_series(1, 10) AS candidate(day)
+             WHERE NOT EXISTS (
+               SELECT 1
+               FROM product_routine_day_progress progress
+               WHERE progress.user_id = $1
+                 AND progress.routine_id = $2
+                 AND progress.day = candidate.day
+                 AND progress.completed_at IS NOT NULL
+             )
+             ORDER BY candidate.day
+             LIMIT 1
+           ),
+           10
+         ), updated_at = NOW()
+         WHERE user_id = $1 AND routine_id = $2`,
+        [userId, routineId]
       );
       return getProductRoutineStatesV98(client, userId);
     });

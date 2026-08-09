@@ -221,11 +221,10 @@ window.addEventListener("product-routines-state-updated", event => {
 
   const active = routines[getActiveRoutineId()];
   if (active?.initialized === true && !isBackendManagedRoutine() && !isPreviewMode) {
-    selectedDay = Math.max(1, Math.min(TOTAL_PROGRAM_DAYS, Number(active.currentDay || 1)));
-    localStorage.setItem(`selectedDay:${getActiveRoutineId()}`, String(selectedDay));
+    // NU APP · PERMANECER EN EL DÍA COMPLETADO V100A
+    // El backend avanza el estado y las cards, pero no cambia la pantalla elegida.
     applyActiveRoutineContent();
     renderSelectedDayHeader();
-    renderStructuredDayDetail();
     renderDays();
     renderFavorites();
   }

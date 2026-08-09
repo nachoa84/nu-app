@@ -59,10 +59,10 @@ function setupMultiRoutineV92() {
   section.insertAdjacentElement("afterend", selector);
   const originalSelectDay = selectDay;
   selectDay = function(day, showImmediately = false) {
-    if (!isBackendManagedRoutine()) {
-      const state = getRoutineState();
-      state.currentDay = Number(day);
-      saveRoutineState(state);
+    if (!isBackendManagedRoutine() && window.BackendAPI) {
+      window.BackendAPI
+        .openProductRoutineDay(getActiveRoutineId(), Number(day))
+        .catch(error => console.warn("No se pudo registrar la apertura del día.", error));
     }
     return originalSelectDay(day, showImmediately);
   };
@@ -251,10 +251,10 @@ setupMultiRoutineV92 = function setupMultiRoutineV92a() {
   document.querySelector(".home-routine-selector")?.remove();
   const originalSelectDay = selectDay;
   selectDay = function(day, showImmediately = false) {
-    if (!isBackendManagedRoutine()) {
-      const state = getRoutineState();
-      state.currentDay = Number(day);
-      saveRoutineState(state);
+    if (!isBackendManagedRoutine() && window.BackendAPI) {
+      window.BackendAPI
+        .openProductRoutineDay(getActiveRoutineId(), Number(day))
+        .catch(error => console.warn("No se pudo registrar la apertura del día.", error));
     }
     return originalSelectDay(day, showImmediately);
   };
@@ -488,3 +488,64 @@ labelRoutineLinkV99(
     `Tutorial 2 · Crear una oferta de ${routineTitle}`
   );
 });
+
+
+// NU APP · CARDS DE AVANCE REAL V100
+function getRoutineCardProgressV100(config) {
+  const state = getRoutineCardStateV92b(config);
+  let completed = 0;
+  for (let day = 1; day <= Number(config.totalDays); day++) {
+    const key = config.backend
+      ? `day${day}Complete`
+      : `day:${config.id}:${day}:complete`;
+    if (localStorage.getItem(key) === "1") completed += 1;
+  }
+  const currentDay = config.backend
+    ? Math.max(1, Math.min(Number(state.currentDay || 1), config.totalDays))
+    : Math.max(1, Math.min(
+        typeof getNextPendingProductRoutineDayV100 === "function"
+          ? getNextPendingProductRoutineDayV100(config.id, config.totalDays)
+          : Number(state.currentDay || 1),
+        config.totalDays
+      ));
+  return {
+    currentDay,
+    completed,
+    complete: completed >= Number(config.totalDays),
+    percent: Math.min(100, Math.round((completed / Number(config.totalDays)) * 100))
+  };
+}
+
+createFixedRoutineCardV92b = function createFixedRoutineCardV100(config) {
+  const progress = getRoutineCardProgressV100(config);
+  const action = progress.complete
+    ? "Rutina completada"
+    : progress.completed > 0
+      ? `Continuar Día ${progress.currentDay}`
+      : "Comenzar rutina";
+  const dayLabel = progress.complete
+    ? `${config.totalDays} de ${config.totalDays} días completados`
+    : `Día ${progress.currentDay} de ${config.totalDays}`;
+  const card = document.createElement("article");
+  card.className = "home-routine-card home-routine-card-active home-routine-card-fixed";
+  card.dataset.routineId = config.id;
+  card.dataset.selected = String(config.id === getActiveRoutineId());
+  card.innerHTML = `
+    <div class="home-routine-cover" aria-hidden="true">
+      <img src="${config.cover}" alt="" loading="lazy" />
+    </div>
+    <div class="home-routine-body">
+      <div class="home-routine-heading"><h2>${config.title}</h2></div>
+      <p class="home-routine-day">${dayLabel}</p>
+      <div class="home-routine-progress-row">
+        <div class="home-routine-progress" aria-hidden="true"><span style="width:${progress.percent}%"></span></div>
+        <span class="home-routine-percent">${progress.percent}%</span>
+      </div>
+      <button class="home-routine-continue" type="button" aria-label="Abrir rutina ${config.title}">
+        <span>${action}</span>
+        <span class="home-routine-continue-icon" aria-hidden="true">›</span>
+      </button>
+    </div>`;
+  card.querySelector("button").onclick = () => openRoutineFromCardV92a(config.id);
+  return card;
+};

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v99-youtube-link-labels";
+const CACHE="nuapp-v100a-stay-completed-day";
 
 const CORE=[
   "./",
@@ -22,10 +22,10 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=99-youtube-link-labels",
+  "./routine-products-v92.js?v=100-immediate-progress",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
-  "./routine-state.js?v=98-multiroutine-sync",
-  "./routine-sync.js?v=98-multiroutine-sync",
+  "./routine-state.js?v=100-immediate-progress",
+  "./routine-sync.js?v=100a-stay-completed-day",
   "./bot.js?v=94-favorite-folders",
   "./bot-shortcuts-v95.js?v=95b-clean-labels",
   "./favorites.js?v=96-material-names",
@@ -35,7 +35,7 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=63e-ios-thumbnails",
   "./app.js?v=63e-ios-thumbnails",
-  "./backend-client.js?v=98-multiroutine-sync",
+  "./backend-client.js?v=100-immediate-progress",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",

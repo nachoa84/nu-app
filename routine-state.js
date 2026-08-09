@@ -288,3 +288,39 @@ function advanceRoutineIfEligible() {
   // Desde V54 currentDay solo avanza con estado confirmado por backend.
   return false;
 }
+
+
+// NU APP · AVANCE INMEDIATO MULTIRUTINA V100
+function getNextPendingProductRoutineDayV100(routineId, totalDays = 10) {
+  for (let day = 1; day <= Number(totalDays); day++) {
+    if (localStorage.getItem(`day:${routineId}:${day}:complete`) !== "1") {
+      return day;
+    }
+  }
+  return Number(totalDays);
+}
+
+setDayComplete = function setDayCompleteV100(day, complete = true) {
+  const safeDay = Number(day);
+  const key = getDayCompleteStorageKey(safeDay);
+
+  if (complete) localStorage.setItem(key, "1");
+  else localStorage.removeItem(key);
+
+  if (isBackendManagedRoutine()) return;
+
+  const routineId = getActiveRoutineId();
+  const totalDays = Number(getActiveRoutineConfig()?.totalDays || 10);
+  const nextDay = getNextPendingProductRoutineDayV100(routineId, totalDays);
+  const state = getRoutineState();
+  state.currentDay = nextDay;
+  localStorage.setItem(`routineState:${routineId}`, JSON.stringify(state));
+
+  if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
+
+  if (complete && window.BackendAPI) {
+    window.BackendAPI
+      .completeProductRoutineDay(routineId, safeDay)
+      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
+  }
+};
