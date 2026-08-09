@@ -1,4 +1,4 @@
-const CACHE="nuapp-v98a-responsive-day2";
+const CACHE="nuapp-v99-youtube-link-labels";
 
 const CORE=[
   "./",
@@ -22,7 +22,7 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=98a-responsive-day2",
+  "./routine-products-v92.js?v=99-youtube-link-labels",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=98-multiroutine-sync",
   "./routine-sync.js?v=98-multiroutine-sync",

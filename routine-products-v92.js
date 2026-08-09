@@ -452,3 +452,39 @@ Object.entries(MANYCHAT_WELCOME_TAGS_V97A).forEach(([routineId, tag]) => {
   }
 });
 
+// NU APP · ETIQUETAS DE YOUTUBE V99
+function labelRoutineLinkV99(routineId, dayNumber, url, label) {
+  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.[String(dayNumber)];
+  if (!day) return;
+  (day.blocks || []).forEach(block => {
+    (block.links || []).forEach(link => {
+      if (String(link.url || "") === url) link.label = label;
+    });
+  });
+}
+
+labelRoutineLinkV99(
+  "lumispa-10",
+  1,
+  "https://youtu.be/J7c38OZ8Z1M",
+  "Video · Conocé LumiSpa"
+);
+
+[
+  ["wellspa-10", "WellSpa"],
+  ["galvanicspa-10", "Galvanic Spa"],
+  ["lumispa-10", "LumiSpa"]
+].forEach(([routineId, routineTitle]) => {
+  labelRoutineLinkV99(
+    routineId,
+    2,
+    "https://youtu.be/rRPg_-xCEzo",
+    "Tutorial 1 · Crear un enlace de invitación"
+  );
+  labelRoutineLinkV99(
+    routineId,
+    2,
+    "https://www.youtube.com/shorts/Y_4yQNki73M",
+    `Tutorial 2 · Crear una oferta de ${routineTitle}`
+  );
+});
