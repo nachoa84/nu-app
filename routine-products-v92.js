@@ -587,3 +587,48 @@ function openRoutineNotificationTargetV101A() {
 window.addEventListener("load", () => {
   window.setTimeout(openRoutineNotificationTargetV101A, 250);
 }, { once: true });
+
+// NU APP · LIMPIEZA DÍA 2 Y GALERÍAS V107
+(function applyRoutineDayCleanupV107() {
+  const galleryLabels = {
+    "lumispa-10": "Ver galería de resultados de LumiSpa",
+    "wellspa-10": "Ver galería de resultados de WellSpa",
+    "galvanicspa-10": "Ver galería de resultados de Galvanic Spa"
+  };
+
+  Object.entries(galleryLabels).forEach(([routineId, galleryLabel]) => {
+    const routine = PRODUCT_ROUTINE_DAYS?.[routineId];
+    if (!routine?.days) return;
+
+    const day2 = routine.days["2"];
+    const day2Objective = day2?.blocks?.find(block => block.type === "text");
+    if (day2Objective) {
+      day2Objective.content = "";
+      day2Objective.links = [];
+      day2Objective.hideObjectiveDetailsV97a = true;
+    }
+
+    const day6 = routine.days["6"];
+    day6?.blocks?.forEach(block => {
+      block.links?.forEach(link => {
+        if (/^https?:\/\//i.test(String(link.url || ""))) {
+          link.label = galleryLabel;
+        }
+      });
+    });
+  });
+})();
+
+// NU APP · GALERÍA OFICIAL GALVANIC V107A
+(function applyOfficialGalvanicGalleryV107a() {
+  const day6 = PRODUCT_ROUTINE_DAYS?.["galvanicspa-10"]?.days?.["6"];
+  day6?.blocks?.forEach(block => {
+    block.links?.forEach(link => {
+      if (/^https?:\/\//i.test(String(link.url || ""))) {
+        link.url = "https://nuskinsocial.smugmug.com/Social/LATAM/Productos/AgeLOC/Galvanic";
+        link.label = "Ver galería de resultados de Galvanic Spa";
+      }
+    });
+  });
+})();
+
