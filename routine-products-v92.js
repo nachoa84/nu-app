@@ -549,3 +549,40 @@ createFixedRoutineCardV92b = function createFixedRoutineCardV100(config) {
   card.querySelector("button").onclick = () => openRoutineFromCardV92a(config.id);
   return card;
 };
+
+
+// NU APP · APERTURA DESDE NOTIFICACIÓN V101A
+function clearRoutineNotificationParamsV101A() {
+  const url = new URL(window.location.href);
+  ["routine", "day", "notification", "routineNotifications"].forEach(key =>
+    url.searchParams.delete(key)
+  );
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+function openRoutineNotificationTargetV101A() {
+  const notificationParams = new URLSearchParams(window.location.search);
+  const grouped = notificationParams.get("routineNotifications") === "1";
+  const routineId = notificationParams.get("routine");
+  const day = Number(notificationParams.get("day"));
+
+  if (grouped) {
+    document.querySelector('[data-view="hoy"]')?.click();
+    closeNativeDayView();
+    if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
+    clearRoutineNotificationParamsV101A();
+    return;
+  }
+
+  if (!ROUTINE_CATALOG[routineId] || !Number.isInteger(day)) return;
+  const totalDays = Number(ROUTINE_CATALOG[routineId].totalDays);
+  if (day < 1 || day > totalDays) return;
+
+  setActiveRoutineV92(routineId);
+  selectDay(day, true);
+  clearRoutineNotificationParamsV101A();
+}
+
+window.addEventListener("load", () => {
+  window.setTimeout(openRoutineNotificationTargetV101A, 250);
+}, { once: true });

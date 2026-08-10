@@ -1249,6 +1249,197 @@ async function processNotificationJobs() {
   return processed;
 }
 
+
+
+// NU APP · ENVÍO AGRUPADO DE RUTINAS V101A
+const ROUTINE_NOTIFICATION_NAMES_V101A = {
+  "collagen-30": "Collagen+",
+  "lumispa-10": "LumiSpa",
+  "wellspa-10": "WellSpa",
+  "galvanicspa-10": "Galvanic Spa"
+};
+
+async function claimUnifiedRoutineNotificationsV101A() {
+  return withTransaction(async client => {
+    const candidate = await client.query(
+      `SELECT user_id, MIN(due_at) AS due_at
+       FROM (
+         SELECT user_id, created_at AS due_at
+         FROM notification_jobs
+         WHERE status IN ('pending', 'failed') AND attempts < 5
+         UNION ALL
+         SELECT user_id, scheduled_for AS due_at
+         FROM routine_notification_jobs
+         WHERE status IN ('pending', 'failed')
+           AND attempts < 5
+           AND scheduled_for <= NOW()
+       ) due
+       GROUP BY user_id
+       ORDER BY MIN(due_at)
+       LIMIT 1`,
+      []
+    );
+
+    if (!candidate.rowCount) return null;
+    const userId = candidate.rows[0].user_id;
+
+    const collagen = await client.query(
+      `SELECT id, cycle, day
+       FROM notification_jobs
+       WHERE user_id = $1
+         AND status IN ('pending', 'failed')
+         AND attempts < 5
+       ORDER BY created_at
+       FOR UPDATE SKIP LOCKED`,
+      [userId]
+    );
+
+    const products = await client.query(
+      `SELECT id, routine_id, cycle, day
+       FROM routine_notification_jobs
+       WHERE user_id = $1
+         AND status IN ('pending', 'failed')
+         AND attempts < 5
+         AND scheduled_for <= NOW()
+       ORDER BY scheduled_for, routine_id
+       FOR UPDATE SKIP LOCKED`,
+      [userId]
+    );
+
+    if (!collagen.rowCount && !products.rowCount) return null;
+
+    const collagenIds = collagen.rows.map(row => row.id);
+    const productIds = products.rows.map(row => row.id);
+
+    if (collagenIds.length) {
+      await client.query(
+        `UPDATE notification_jobs
+         SET status = 'processing', attempts = attempts + 1, updated_at = NOW()
+         WHERE id = ANY($1::bigint[])`,
+        [collagenIds]
+      );
+    }
+    if (productIds.length) {
+      await client.query(
+        `UPDATE routine_notification_jobs
+         SET status = 'processing', attempts = attempts + 1, updated_at = NOW()
+         WHERE id = ANY($1::bigint[])`,
+        [productIds]
+      );
+    }
+
+    return {
+      userId,
+      collagen: collagen.rows,
+      products: products.rows
+    };
+  });
+}
+
+function buildUnifiedRoutinePayloadV101A(batch) {
+  const entries = [
+    ...batch.collagen.map(row => ({
+      routineId: "collagen-30",
+      day: Number(row.day)
+    })),
+    ...batch.products.map(row => ({
+      routineId: row.routine_id,
+      day: Number(row.day)
+    }))
+  ];
+
+  const unique = [];
+  const seen = new Set();
+  for (const entry of entries) {
+    const key = `${entry.routineId}:${entry.day}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(entry);
+  }
+
+  if (unique.length === 1) {
+    const entry = unique[0];
+    const name = ROUTINE_NOTIFICATION_NAMES_V101A[entry.routineId] || "tu rutina";
+    return {
+      title: `🔥 Tu Día ${entry.day} de ${name} está disponible`,
+      body: "Entrá y descubrí tu acción de hoy.",
+      url: `/?routine=${encodeURIComponent(entry.routineId)}&day=${entry.day}&notification=1`,
+      tag: `routine_daily_${batch.userId}`
+    };
+  }
+
+  const routines = [...new Set(unique.map(entry =>
+    ROUTINE_NOTIFICATION_NAMES_V101A[entry.routineId] || "Rutina"
+  ))];
+  return {
+    title: `🔥 Tenés contenido nuevo en ${routines.length} rutinas`,
+    body: `Continuá con ${routines.join(", ")}.`,
+    url: "/?routineNotifications=1",
+    tag: `routine_daily_${batch.userId}`
+  };
+}
+
+async function markUnifiedRoutineNotificationsV101A(batch, status, lastError = null) {
+  const collagenIds = batch.collagen.map(row => row.id);
+  const productIds = batch.products.map(row => row.id);
+  const sent = status === "sent";
+
+  if (collagenIds.length) {
+    await pool.query(
+      `UPDATE notification_jobs
+       SET status = $2, last_error = $3, updated_at = NOW(),
+           sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
+       WHERE id = ANY($1::bigint[])`,
+      [collagenIds, status, lastError]
+    );
+  }
+  if (productIds.length) {
+    await pool.query(
+      `UPDATE routine_notification_jobs
+       SET status = $2, last_error = $3, updated_at = NOW(),
+           sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
+       WHERE id = ANY($1::bigint[])`,
+      [productIds, status, lastError]
+    );
+  }
+  void sent;
+}
+
+async function processUnifiedRoutineNotificationJobsV101A() {
+  let processed = 0;
+
+  while (processed < 100) {
+    const batch = await claimUnifiedRoutineNotificationsV101A();
+    if (!batch) break;
+
+    try {
+      const result = await sendPushToUser(
+        batch.userId,
+        buildUnifiedRoutinePayloadV101A(batch)
+      );
+
+      if (result.sent > 0) {
+        await markUnifiedRoutineNotificationsV101A(batch, "sent");
+      } else {
+        const reason = result.subscriptions === 0
+          ? "El usuario no tiene dispositivos suscriptos."
+          : result.errors.join(" | ") || "No se pudo enviar la notificación.";
+        await markUnifiedRoutineNotificationsV101A(batch, "failed", reason);
+      }
+    } catch (error) {
+      await markUnifiedRoutineNotificationsV101A(
+        batch,
+        "failed",
+        error.message || String(error)
+      );
+    }
+
+    processed += 1;
+  }
+
+  return processed;
+}
+
 async function runSchedulerCycle() {
   if (
     schedulerRunning ||
@@ -1265,7 +1456,7 @@ async function runSchedulerCycle() {
       await enqueueDueUnlocks();
 
     const notifications =
-      await processNotificationJobs();
+      await processUnifiedRoutineNotificationJobsV101A();
 
     if (
       advanced > 0 ||
@@ -2226,6 +2417,37 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
          WHERE user_id = $1 AND routine_id = $2`,
         [userId, routineId]
       );
+      // NU APP · PROGRAMACIÓN UNIFICADA DE RUTINAS V101
+      // Completar hoy programa el contenido siguiente para mañana,
+      // respetando la hora y la zona horaria elegidas por la persona.
+      if (day < 10) {
+        const notificationProfile = await client.query(
+          `SELECT timezone, notification_time FROM users WHERE id = $1`,
+          [userId]
+        );
+        const schedule = notificationProfile.rows[0];
+        if (schedule) {
+          const scheduledFor = nextUnlockAt({
+            openedAt: new Date(),
+            timezone: schedule.timezone,
+            notificationTime: schedule.notification_time
+          });
+          await client.query(
+            `INSERT INTO routine_notification_jobs (
+               user_id, routine_id, cycle, day, kind, scheduled_for, status
+             ) VALUES ($1, $2, 1, $3, 'day_available', $4, 'pending')
+             ON CONFLICT (user_id, routine_id, cycle, day, kind)
+             DO UPDATE SET
+               scheduled_for = CASE
+                 WHEN routine_notification_jobs.status = 'sent'
+                   THEN routine_notification_jobs.scheduled_for
+                 ELSE LEAST(routine_notification_jobs.scheduled_for, EXCLUDED.scheduled_for)
+               END,
+               updated_at = NOW()`,
+            [userId, routineId, day + 1, scheduledFor]
+          );
+        }
+      }
       return getProductRoutineStatesV98(client, userId);
     });
     res.json({ ok: true, state });

@@ -90,3 +90,34 @@ CREATE TABLE IF NOT EXISTS product_routine_day_progress (
 CREATE INDEX IF NOT EXISTS idx_product_routine_progress_user
   ON product_routine_day_progress(user_id, routine_id, day);
 
+
+
+-- NU APP · PROGRAMACIÓN UNIFICADA DE RUTINAS V101
+-- En V101 se registran los avisos de las rutinas de producto.
+-- V101a incorporará Collagen+ al envío agrupado usando esta misma cola.
+CREATE TABLE IF NOT EXISTS routine_notification_jobs (
+  id BIGSERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  routine_id TEXT NOT NULL,
+  cycle INTEGER NOT NULL DEFAULT 1,
+  day INTEGER NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'day_available',
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  UNIQUE (user_id, routine_id, cycle, day, kind),
+  CHECK (routine_id IN ('collagen-30', 'lumispa-10', 'wellspa-10', 'galvanicspa-10')),
+  CHECK (day BETWEEN 1 AND 30),
+  CHECK (status IN ('pending', 'processing', 'sent', 'failed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_routine_notification_jobs_due
+  ON routine_notification_jobs(status, scheduled_for)
+  WHERE status IN ('pending', 'failed');
+
+CREATE INDEX IF NOT EXISTS idx_routine_notification_jobs_user
+  ON routine_notification_jobs(user_id, scheduled_for);

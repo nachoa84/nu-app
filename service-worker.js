@@ -1,4 +1,4 @@
-const CACHE="nuapp-v100a-stay-completed-day";
+const CACHE="nuapp-v101a-unified-routine-notifications";
 
 const CORE=[
   "./",
@@ -22,7 +22,7 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=61b-progress-canonical",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=100-immediate-progress",
+  "./routine-products-v92.js?v=101a-unified-notifications",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=100-immediate-progress",
   "./routine-sync.js?v=100a-stay-completed-day",
