@@ -17,7 +17,16 @@
       description: "Uso, materiales y apoyo para asesorar.",
       tone: "blue",
       icon: "products",
-      commands: ["como usar", "box colageno", "como asesorar lumi spa", "estrategia colageno europa"]
+      commands: [
+        "como usar boost",
+        "como usar lumi spa",
+        "como usar facial spa",
+        "como usar well spa",
+        "como usar face wash 180",
+        "box colageno",
+        "como asesorar lumi spa",
+        "estrategia colageno europa"
+      ]
     },
     {
       id: "tramites-informacion",
@@ -66,8 +75,22 @@
   }
 
   function commandCatalog() {
-    const catalog = Array.isArray(window.BotCommandCatalog) ? window.BotCommandCatalog : [];
-    const byCommand = new Map(catalog.map(item => [normalizedCommand(item.command), item]));
+    // NU APP · TECNOLOGÍAS DIRECTAS V105
+    // Incluye los temas ocultos de detalle únicamente para resolver accesos
+    // rápidos; no altera la búsqueda normal ni la biblioteca visible del Bot.
+    const catalog = [
+      ...(Array.isArray(window.BotCommandCatalog) ? window.BotCommandCatalog : []),
+      ...(Array.isArray(window.BotContent) ? window.BotContent : [])
+    ].map(item => ({
+      ...item,
+      label: item.label || item.title || item.command
+    }));
+    const byCommand = new Map();
+    catalog.forEach(item => {
+      [item.command, ...(Array.isArray(item.commands) ? item.commands : [])]
+        .filter(Boolean)
+        .forEach(command => byCommand.set(normalizedCommand(command), item));
+    });
     return QUICK_ACCESS_CATEGORIES.map(category => ({
       ...category,
       items: category.commands.map(command => byCommand.get(command)).filter(Boolean)

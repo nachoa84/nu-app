@@ -1305,6 +1305,26 @@ function botAsk(q) {
   if (!question) return;
 
   const messages = loadBotConversation();
+
+  // NU APP · REPETICIÓN CONSECUTIVA V105
+  // Bloquea solamente el mismo pedido dos veces seguidas. Si hubo otro pedido
+  // en el medio, el comando vuelve a responder con normalidad.
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find(message => message?.role === "user");
+  if (
+    lastUserMessage &&
+    normalizeBotText(lastUserMessage.text) === normalizeBotText(question)
+  ) {
+    if (typeof toast === "function") {
+      toast("Ese recurso ya es el último de la conversación.", {
+        type: "info",
+        duration: 2400
+      });
+    }
+    return;
+  }
+
   messages.push(createBotMessage("user", question));
   saveBotConversation(messages);
   renderBotConversation({ scroll: true });

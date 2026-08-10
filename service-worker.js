@@ -1,4 +1,4 @@
-const CACHE="nuapp-v103a-unified-app-store";
+const CACHE="nuapp-v105-navigation-bot-fixes";
 
 const CORE=[
   "./",
@@ -26,15 +26,15 @@ const CORE=[
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
   "./routine-state.js?v=100-immediate-progress",
   "./routine-sync.js?v=100a-stay-completed-day",
-  "./bot.js?v=94-favorite-folders",
-  "./bot-shortcuts-v95.js?v=95b-clean-labels",
+  "./bot.js?v=105-navigation-bot-fixes",
+  "./bot-shortcuts-v95.js?v=105-navigation-bot-fixes",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
-  "./media-preview.js?v=63e-ios-thumbnails",
+  "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=63e-ios-thumbnails",
   "./backend-client.js?v=100-immediate-progress",
   "./push-client.js?v=61b-progress-canonical",

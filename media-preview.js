@@ -6,6 +6,12 @@
 let previewState = { items: [], index: 0, day: 1 };
 let activePreviewVideo = null;
 
+// NU APP · HISTORIAL DEL VISOR V105
+// El gesto Atrás de Android/iPhone cierra primero el visor sin salir de la PWA.
+const MEDIA_PREVIEW_HISTORY_KEY = "nuapp-media-preview";
+let mediaPreviewHistoryActive = false;
+let mediaPreviewClosingFromHistory = false;
+
 // Cada render invalida callbacks de imágenes anteriores.
 // No bloquea la navegación: solo evita que una carga vieja toque la UI actual.
 let previewRenderToken = 0;
@@ -78,6 +84,13 @@ function closeMediaPreview(direction = "right") {
   const modal = document.getElementById("mediaPreview");
   const shell = document.getElementById("mediaPreviewShell");
   if (!modal || modal.hidden) return;
+
+  // Si el cierre nació en el botón, backdrop o gesto vertical, retiramos el
+  // estado artificial del visor. Si nació en popstate, el historial ya volvió.
+  if (mediaPreviewHistoryActive && !mediaPreviewClosingFromHistory) {
+    mediaPreviewHistoryActive = false;
+    window.history.back();
+  }
 
   // Cortamos reproducción/red inmediatamente al cerrar el visor.
   destroyActivePreviewVideo();
@@ -490,6 +503,8 @@ function navigateMediaPreview(
 }
 
 function openMediaPreview(items, index = 0, day = selectedDay) {
+  const modal = document.getElementById("mediaPreview");
+  const wasAlreadyOpen = Boolean(modal && !modal.hidden);
   const normalized = items
     .filter(item => item && item.src && item.mediaType !== "link")
     .map(normalizePreviewItem);
@@ -507,6 +522,15 @@ function openMediaPreview(items, index = 0, day = selectedDay) {
   };
 
   renderMediaPreview();
+
+  if (!wasAlreadyOpen && !mediaPreviewHistoryActive) {
+    window.history.pushState(
+      { nuappOverlay: MEDIA_PREVIEW_HISTORY_KEY },
+      "",
+      window.location.href
+    );
+    mediaPreviewHistoryActive = true;
+  }
 }
 
 function setupMediaPreview() {
@@ -681,6 +705,17 @@ function setupMediaPreview() {
     if (event.key === "ArrowRight") navigateMediaPreview(1);
   });
 }
+
+// NU APP · HISTORIAL DEL VISOR V105
+window.addEventListener("popstate", () => {
+  const modal = document.getElementById("mediaPreview");
+  if (!mediaPreviewHistoryActive || !modal || modal.hidden) return;
+
+  mediaPreviewHistoryActive = false;
+  mediaPreviewClosingFromHistory = true;
+  closeMediaPreview("right");
+  mediaPreviewClosingFromHistory = false;
+});
 
 // Inicializar solo después de que app.js haya definido sus dependencias globales.
 setupMediaPreview();
