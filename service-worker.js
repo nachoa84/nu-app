@@ -1,4 +1,4 @@
-const CACHE="nuapp-v105-navigation-bot-fixes";
+const CACHE="nuapp-v106f-routine-images-cleanup";
 
 const CORE=[
   "./",
@@ -22,8 +22,8 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=101a-unified-notifications",
-  "./multiroutine-v92.css?v=92c-multiroutine-polish",
+  "./routine-products-v92.js?v=106e-lumispa-interior-image",
+  "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=100-immediate-progress",
   "./routine-sync.js?v=100a-stay-completed-day",
   "./bot.js?v=105-navigation-bot-fixes",
@@ -62,6 +62,11 @@ const CORE=[
   "./icons/nuapp-maskable-512.png?v=61b-progress-canonical",
   "./assets/custom/routine-collagen-home.png",
   "./assets/custom/routine-lumispa-home.png",
+  "./assets/custom/routine-lumispa-hero-v4.png",
+  "./assets/custom/routine-wellspa-hero-v3.png",
+  "./assets/custom/routine-galvanicspa-hero-v3.png",
+  "./assets/custom/routine-wellspa-home.jpg",
+  "./assets/custom/routine-galvanicspa-home.webp",
   "./assets/custom/routine-pharmanex-home.png",
   "./assets/custom/collagen-day-hero.jpg",
   "./assets/D01_05_IMAGEN.jpg",

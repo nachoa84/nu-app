@@ -23,3 +23,177 @@
 .home-routine-card-fixed .home-routine-continue{display:inline-flex}
 .home-routine-card-fixed[data-selected="true"]{border-color:rgba(86,72,190,.18)}
 
+/* NU APP · PORTADAS Y HEROES DIFERENTES V106A */
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover,
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover {
+  background: #fff;
+}
+
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img,
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img {
+  transform: scale(1.06);
+}
+
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
+  transform: scale(1.1);
+}
+
+img[src*="routine-lumispa-hero.webp"] {
+  object-fit: cover;
+  object-position: center;
+  background: #e99bb3;
+}
+
+img[src*="routine-wellspa-hero.jpg"] {
+  object-fit: cover;
+  object-position: 50% center;
+  background: #718aa5;
+}
+
+img[src*="routine-galvanicspa-hero.jpg"] {
+  object-fit: cover;
+  object-position: 50% 36%;
+  background: #ead8d9;
+}
+
+/* NU APP · FONDOS UNIFICADOS DE RUTINAS V106B */
+.home-routine-card .home-routine-cover,
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover,
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, .96) 0 28%, rgba(255, 255, 255, .4) 62%, transparent 78%),
+    linear-gradient(180deg, #f8f9f9 0%, #f1f3f4 100%);
+}
+
+.home-routine-card .home-routine-cover img {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  mix-blend-mode: multiply;
+}
+
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img,
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img {
+  transform: scale(1.06);
+}
+
+.home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
+  transform: scale(1.1);
+}
+
+.native-day-hero-media {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, .98) 0 24%, rgba(248, 248, 247, .9) 62%, rgba(243, 244, 244, .98) 100%);
+  box-shadow: inset 0 0 0 1px rgba(21, 32, 60, .035);
+}
+
+.native-day-hero-media::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  content: "";
+  box-shadow:
+    inset 0 0 18px 7px rgba(248, 248, 247, .23),
+    inset 0 0 0 1px rgba(255, 255, 255, .32);
+}
+
+.native-day-hero-media img,
+.native-day-hero-media img[src*="collagen-day-hero.jpg"],
+.native-day-hero-media img[src*="routine-lumispa-hero.webp"],
+.native-day-hero-media img[src*="routine-wellspa-hero.jpg"],
+.native-day-hero-media img[src*="routine-galvanicspa-hero.jpg"] {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: transparent;
+  -webkit-mask-image: radial-gradient(ellipse 78% 76% at 50% 50%, #000 0 70%, rgba(0, 0, 0, .94) 82%, transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 76% at 50% 50%, #000 0 70%, rgba(0, 0, 0, .94) 82%, transparent 100%);
+}
+
+.native-day-hero-media img[src*="routine-wellspa-hero.jpg"] {
+  object-position: 50% center;
+}
+
+.native-day-hero-media img[src*="routine-galvanicspa-hero.jpg"] {
+  object-position: 50% 36%;
+}
+
+/* NU APP · HEROES TRANSPARENTES NORMALIZADOS V106C */
+.native-day-hero-media {
+  background: linear-gradient(180deg, #f8f9f9 0%, #f1f3f4 100%);
+  box-shadow: none;
+}
+
+.native-day-hero-media::after {
+  display: none;
+}
+
+.native-day-hero-media img[src*="routine-lumispa-hero-v3.png"],
+.native-day-hero-media img[src*="routine-wellspa-hero-v3.png"],
+.native-day-hero-media img[src*="routine-galvanicspa-hero-v3.png"] {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  transform: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* NU APP · AJUSTE FINAL DE HEROES TRANSPARENTES V106D */
+.native-day-hero-media {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.native-day-hero-media::before,
+.native-day-hero-media::after {
+  display: none !important;
+}
+
+.native-day-hero-media img[src*="routine-lumispa-hero-v3.png"] {
+  transform: scale(1.12);
+}
+
+.native-day-hero-media img[src*="routine-wellspa-hero-v3.png"] {
+  transform: scale(1.15);
+}
+
+.native-day-hero-media img[src*="routine-galvanicspa-hero-v3.png"] {
+  transform: scale(1.1);
+}
+
+/* NU APP · NUEVA IMAGEN INTERIOR LUMISPA V106E */
+.native-day-hero-media img[src*="routine-lumispa-hero-v4.png"] {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  transform: scale(1.12);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
