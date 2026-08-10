@@ -100,7 +100,7 @@ Importante:
 LINKS DE DESCARGA`,
         links: [
           { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.nuskin.sol" },
-          { label: "App Store", url: "https://apps.apple.com/us/app/nu-skin-stela/id1569407043" }
+          { label: "App Store", url: "https://apps.apple.com/es/app/nu-skin-stela/id1569407043" }
         ]
       },
       {

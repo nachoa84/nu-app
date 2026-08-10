@@ -1,4 +1,4 @@
-const CACHE="nuapp-v103-fixed-collagen-links";
+const CACHE="nuapp-v103a-unified-app-store";
 
 const CORE=[
   "./",
@@ -20,7 +20,7 @@ const CORE=[
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
-  "./routine-content.js?v=103-fixed-collagen-links",
+  "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=101a-unified-notifications",
   "./multiroutine-v92.css?v=92c-multiroutine-polish",
