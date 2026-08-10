@@ -20,7 +20,7 @@ Bienvenid@ al día #1 del Challenge #30DíasCollagen+ 🙌🏻
 
 Hoy te propongo que aprendas sobre Collagen+, con este breve video que tiene toda la info que necesitas🙌🏻`,
         links: [
-          { label: "Ver video educativo", url: "https://mc.ht/s/URLFxbD" }
+          { label: "Ver video educativo", url: "https://youtu.be/YZvoxrr673o?si=TOEjhQFfKAED8-kl" }
         ]
       },
       {
@@ -99,8 +99,8 @@ Importante:
 
 LINKS DE DESCARGA`,
         links: [
-          { label: "Google Play", url: "https://mc.ht/s/XFs7VKt" },
-          { label: "App Store", url: "https://mc.ht/s/ETQAOPD" }
+          { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.nuskin.sol" },
+          { label: "App Store", url: "https://apps.apple.com/us/app/nu-skin-stela/id1569407043" }
         ]
       },
       {
@@ -220,7 +220,7 @@ En la lista apunta a personas que:
         type: "text",
         content: "✨ Mírate este video para sacar el máximo potencial de tu lista de contactos con los tips de Micaela Barreneche🔥",
         links: [
-          { label: "Ver video", url: "https://mc.ht/s/50OUUkt" }
+          { label: "Ver video", url: "https://youtu.be/PtRYAJVfs5I" }
         ]
       },
       {
@@ -473,7 +473,7 @@ Te sugerimos tomar nota de los tips y luego salir y ponerlos en práctica!`
         type: "text",
         content: "Te comparto un contenido de lujo: 🔥\n\nVero Ruchtein comparte TIPS sobre cómo asesorar a los clientes que ya consumen colágeno, haciendo hincapié en las ventajas competitivas de Collagen+🧡",
         links: [
-          { label: "Ver capacitación", url: "https://mc.ht/s/dPkVEjM" }
+          { label: "Ver capacitación", url: "https://youtu.be/qORdv4gI9gU" }
         ]
       },
       {
