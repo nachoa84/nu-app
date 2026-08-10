@@ -1,4 +1,4 @@
-const CACHE="nuapp-v101a-unified-routine-notifications";
+const CACHE="nuapp-v102b-sales-training-no-duplicate";
 
 const CORE=[
   "./",
@@ -28,10 +28,11 @@ const CORE=[
   "./routine-sync.js?v=100a-stay-completed-day",
   "./bot.js?v=94-favorite-folders",
   "./bot-shortcuts-v95.js?v=95b-clean-labels",
+  "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
   "./home-view.js?v=61b-progress-canonical",
-  "./daily-view.js?v=97a-remove-manychat-welcome",
+  "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=63e-ios-thumbnails",
   "./app.js?v=63e-ios-thumbnails",

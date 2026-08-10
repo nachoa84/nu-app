@@ -76,7 +76,15 @@ function createBlock(block) {
     btn.type = "button";
     btn.innerHTML = `<span>Abrir capacitación</span><span aria-hidden="true">${ICONS.arrow}</span>`;
 
-    if (block.url) {
+    if (block.botCommand) {
+      btn.onclick = () => {
+        if (typeof window.openRoutineTrainingInBot === "function") {
+          window.openRoutineTrainingInBot(block);
+          return;
+        }
+        toast("No se pudo abrir la capacitación.", { type: "info" });
+      };
+    } else if (block.url) {
       btn.onclick = () => window.open(block.url, "_blank", "noopener");
     } else {
       btn.onclick = () =>
