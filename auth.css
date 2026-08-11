@@ -1,0 +1,93 @@
+/* NU APP · ACCESO POR CORREO Y CÓDIGO TEMPORAL V110 */
+/* Capa mínima: reutiliza los tokens existentes y no altera el diseño. */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 15, 20, 0.72);
+}
+
+.auth-overlay[hidden] {
+  display: none;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--surface, #ffffff);
+  color: var(--text, #1c1c1e);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+.auth-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.auth-subtitle {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form[hidden] {
+  display: none;
+}
+
+.auth-label {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #fff;
+  color: inherit;
+}
+
+.auth-button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent, #b4553c);
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-link {
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.auth-message {
+  margin: 12px 0 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+}
+
+.auth-message[data-auth-error="1"] {
+  color: #b42318;
+}

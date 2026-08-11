@@ -9,6 +9,16 @@ const {
   DateTime,
   IANAZone
 } = require("luxon");
+const {
+  createAuthService,
+  createEmailSender
+} = require("./auth-core");
+const {
+  createPgAuthStore
+} = require("./auth-store-pg");
+const {
+  createAuthHttp
+} = require("./auth-http");
 
 const app = express();
 
@@ -377,6 +387,138 @@ app.use(
   "/api/push",
   pushLimiter
 );
+
+// NU APP · ACCESO POR CORREO Y CÓDIGO TEMPORAL V110
+const authLimiter =
+  createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message:
+      "Demasiados intentos de acceso. Esperá unos minutos."
+  });
+
+app.use(
+  "/api/auth",
+  authLimiter
+);
+
+const LEGACY_LINKING_ENABLED =
+  String(
+    process.env.LEGACY_LINKING_ENABLED ||
+    "true"
+  ).toLowerCase() !== "false";
+
+const authStore = pool
+  ? createPgAuthStore(pool)
+  : null;
+
+const authService = authStore
+  ? createAuthService({
+      store: authStore,
+      sendEmail:
+        createEmailSender(process.env),
+      options: {
+        codeTtlMs:
+          Math.max(
+            Number(
+              process.env.AUTH_CODE_TTL_MINUTES || 10
+            ),
+            1
+          ) * 60 * 1000,
+        codeMaxAttempts:
+          Math.max(
+            Number(
+              process.env.AUTH_CODE_MAX_ATTEMPTS || 5
+            ),
+            1
+          ),
+        sessionTtlMs:
+          Math.max(
+            Number(
+              process.env.AUTH_SESSION_TTL_DAYS || 30
+            ),
+            1
+          ) * 24 * 60 * 60 * 1000,
+        requestsPerEmailMax:
+          Math.max(
+            Number(
+              process.env.AUTH_CODES_PER_EMAIL_MAX || 3
+            ),
+            1
+          ),
+        legacyLinkingEnabled:
+          LEGACY_LINKING_ENABLED
+      }
+    })
+  : null;
+
+const authHttp = authService
+  ? createAuthHttp({
+      service: authService,
+      secureCookies:
+        String(
+          process.env.COOKIE_SECURE ||
+          (process.env.NODE_ENV === "production"
+            ? "true"
+            : "false")
+        ).toLowerCase() === "true"
+    })
+  : null;
+
+function assertAuthConfigured() {
+  if (!authHttp) {
+    const error =
+      new Error(
+        "El acceso por correo necesita DATABASE_URL configurado."
+      );
+
+    error.status = 503;
+
+    throw error;
+  }
+}
+
+app.use(
+  "/api",
+  (req, res, next) => {
+    if (!authHttp) {
+      req.auth = null;
+      return next();
+    }
+
+    return authHttp.attachSession(req, res, next);
+  }
+);
+
+// Sin base de datos no hay acceso posible: se responde explícitamente.
+app.use(
+  "/api/auth",
+  (req, res, next) => {
+    try {
+      assertAuthConfigured();
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Endpoints privados: el userId sale siempre de la sesión validada.
+function requireSession(req, res, next) {
+  try {
+    assertAuthConfigured();
+  } catch (error) {
+    return next(error);
+  }
+
+  return authHttp.requireSession(req, res, next);
+}
+
+function sessionUserId(req) {
+  assertAuthConfigured();
+
+  return authHttp.sessionUserId(req);
+}
 
 function assertDatabase() {
   if (!pool) {
@@ -1525,14 +1667,20 @@ app.get(
   }
 );
 
+if (authHttp) {
+  authHttp.mountRoutes(app);
+}
+
 app.post(
   "/api/bootstrap",
+  requireSession,
   async (req, res, next) => {
     try {
       const profile =
-        normalizeProfile(
-          req.body.profile
-        );
+        normalizeProfile({
+          ...(req.body.profile || {}),
+          userId: sessionUserId(req)
+        });
 
       const localState =
         req.body.localState || {};
@@ -1735,14 +1883,17 @@ app.post(
 );
 
 app.get(
-  "/api/state/:userId",
+  [
+    "/api/state",
+    // Se conserva la forma anterior para clientes cacheados,
+    // pero el :userId de la URL se ignora por completo.
+    "/api/state/:userId"
+  ],
+  requireSession,
   async (req, res, next) => {
     try {
       const userId =
-        String(
-          req.params.userId ||
-          ""
-        ).trim();
+        sessionUserId(req);
 
       const state =
         await withTransaction(
@@ -1770,14 +1921,18 @@ app.get(
 );
 
 app.patch(
-  "/api/profile/:userId",
+  [
+    "/api/profile",
+    "/api/profile/:userId"
+  ],
+  requireSession,
   async (req, res, next) => {
     try {
       const profile =
         normalizeProfile({
+          ...req.body,
           userId:
-            req.params.userId,
-          ...req.body
+            sessionUserId(req)
         });
 
       const state =
@@ -1846,13 +2001,11 @@ app.patch(
 
 app.post(
   "/api/routine/open",
+  requireSession,
   async (req, res, next) => {
     try {
       const userId =
-        String(
-          req.body.userId ||
-          ""
-        ).trim();
+        sessionUserId(req);
 
       const requestedDay =
         parseRoutineDay(
@@ -1965,13 +2118,11 @@ app.post(
 
 app.post(
   "/api/routine/complete",
+  requireSession,
   async (req, res, next) => {
     try {
       const userId =
-        String(
-          req.body.userId ||
-          ""
-        ).trim();
+        sessionUserId(req);
 
       const day =
         parseRoutineDay(
@@ -2081,15 +2232,13 @@ app.post(
 
 app.post(
   "/api/routine/demo-advance",
+  requireSession,
   async (req, res, next) => {
     try {
       assertDemoRoutesEnabled();
 
       const userId =
-        String(
-          req.body.userId ||
-          ""
-        ).trim();
+        sessionUserId(req);
 
       const state =
         await withTransaction(
@@ -2261,9 +2410,9 @@ async function getProductRoutineStatesV98(client, userId) {
   return { userId, routines };
 }
 
-app.post("/api/product-routines/bootstrap", async (req, res, next) => {
+app.post("/api/product-routines/bootstrap", requireSession, async (req, res, next) => {
   try {
-    const userId = String(req.body.userId || "").trim();
+    const userId = sessionUserId(req);
     const localRoutines = req.body.routines && typeof req.body.routines === "object"
       ? req.body.routines : {};
     const state = await withTransaction(async client => {
@@ -2333,17 +2482,20 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.get("/api/product-routines/state/:userId", async (req, res, next) => {
+app.get([
+  "/api/product-routines/state",
+  "/api/product-routines/state/:userId"
+], requireSession, async (req, res, next) => {
   try {
-    const userId = String(req.params.userId || "").trim();
+    const userId = sessionUserId(req);
     const state = await withTransaction(client => getProductRoutineStatesV98(client, userId));
     res.json({ ok: true, state });
   } catch (error) { next(error); }
 });
 
-app.post("/api/product-routines/open", async (req, res, next) => {
+app.post("/api/product-routines/open", requireSession, async (req, res, next) => {
   try {
-    const userId = String(req.body.userId || "").trim();
+    const userId = sessionUserId(req);
     const routineId = parseProductRoutineIdV98(req.body.routineId);
     const day = parseProductRoutineDayV98(req.body.day);
     const state = await withTransaction(async client => {
@@ -2369,9 +2521,9 @@ app.post("/api/product-routines/open", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.post("/api/product-routines/complete", async (req, res, next) => {
+app.post("/api/product-routines/complete", requireSession, async (req, res, next) => {
   try {
-    const userId = String(req.body.userId || "").trim();
+    const userId = sessionUserId(req);
     const routineId = parseProductRoutineIdV98(req.body.routineId);
     const day = parseProductRoutineDayV98(req.body.day);
     const state = await withTransaction(async client => {
@@ -2468,26 +2620,14 @@ app.get(
 
 app.post(
   "/api/push/subscribe",
+  requireSession,
   async (req, res, next) => {
     try {
       assertDatabase();
       assertPushConfigured();
 
       const userId =
-        String(
-          req.body.userId || ""
-        ).trim();
-
-      if (!userId) {
-        const error =
-          new Error(
-            "Falta userId."
-          );
-
-        error.status = 400;
-
-        throw error;
-      }
+        sessionUserId(req);
 
       const subscription =
         normalizePushSubscription(
@@ -2553,21 +2693,20 @@ app.post(
 
 app.post(
   "/api/push/unsubscribe",
+  requireSession,
   async (req, res, next) => {
     try {
       assertDatabase();
 
       const userId =
-        String(
-          req.body.userId || ""
-        ).trim();
+        sessionUserId(req);
 
       const endpoint =
         String(
           req.body.endpoint || ""
         ).trim();
 
-      if (!userId || !endpoint) {
+      if (!endpoint) {
         const error =
           new Error(
             "Faltan datos para eliminar la suscripción."
@@ -3235,6 +3374,9 @@ function isBlockedPublicPath(requestPath) {
   const blockedFiles =
     new Set([
       "/server.js",
+      "/auth-core.js",
+      "/auth-http.js",
+      "/auth-store-pg.js",
       "/package.json",
       "/package-lock.json",
       "/schema.sql",
@@ -3257,6 +3399,7 @@ function isBlockedPublicPath(requestPath) {
   const blockedDirectory =
     segments.some(segment =>
       segment === "node_modules" ||
+      segment === "tests" ||
       segment === "attached_assets" ||
       segment === "migration-collagen-assets-v1" ||
       segment === "collagen-assets-downloader-v1" ||

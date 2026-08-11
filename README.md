@@ -34,6 +34,71 @@ Este prototipo incluye:
    - Preguntar al Bot
    - Instalar PWA (cuando el navegador lo ofrezca)
 
+## Acceso por correo y código temporal (V110)
+
+Los endpoints privados ya no aceptan un `userId` enviado por el cliente:
+el backend lo obtiene siempre de una sesión validada.
+
+- `POST /api/auth/request-code` · envía un código numérico al correo.
+- `POST /api/auth/verify-code` · valida el código y emite la sesión.
+- `GET /api/auth/session` · informa si hay sesión y a qué cuenta pertenece.
+- `POST /api/auth/logout` · cierra la sesión y borra la cookie.
+- `POST /api/auth/link-legacy-account` · vincula una cuenta anterior a V110.
+
+El código se guarda sólo como hash SHA-256, vence, sirve una sola vez, limita
+los intentos y limita cuántos se pueden pedir por correo y por IP. La sesión es
+un token aleatorio de 32 bytes guardado como hash en PostgreSQL y entregado en
+una cookie `HttpOnly`, `SameSite=Lax` y `Secure` en producción.
+
+### Variables de entorno
+
+| Variable | Default | Para qué sirve |
+| --- | --- | --- |
+| `EMAIL_PROVIDER` | `console` | `console` (sólo log, desarrollo) o `webhook`. |
+| `EMAIL_WEBHOOK_URL` | — | Obligatoria con `EMAIL_PROVIDER=webhook`. |
+| `EMAIL_WEBHOOK_TOKEN` | — | Bearer opcional para el webhook de correo. |
+| `EMAIL_FROM` | `no-reply@nu-app.local` | Remitente enviado al proveedor. |
+| `AUTH_CODE_TTL_MINUTES` | `10` | Vigencia del código. |
+| `AUTH_CODE_MAX_ATTEMPTS` | `5` | Intentos por código antes de bloquearlo. |
+| `AUTH_CODES_PER_EMAIL_MAX` | `3` | Códigos por correo cada 15 minutos. |
+| `AUTH_SESSION_TTL_DAYS` | `30` | Duración de la sesión. |
+| `COOKIE_SECURE` | `true` si `NODE_ENV=production` | Fuerza la cookie `Secure`. |
+| `LEGACY_LINKING_ENABLED` | `true` | Habilita la transición de cuentas previas. |
+
+No se incluyen claves reales en el repositorio: el proveedor de correo se
+configura por variables de entorno.
+
+### Transición de cuentas anteriores a V110
+
+Las cuentas creadas antes de V110 no tienen correo. Después de verificar su
+correo, una persona puede reclamar **una sola vez** su cuenta anterior enviando
+el `userId` que la PWA guardó en `localStorage`.
+
+Riesgos y límites de esa transición:
+
+- El `userId` anterior es el único dato que prueba la propiedad de esa cuenta.
+  Quien lo conozca podría reclamarla, por eso la vinculación es de un solo uso.
+- Una cuenta ya vinculada a un correo no se puede reclamar de nuevo.
+- Sólo se permite si la cuenta recién creada por correo todavía no tiene
+  progreso propio; si tiene, hay que unificar manualmente.
+- Se puede apagar por completo con `LEGACY_LINKING_ENABLED=false` cuando la
+  migración termine.
+
+### Migración
+
+El esquema de `schema.sql` es idempotente y se aplica al iniciar el servidor.
+V110 agrega `users.email`, `users.email_verified_at`, `auth_codes` y
+`user_sessions`.
+
+### Pruebas
+
+```bash
+npm test
+```
+
+Las pruebas usan un store en memoria: no necesitan PostgreSQL, correo real ni
+credenciales.
+
 ## Próximo paso técnico
 
 Después de validar esta experiencia:

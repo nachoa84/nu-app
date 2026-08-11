@@ -89,6 +89,8 @@
   async function request(path, options = {}) {
     const response = await fetch(path, {
       ...options,
+      // V110: la sesión viaja en una cookie HttpOnly emitida por el backend.
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
         ...(options.headers || {})
@@ -104,8 +106,111 @@
         payload.error ||
         `Error HTTP ${response.status}`;
 
-      throw new Error(message);
+      const error = new Error(message);
+      error.status = response.status;
+
+      if (response.status === 401) {
+        authState = {
+          authenticated: false,
+          userId: null,
+          email: null
+        };
+
+        emit("auth-required", {
+          reason: "unauthenticated"
+        });
+      }
+
+      throw error;
     }
+
+    return payload;
+  }
+
+  // NU APP · ACCESO POR CORREO Y CÓDIGO TEMPORAL V110
+  // El navegador ya no elige su userId: lo entrega la sesión validada.
+  let authState = {
+    authenticated: false,
+    userId: null,
+    email: null
+  };
+
+  function getAuthState() {
+    return { ...authState };
+  }
+
+  function setAuthState(next) {
+    authState = {
+      authenticated: Boolean(next?.authenticated),
+      userId: next?.userId || null,
+      email: next?.email || null
+    };
+
+    emit("auth-state-changed", getAuthState());
+
+    return getAuthState();
+  }
+
+  function getLegacyUserId() {
+    return getProfile()?.userId || null;
+  }
+
+  async function fetchSession() {
+    const payload = await request("/api/auth/session");
+
+    return setAuthState(payload);
+  }
+
+  async function requestLoginCode(email) {
+    return request("/api/auth/request-code", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+  }
+
+  async function verifyLoginCode(email, code) {
+    const payload = await request("/api/auth/verify-code", {
+      method: "POST",
+      body: JSON.stringify({ email, code })
+    });
+
+    setAuthState({
+      authenticated: true,
+      userId: payload.userId,
+      email: payload.email
+    });
+
+    return payload;
+  }
+
+  async function logout() {
+    const payload = await request("/api/auth/logout", {
+      method: "POST"
+    });
+
+    setAuthState({ authenticated: false });
+
+    return payload;
+  }
+
+  // Transición V110: reclamar una sola vez la cuenta local anterior.
+  async function linkLegacyAccount(
+    legacyUserId = getLegacyUserId()
+  ) {
+    if (!legacyUserId) {
+      throw new Error("No hay una cuenta anterior en este dispositivo.");
+    }
+
+    const payload = await request("/api/auth/link-legacy-account", {
+      method: "POST",
+      body: JSON.stringify({ legacyUserId })
+    });
+
+    setAuthState({
+      authenticated: true,
+      userId: payload.userId,
+      email: authState.email
+    });
 
     return payload;
   }
@@ -160,13 +265,20 @@
   }
 
   async function bootstrapFromLocal() {
-    let profile = getProfile();
+    const profile = getProfile();
 
     if (!profile) {
       return null;
     }
 
-    profile = ensureUserId(profile);
+    if (!authState.authenticated) {
+      await fetchSession();
+    }
+
+    if (!authState.authenticated) {
+      emit("auth-required", { reason: "bootstrap" });
+      return null;
+    }
 
     const payload = await request(
       "/api/bootstrap",
@@ -199,17 +311,8 @@
   }
 
   async function getState() {
-    const profile =
-      ensureUserId();
-
-    if (!profile?.userId) {
-      return null;
-    }
-
     const payload = await request(
-      `/api/state/${encodeURIComponent(
-        profile.userId
-      )}`
+      "/api/state"
     );
 
     publishState(payload.state);
@@ -218,19 +321,11 @@
   }
 
   async function openDay(day) {
-    const profile =
-      ensureUserId();
-
-    if (!profile?.userId) {
-      return null;
-    }
-
     const payload = await request(
       "/api/routine/open",
       {
         method: "POST",
         body: JSON.stringify({
-          userId: profile.userId,
           day
         })
       }
@@ -242,19 +337,11 @@
   }
 
   async function completeDay(day) {
-    const profile =
-      ensureUserId();
-
-    if (!profile?.userId) {
-      return null;
-    }
-
     const payload = await request(
       "/api/routine/complete",
       {
         method: "POST",
         body: JSON.stringify({
-          userId: profile.userId,
           day
         })
       }
@@ -266,17 +353,12 @@
   }
 
   async function updateProfile(profile) {
-    profile =
-      ensureUserId(profile);
-
-    if (!profile?.userId) {
+    if (!profile) {
       return null;
     }
 
     const payload = await request(
-      `/api/profile/${encodeURIComponent(
-        profile.userId
-      )}`,
+      "/api/profile",
       {
         method: "PATCH",
         body: JSON.stringify({
@@ -295,20 +377,11 @@
   }
 
   async function demoAdvance() {
-    const profile =
-      ensureUserId();
-
-    if (!profile?.userId) {
-      return null;
-    }
-
     const payload = await request(
       "/api/routine/demo-advance",
       {
         method: "POST",
-        body: JSON.stringify({
-          userId: profile.userId
-        })
+        body: JSON.stringify({})
       }
     );
 
@@ -351,12 +424,9 @@
   }
 
   async function bootstrapProductRoutinesV98() {
-    const profile = ensureUserId();
-    if (!profile?.userId) return null;
     const payload = await request("/api/product-routines/bootstrap", {
       method: "POST",
       body: JSON.stringify({
-        userId: profile.userId,
         routines: getLocalProductRoutinesV98()
       })
     });
@@ -365,22 +435,18 @@
   }
 
   async function openProductRoutineDay(routineId, day) {
-    const profile = ensureUserId();
-    if (!profile?.userId) return null;
     const payload = await request("/api/product-routines/open", {
       method: "POST",
-      body: JSON.stringify({ userId: profile.userId, routineId, day })
+      body: JSON.stringify({ routineId, day })
     });
     publishProductRoutineStatesV98(payload.state);
     return payload.state;
   }
 
   async function completeProductRoutineDay(routineId, day) {
-    const profile = ensureUserId();
-    if (!profile?.userId) return null;
     const payload = await request("/api/product-routines/complete", {
       method: "POST",
-      body: JSON.stringify({ userId: profile.userId, routineId, day })
+      body: JSON.stringify({ routineId, day })
     });
     publishProductRoutineStatesV98(payload.state);
     return payload.state;
@@ -398,7 +464,14 @@
     demoAdvance,
     health,
     ensureUserId,
-    getProfile
+    getProfile,
+    getAuthState,
+    fetchSession,
+    requestLoginCode,
+    verifyLoginCode,
+    logout,
+    linkLegacyAccount,
+    getLegacyUserId
   };
 
 
@@ -424,9 +497,17 @@
   window.addEventListener(
     "DOMContentLoaded",
     () => {
-      if (!getProfile()) return;
+      fetchSession()
+        .then(state => {
+          if (!state.authenticated) {
+            emit("auth-required", { reason: "startup" });
+            return null;
+          }
 
-      bootstrapFromLocal()
+          if (!getProfile()) return null;
+
+          return bootstrapFromLocal();
+        })
         .catch(error => {
           console.warn(
             "Backend no disponible. La PWA continúa en modo local.",
