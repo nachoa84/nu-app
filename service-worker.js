@@ -1,4 +1,4 @@
-const CACHE="nuapp-v111-reliable-push-delivery";
+const CACHE="nuapp-v112-auth-reliable-push";
 
 const CORE=[
   "./",
@@ -36,8 +36,10 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=63e-ios-thumbnails",
-  "./backend-client.js?v=100-immediate-progress",
-  "./push-client.js?v=61b-progress-canonical",
+  "./backend-client.js?v=110-email-auth",
+  "./auth-view.js?v=110-email-auth",
+  "./auth.css?v=110-email-auth",
+  "./push-client.js?v=110-email-auth",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",
   "./guide.css?v=82-guide-legibility",
@@ -331,9 +333,22 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
+  const requestUrl = new URL(req.url);
+
+  // V110: las respuestas de sesión y de estado nunca se cachean.
+  // Los assets de /api/bot-assets y /api/routine-assets sí siguen cacheados.
+  const isPrivateApi =
+    requestUrl.pathname.startsWith("/api/") &&
+    !requestUrl.pathname.startsWith("/api/bot-assets") &&
+    !requestUrl.pathname.startsWith("/api/routine-assets");
+
+  if (isPrivateApi) {
+    event.respondWith(fetch(req));
+    return;
+  }
+
   // Los videos se sirven bajo demanda y no se guardan automáticamente
   // en Cache Storage. Esto evita que la PWA acumule cientos de MB.
-  const requestUrl = new URL(req.url);
   const isVideoAsset = /\.(mp4|mov|m4v|webm)$/i.test(requestUrl.pathname);
 
   if (isVideoAsset) {

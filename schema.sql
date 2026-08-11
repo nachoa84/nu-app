@@ -179,3 +179,53 @@ CREATE INDEX IF NOT EXISTS idx_notification_deliveries_batch
 CREATE INDEX IF NOT EXISTS idx_notification_deliveries_processing
   ON notification_deliveries(processing_at)
   WHERE status = 'processing';
+
+-- NU APP · ACCESO POR CORREO Y CÓDIGO TEMPORAL V110
+-- Migración idempotente: se aplica al iniciar el servidor junto al resto
+-- del esquema. Nunca guarda códigos ni tokens en texto plano.
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS email TEXT;
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMPTZ NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
+  ON users(email)
+  WHERE email IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS auth_codes (
+  id BIGSERIAL PRIMARY KEY,
+  email TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  expires_at TIMESTAMPTZ NOT NULL,
+  consumed_at TIMESTAMPTZ NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  request_ip TEXT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_codes_email_active
+  ON auth_codes(email, created_at DESC)
+  WHERE consumed_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_auth_codes_created
+  ON auth_codes(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_auth_codes_request_ip
+  ON auth_codes(request_ip, created_at)
+  WHERE request_ip IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS user_sessions (
+  token_hash TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  request_ip TEXT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user
+  ON user_sessions(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_user_sessions_expires
+  ON user_sessions(expires_at);

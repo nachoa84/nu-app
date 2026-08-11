@@ -94,6 +94,8 @@
         path,
         {
           ...options,
+          // V110: la sesión viaja en la cookie HttpOnly del backend.
+          credentials: "same-origin",
           headers: {
             "Content-Type":
               "application/json",
@@ -141,6 +143,24 @@
   }
 
 
+  // V110: el backend decide la identidad; el cliente sólo consulta la sesión.
+  async function ensureSession() {
+    if (!window.BackendAPI?.fetchSession) {
+      return { authenticated: false };
+    }
+
+    const current =
+      window.BackendAPI.getAuthState?.();
+
+    if (current?.authenticated) {
+      return current;
+    }
+
+    return window.BackendAPI
+      .fetchSession()
+      .catch(() => ({ authenticated: false }));
+  }
+
   async function ensureBackendReady() {
     if (
       window.BackendAPI
@@ -167,12 +187,14 @@
       );
     }
 
-    const profile =
-      await ensureBackendReady();
+    await ensureBackendReady();
 
-    if (!profile?.userId) {
+    const session =
+      await ensureSession();
+
+    if (!session?.authenticated) {
       throw new Error(
-        "Primero necesitás completar tu perfil."
+        "Primero iniciá sesión con tu correo."
       );
     }
 
@@ -227,8 +249,6 @@
       {
         method: "POST",
         body: JSON.stringify({
-          userId:
-            profile.userId,
           subscription:
             subscription.toJSON()
         })
@@ -239,11 +259,6 @@
   }
 
   async function unsubscribe() {
-    const profile =
-      window.BackendAPI
-        ?.ensureUserId?.() ||
-      getProfile();
-
     const subscription =
       await getSubscription();
 
@@ -257,8 +272,6 @@
       {
         method: "POST",
         body: JSON.stringify({
-          userId:
-            profile?.userId,
           endpoint:
             subscription.endpoint
         })
@@ -275,19 +288,26 @@
     const profile =
       await ensureBackendReady();
 
-    if (!profile?.userId) {
+    const session =
+      await ensureSession();
+
+    const userId =
+      session?.userId ||
+      profile?.userId;
+
+    if (!userId) {
       throw new Error(
         "No encontramos tu usuario."
       );
     }
 
+    // /api/push/test es una ruta administrativa: mantiene su userId explícito.
     await api(
       "/api/push/test",
       {
         method: "POST",
         body: JSON.stringify({
-          userId:
-            profile.userId
+          userId
         })
       }
     );
@@ -320,12 +340,10 @@
       // Para una resincronización de identidad no hacemos bootstrap:
       // necesitamos respetar el perfil local recién guardado y evitar que
       // una respuesta anterior del backend lo pise antes del PATCH.
-      const profile =
-        window.BackendAPI
-          ?.ensureUserId?.() ||
-        getProfile();
+      const session =
+        await ensureSession();
 
-      if (!profile?.userId) {
+      if (!session?.authenticated) {
         return;
       }
 
@@ -348,8 +366,6 @@
         {
           method: "POST",
           body: JSON.stringify({
-            userId:
-              profile.userId,
             subscription:
               subscription.toJSON()
           })
