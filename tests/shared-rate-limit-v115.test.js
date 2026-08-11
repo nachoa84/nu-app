@@ -2,6 +2,8 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const {
   consumeSharedRateLimitV115,
   rateLimitKeyHashV115
@@ -63,4 +65,17 @@ test("una ventana nueva reinicia el contador", async () => {
     (await consumeSharedRateLimitV115(pool, { ...base, now: 2000 })).allowed,
     true
   );
+});
+
+
+test("la inicialización del esquema se serializa entre instancias", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "server.js"),
+    "utf8"
+  );
+  const start = source.indexOf("async function initDatabase");
+  const section = source.slice(start, start + 1400);
+  assert.match(section, /pg_advisory_lock/);
+  assert.match(section, /pg_advisory_unlock/);
+  assert.match(section, /client\.release\(\)/);
 });
