@@ -1467,18 +1467,23 @@ async function markNotificationDeliveryV111(
   delivery,
   status,
   lastError = null,
-  nextAttemptAt = null
+  nextAttemptAt = null,
+  preserveAttempt = false
 ) {
   await pool.query(
     `UPDATE notification_deliveries
      SET status = $2,
          last_error = $3,
          next_attempt_at = COALESCE($4, next_attempt_at),
+         attempts = CASE
+           WHEN $5 THEN GREATEST(attempts - 1, 0)
+           ELSE attempts
+         END,
          processing_at = NULL,
          sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END,
          updated_at = NOW()
      WHERE id = $1`,
-    [delivery.id, status, lastError, nextAttemptAt]
+    [delivery.id, status, lastError, nextAttemptAt, preserveAttempt]
   );
 }
 
@@ -1512,6 +1517,20 @@ async function sendNotificationDeliveryV111(delivery, payload) {
   } catch (error) {
     const classification = classifyPushErrorV111(error);
     const reason = safePushErrorV111(error);
+
+    if (classification.kind === "configuration") {
+      const retryAt = new Date(
+        Date.now() + NOTIFICATION_RETRY_BASE_MS_V109
+      );
+      await markNotificationDeliveryV111(
+        delivery,
+        "retryable",
+        reason,
+        retryAt,
+        true
+      );
+      return "configuration";
+    }
 
     if (classification.kind === "expired") {
       if (delivery.subscription_id) {
@@ -1607,7 +1626,8 @@ async function markUnifiedRoutineNotificationsV109(
   batch,
   status,
   lastError = null,
-  permanent = false
+  permanent = false,
+  preserveAttempt = false
 ) {
   const collagenIds = batch.collagen.map(row => row.id);
   const productIds = batch.products.map(row => row.id);
@@ -1615,20 +1635,24 @@ async function markUnifiedRoutineNotificationsV109(
     `UPDATE ${table}
      SET status = $2,
          last_error = $3,
-         attempts = CASE WHEN $4 THEN 5 ELSE attempts END,
+         attempts = CASE
+           WHEN $4 THEN 5
+           WHEN $5 THEN GREATEST(attempts - 1, 0)
+           ELSE attempts
+         END,
          updated_at = NOW(),
          sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
      WHERE id = ANY($1::bigint[])`;
   if (collagenIds.length) {
     await pool.query(
       query("notification_jobs"),
-      [collagenIds, status, lastError, permanent]
+      [collagenIds, status, lastError, permanent, preserveAttempt]
     );
   }
   if (productIds.length) {
     await pool.query(
       query("routine_notification_jobs"),
-      [productIds, status, lastError, permanent]
+      [productIds, status, lastError, permanent, preserveAttempt]
     );
   }
 }
@@ -1755,7 +1779,8 @@ async function processDeliveryGroupV111(batch) {
         batch,
         "failed",
         `${summary.open} dispositivo(s) pendiente(s) de reintento.`,
-        false
+        false,
+        outcomes.includes("configuration")
       );
       return {
         outcome: "retryable_failed",
