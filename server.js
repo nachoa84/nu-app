@@ -2962,11 +2962,16 @@ app.post(
 
 
 
-// NU APP · BOT ACTIVE APP STORAGE V66
-// Sirve únicamente recursos canónicos publicados bajo bot/active/.
-// Mantiene soporte HTTP Range para video y evita exponer rutas arbitrarias.
+// NU APP · APP STORAGE RANGE NATIVO V108
+// Sirve bot/active/ y routines/active/ con byte ranges nativos de GCS.
+// Evita descargar el objeto completo y evita recalcular SHA-256 por request.
 const botAssetStorage = new ObjectStorageClient();
 const BOT_ASSET_STORAGE_PREFIX = "bot/active/";
+const ROUTINE_ASSET_STORAGE_PREFIX = "routines/active/";
+const ASSET_METADATA_CACHE_TTL_MS = 60 * 1000;
+const ASSET_METADATA_CACHE_MAX = 512;
+const assetMetadataCacheV108 = new Map();
+let assetBucketPromiseV108 = null;
 
 function botAssetContentType(objectName) {
   const extension = path.posix.extname(objectName).toLowerCase();
@@ -3023,141 +3028,198 @@ function parseBotAssetRange(rangeHeader, totalSize) {
   };
 }
 
+function normalizeStorageEtagV108(value, objectName) {
+  const raw = String(value || "").replace(/^W\//, "").replace(/^"|"$/g, "");
+  if (raw) return `"${raw}"`;
+
+  const canonicalHash = path.posix
+    .basename(objectName, path.posix.extname(objectName))
+    .toLowerCase();
+
+  return /^[a-f0-9]{64}$/.test(canonicalHash)
+    ? `"${canonicalHash}"`
+    : undefined;
+}
+
+async function getAssetBucketV108() {
+  if (!assetBucketPromiseV108) {
+    assetBucketPromiseV108 = botAssetStorage.getBucket();
+  }
+
+  return assetBucketPromiseV108;
+}
+
+function rememberAssetMetadataV108(objectName, value) {
+  assetMetadataCacheV108.delete(objectName);
+  assetMetadataCacheV108.set(objectName, {
+    expiresAt: Date.now() + ASSET_METADATA_CACHE_TTL_MS,
+    value
+  });
+
+  while (assetMetadataCacheV108.size > ASSET_METADATA_CACHE_MAX) {
+    const oldestKey = assetMetadataCacheV108.keys().next().value;
+    if (!oldestKey) break;
+    assetMetadataCacheV108.delete(oldestKey);
+  }
+}
+
+async function getAssetFileV108(objectName) {
+  const cached = assetMetadataCacheV108.get(objectName);
+  if (cached && cached.expiresAt > Date.now()) {
+    assetMetadataCacheV108.delete(objectName);
+    assetMetadataCacheV108.set(objectName, cached);
+    return cached.value;
+  }
+
+  assetMetadataCacheV108.delete(objectName);
+
+  const bucket = await getAssetBucketV108();
+  const file = bucket.file(objectName);
+  const [metadata] = await file.getMetadata();
+  const totalSize = Number(metadata.size);
+
+  if (!Number.isSafeInteger(totalSize) || totalSize < 0) {
+    const error = new Error("Tamaño de asset inválido.");
+    error.status = 502;
+    throw error;
+  }
+
+  const value = {
+    file,
+    totalSize,
+    contentType: metadata.contentType || botAssetContentType(objectName),
+    etag: normalizeStorageEtagV108(metadata.etag, objectName)
+  };
+
+  rememberAssetMetadataV108(objectName, value);
+  return value;
+}
+
+function validAssetRelativePathV108(requestPath) {
+  const relativePath = decodeURIComponent(requestPath).replace(/^\/+/, "");
+
+  if (
+    !relativePath ||
+    relativePath.includes("..") ||
+    relativePath.includes("\\") ||
+    !/^[A-Za-z0-9._/-]+$/.test(relativePath)
+  ) {
+    return null;
+  }
+
+  return relativePath;
+}
+
+function pipeAssetStreamV108(stream, res, next) {
+  let handled = false;
+
+  stream.once("error", error => {
+    if (handled) return;
+    handled = true;
+
+    if (res.headersSent) {
+      res.destroy(error);
+      return;
+    }
+
+    next(error);
+  });
+
+  res.once("finish", () => {
+    handled = true;
+  });
+
+  res.once("close", () => {
+    if (!handled) {
+      handled = true;
+      stream.destroy();
+    }
+  });
+
+  stream.pipe(res);
+}
+
+function createStorageAssetHandlerV108(prefix, logLabel) {
+  return async (req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return res.status(405).set("Allow", "GET, HEAD").end();
+    }
+
+    try {
+      const relativePath = validAssetRelativePathV108(req.path);
+      if (!relativePath) return res.status(400).end();
+
+      const objectName = prefix + relativePath;
+      let asset;
+
+      try {
+        asset = await getAssetFileV108(objectName);
+      } catch (error) {
+        if (Number(error?.code) === 404 || Number(error?.status) === 404) {
+          console.warn(`[${logLabel}] No disponible:`, objectName);
+          return res.status(404).end();
+        }
+        throw error;
+      }
+
+      const { file, totalSize, contentType, etag } = asset;
+      const range = parseBotAssetRange(req.headers.range, totalSize);
+      const commonHeaders = {
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": contentType
+      };
+
+      if (etag) commonHeaders.ETag = etag;
+      res.set(commonHeaders);
+
+      if (req.headers.range) {
+        if (!range || range.unsatisfiable) {
+          return res
+            .status(416)
+            .set("Content-Range", `bytes */${totalSize}`)
+            .end();
+        }
+
+        const contentLength = range.end - range.start + 1;
+        res.status(206).set({
+          "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
+          "Content-Length": String(contentLength)
+        });
+
+        if (req.method === "HEAD") return res.end();
+
+        const stream = file.createReadStream({
+          start: range.start,
+          end: range.end,
+          decompress: false
+        });
+
+        return pipeAssetStreamV108(stream, res, next);
+      }
+
+      res.status(200).set("Content-Length", String(totalSize));
+      if (req.method === "HEAD") return res.end();
+
+      return pipeAssetStreamV108(
+        file.createReadStream({ decompress: false }),
+        res,
+        next
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
 app.use(
   "/api/bot-assets",
-  async (req, res, next) => {
-    if (req.method !== "GET" && req.method !== "HEAD") {
-      return res.status(405).set("Allow", "GET, HEAD").end();
-    }
-
-    try {
-      const relativePath = decodeURIComponent(req.path)
-        .replace(/^\/+/, "");
-
-      if (
-        !relativePath ||
-        relativePath.includes("..") ||
-        relativePath.includes("\\") ||
-        !/^[A-Za-z0-9._/-]+$/.test(relativePath)
-      ) {
-        return res.status(400).end();
-      }
-
-      const objectName = BOT_ASSET_STORAGE_PREFIX + relativePath;
-      const result = await botAssetStorage.downloadAsBytes(objectName);
-
-      if (!result?.ok) {
-        console.warn("[bot-assets] No disponible:", objectName, result?.error || "");
-        return res.status(404).end();
-      }
-
-      const rawBytes =
-        Array.isArray(result.value)
-          ? result.value[0]
-          : result.value;
-      const buffer = Buffer.from(rawBytes);
-      const totalSize = buffer.length;
-      const range = parseBotAssetRange(req.headers.range, totalSize);
-
-      res.set({
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "public, max-age=31536000, immutable",
-        "Content-Type": botAssetContentType(objectName),
-        "ETag": `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`
-      });
-
-      if (req.headers.range) {
-        if (!range || range.unsatisfiable) {
-          return res
-            .status(416)
-            .set("Content-Range", `bytes */${totalSize}`)
-            .end();
-        }
-
-        const chunk = buffer.subarray(range.start, range.end + 1);
-        res.status(206).set({
-          "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
-          "Content-Length": String(chunk.length)
-        });
-
-        return req.method === "HEAD" ? res.end() : res.send(chunk);
-      }
-
-      res.set("Content-Length", String(totalSize));
-      return req.method === "HEAD" ? res.end() : res.send(buffer);
-    } catch (error) {
-      next(error);
-    }
-  }
+  createStorageAssetHandlerV108(BOT_ASSET_STORAGE_PREFIX, "bot-assets")
 );
 
-// NU APP · MULTIRUTINA V92
 app.use(
   "/api/routine-assets",
-  async (req, res, next) => {
-    if (req.method !== "GET" && req.method !== "HEAD") {
-      return res.status(405).set("Allow", "GET, HEAD").end();
-    }
-
-    try {
-      const relativePath = decodeURIComponent(req.path)
-        .replace(/^\/+/, "");
-
-      if (
-        !relativePath ||
-        relativePath.includes("..") ||
-        relativePath.includes("\\") ||
-        !/^[A-Za-z0-9._/-]+$/.test(relativePath)
-      ) {
-        return res.status(400).end();
-      }
-
-      const objectName = "routines/active/" + relativePath;
-      const result = await botAssetStorage.downloadAsBytes(objectName);
-
-      if (!result?.ok) {
-        console.warn("[routine-assets] No disponible:", objectName, result?.error || "");
-        return res.status(404).end();
-      }
-
-      const rawBytes =
-        Array.isArray(result.value)
-          ? result.value[0]
-          : result.value;
-      const buffer = Buffer.from(rawBytes);
-      const totalSize = buffer.length;
-      const range = parseBotAssetRange(req.headers.range, totalSize);
-
-      res.set({
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "public, max-age=31536000, immutable",
-        "Content-Type": botAssetContentType(objectName),
-        "ETag": `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`
-      });
-
-      if (req.headers.range) {
-        if (!range || range.unsatisfiable) {
-          return res
-            .status(416)
-            .set("Content-Range", `bytes */${totalSize}`)
-            .end();
-        }
-
-        const chunk = buffer.subarray(range.start, range.end + 1);
-        res.status(206).set({
-          "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
-          "Content-Length": String(chunk.length)
-        });
-
-        return req.method === "HEAD" ? res.end() : res.send(chunk);
-      }
-
-      res.set("Content-Length", String(totalSize));
-      return req.method === "HEAD" ? res.end() : res.send(buffer);
-    } catch (error) {
-      next(error);
-    }
-  }
+  createStorageAssetHandlerV108(ROUTINE_ASSET_STORAGE_PREFIX, "routine-assets")
 );
 
 function isBlockedPublicPath(requestPath) {
