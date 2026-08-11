@@ -3,7 +3,7 @@
 
 const crypto = require("crypto");
 
-const RETRYABLE_STATUS_CODES_V111 = new Set([0, 408, 425, 429]);
+const RETRYABLE_STATUS_CODES_V111 = new Set([0, 401, 403, 408, 425, 429]);
 
 function sourceReferencesV111(batch = {}) {
   return [
