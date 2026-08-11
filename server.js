@@ -633,7 +633,25 @@ async function initDatabase() {
       "utf8"
     );
 
-  await pool.query(schema);
+  const client = await pool.connect();
+  const schemaLockV115 = 11520260811;
+
+  try {
+    await client.query(
+      "SELECT pg_advisory_lock($1)",
+      [schemaLockV115]
+    );
+    await client.query(schema);
+  } finally {
+    try {
+      await client.query(
+        "SELECT pg_advisory_unlock($1)",
+        [schemaLockV115]
+      );
+    } finally {
+      client.release();
+    }
+  }
 
   console.log(
     "Base de datos inicializada."
