@@ -1042,7 +1042,9 @@ const SCHEDULER_ADVISORY_LOCK_V109 = 109030;
 // suscripción. El máximo se aplica por dispositivo, no por usuario.
 const NOTIFICATION_DELIVERY_MAX_ATTEMPTS_V111 = Math.max(
   1,
-  Math.min(Number(process.env.NOTIFICATION_DELIVERY_MAX_ATTEMPTS || 5), 10)
+  // Los jobs padre V109 se reclaman hasta cinco veces. Mantener el mismo
+  // techo evita dejar una entrega retryable sin un job capaz de retomarla.
+  Math.min(Number(process.env.NOTIFICATION_DELIVERY_MAX_ATTEMPTS || 5), 5)
 );
 const NOTIFICATION_DELIVERY_STALE_MS_V111 = Math.max(
   60000,
@@ -1346,15 +1348,26 @@ async function prepareNotificationDeliveriesV111(batch, payload) {
   const sources = sourceReferencesV111(batch);
 
   return withTransaction(async client => {
-    await client.query(
+    const insertedBatch = await client.query(
       `INSERT INTO notification_delivery_batches (
          logical_key, user_id, payload, status, updated_at
        ) VALUES ($1, $2, $3::jsonb, 'pending', NOW())
-       ON CONFLICT (logical_key) DO UPDATE
-       SET payload = EXCLUDED.payload,
-           updated_at = NOW()`,
+       ON CONFLICT (logical_key) DO NOTHING
+       RETURNING payload`,
       [logicalKey, batch.userId, JSON.stringify(identifiedPayload)]
     );
+    const isNewBatch = insertedBatch.rowCount > 0;
+    let storedPayload = identifiedPayload;
+
+    if (!isNewBatch) {
+      const existingBatch = await client.query(
+        `SELECT payload
+         FROM notification_delivery_batches
+         WHERE logical_key = $1`,
+        [logicalKey]
+      );
+      storedPayload = existingBatch.rows[0].payload;
+    }
 
     for (const source of sources) {
       await client.query(
@@ -1366,39 +1379,48 @@ async function prepareNotificationDeliveriesV111(batch, payload) {
       );
     }
 
-    const subscriptions = await client.query(
-      `SELECT id, endpoint, subscription
-       FROM push_subscriptions
-       WHERE user_id = $1
-       ORDER BY id`,
-      [batch.userId]
-    );
-
-    for (const row of subscriptions.rows) {
-      await client.query(
-        `INSERT INTO notification_deliveries (
-           logical_key,
-           subscription_id,
-           endpoint_hash,
-           subscription_snapshot,
-           status,
-           next_attempt_at,
-           updated_at
-         ) VALUES ($1, $2, $3, $4::jsonb, 'pending', NOW(), NOW())
-         ON CONFLICT (logical_key, endpoint_hash) DO NOTHING`,
-        [
-          logicalKey,
-          row.id,
-          endpointHashV111(row.endpoint),
-          JSON.stringify(row.subscription)
-        ]
+    if (isNewBatch) {
+      const subscriptions = await client.query(
+        `SELECT id, endpoint, subscription
+         FROM push_subscriptions
+         WHERE user_id = $1
+         ORDER BY id`,
+        [batch.userId]
       );
+
+      for (const row of subscriptions.rows) {
+        await client.query(
+          `INSERT INTO notification_deliveries (
+             logical_key,
+             subscription_id,
+             endpoint_hash,
+             subscription_snapshot,
+             status,
+             next_attempt_at,
+             updated_at
+           ) VALUES ($1, $2, $3, $4::jsonb, 'pending', NOW(), NOW())
+           ON CONFLICT (logical_key, endpoint_hash) DO NOTHING`,
+          [
+            logicalKey,
+            row.id,
+            endpointHashV111(row.endpoint),
+            JSON.stringify(row.subscription)
+          ]
+        );
+      }
     }
+
+    const deliveryCount = await client.query(
+      `SELECT COUNT(*)::integer AS count
+       FROM notification_deliveries
+       WHERE logical_key = $1`,
+      [logicalKey]
+    );
 
     return {
       logicalKey,
-      payload: identifiedPayload,
-      subscriptions: subscriptions.rowCount
+      payload: storedPayload,
+      subscriptions: deliveryCount.rows[0].count
     };
   });
 }
@@ -1461,6 +1483,25 @@ async function markNotificationDeliveryV111(
 }
 
 async function sendNotificationDeliveryV111(delivery, payload) {
+  const activeSubscription = delivery.subscription_id
+    ? await pool.query(
+        `SELECT 1
+         FROM push_subscriptions
+         WHERE id = $1
+           AND subscription = $2::jsonb`,
+        [delivery.subscription_id, JSON.stringify(delivery.subscription_snapshot)]
+      )
+    : { rowCount: 0 };
+
+  if (!activeSubscription.rowCount) {
+    await markNotificationDeliveryV111(
+      delivery,
+      "permanent",
+      "La suscripción fue retirada o actualizada."
+    );
+    return "inactive";
+  }
+
   try {
     await webpush.sendNotification(
       delivery.subscription_snapshot,
@@ -1475,8 +1516,10 @@ async function sendNotificationDeliveryV111(delivery, payload) {
     if (classification.kind === "expired") {
       if (delivery.subscription_id) {
         await pool.query(
-          `DELETE FROM push_subscriptions WHERE id = $1`,
-          [delivery.subscription_id]
+          `DELETE FROM push_subscriptions
+           WHERE id = $1
+             AND subscription = $2::jsonb`,
+          [delivery.subscription_id, JSON.stringify(delivery.subscription_snapshot)]
         );
       }
       await markNotificationDeliveryV111(delivery, "permanent", reason);
@@ -1701,7 +1744,10 @@ async function processDeliveryGroupV111(batch) {
       value => value === "removed"
     ).length;
     const cyclePermanent = outcomes.filter(
-      value => value === "permanent" || value === "removed"
+      value =>
+        value === "permanent" ||
+        value === "removed" ||
+        value === "inactive"
     ).length;
 
     if (summary.open > 0) {
