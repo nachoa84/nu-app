@@ -19,6 +19,8 @@ const DEFAULT_OPTIONS = {
   legacyLinkingEnabled: true
 };
 
+const MIN_PEPPER_LENGTH = 16;
+
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -49,6 +51,8 @@ function generateNumericCode(length) {
   return code;
 }
 
+// Sólo para tokens de sesión (32 bytes aleatorios): no necesitan pepper
+// porque no son adivinables.
 function hashSecret(value) {
   return crypto
     .createHash("sha256")
@@ -56,17 +60,54 @@ function hashSecret(value) {
     .digest("hex");
 }
 
-function generateSessionToken() {
-  return crypto.randomBytes(32).toString("base64url");
+// Los códigos de seis dígitos sí son adivinables: se guardan como
+// HMAC-SHA256 con un pepper que vive fuera de la base de datos.
+function createCodeHasher(pepper) {
+  const secret = String(pepper || "");
+
+  if (secret.length < MIN_PEPPER_LENGTH) {
+    throw new Error(
+      `AUTH_CODE_PEPPER debe tener al menos ${MIN_PEPPER_LENGTH} caracteres.`
+    );
+  }
+
+  return function hashCode(email, code) {
+    return crypto
+      .createHmac("sha256", secret)
+      .update(`${String(email)}:${String(code)}`, "utf8")
+      .digest("hex");
+  };
 }
 
-function safeEqualHex(a, b) {
-  const left = Buffer.from(String(a || ""), "utf8");
-  const right = Buffer.from(String(b || ""), "utf8");
+// Validación de arranque: en producción no se admite el proveedor de
+// consola ni la ausencia de pepper.
+function assertProductionAuthConfig(env = process.env) {
+  if (String(env.NODE_ENV || "").toLowerCase() !== "production") return;
 
-  if (left.length !== right.length) return false;
+  const pepper = String(env.AUTH_CODE_PEPPER || "");
 
-  return crypto.timingSafeEqual(left, right);
+  if (pepper.length < MIN_PEPPER_LENGTH) {
+    throw new Error(
+      "AUTH_CODE_PEPPER es obligatorio en producción " +
+      `(mínimo ${MIN_PEPPER_LENGTH} caracteres).`
+    );
+  }
+
+  const provider = String(env.EMAIL_PROVIDER || "").toLowerCase();
+
+  if (!provider || provider === "console") {
+    throw new Error(
+      "En producción hace falta un proveedor de correo real: " +
+      "EMAIL_PROVIDER=console está prohibido."
+    );
+  }
+
+  // Falla temprano si el proveedor elegido no está bien configurado.
+  createEmailSender(env);
+}
+
+function generateSessionToken() {
+  return crypto.randomBytes(32).toString("base64url");
 }
 
 function defaultNameFromEmail(email) {
@@ -79,8 +120,17 @@ function defaultNameFromEmail(email) {
 function createEmailSender(env = process.env, logger = console) {
   const provider = String(env.EMAIL_PROVIDER || "console").toLowerCase();
   const from = env.EMAIL_FROM || "no-reply@nu-app.local";
+  const isProduction =
+    String(env.NODE_ENV || "").toLowerCase() === "production";
 
   if (provider === "console") {
+    if (isProduction) {
+      throw new Error(
+        "EMAIL_PROVIDER=console está prohibido en producción: " +
+        "imprimiría los códigos en los logs."
+      );
+    }
+
     return async ({ to, subject, text }) => {
       logger.log(
         `[email:console] para=${to} asunto="${subject}" cuerpo="${text}"`
@@ -136,6 +186,7 @@ function buildCodeEmail(code, ttlMinutes) {
 function createAuthService({
   store,
   sendEmail,
+  codePepper,
   now = () => new Date(),
   options = {}
 }) {
@@ -145,6 +196,7 @@ function createAuthService({
   }
 
   const config = { ...DEFAULT_OPTIONS, ...options };
+  const hashCode = createCodeHasher(codePepper);
 
   async function assertRateLimits(email, ip) {
     const current = now().getTime();
@@ -190,7 +242,7 @@ function createAuthService({
 
     await store.createCode({
       email,
-      codeHash: hashSecret(code),
+      codeHash: hashCode(email, code),
       expiresAt,
       createdAt: issuedAt,
       requestIp: ip
@@ -219,30 +271,30 @@ function createAuthService({
       throw httpError("Código inválido.", 400);
     }
 
-    const record = await store.findActiveCode(email);
-    const invalid = httpError("Código inválido o vencido.", 401);
+    // Consumo atómico: el store marca consumed_at en una sola operación
+    // condicional, así dos verificaciones simultáneas del mismo código
+    // no pueden abrir dos sesiones.
+    const outcome = await store.consumeMatchingCode({
+      email,
+      codeHash: hashCode(email, code),
+      now: now(),
+      maxAttempts: config.codeMaxAttempts
+    });
 
-    if (!record) throw invalid;
-
-    if (record.consumedAt) throw invalid;
-
-    if (new Date(record.expiresAt).getTime() <= now().getTime()) {
+    if (outcome.status === "expired") {
       throw httpError("El código venció. Pedí uno nuevo.", 401);
     }
 
-    if (record.attempts >= config.codeMaxAttempts) {
+    if (outcome.status === "too_many_attempts") {
       throw httpError(
         "Se agotaron los intentos para este código. Pedí uno nuevo.",
         429
       );
     }
 
-    if (!safeEqualHex(hashSecret(code), record.codeHash)) {
-      await store.incrementCodeAttempts(record.id);
-      throw invalid;
+    if (outcome.status !== "consumed") {
+      throw httpError("Código inválido o vencido.", 401);
     }
-
-    await store.consumeCode(record.id, now());
 
     let user = await store.findUserByEmail(email);
     let createdUser = false;
@@ -355,11 +407,16 @@ function createAuthService({
       );
     }
 
-    await store.attachEmailToUser(legacyUserId, current.email, now());
-    await store.moveSessions(sessionUserId, legacyUserId);
-    await store.deleteUser(sessionUserId);
-
-    return { userId: legacyUserId, email: current.email };
+    // Todo el traspaso ocurre en una sola transacción del store:
+    // vuelve a validar las condiciones con las dos filas bloqueadas,
+    // libera el correo de la cuenta temporal, se lo asigna a la anterior,
+    // mueve las sesiones y borra la temporal. Cualquier error deshace todo.
+    return store.linkLegacyAccount({
+      sessionUserId,
+      legacyUserId,
+      email: current.email,
+      now: now()
+    });
   }
 
   async function getUser(userId) {
@@ -380,7 +437,10 @@ function createAuthService({
 
 module.exports = {
   DEFAULT_OPTIONS,
+  MIN_PEPPER_LENGTH,
+  assertProductionAuthConfig,
   buildCodeEmail,
+  createCodeHasher,
   createAuthService,
   createEmailSender,
   generateNumericCode,

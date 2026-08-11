@@ -10,6 +10,7 @@ const {
   IANAZone
 } = require("luxon");
 const {
+  assertProductionAuthConfig,
   createAuthService,
   createEmailSender
 } = require("./auth-core");
@@ -19,12 +20,22 @@ const {
 const {
   createAuthHttp
 } = require("./auth-http");
+const {
+  clientKey,
+  resolveTrustProxy
+} = require("./client-ip");
+
+// V110: en producción el arranque falla si falta AUTH_CODE_PEPPER o si el
+// proveedor de correo no es real. Se valida antes de levantar nada.
+assertProductionAuthConfig(process.env);
 
 const app = express();
 
-// Replit publica la app detrás de un proxy.
-// Necesario para que req.ip represente al cliente real.
-app.set("trust proxy", 1);
+// Replit publica la app detrás de un único proxy inverso.
+// La política es explícita (TRUST_PROXY_HOPS, 1 por defecto) para que
+// req.ip sea la IP que vio el proxy y no una cabecera elegida por el
+// cliente, y para que el rate limiting no quede compartido por todos.
+app.set("trust proxy", resolveTrustProxy(process.env));
 
 const PORT =
   Number(process.env.PORT || 3000);
@@ -202,9 +213,7 @@ function assertAllowedWriteOrigin(
 }
 
 function requestRateKey(req) {
-  return `ip:${String(
-    req.ip || "unknown"
-  )}`;
+  return clientKey(req);
 }
 
 function targetUserRateKey(req) {
@@ -350,9 +359,7 @@ const adminLimiter =
     windowMs: 10 * 60 * 1000,
     max: 10,
     keyFn: req =>
-      `admin:${String(
-        req.ip || "unknown"
-      )}`,
+      `admin:${clientKey(req)}`,
     message:
       "Demasiados intentos administrativos."
   });
@@ -402,6 +409,12 @@ app.use(
   authLimiter
 );
 
+// El pepper es obligatorio en producción (assertProductionAuthConfig).
+// Fuera de producción se deriva uno efímero para poder levantar la app
+// sin configurar nada: al reiniciar, los códigos pendientes se invalidan.
+const DEV_AUTH_CODE_PEPPER =
+  crypto.randomBytes(32).toString("hex");
+
 const LEGACY_LINKING_ENABLED =
   String(
     process.env.LEGACY_LINKING_ENABLED ||
@@ -417,6 +430,9 @@ const authService = authStore
       store: authStore,
       sendEmail:
         createEmailSender(process.env),
+      codePepper:
+        process.env.AUTH_CODE_PEPPER ||
+        DEV_AUTH_CODE_PEPPER,
       options: {
         codeTtlMs:
           Math.max(
@@ -1610,6 +1626,53 @@ async function runSchedulerCycle() {
     lockClient.release();
     schedulerRunning = false;
   }
+}
+
+// V110: limpieza periódica de códigos y sesiones vencidos.
+// Corre en su propio intervalo, aparte del scheduler V109, para no
+// interferir con su ciclo ni con su advisory lock.
+const AUTH_CLEANUP_INTERVAL_MS =
+  Math.max(
+    Number(
+      process.env.AUTH_CLEANUP_INTERVAL_MINUTES || 60
+    ),
+    1
+  ) * 60 * 1000;
+
+let authCleanupRunning = false;
+
+async function runAuthCleanupCycle() {
+  if (authCleanupRunning || !authStore) return;
+
+  authCleanupRunning = true;
+
+  try {
+    const removed = await authStore.deleteExpired(new Date());
+
+    if (removed.sessions || removed.codes) {
+      console.log(
+        `[auth-v110] limpieza sesiones=${removed.sessions} ` +
+        `codigos=${removed.codes}`
+      );
+    }
+  } catch (error) {
+    console.error("[auth-v110] error en la limpieza:", error);
+  } finally {
+    authCleanupRunning = false;
+  }
+}
+
+function startAuthCleanup() {
+  if (!authStore) {
+    console.warn(
+      "Limpieza de acceso no iniciada: falta base de datos."
+    );
+
+    return;
+  }
+
+  setTimeout(runAuthCleanupCycle, 10000);
+  setInterval(runAuthCleanupCycle, AUTH_CLEANUP_INTERVAL_MS);
 }
 
 function startScheduler() {
@@ -3377,6 +3440,7 @@ function isBlockedPublicPath(requestPath) {
       "/auth-core.js",
       "/auth-http.js",
       "/auth-store-pg.js",
+      "/client-ip.js",
       "/package.json",
       "/package-lock.json",
       "/schema.sql",
@@ -3507,6 +3571,7 @@ async function start() {
       );
 
       startScheduler();
+      startAuthCleanup();
     }
   );
 }

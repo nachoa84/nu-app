@@ -5,11 +5,16 @@ const express = require("express");
 const { createAuthService } = require("../../auth-core");
 const { createAuthHttp } = require("../../auth-http");
 const { createMemoryAuthStore } = require("../memory-auth-store");
+const { resolveTrustProxy } = require("../../client-ip");
+
+const TEST_PEPPER = "pepper-de-pruebas-v110";
 
 async function startTestServer({
   store = createMemoryAuthStore(),
   now = () => new Date(),
-  options = {}
+  options = {},
+  codePepper = TEST_PEPPER,
+  trustProxyEnv = { TRUST_PROXY_HOPS: "1" }
 } = {}) {
   const emails = [];
 
@@ -17,6 +22,7 @@ async function startTestServer({
     store,
     now,
     options,
+    codePepper,
     sendEmail: async message => {
       emails.push(message);
       return { delivered: true, provider: "memory" };
@@ -26,6 +32,8 @@ async function startTestServer({
   const authHttp = createAuthHttp({ service, secureCookies: false });
 
   const app = express();
+  // Misma política de proxy que server.js.
+  app.set("trust proxy", resolveTrustProxy(trustProxyEnv));
   app.use(express.json());
   app.use("/api", authHttp.attachSession);
   authHttp.mountRoutes(app);
@@ -57,12 +65,23 @@ async function startTestServer({
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
   let cookie = null;
 
-  async function call(path, { method = "GET", body, withCookie = true } = {}) {
+  async function call(path, {
+    method = "GET",
+    body,
+    withCookie = true,
+    forwardedFor = null,
+    cookie: explicitCookie = null
+  } = {}) {
     const response = await fetch(`${baseUrl}${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
-        ...(withCookie && cookie ? { Cookie: cookie } : {})
+        ...(forwardedFor ? { "X-Forwarded-For": forwardedFor } : {}),
+        ...(explicitCookie
+          ? { Cookie: explicitCookie }
+          : withCookie && cookie
+            ? { Cookie: cookie }
+            : {})
       },
       body: body === undefined ? undefined : JSON.stringify(body)
     });
@@ -82,6 +101,7 @@ async function startTestServer({
     baseUrl,
     call,
     emails,
+    app,
     service,
     store,
     getCookie: () => cookie,
@@ -99,4 +119,4 @@ function lastCodeFromEmails(emails) {
   return match ? match[1] : null;
 }
 
-module.exports = { startTestServer, lastCodeFromEmails };
+module.exports = { startTestServer, lastCodeFromEmails, TEST_PEPPER };

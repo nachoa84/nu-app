@@ -39,11 +39,39 @@ function mapSession(row) {
   };
 }
 
+function linkError(message, status) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
 function createPgAuthStore(pool, {
   defaultCountry = "",
   defaultTimezone = "UTC"
 } = {}) {
+  async function withTransaction(work) {
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+      const result = await work(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (error) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("[auth-v110] error en ROLLBACK:", rollbackError);
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   return {
+    withTransaction,
+
     async countCodesSince(email, since) {
       const result = await pool.query(
         `SELECT COUNT(*)::int AS total
@@ -84,32 +112,83 @@ function createPgAuthStore(pool, {
       return mapCode(result.rows[0]);
     },
 
-    async findActiveCode(email) {
-      const result = await pool.query(
-        `SELECT *
+    // Consumo atómico del código vigente. El UPDATE condicional con
+    // RETURNING garantiza que, ante dos verificaciones simultáneas,
+    // exactamente una obtenga la fila.
+    async consumeMatchingCode({ email, codeHash, now, maxAttempts }) {
+      const consumed = await pool.query(
+        `WITH candidato AS (
+           SELECT id
+           FROM auth_codes
+           WHERE email = $1 AND consumed_at IS NULL
+           ORDER BY created_at DESC
+           LIMIT 1
+         )
+         UPDATE auth_codes AS c
+         SET consumed_at = COALESCE($3, NOW())
+         FROM candidato
+         WHERE c.id = candidato.id
+           AND c.consumed_at IS NULL
+           AND c.expires_at > COALESCE($3, NOW())
+           AND c.attempts < $4
+           AND c.code_hash = $2
+         RETURNING c.id`,
+        [email, codeHash, now || null, maxAttempts]
+      );
+
+      if (consumed.rowCount) {
+        return { status: "consumed", id: consumed.rows[0].id };
+      }
+
+      // No se consumió: hay que distinguir el motivo y, si el código no
+      // coincide, contabilizar el intento fallido.
+      const failed = await pool.query(
+        `UPDATE auth_codes AS c
+         SET attempts = c.attempts + 1
+         FROM (
+           SELECT id
+           FROM auth_codes
+           WHERE email = $1 AND consumed_at IS NULL
+           ORDER BY created_at DESC
+           LIMIT 1
+         ) AS candidato
+         WHERE c.id = candidato.id
+           AND c.consumed_at IS NULL
+           AND c.expires_at > COALESCE($3, NOW())
+           AND c.attempts < $4
+           AND c.code_hash <> $2
+         RETURNING c.attempts`,
+        [email, codeHash, now || null, maxAttempts]
+      );
+
+      if (failed.rowCount) {
+        return { status: "mismatch", attempts: failed.rows[0].attempts };
+      }
+
+      const current = await pool.query(
+        `SELECT expires_at, attempts
          FROM auth_codes
          WHERE email = $1 AND consumed_at IS NULL
          ORDER BY created_at DESC
          LIMIT 1`,
         [email]
       );
-      return mapCode(result.rows[0]);
-    },
 
-    async incrementCodeAttempts(id) {
-      await pool.query(
-        `UPDATE auth_codes SET attempts = attempts + 1 WHERE id = $1`,
-        [id]
-      );
-    },
+      const row = current.rows[0];
 
-    async consumeCode(id, consumedAt) {
-      await pool.query(
-        `UPDATE auth_codes
-         SET consumed_at = COALESCE($2, NOW())
-         WHERE id = $1`,
-        [id, consumedAt || null]
-      );
+      if (!row) return { status: "not_found" };
+
+      const reference = now ? new Date(now) : new Date();
+
+      if (new Date(row.expires_at).getTime() <= reference.getTime()) {
+        return { status: "expired" };
+      }
+
+      if (Number(row.attempts) >= maxAttempts) {
+        return { status: "too_many_attempts" };
+      }
+
+      return { status: "not_found" };
     },
 
     async findUserByEmail(email) {
@@ -234,16 +313,107 @@ function createPgAuthStore(pool, {
       );
     },
 
+    // Transición V110 completa en una sola transacción. users.email tiene
+    // índice único parcial: el correo se libera de la cuenta temporal antes
+    // de asignarlo a la anterior. Cualquier error deshace todo con ROLLBACK.
+    async linkLegacyAccount({ sessionUserId, legacyUserId, email, now }) {
+      return withTransaction(async client => {
+        // Se bloquean las dos filas en orden estable para evitar deadlocks.
+        const locked = await client.query(
+          `SELECT id, email
+           FROM users
+           WHERE id = ANY($1::text[])
+           ORDER BY id
+           FOR UPDATE`,
+          [[sessionUserId, legacyUserId].sort()]
+        );
+
+        const rows = new Map(locked.rows.map(row => [row.id, row]));
+        const current = rows.get(sessionUserId);
+        const legacy = rows.get(legacyUserId);
+
+        if (!current) throw linkError("Sesión inválida.", 401);
+
+        if (!legacy) {
+          throw linkError("No encontramos esa cuenta anterior.", 404);
+        }
+
+        if (legacy.email) {
+          throw linkError("Esa cuenta ya está vinculada a un correo.", 409);
+        }
+
+        if (current.email !== email) {
+          throw linkError("Sesión inválida.", 401);
+        }
+
+        const progress = await client.query(
+          `SELECT
+             EXISTS (
+               SELECT 1 FROM day_progress WHERE user_id = $1
+             ) AS collagen,
+             EXISTS (
+               SELECT 1 FROM product_routine_day_progress WHERE user_id = $1
+             ) AS products`,
+          [sessionUserId]
+        );
+
+        if (progress.rows[0].collagen || progress.rows[0].products) {
+          throw linkError(
+            "Tu cuenta actual ya tiene progreso. " +
+            "Escribinos para unificarlas manualmente.",
+            409
+          );
+        }
+
+        await client.query(
+          `UPDATE users
+           SET email = NULL, email_verified_at = NULL
+           WHERE id = $1`,
+          [sessionUserId]
+        );
+
+        const attached = await client.query(
+          `UPDATE users
+           SET email = $2, email_verified_at = COALESCE($3, NOW())
+           WHERE id = $1 AND email IS NULL
+           RETURNING id`,
+          [legacyUserId, email, now || null]
+        );
+
+        if (!attached.rowCount) {
+          throw linkError("Esa cuenta ya está vinculada a un correo.", 409);
+        }
+
+        await client.query(
+          `UPDATE user_sessions SET user_id = $2 WHERE user_id = $1`,
+          [sessionUserId, legacyUserId]
+        );
+
+        await client.query(
+          `DELETE FROM users WHERE id = $1`,
+          [sessionUserId]
+        );
+
+        return { userId: legacyUserId, email };
+      });
+    },
+
     async deleteExpired(now) {
-      await pool.query(
+      const sessions = await pool.query(
         `DELETE FROM user_sessions WHERE expires_at < COALESCE($1, NOW())`,
         [now || null]
       );
-      await pool.query(
+
+      const codes = await pool.query(
         `DELETE FROM auth_codes
          WHERE created_at < COALESCE($1, NOW()) - INTERVAL '1 day'`,
         [now || null]
       );
+
+      return {
+        sessions: sessions.rowCount || 0,
+        codes: codes.rowCount || 0
+      };
     }
   };
 }
