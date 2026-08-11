@@ -3,7 +3,8 @@
 
 const crypto = require("crypto");
 
-const RETRYABLE_STATUS_CODES_V111 = new Set([0, 401, 403, 408, 425, 429]);
+const RETRYABLE_STATUS_CODES_V111 = new Set([0, 408, 425, 429]);
+const CONFIGURATION_STATUS_CODES_V111 = new Set([401, 403]);
 
 function sourceReferencesV111(batch = {}) {
   return [
@@ -58,6 +59,10 @@ function classifyPushErrorV111(error = {}) {
 
   if (statusCode === 404 || statusCode === 410) {
     return { kind: "expired", statusCode };
+  }
+
+  if (CONFIGURATION_STATUS_CODES_V111.has(statusCode)) {
+    return { kind: "configuration", statusCode };
   }
 
   if (
