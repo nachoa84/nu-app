@@ -60,8 +60,8 @@ test("clasifica respuestas push", () => {
   assert.equal(classifyPushErrorV111({ statusCode: 404 }).kind, "expired");
   assert.equal(classifyPushErrorV111({ statusCode: 429 }).kind, "retryable");
   assert.equal(classifyPushErrorV111({ statusCode: 503 }).kind, "retryable");
-  assert.equal(classifyPushErrorV111({ statusCode: 401 }).kind, "retryable");
-  assert.equal(classifyPushErrorV111({ statusCode: 403 }).kind, "retryable");
+  assert.equal(classifyPushErrorV111({ statusCode: 401 }).kind, "configuration");
+  assert.equal(classifyPushErrorV111({ statusCode: 403 }).kind, "configuration");
   assert.equal(classifyPushErrorV111({ statusCode: 400 }).kind, "permanent");
   assert.equal(classifyPushErrorV111(new Error("network")).kind, "retryable");
 });
