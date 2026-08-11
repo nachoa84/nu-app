@@ -993,7 +993,64 @@ async function recalculatePendingUnlock(
 }
 
 
+// NU APP · NOTIFICACIONES ESCALABLES V109
+// Lotes, concurrencia limitada, backoff, recuperación y liderazgo PostgreSQL.
+const NOTIFICATION_BATCH_SIZE_V109 = Math.max(
+  25,
+  Math.min(Number(process.env.NOTIFICATION_BATCH_SIZE || 250), 500)
+);
+const NOTIFICATION_CONCURRENCY_V109 = Math.max(
+  1,
+  Math.min(Number(process.env.NOTIFICATION_CONCURRENCY || 20), 50)
+);
+const NOTIFICATION_MAX_PER_CYCLE_V109 = Math.max(
+  NOTIFICATION_BATCH_SIZE_V109,
+  Math.min(Number(process.env.NOTIFICATION_MAX_PER_CYCLE || 1000), 5000)
+);
+const NOTIFICATION_CYCLE_BUDGET_MS_V109 = Math.max(
+  5000,
+  Math.min(Number(process.env.NOTIFICATION_CYCLE_BUDGET_MS || 25000), 55000)
+);
+const NOTIFICATION_RETRY_BASE_MS_V109 = Math.max(
+  30000,
+  Number(process.env.NOTIFICATION_RETRY_BASE_MS || 60000)
+);
+const NOTIFICATION_PROCESSING_STALE_MS_V109 = Math.max(
+  60000,
+  Number(process.env.NOTIFICATION_PROCESSING_STALE_MS || 300000)
+);
+const NOTIFICATION_UNLOCK_LIMIT_V109 = Math.max(
+  200,
+  Math.min(Number(process.env.NOTIFICATION_UNLOCK_LIMIT || 1000), 5000)
+);
+const NOTIFICATION_UNLOCK_CONCURRENCY_V109 = Math.max(
+  1,
+  Math.min(Number(process.env.NOTIFICATION_UNLOCK_CONCURRENCY || 10), 20)
+);
+const SCHEDULER_ADVISORY_LOCK_V109 = 109030;
+
 let schedulerRunning = false;
+
+async function mapWithConcurrencyV109(items, concurrency, worker) {
+  const results = new Array(items.length);
+  let cursor = 0;
+
+  async function runWorker() {
+    while (cursor < items.length) {
+      const index = cursor;
+      cursor += 1;
+      results[index] = await worker(items[index], index);
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(concurrency, Math.max(items.length, 1)) },
+      runWorker
+    )
+  );
+  return results;
+}
 
 async function sendPushToUser(
   userId,
@@ -1002,53 +1059,47 @@ async function sendPushToUser(
   assertDatabase();
   assertPushConfigured();
 
-  const result =
-    await pool.query(
-      `
-      SELECT
-        id,
-        subscription
-      FROM push_subscriptions
-      WHERE user_id = $1
-      ORDER BY updated_at DESC
-      `,
-      [userId]
-    );
+  const result = await pool.query(
+    `SELECT id, subscription
+     FROM push_subscriptions
+     WHERE user_id = $1
+     ORDER BY updated_at DESC`,
+    [userId]
+  );
 
   let sent = 0;
   let removed = 0;
+  let retryableErrors = 0;
+  let permanentErrors = 0;
   const errors = [];
 
-  for (
-    const row of result.rows
-  ) {
+  for (const row of result.rows) {
     try {
-      await webpush
-        .sendNotification(
-          row.subscription,
-          JSON.stringify(payload)
-        );
-
+      await webpush.sendNotification(
+        row.subscription,
+        JSON.stringify(payload)
+      );
       sent += 1;
     } catch (error) {
-      if (
-        error.statusCode === 404 ||
-        error.statusCode === 410
-      ) {
+      const statusCode = Number(error.statusCode || 0);
+      if (statusCode === 404 || statusCode === 410) {
         await pool.query(
-          `
-          DELETE FROM push_subscriptions
-          WHERE id = $1
-          `,
+          `DELETE FROM push_subscriptions WHERE id = $1`,
           [row.id]
         );
-
         removed += 1;
       } else {
-        errors.push(
-          error.message ||
-          String(error)
-        );
+        errors.push(error.message || String(error));
+        if (
+          !statusCode ||
+          statusCode === 408 ||
+          statusCode === 429 ||
+          statusCode >= 500
+        ) {
+          retryableErrors += 1;
+        } else {
+          permanentErrors += 1;
+        }
       }
     }
   }
@@ -1057,260 +1108,144 @@ async function sendPushToUser(
     sent,
     removed,
     errors,
-    subscriptions:
-      result.rowCount
+    retryableErrors,
+    permanentErrors,
+    subscriptions: result.rowCount
   };
 }
 
-async function enqueueDueUnlocks() {
+async function enqueueDueUnlocksV109(deadline) {
   assertDatabase();
+  const dueResult = await pool.query(
+    `SELECT id
+     FROM users
+     WHERE current_day < $1
+       AND next_unlock_at IS NOT NULL
+       AND next_unlock_at <= NOW()
+     ORDER BY next_unlock_at ASC
+     LIMIT $2`,
+    [MAX_DAY, NOTIFICATION_UNLOCK_LIMIT_V109]
+  );
 
-  const dueResult =
-    await pool.query(
-      `
-      SELECT id
-      FROM users
-      WHERE
-        current_day < $1
-        AND next_unlock_at IS NOT NULL
-        AND next_unlock_at <= NOW()
-      ORDER BY next_unlock_at ASC
-      LIMIT 200
-      `,
-      [MAX_DAY]
-    );
-
-  let advanced = 0;
-
-  for (
-    const row of dueResult.rows
-  ) {
-    const result =
-      await withTransaction(
-        async client => {
-          return advanceIfEligible(
-            client,
-            row.id
-          );
-        }
+  const results = await mapWithConcurrencyV109(
+    dueResult.rows,
+    NOTIFICATION_UNLOCK_CONCURRENCY_V109,
+    async row => {
+      if (Date.now() >= deadline) return false;
+      const result = await withTransaction(client =>
+        advanceIfEligible(client, row.id)
       );
-
-    if (result.advanced) {
-      advanced += 1;
-    }
-  }
-
-  return advanced;
-}
-
-async function claimNextNotificationJob() {
-  return withTransaction(
-    async client => {
-      const result =
-        await client.query(
-          `
-          SELECT *
-          FROM notification_jobs
-          WHERE
-            status IN (
-              'pending',
-              'failed'
-            )
-            AND attempts < 5
-          ORDER BY created_at ASC
-          LIMIT 1
-          FOR UPDATE SKIP LOCKED
-          `
-        );
-
-      if (!result.rowCount) {
-        return null;
-      }
-
-      const job =
-        result.rows[0];
-
-      await client.query(
-        `
-        UPDATE notification_jobs
-        SET
-          status = 'processing',
-          attempts = attempts + 1,
-          updated_at = NOW()
-        WHERE id = $1
-        `,
-        [job.id]
-      );
-
-      return job;
+      return Boolean(result.advanced);
     }
   );
+
+  return results.filter(Boolean).length;
 }
 
-async function markNotificationJob(
-  jobId,
-  {
-    status,
-    lastError = null
-  }
-) {
-  await pool.query(
-    `
-    UPDATE notification_jobs
-    SET
-      status = $2,
-      last_error = $3,
-      updated_at = NOW(),
-      sent_at =
-        CASE
-          WHEN $2 = 'sent'
-          THEN NOW()
-          ELSE sent_at
-        END
-    WHERE id = $1
-    `,
-    [
-      jobId,
-      status,
-      lastError
-    ]
+async function recoverStaleNotificationJobsV109() {
+  const staleSeconds = Math.ceil(
+    NOTIFICATION_PROCESSING_STALE_MS_V109 / 1000
   );
-}
-
-async function processNotificationJobs() {
-  let processed = 0;
-
-  while (processed < 100) {
-    const job =
-      await claimNextNotificationJob();
-
-    if (!job) {
-      break;
-    }
-
-    const payload = {
-      title:
-        `🔥 Tu Día ${job.day} ya está disponible`,
-      body:
-        "Entrá y descubrí tu acción de hoy.",
-      url: "/",
-      tag:
-        `day_available_${job.cycle}_${job.day}`
-    };
-
-    try {
-      const result =
-        await sendPushToUser(
-          job.user_id,
-          payload
-        );
-
-      if (result.sent > 0) {
-        await markNotificationJob(
-          job.id,
-          {
-            status: "sent"
-          }
-        );
-      } else {
-        const reason =
-          result.subscriptions === 0
-            ? "El usuario no tiene dispositivos suscriptos."
-            : (
-                result.errors.join(
-                  " | "
-                ) ||
-                "No se pudo enviar la notificación."
-              );
-
-        await markNotificationJob(
-          job.id,
-          {
-            status: "failed",
-            lastError: reason
-          }
-        );
-      }
-    } catch (error) {
-      await markNotificationJob(
-        job.id,
-        {
-          status: "failed",
-          lastError:
-            error.message ||
-            String(error)
-        }
-      );
-    }
-
-    processed += 1;
+  const queries = [
+    `UPDATE notification_jobs
+     SET status = 'failed',
+         last_error = 'Trabajo recuperado después de una interrupción.',
+         updated_at = NOW() - make_interval(secs => $1)
+     WHERE status = 'processing'
+       AND updated_at <= NOW() - make_interval(secs => $1)`,
+    `UPDATE routine_notification_jobs
+     SET status = 'failed',
+         last_error = 'Trabajo recuperado después de una interrupción.',
+         updated_at = NOW() - make_interval(secs => $1)
+     WHERE status = 'processing'
+       AND updated_at <= NOW() - make_interval(secs => $1)`
+  ];
+  const results = [];
+  for (const query of queries) {
+    results.push(await pool.query(query, [staleSeconds]));
   }
-
-  return processed;
+  return results.reduce((sum, result) => sum + result.rowCount, 0);
 }
 
-
-
-// NU APP · ENVÍO AGRUPADO DE RUTINAS V101A
-const ROUTINE_NOTIFICATION_NAMES_V101A = {
-  "collagen-30": "Collagen+",
-  "lumispa-10": "LumiSpa",
-  "wellspa-10": "WellSpa",
-  "galvanicspa-10": "Galvanic Spa"
-};
-
-async function claimUnifiedRoutineNotificationsV101A() {
+async function claimUnifiedRoutineNotificationBatchV109(limit) {
   return withTransaction(async client => {
-    const candidate = await client.query(
+    const retryBase = NOTIFICATION_RETRY_BASE_MS_V109;
+    const candidates = await client.query(
       `SELECT user_id, MIN(due_at) AS due_at
        FROM (
          SELECT user_id, created_at AS due_at
          FROM notification_jobs
-         WHERE status IN ('pending', 'failed') AND attempts < 5
+         WHERE attempts < 5
+           AND (
+             status = 'pending'
+             OR (
+               status = 'failed'
+               AND updated_at <= NOW() -
+                 (POWER(2, GREATEST(attempts - 1, 0)) * $2 * INTERVAL '1 millisecond')
+             )
+           )
          UNION ALL
          SELECT user_id, scheduled_for AS due_at
          FROM routine_notification_jobs
-         WHERE status IN ('pending', 'failed')
-           AND attempts < 5
+         WHERE attempts < 5
            AND scheduled_for <= NOW()
+           AND (
+             status = 'pending'
+             OR (
+               status = 'failed'
+               AND updated_at <= NOW() -
+                 (POWER(2, GREATEST(attempts - 1, 0)) * $2 * INTERVAL '1 millisecond')
+             )
+           )
        ) due
        GROUP BY user_id
        ORDER BY MIN(due_at)
-       LIMIT 1`,
-      []
+       LIMIT $1`,
+      [limit, retryBase]
     );
 
-    if (!candidate.rowCount) return null;
-    const userId = candidate.rows[0].user_id;
+    const userIds = candidates.rows.map(row => row.user_id);
+    if (!userIds.length) return [];
 
     const collagen = await client.query(
-      `SELECT id, cycle, day
+      `SELECT id, user_id, cycle, day
        FROM notification_jobs
-       WHERE user_id = $1
-         AND status IN ('pending', 'failed')
+       WHERE user_id = ANY($1::text[])
          AND attempts < 5
+         AND (
+           status = 'pending'
+           OR (
+             status = 'failed'
+             AND updated_at <= NOW() -
+               (POWER(2, GREATEST(attempts - 1, 0)) * $2 * INTERVAL '1 millisecond')
+           )
+         )
        ORDER BY created_at
        FOR UPDATE SKIP LOCKED`,
-      [userId]
+      [userIds, retryBase]
     );
 
     const products = await client.query(
-      `SELECT id, routine_id, cycle, day
+      `SELECT id, user_id, routine_id, cycle, day
        FROM routine_notification_jobs
-       WHERE user_id = $1
-         AND status IN ('pending', 'failed')
+       WHERE user_id = ANY($1::text[])
          AND attempts < 5
          AND scheduled_for <= NOW()
+         AND (
+           status = 'pending'
+           OR (
+             status = 'failed'
+             AND updated_at <= NOW() -
+               (POWER(2, GREATEST(attempts - 1, 0)) * $2 * INTERVAL '1 millisecond')
+           )
+         )
        ORDER BY scheduled_for, routine_id
        FOR UPDATE SKIP LOCKED`,
-      [userId]
+      [userIds, retryBase]
     );
-
-    if (!collagen.rowCount && !products.rowCount) return null;
 
     const collagenIds = collagen.rows.map(row => row.id);
     const productIds = products.rows.map(row => row.id);
-
     if (collagenIds.length) {
       await client.query(
         `UPDATE notification_jobs
@@ -1328,26 +1263,30 @@ async function claimUnifiedRoutineNotificationsV101A() {
       );
     }
 
-    return {
-      userId,
-      collagen: collagen.rows,
-      products: products.rows
-    };
+    const grouped = new Map(
+      userIds.map(userId => [userId, { userId, collagen: [], products: [] }])
+    );
+    for (const row of collagen.rows) grouped.get(row.user_id)?.collagen.push(row);
+    for (const row of products.rows) grouped.get(row.user_id)?.products.push(row);
+    return [...grouped.values()].filter(
+      batch => batch.collagen.length || batch.products.length
+    );
   });
 }
 
+// NU APP · ENVÍO AGRUPADO DE RUTINAS V109
+const ROUTINE_NOTIFICATION_NAMES_V101A = {
+  "collagen-30": "Collagen+",
+  "lumispa-10": "LumiSpa",
+  "wellspa-10": "WellSpa",
+  "galvanicspa-10": "Galvanic Spa"
+};
+
 function buildUnifiedRoutinePayloadV101A(batch) {
   const entries = [
-    ...batch.collagen.map(row => ({
-      routineId: "collagen-30",
-      day: Number(row.day)
-    })),
-    ...batch.products.map(row => ({
-      routineId: row.routine_id,
-      day: Number(row.day)
-    }))
+    ...batch.collagen.map(row => ({ routineId: "collagen-30", day: Number(row.day) })),
+    ...batch.products.map(row => ({ routineId: row.routine_id, day: Number(row.day) }))
   ];
-
   const unique = [];
   const seen = new Set();
   for (const entry of entries) {
@@ -1356,7 +1295,6 @@ function buildUnifiedRoutinePayloadV101A(batch) {
     seen.add(key);
     unique.push(entry);
   }
-
   if (unique.length === 1) {
     const entry = unique[0];
     const name = ROUTINE_NOTIFICATION_NAMES_V101A[entry.routineId] || "tu rutina";
@@ -1367,7 +1305,6 @@ function buildUnifiedRoutinePayloadV101A(batch) {
       tag: `routine_daily_${batch.userId}`
     };
   }
-
   const routines = [...new Set(unique.map(entry =>
     ROUTINE_NOTIFICATION_NAMES_V101A[entry.routineId] || "Rutina"
   ))];
@@ -1379,99 +1316,156 @@ function buildUnifiedRoutinePayloadV101A(batch) {
   };
 }
 
-async function markUnifiedRoutineNotificationsV101A(batch, status, lastError = null) {
+async function markUnifiedRoutineNotificationsV109(
+  batch,
+  status,
+  lastError = null,
+  permanent = false
+) {
   const collagenIds = batch.collagen.map(row => row.id);
   const productIds = batch.products.map(row => row.id);
-  const sent = status === "sent";
-
+  const query = table =>
+    `UPDATE ${table}
+     SET status = $2,
+         last_error = $3,
+         attempts = CASE WHEN $4 THEN 5 ELSE attempts END,
+         updated_at = NOW(),
+         sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
+     WHERE id = ANY($1::bigint[])`;
   if (collagenIds.length) {
     await pool.query(
-      `UPDATE notification_jobs
-       SET status = $2, last_error = $3, updated_at = NOW(),
-           sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
-       WHERE id = ANY($1::bigint[])`,
-      [collagenIds, status, lastError]
+      query("notification_jobs"),
+      [collagenIds, status, lastError, permanent]
     );
   }
   if (productIds.length) {
     await pool.query(
-      `UPDATE routine_notification_jobs
-       SET status = $2, last_error = $3, updated_at = NOW(),
-           sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
-       WHERE id = ANY($1::bigint[])`,
-      [productIds, status, lastError]
+      query("routine_notification_jobs"),
+      [productIds, status, lastError, permanent]
     );
   }
-  void sent;
 }
 
-async function processUnifiedRoutineNotificationJobsV101A() {
-  let processed = 0;
-
-  while (processed < 100) {
-    const batch = await claimUnifiedRoutineNotificationsV101A();
-    if (!batch) break;
-
-    try {
-      const result = await sendPushToUser(
-        batch.userId,
-        buildUnifiedRoutinePayloadV101A(batch)
-      );
-
-      if (result.sent > 0) {
-        await markUnifiedRoutineNotificationsV101A(batch, "sent");
-      } else {
-        const reason = result.subscriptions === 0
-          ? "El usuario no tiene dispositivos suscriptos."
-          : result.errors.join(" | ") || "No se pudo enviar la notificación.";
-        await markUnifiedRoutineNotificationsV101A(batch, "failed", reason);
-      }
-    } catch (error) {
-      await markUnifiedRoutineNotificationsV101A(
-        batch,
-        "failed",
-        error.message || String(error)
-      );
+async function processUnifiedBatchV109(batch) {
+  try {
+    const result = await sendPushToUser(
+      batch.userId,
+      buildUnifiedRoutinePayloadV101A(batch)
+    );
+    if (result.sent > 0) {
+      await markUnifiedRoutineNotificationsV109(batch, "sent");
+      return "sent";
     }
 
-    processed += 1;
+    const noActiveSubscriptions =
+      result.subscriptions === 0 ||
+      (
+        result.subscriptions > 0 &&
+        result.removed === result.subscriptions &&
+        result.errors.length === 0
+      );
+    const permanent =
+      noActiveSubscriptions ||
+      (result.errors.length > 0 && result.retryableErrors === 0);
+    const reason = noActiveSubscriptions
+      ? "El usuario no tiene dispositivos suscriptos."
+      : result.errors.join(" | ") || "No se pudo enviar la notificación.";
+    await markUnifiedRoutineNotificationsV109(
+      batch,
+      "failed",
+      reason,
+      permanent
+    );
+    return permanent ? "permanent_failed" : "retryable_failed";
+  } catch (error) {
+    await markUnifiedRoutineNotificationsV109(
+      batch,
+      "failed",
+      error.message || String(error),
+      false
+    );
+    return "retryable_failed";
   }
+}
 
-  return processed;
+async function processUnifiedRoutineNotificationJobsV109(deadline) {
+  const summary = {
+    processed: 0,
+    sent: 0,
+    retryableFailed: 0,
+    permanentFailed: 0
+  };
+
+  while (
+    summary.processed < NOTIFICATION_MAX_PER_CYCLE_V109 &&
+    Date.now() < deadline
+  ) {
+    const remaining = NOTIFICATION_MAX_PER_CYCLE_V109 - summary.processed;
+    const batches = await claimUnifiedRoutineNotificationBatchV109(
+      Math.min(NOTIFICATION_BATCH_SIZE_V109, remaining)
+    );
+    if (!batches.length) break;
+
+    const outcomes = await mapWithConcurrencyV109(
+      batches,
+      NOTIFICATION_CONCURRENCY_V109,
+      processUnifiedBatchV109
+    );
+    summary.processed += outcomes.length;
+    for (const outcome of outcomes) {
+      if (outcome === "sent") summary.sent += 1;
+      if (outcome === "retryable_failed") summary.retryableFailed += 1;
+      if (outcome === "permanent_failed") summary.permanentFailed += 1;
+    }
+  }
+  return summary;
 }
 
 async function runSchedulerCycle() {
-  if (
-    schedulerRunning ||
-    !pool ||
-    !pushConfigured
-  ) {
-    return;
-  }
-
+  if (schedulerRunning || !pool || !pushConfigured) return;
   schedulerRunning = true;
+  const lockClient = await pool.connect();
+  let leader = false;
+  const startedAt = Date.now();
 
   try {
-    const advanced =
-      await enqueueDueUnlocks();
+    const lockResult = await lockClient.query(
+      `SELECT pg_try_advisory_lock($1) AS locked`,
+      [SCHEDULER_ADVISORY_LOCK_V109]
+    );
+    leader = Boolean(lockResult.rows[0]?.locked);
+    if (!leader) return;
 
-    const notifications =
-      await processUnifiedRoutineNotificationJobsV101A();
+    const deadline = startedAt + NOTIFICATION_CYCLE_BUDGET_MS_V109;
+    const recovered = await recoverStaleNotificationJobsV109();
+    const advanced = await enqueueDueUnlocksV109(deadline);
+    const notifications = Date.now() < deadline
+      ? await processUnifiedRoutineNotificationJobsV109(deadline)
+      : { processed: 0, sent: 0, retryableFailed: 0, permanentFailed: 0 };
 
-    if (
-      advanced > 0 ||
-      notifications > 0
-    ) {
+    if (advanced > 0 || recovered > 0 || notifications.processed > 0) {
       console.log(
-        `[scheduler] desbloqueos=${advanced} notificaciones=${notifications}`
+        `[scheduler-v109] ms=${Date.now() - startedAt} ` +
+        `desbloqueos=${advanced} recuperados=${recovered} ` +
+        `procesados=${notifications.processed} enviados=${notifications.sent} ` +
+        `reintentables=${notifications.retryableFailed} ` +
+        `permanentes=${notifications.permanentFailed}`
       );
     }
   } catch (error) {
-    console.error(
-      "[scheduler] error:",
-      error
-    );
+    console.error("[scheduler-v109] error:", error);
   } finally {
+    if (leader) {
+      try {
+        await lockClient.query(
+          `SELECT pg_advisory_unlock($1)`,
+          [SCHEDULER_ADVISORY_LOCK_V109]
+        );
+      } catch (unlockError) {
+        console.error("[scheduler-v109] error liberando lock:", unlockError);
+      }
+    }
+    lockClient.release();
     schedulerRunning = false;
   }
 }
