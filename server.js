@@ -18,6 +18,9 @@ const {
   sourceReferencesV111,
   summarizeDeliveryRowsV111
 } = require("./notification-delivery-v111");
+const {
+  databasePoolOptionsV113
+} = require("./runtime-config-v113");
 
 const app = express();
 
@@ -49,10 +52,14 @@ if (!DATABASE_URL) {
   );
 }
 
-const pool = DATABASE_URL
-  ? new Pool({
-      connectionString: DATABASE_URL
-    })
+const poolOptionsV113 =
+  databasePoolOptionsV113(
+    DATABASE_URL,
+    process.env
+  );
+
+const pool = poolOptionsV113
+  ? new Pool(poolOptionsV113)
   : null;
 
 
@@ -3265,6 +3272,7 @@ app.post(
   "/api/admin/schedule-auto-test-latest",
   async (req, res, next) => {
     try {
+      assertAdminTestRoutesEnabled();
       assertDatabase();
       assertPushConfigured();
       assertAdminTestToken(req);
@@ -3398,6 +3406,7 @@ app.post(
   "/api/admin/scheduler-run",
   async (req, res, next) => {
     try {
+      assertAdminTestRoutesEnabled();
       assertAdminTestToken(req);
 
       await runSchedulerCycle();
@@ -3415,6 +3424,7 @@ app.post(
   "/api/admin/push-test-latest",
   async (req, res, next) => {
     try {
+      assertAdminTestRoutesEnabled();
       assertDatabase();
       assertPushConfigured();
       assertAdminTestToken(req);
