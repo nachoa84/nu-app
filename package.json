@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test:v111": "node --test tests/notification-delivery-v111.test.js"
   },
   "engines": {
     "node": ">=20"
