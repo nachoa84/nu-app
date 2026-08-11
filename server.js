@@ -9,6 +9,15 @@ const {
   DateTime,
   IANAZone
 } = require("luxon");
+const {
+  attachDeliveryIdentityV111,
+  classifyPushErrorV111,
+  endpointHashV111,
+  logicalDeliveryKeyV111,
+  retryDelayMsV111,
+  sourceReferencesV111,
+  summarizeDeliveryRowsV111
+} = require("./notification-delivery-v111");
 
 const app = express();
 
@@ -1029,6 +1038,22 @@ const NOTIFICATION_UNLOCK_CONCURRENCY_V109 = Math.max(
 );
 const SCHEDULER_ADVISORY_LOCK_V109 = 109030;
 
+// V111 conserva los límites globales de V109 y agrega un ledger por
+// suscripción. El máximo se aplica por dispositivo, no por usuario.
+const NOTIFICATION_DELIVERY_MAX_ATTEMPTS_V111 = Math.max(
+  1,
+  // Los jobs padre V109 se reclaman hasta cinco veces. Mantener el mismo
+  // techo evita dejar una entrega retryable sin un job capaz de retomarla.
+  Math.min(Number(process.env.NOTIFICATION_DELIVERY_MAX_ATTEMPTS || 5), 5)
+);
+const NOTIFICATION_DELIVERY_STALE_MS_V111 = Math.max(
+  60000,
+  Number(
+    process.env.NOTIFICATION_DELIVERY_STALE_MS ||
+    NOTIFICATION_PROCESSING_STALE_MS_V109
+  )
+);
+
 let schedulerRunning = false;
 
 async function mapWithConcurrencyV109(items, concurrency, worker) {
@@ -1316,11 +1341,293 @@ function buildUnifiedRoutinePayloadV101A(batch) {
   };
 }
 
+// NU APP · ENTREGA POR DISPOSITIVO V111
+async function prepareNotificationDeliveriesV111(batch, payload) {
+  const logicalKey = logicalDeliveryKeyV111(batch);
+  const identifiedPayload = attachDeliveryIdentityV111(payload, logicalKey);
+  const sources = sourceReferencesV111(batch);
+
+  return withTransaction(async client => {
+    const insertedBatch = await client.query(
+      `INSERT INTO notification_delivery_batches (
+         logical_key, user_id, payload, status, updated_at
+       ) VALUES ($1, $2, $3::jsonb, 'pending', NOW())
+       ON CONFLICT (logical_key) DO NOTHING
+       RETURNING payload`,
+      [logicalKey, batch.userId, JSON.stringify(identifiedPayload)]
+    );
+    const isNewBatch = insertedBatch.rowCount > 0;
+    let storedPayload = identifiedPayload;
+
+    if (!isNewBatch) {
+      const existingBatch = await client.query(
+        `SELECT payload
+         FROM notification_delivery_batches
+         WHERE logical_key = $1`,
+        [logicalKey]
+      );
+      storedPayload = existingBatch.rows[0].payload;
+    }
+
+    for (const source of sources) {
+      await client.query(
+        `INSERT INTO notification_delivery_sources (
+           logical_key, source_table, source_id
+         ) VALUES ($1, $2, $3)
+         ON CONFLICT (source_table, source_id) DO NOTHING`,
+        [logicalKey, source.sourceTable, source.sourceId]
+      );
+    }
+
+    if (isNewBatch) {
+      const subscriptions = await client.query(
+        `SELECT id, endpoint, subscription
+         FROM push_subscriptions
+         WHERE user_id = $1
+         ORDER BY id`,
+        [batch.userId]
+      );
+
+      for (const row of subscriptions.rows) {
+        await client.query(
+          `INSERT INTO notification_deliveries (
+             logical_key,
+             subscription_id,
+             endpoint_hash,
+             subscription_snapshot,
+             status,
+             next_attempt_at,
+             updated_at
+           ) VALUES ($1, $2, $3, $4::jsonb, 'pending', NOW(), NOW())
+           ON CONFLICT (logical_key, endpoint_hash) DO NOTHING`,
+          [
+            logicalKey,
+            row.id,
+            endpointHashV111(row.endpoint),
+            JSON.stringify(row.subscription)
+          ]
+        );
+      }
+    }
+
+    const deliveryCount = await client.query(
+      `SELECT COUNT(*)::integer AS count
+       FROM notification_deliveries
+       WHERE logical_key = $1`,
+      [logicalKey]
+    );
+
+    return {
+      logicalKey,
+      payload: storedPayload,
+      subscriptions: deliveryCount.rows[0].count
+    };
+  });
+}
+
+async function claimNotificationDeliveriesV111(logicalKey) {
+  return withTransaction(async client => {
+    const claimed = await client.query(
+      `WITH candidates AS (
+         SELECT id
+         FROM notification_deliveries
+         WHERE logical_key = $1
+           AND attempts < $2
+           AND next_attempt_at <= NOW()
+           AND status IN ('pending', 'retryable')
+         ORDER BY id
+         FOR UPDATE SKIP LOCKED
+       )
+       UPDATE notification_deliveries AS delivery
+       SET status = 'processing',
+           attempts = attempts + 1,
+           processing_at = NOW(),
+           updated_at = NOW()
+       FROM candidates
+       WHERE delivery.id = candidates.id
+       RETURNING
+         delivery.id,
+         delivery.subscription_id,
+         delivery.endpoint_hash,
+         delivery.subscription_snapshot,
+         delivery.attempts`,
+      [logicalKey, NOTIFICATION_DELIVERY_MAX_ATTEMPTS_V111]
+    );
+
+    return claimed.rows;
+  });
+}
+
+function safePushErrorV111(error) {
+  const message = String(error?.message || error || "Error Web Push.");
+  return message.slice(0, 500);
+}
+
+async function markNotificationDeliveryV111(
+  delivery,
+  status,
+  lastError = null,
+  nextAttemptAt = null,
+  preserveAttempt = false
+) {
+  await pool.query(
+    `UPDATE notification_deliveries
+     SET status = $2,
+         last_error = $3,
+         next_attempt_at = COALESCE($4, next_attempt_at),
+         attempts = CASE
+           WHEN $5 THEN GREATEST(attempts - 1, 0)
+           ELSE attempts
+         END,
+         processing_at = NULL,
+         sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END,
+         updated_at = NOW()
+     WHERE id = $1`,
+    [delivery.id, status, lastError, nextAttemptAt, preserveAttempt]
+  );
+}
+
+async function sendNotificationDeliveryV111(delivery, payload) {
+  const activeSubscription = delivery.subscription_id
+    ? await pool.query(
+        `SELECT 1
+         FROM push_subscriptions
+         WHERE id = $1
+           AND subscription = $2::jsonb`,
+        [delivery.subscription_id, JSON.stringify(delivery.subscription_snapshot)]
+      )
+    : { rowCount: 0 };
+
+  if (!activeSubscription.rowCount) {
+    await markNotificationDeliveryV111(
+      delivery,
+      "permanent",
+      "La suscripción fue retirada o actualizada."
+    );
+    return "inactive";
+  }
+
+  try {
+    await webpush.sendNotification(
+      delivery.subscription_snapshot,
+      JSON.stringify(payload)
+    );
+    await markNotificationDeliveryV111(delivery, "sent");
+    return "sent";
+  } catch (error) {
+    const classification = classifyPushErrorV111(error);
+    const reason = safePushErrorV111(error);
+
+    if (classification.kind === "configuration") {
+      const retryAt = new Date(
+        Date.now() + NOTIFICATION_RETRY_BASE_MS_V109
+      );
+      await markNotificationDeliveryV111(
+        delivery,
+        "retryable",
+        reason,
+        retryAt,
+        true
+      );
+      return "configuration";
+    }
+
+    if (classification.kind === "expired") {
+      if (delivery.subscription_id) {
+        await pool.query(
+          `DELETE FROM push_subscriptions
+           WHERE id = $1
+             AND subscription = $2::jsonb`,
+          [delivery.subscription_id, JSON.stringify(delivery.subscription_snapshot)]
+        );
+      }
+      await markNotificationDeliveryV111(delivery, "permanent", reason);
+      return "removed";
+    }
+
+    if (
+      classification.kind === "retryable" &&
+      delivery.attempts < NOTIFICATION_DELIVERY_MAX_ATTEMPTS_V111
+    ) {
+      const retryAt = new Date(
+        Date.now() +
+        retryDelayMsV111(
+          delivery.attempts,
+          NOTIFICATION_RETRY_BASE_MS_V109
+        )
+      );
+      await markNotificationDeliveryV111(
+        delivery,
+        "retryable",
+        reason,
+        retryAt
+      );
+      return "retryable";
+    }
+
+    await markNotificationDeliveryV111(delivery, "permanent", reason);
+    return "permanent";
+  }
+}
+
+async function summarizeNotificationBatchV111(logicalKey) {
+  const result = await pool.query(
+    `SELECT status
+     FROM notification_deliveries
+     WHERE logical_key = $1`,
+    [logicalKey]
+  );
+  return summarizeDeliveryRowsV111(result.rows);
+}
+
+async function updateDeliveryBatchStatusV111(logicalKey, summary) {
+  const status = summary.open > 0
+    ? "pending"
+    : summary.sent > 0
+      ? "sent"
+      : "failed";
+  const detail = summary.permanent > 0
+    ? `${summary.permanent} entrega(s) permanente(s).`
+    : null;
+
+  await pool.query(
+    `UPDATE notification_delivery_batches
+     SET status = $2,
+         last_error = $3,
+         sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END,
+         updated_at = NOW()
+     WHERE logical_key = $1`,
+    [logicalKey, status, detail]
+  );
+}
+
+async function recoverStaleNotificationDeliveriesV111() {
+  const staleSeconds = Math.ceil(
+    NOTIFICATION_DELIVERY_STALE_MS_V111 / 1000
+  );
+  const result = await pool.query(
+    `UPDATE notification_deliveries
+     SET status = CASE
+           WHEN attempts < $2 THEN 'retryable'
+           ELSE 'permanent'
+         END,
+         last_error = 'Entrega recuperada después de una interrupción.',
+         processing_at = NULL,
+         next_attempt_at = NOW(),
+         updated_at = NOW()
+     WHERE status = 'processing'
+       AND processing_at <= NOW() - make_interval(secs => $1)`,
+    [staleSeconds, NOTIFICATION_DELIVERY_MAX_ATTEMPTS_V111]
+  );
+  return result.rowCount;
+}
+
 async function markUnifiedRoutineNotificationsV109(
   batch,
   status,
   lastError = null,
-  permanent = false
+  permanent = false,
+  preserveAttempt = false
 ) {
   const collagenIds = batch.collagen.map(row => row.id);
   const productIds = batch.products.map(row => row.id);
@@ -1328,55 +1635,197 @@ async function markUnifiedRoutineNotificationsV109(
     `UPDATE ${table}
      SET status = $2,
          last_error = $3,
-         attempts = CASE WHEN $4 THEN 5 ELSE attempts END,
+         attempts = CASE
+           WHEN $4 THEN 5
+           WHEN $5 THEN GREATEST(attempts - 1, 0)
+           ELSE attempts
+         END,
          updated_at = NOW(),
          sent_at = CASE WHEN $2 = 'sent' THEN NOW() ELSE sent_at END
      WHERE id = ANY($1::bigint[])`;
   if (collagenIds.length) {
     await pool.query(
       query("notification_jobs"),
-      [collagenIds, status, lastError, permanent]
+      [collagenIds, status, lastError, permanent, preserveAttempt]
     );
   }
   if (productIds.length) {
     await pool.query(
       query("routine_notification_jobs"),
-      [productIds, status, lastError, permanent]
+      [productIds, status, lastError, permanent, preserveAttempt]
     );
   }
 }
 
-async function processUnifiedBatchV109(batch) {
+async function partitionUnifiedBatchV111(batch) {
+  const collagenIds = batch.collagen.map(row => row.id);
+  const productIds = batch.products.map(row => row.id);
+  const existing = await pool.query(
+    `SELECT source_table, source_id, logical_key
+     FROM notification_delivery_sources
+     WHERE (
+       source_table = 'notification_jobs'
+       AND source_id = ANY($1::bigint[])
+     ) OR (
+       source_table = 'routine_notification_jobs'
+       AND source_id = ANY($2::bigint[])
+     )`,
+    [collagenIds, productIds]
+  );
+  const bySource = new Map(
+    existing.rows.map(row => [
+      `${row.source_table}:${row.source_id}`,
+      row.logical_key
+    ])
+  );
+  const groups = new Map();
+
+  function add(groupKey, type, row) {
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        userId: batch.userId,
+        collagen: [],
+        products: []
+      });
+    }
+    groups.get(groupKey)[type].push(row);
+  }
+
+  for (const row of batch.collagen) {
+    add(
+      bySource.get(`notification_jobs:${row.id}`) || "unassigned",
+      "collagen",
+      row
+    );
+  }
+  for (const row of batch.products) {
+    add(
+      bySource.get(`routine_notification_jobs:${row.id}`) || "unassigned",
+      "products",
+      row
+    );
+  }
+  return [...groups.values()];
+}
+
+async function processDeliveryGroupV111(batch) {
   try {
-    const result = await sendPushToUser(
-      batch.userId,
+    const prepared = await prepareNotificationDeliveriesV111(
+      batch,
       buildUnifiedRoutinePayloadV101A(batch)
     );
-    if (result.sent > 0) {
-      await markUnifiedRoutineNotificationsV109(batch, "sent");
-      return "sent";
+
+    if (prepared.subscriptions === 0) {
+      await updateDeliveryBatchStatusV111(
+        prepared.logicalKey,
+        {
+          open: 0,
+          sent: 0,
+          permanent: 0
+        }
+      );
+      await markUnifiedRoutineNotificationsV109(
+        batch,
+        "failed",
+        "El usuario no tiene dispositivos suscriptos.",
+        true
+      );
+      return {
+        outcome: "permanent_failed",
+        deliveries: 0,
+        sent: 0,
+        retryable: 0,
+        permanent: 0,
+        removed: 0
+      };
     }
 
-    const noActiveSubscriptions =
-      result.subscriptions === 0 ||
-      (
-        result.subscriptions > 0 &&
-        result.removed === result.subscriptions &&
-        result.errors.length === 0
+    const claimed = await claimNotificationDeliveriesV111(
+      prepared.logicalKey
+    );
+    const outcomes = [];
+
+    // Los lotes de usuarios ya se procesan con concurrencia V109. Dentro
+    // de cada usuario enviamos sus pocos dispositivos secuencialmente para
+    // no multiplicar NOTIFICATION_CONCURRENCY por segunda vez.
+    for (const delivery of claimed) {
+      outcomes.push(
+        await sendNotificationDeliveryV111(
+          delivery,
+          prepared.payload
+        )
       );
-    const permanent =
-      noActiveSubscriptions ||
-      (result.errors.length > 0 && result.retryableErrors === 0);
-    const reason = noActiveSubscriptions
-      ? "El usuario no tiene dispositivos suscriptos."
-      : result.errors.join(" | ") || "No se pudo enviar la notificación.";
+    }
+
+    const summary = await summarizeNotificationBatchV111(
+      prepared.logicalKey
+    );
+    await updateDeliveryBatchStatusV111(prepared.logicalKey, summary);
+    const cycleSent = outcomes.filter(
+      value => value === "sent"
+    ).length;
+    const cycleRemoved = outcomes.filter(
+      value => value === "removed"
+    ).length;
+    const cyclePermanent = outcomes.filter(
+      value =>
+        value === "permanent" ||
+        value === "removed" ||
+        value === "inactive"
+    ).length;
+
+    if (summary.open > 0) {
+      await markUnifiedRoutineNotificationsV109(
+        batch,
+        "failed",
+        `${summary.open} dispositivo(s) pendiente(s) de reintento.`,
+        false,
+        outcomes.includes("configuration")
+      );
+      return {
+        outcome: "retryable_failed",
+        deliveries: claimed.length,
+        sent: cycleSent,
+        retryable: summary.retryable,
+        permanent: cyclePermanent,
+        removed: cycleRemoved
+      };
+    }
+
+    if (summary.sent > 0) {
+      const partialReason = summary.permanent > 0
+        ? `Envío parcial: ${summary.sent} enviada(s), ` +
+          `${summary.permanent} permanente(s).`
+        : null;
+      await markUnifiedRoutineNotificationsV109(
+        batch,
+        "sent",
+        partialReason
+      );
+      return {
+        outcome: "sent",
+        deliveries: claimed.length,
+        sent: cycleSent,
+        retryable: 0,
+        permanent: cyclePermanent,
+        removed: cycleRemoved
+      };
+    }
+
     await markUnifiedRoutineNotificationsV109(
       batch,
       "failed",
-      reason,
-      permanent
+      "Ningún dispositivo pudo recibir la notificación.",
+      true
     );
-    return permanent ? "permanent_failed" : "retryable_failed";
+    return {
+      outcome: "permanent_failed",
+      deliveries: claimed.length,
+      sent: 0,
+      retryable: 0,
+      permanent: cyclePermanent,
+      removed: cycleRemoved
+    };
   } catch (error) {
     await markUnifiedRoutineNotificationsV109(
       batch,
@@ -1384,7 +1833,65 @@ async function processUnifiedBatchV109(batch) {
       error.message || String(error),
       false
     );
-    return "retryable_failed";
+    return {
+      outcome: "retryable_failed",
+      deliveries: 0,
+      sent: 0,
+      retryable: 1,
+      permanent: 0,
+      removed: 0
+    };
+  }
+}
+
+async function processUnifiedBatchV111(batch) {
+  try {
+    const groups = await partitionUnifiedBatchV111(batch);
+    const results = [];
+
+    // Un trabajo que ya tiene ledger conserva su grupo original. Los trabajos
+    // nuevos no se mezclan con un reintento anterior, evitando reenviar a los
+    // dispositivos que ya habían recibido correctamente.
+    for (const group of groups) {
+      results.push(await processDeliveryGroupV111(group));
+    }
+
+    const aggregate = {
+      outcome: results.some(row => row.outcome === "retryable_failed")
+        ? "retryable_failed"
+        : results.some(row => row.outcome === "sent")
+          ? "sent"
+          : "permanent_failed",
+      deliveries: 0,
+      sent: 0,
+      retryable: 0,
+      permanent: 0,
+      removed: 0
+    };
+
+    for (const result of results) {
+      aggregate.deliveries += result.deliveries;
+      aggregate.sent += result.sent;
+      aggregate.retryable += result.retryable;
+      aggregate.permanent += result.permanent;
+      aggregate.removed += result.removed;
+    }
+    return aggregate;
+  } catch (error) {
+    await markUnifiedRoutineNotificationsV109(
+      batch,
+      "failed",
+      error.message || String(error),
+      false
+    );
+    return {
+      outcome: "retryable_failed",
+      deliveries: 0,
+      sent: 0,
+      retryable: 1,
+      permanent: 0,
+      removed: 0
+    };
   }
 }
 
@@ -1393,7 +1900,12 @@ async function processUnifiedRoutineNotificationJobsV109(deadline) {
     processed: 0,
     sent: 0,
     retryableFailed: 0,
-    permanentFailed: 0
+    permanentFailed: 0,
+    deliveries: 0,
+    deviceSent: 0,
+    deviceRetryable: 0,
+    devicePermanent: 0,
+    subscriptionsRemoved: 0
   };
 
   while (
@@ -1409,13 +1921,18 @@ async function processUnifiedRoutineNotificationJobsV109(deadline) {
     const outcomes = await mapWithConcurrencyV109(
       batches,
       NOTIFICATION_CONCURRENCY_V109,
-      processUnifiedBatchV109
+      processUnifiedBatchV111
     );
     summary.processed += outcomes.length;
-    for (const outcome of outcomes) {
-      if (outcome === "sent") summary.sent += 1;
-      if (outcome === "retryable_failed") summary.retryableFailed += 1;
-      if (outcome === "permanent_failed") summary.permanentFailed += 1;
+    for (const result of outcomes) {
+      if (result.outcome === "sent") summary.sent += 1;
+      if (result.outcome === "retryable_failed") summary.retryableFailed += 1;
+      if (result.outcome === "permanent_failed") summary.permanentFailed += 1;
+      summary.deliveries += result.deliveries;
+      summary.deviceSent += result.sent;
+      summary.deviceRetryable += result.retryable;
+      summary.devicePermanent += result.permanent;
+      summary.subscriptionsRemoved += result.removed;
     }
   }
   return summary;
@@ -1438,18 +1955,41 @@ async function runSchedulerCycle() {
 
     const deadline = startedAt + NOTIFICATION_CYCLE_BUDGET_MS_V109;
     const recovered = await recoverStaleNotificationJobsV109();
+    const recoveredDeliveries =
+      await recoverStaleNotificationDeliveriesV111();
     const advanced = await enqueueDueUnlocksV109(deadline);
     const notifications = Date.now() < deadline
       ? await processUnifiedRoutineNotificationJobsV109(deadline)
-      : { processed: 0, sent: 0, retryableFailed: 0, permanentFailed: 0 };
+      : {
+          processed: 0,
+          sent: 0,
+          retryableFailed: 0,
+          permanentFailed: 0,
+          deliveries: 0,
+          deviceSent: 0,
+          deviceRetryable: 0,
+          devicePermanent: 0,
+          subscriptionsRemoved: 0
+        };
 
-    if (advanced > 0 || recovered > 0 || notifications.processed > 0) {
+    if (
+      advanced > 0 ||
+      recovered > 0 ||
+      recoveredDeliveries > 0 ||
+      notifications.processed > 0
+    ) {
       console.log(
-        `[scheduler-v109] ms=${Date.now() - startedAt} ` +
+        `[scheduler-v111] ms=${Date.now() - startedAt} ` +
         `desbloqueos=${advanced} recuperados=${recovered} ` +
+        `entregas_recuperadas=${recoveredDeliveries} ` +
         `procesados=${notifications.processed} enviados=${notifications.sent} ` +
         `reintentables=${notifications.retryableFailed} ` +
-        `permanentes=${notifications.permanentFailed}`
+        `permanentes=${notifications.permanentFailed} ` +
+        `entregas=${notifications.deliveries} ` +
+        `dispositivos_enviados=${notifications.deviceSent} ` +
+        `dispositivos_reintentables=${notifications.deviceRetryable} ` +
+        `dispositivos_permanentes=${notifications.devicePermanent} ` +
+        `suscripciones_eliminadas=${notifications.subscriptionsRemoved}`
       );
     }
   } catch (error) {

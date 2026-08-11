@@ -1,4 +1,4 @@
-const CACHE="nuapp-v107a-galvanic-official-gallery";
+const CACHE="nuapp-v111-reliable-push-delivery";
 
 const CORE=[
   "./",
@@ -396,14 +396,20 @@ self.addEventListener(
           {
             body:
               data.body,
-            data: {
-              url:
-                data.url || "/"
-            },
-            tag:
-              data.tag ||
-              "rutina30",
-            renotify: true
+        data: {
+          url:
+            data.url || "/",
+          notificationId:
+            data.notificationId ||
+            data.tag ||
+            null
+        },
+        tag:
+          data.tag ||
+          "rutina30",
+        // V111: un reenvío del mismo trabajo conserva el tag y reemplaza
+        // la tarjeta anterior en vez de alertar como una notificación nueva.
+        renotify: false
           }
         )
     ];

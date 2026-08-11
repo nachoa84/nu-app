@@ -121,3 +121,61 @@ CREATE INDEX IF NOT EXISTS idx_routine_notification_jobs_due
 
 CREATE INDEX IF NOT EXISTS idx_routine_notification_jobs_user
   ON routine_notification_jobs(user_id, scheduled_for);
+
+-- NU APP · ENTREGA CONFIABLE POR DISPOSITIVO V111
+CREATE TABLE IF NOT EXISTS notification_delivery_batches (
+  logical_key TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  payload JSONB NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  CHECK (status IN ('pending', 'sent', 'failed'))
+);
+
+CREATE TABLE IF NOT EXISTS notification_delivery_sources (
+  logical_key TEXT NOT NULL
+    REFERENCES notification_delivery_batches(logical_key) ON DELETE CASCADE,
+  source_table TEXT NOT NULL,
+  source_id BIGINT NOT NULL,
+  PRIMARY KEY (logical_key, source_table, source_id),
+  UNIQUE (source_table, source_id),
+  CHECK (
+    source_table IN ('notification_jobs', 'routine_notification_jobs')
+  )
+);
+
+CREATE TABLE IF NOT EXISTS notification_deliveries (
+  id BIGSERIAL PRIMARY KEY,
+  logical_key TEXT NOT NULL
+    REFERENCES notification_delivery_batches(logical_key) ON DELETE CASCADE,
+  subscription_id BIGINT NULL
+    REFERENCES push_subscriptions(id) ON DELETE SET NULL,
+  endpoint_hash TEXT NOT NULL,
+  subscription_snapshot JSONB NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  processing_at TIMESTAMPTZ NULL,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  UNIQUE (logical_key, endpoint_hash),
+  CHECK (
+    status IN ('pending', 'processing', 'retryable', 'sent', 'permanent')
+  )
+);
+
+CREATE INDEX IF NOT EXISTS idx_notification_deliveries_due
+  ON notification_deliveries(status, next_attempt_at)
+  WHERE status IN ('pending', 'retryable');
+
+CREATE INDEX IF NOT EXISTS idx_notification_deliveries_batch
+  ON notification_deliveries(logical_key, status);
+
+CREATE INDEX IF NOT EXISTS idx_notification_deliveries_processing
+  ON notification_deliveries(processing_at)
+  WHERE status = 'processing';
