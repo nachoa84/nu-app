@@ -21,6 +21,10 @@ const {
 const {
   databasePoolOptionsV113
 } = require("./runtime-config-v113");
+const {
+  shouldHonorRangeV114,
+  shouldReturnNotModifiedV114
+} = require("./http-cache-v114");
 
 const app = express();
 
@@ -3717,7 +3721,14 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
       if (etag) commonHeaders.ETag = etag;
       res.set(commonHeaders);
 
-      if (req.headers.range) {
+      if (shouldReturnNotModifiedV114(req, etag)) {
+        return res.status(304).end();
+      }
+
+      if (
+        req.headers.range &&
+        shouldHonorRangeV114(req, etag)
+      ) {
         if (!range || range.unsatisfiable) {
           return res
             .status(416)

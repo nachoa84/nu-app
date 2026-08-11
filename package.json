@@ -8,7 +8,8 @@
     "start": "node server.js",
     "dev": "node server.js",
     "test:v111": "node --test tests/notification-delivery-v111.test.js",
-    "test:v113": "node --test tests/runtime-hardening-v113.test.js"
+    "test:v113": "node --test tests/runtime-hardening-v113.test.js",
+    "test:v114": "node --test tests/http-cache-v114.test.js"
   },
   "engines": {
     "node": ">=20"
