@@ -1289,3 +1289,72 @@ body.bot-quick-access-open {
   .bot-quick-access-layer,
   .bot-quick-access-sheet { transition: none; }
 }
+
+
+/* NU APP · RECURSOS Y ACCIONES TÁCTILES DEL BOT V118 */
+/* Agrupa visualmente recursos consecutivos sin alterar su render ni acciones. */
+#view-bot .bot-response-stack > .bot-resource-card {
+  border-right: 1px solid var(--bot-line);
+  border-left: 1px solid var(--bot-line);
+  padding-right: 12px;
+  padding-left: 12px;
+  background: #fff;
+}
+
+#view-bot .bot-response-stack > .bot-resource-card:first-child,
+#view-bot .bot-response-stack > .bubble.bot + .bot-resource-card {
+  border-top: 1px solid var(--bot-line);
+  border-radius: 16px 16px 0 0;
+}
+
+#view-bot .bot-response-stack > .bot-resource-card + .bot-resource-card {
+  border-top-color: rgba(23, 34, 61, .075);
+}
+
+#view-bot .bot-response-stack > .bot-resource-card:not(:has(+ .bot-resource-card)) {
+  border-bottom: 1px solid var(--bot-line);
+  border-radius: 0 0 16px 16px;
+}
+
+#view-bot .bot-response-stack > .bot-resource-card:only-child {
+  border-radius: 16px;
+}
+
+#view-bot .bot-response-stack > .bot-resource-card:first-child:not(:has(+ .bot-resource-card)),
+#view-bot .bot-response-stack > .bubble.bot + .bot-resource-card:not(:has(+ .bot-resource-card)) {
+  border-radius: 16px;
+}
+
+#view-bot .bot-message-actions {
+  gap: 8px;
+}
+
+#view-bot .bot-message-action {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--bot-line);
+  border-radius: 999px;
+  background: #fff;
+  color: #626b78;
+}
+
+#view-bot .bot-message-action:active {
+  background: var(--bot-brand-soft);
+  transform: scale(.97);
+}
+
+#view-bot .bot-message-action.is-saved {
+  border-color: rgba(39, 63, 122, .16);
+  background: var(--bot-brand-soft);
+}
+
+#view-bot .bot-message-action.is-copied {
+  border-color: rgba(115, 139, 93, .22);
+  background: var(--bot-green-soft);
+}
+
+@media (max-width: 360px) {
+  #view-bot .bot-message-action {
+    padding-inline: 12px;
+  }
+}
