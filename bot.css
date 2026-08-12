@@ -1360,83 +1360,16 @@ body.bot-quick-access-open {
 }
 
 
-/* NU APP · IDENTIDAD IRIS V124 */
-#view-bot .bot-page-header {
-  min-height: 112px;
-  align-items: flex-start;
-  padding: 5px 0 14px;
-}
 
-#view-bot .bot-identity {
-  min-width: 0;
-  max-width: min(72%, 430px);
+/* NU APP · UBICACIÓN DE IRIS V124A */
+#view-bot .bot-page-header > div:first-child {
   display: grid;
   gap: 4px;
 }
 
-#view-bot .bot-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#view-bot .bot-title-row h1 {
-  margin: 0;
-}
-
 #view-bot .bot-status {
-  min-height: 25px;
-  padding: 4px 10px;
-  border: 1px solid rgba(52, 181, 106, .18);
-  border-radius: 999px;
-  background: rgba(52, 181, 106, .09);
-  color: #277a4c;
-  font-size: 11px;
-  font-weight: 720;
-  letter-spacing: .01em;
-}
-
-#view-bot .bot-status i {
-  width: 7px;
-  height: 7px;
-  box-shadow: 0 0 0 4px rgba(52, 181, 106, .12);
-}
-
-#view-bot .bot-tagline,
-#view-bot .bot-introduction {
-  margin: 0;
-}
-
-#view-bot .bot-tagline {
-  color: var(--bot-ink);
-  font-size: 14px;
-  line-height: 1.3;
-  font-weight: 720;
-  letter-spacing: -.01em;
-}
-
-#view-bot .bot-introduction {
-  max-width: 410px;
-  color: var(--bot-muted);
-  font-size: 12px;
-  line-height: 1.45;
-  font-weight: 520;
-}
-
-#view-bot .bot-header-actions {
-  padding-top: 2px;
-}
-
-@media (max-width: 390px) {
-  #view-bot .bot-page-header {
-    min-height: 120px;
-  }
-
-  #view-bot .bot-identity {
-    max-width: calc(100% - 92px);
-  }
-
-  #view-bot .bot-introduction {
-    font-size: 11.5px;
-  }
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
 }

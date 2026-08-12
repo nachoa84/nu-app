@@ -769,7 +769,7 @@ function renderBotConversation({ scroll = false } = {}) {
       title.textContent = "Preguntame lo que necesites";
 
       const text = document.createElement("p");
-      text.textContent = "Podés escribir un comando como “loi”, “tramites” o “box colageno”, o preguntarme con tus palabras.";
+      text.textContent = "Hola, soy Iris. Estoy acá para ayudarte, encontrar recursos y acompañarte en cada paso.";
 
       welcome.append(mark, title, text);
       thread.appendChild(welcome);
