@@ -1,4 +1,4 @@
-const CACHE="nuapp-v122b-community-single";
+const CACHE="nuapp-v123-product-contours-pharmanex";
 
 const CORE=[
   "./",
@@ -22,12 +22,12 @@ const CORE=[
   "./ui-core.js?v=63e-ios-thumbnails",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=107a-galvanic-official-gallery",
+  "./routine-products-v92.js?v=123-pharmanex-card",
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=100-immediate-progress",
   "./routine-sync.js?v=100a-stay-completed-day",
   "./bot.js?v=105-navigation-bot-fixes",
-  "./bot-shortcuts-v95.js?v=105-navigation-bot-fixes",
+  "./bot-shortcuts-v95.js?v=123-product-contours",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",

@@ -306,6 +306,23 @@ function createFixedRoutineCardV92b(config) {
   return card;
 }
 
+// NU APP · PORTADA PHARMANEX PRÓXIMAMENTE V123
+function createUpcomingPharmanexCardV123() {
+  const card = document.createElement("article");
+  card.className = "home-routine-card home-routine-card-placeholder";
+  card.setAttribute("aria-disabled", "true");
+  card.innerHTML = `
+    <div class="home-routine-cover" aria-hidden="true">
+      <img src="assets/custom/routine-pharmanex-home.png" alt="" loading="lazy" />
+    </div>
+    <div class="home-routine-body">
+      <div class="home-routine-heading"><h2>Suplementos</h2></div>
+      <p class="home-routine-day">Pharmanex · Próximamente</p>
+      <span class="home-routine-placeholder-label">Nueva rutina</span>
+    </div>`;
+  return card;
+}
+
 renderRoutineCardsV92a = function renderRoutineCardsV92b() {
   const container = document.querySelector(".home-routines");
   if (!container) return;
@@ -315,6 +332,7 @@ renderRoutineCardsV92a = function renderRoutineCardsV92b() {
     const config = ROUTINE_CATALOG[routineId];
     if (config) fragment.appendChild(createFixedRoutineCardV92b(config));
   });
+  fragment.appendChild(createUpcomingPharmanexCardV123());
   container.replaceChildren(fragment);
 };
 
