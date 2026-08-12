@@ -1373,3 +1373,24 @@ body.bot-quick-access-open {
   align-items: center;
   gap: 6px;
 }
+
+
+/* NU APP · ESTADO VERDE DE IRIS V124B */
+#view-bot .bot-status {
+  min-height: 25px;
+  padding: 4px 10px;
+  border: 1px solid rgba(52, 181, 106, .22);
+  border-radius: 999px;
+  background: rgba(52, 181, 106, .11);
+  color: #277a4c;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: .01em;
+}
+
+#view-bot .bot-status i {
+  width: 7px;
+  height: 7px;
+  background: #34b56a;
+  box-shadow: 0 0 0 4px rgba(52, 181, 106, .14);
+}
