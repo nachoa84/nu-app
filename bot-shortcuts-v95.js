@@ -61,6 +61,12 @@
     arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`,
     briefcase: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg>`,
     products: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l2 5-7 11L5 9l2-5Z"/><path d="M5 9h14M9 4l3 5 3-5"/></svg>`,
+    boost: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 11.26 3.00 L 10.89 3.32 L 10.80 4.17 L 10.52 4.46 L 10.34 5.08 L 10.48 6.14 L 11.10 8.06 L 11.18 9.14 L 10.14 14.28 L 10.00 16.93 L 10.25 18.58 L 10.63 19.77 L 11.28 20.69 L 11.95 21.00 L 12.11 21.00 L 12.72 20.75 L 13.18 20.24 L 13.58 19.32 L 13.81 18.20 L 13.91 14.72 L 13.23 8.64 L 13.30 7.91 L 13.84 7.46 L 14.01 6.53 L 13.79 5.55 L 13.12 4.29 L 12.27 3.38 L 11.51 3.00 Z"/></svg>`,
+    collagen: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 8.62 4.62 L 4.63 4.93 L 3.41 5.23 L 3.09 5.54 L 3.07 7.93 L 3.44 8.19 L 3.11 8.47 L 3.02 8.82 L 3.04 17.94 L 3.52 18.68 L 4.55 19.07 L 6.81 19.29 L 11.03 19.38 L 13.01 19.38 L 17.13 19.29 L 19.41 19.07 L 20.35 18.79 L 20.83 18.31 L 21.00 17.83 L 21.00 8.76 L 20.56 8.19 L 20.93 7.93 L 20.91 5.49 L 20.15 5.08 L 18.21 4.80 L 9.01 4.62 Z"/></svg>`,
+    facewash: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 14.96 3.00 L 8.94 3.04 L 9.55 8.75 L 10.25 20.59 L 10.61 20.86 L 11.51 21.00 L 12.41 21.00 L 13.54 20.81 L 13.88 20.54 L 14.39 10.21 L 15.03 3.00 Z"/></svg>`,
+    facialspa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 12.25 3.00 L 11.40 3.10 L 10.82 3.50 L 10.32 4.40 L 9.64 4.91 L 9.22 5.71 L 8.62 7.69 L 7.61 12.40 L 7.34 15.11 L 7.36 17.84 L 7.91 21.00 L 15.94 21.00 L 16.09 19.77 L 16.46 18.64 L 16.66 14.51 L 16.41 11.50 L 15.84 8.26 L 14.86 4.93 L 14.23 4.50 L 13.91 3.75 L 13.33 3.10 L 12.40 3.00 Z"/></svg>`,
+    lumispa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 14.73 3.00 L 13.37 3.51 L 11.41 4.73 L 8.53 6.98 L 7.07 8.48 L 8.32 10.72 L 11.49 10.85 L 11.45 12.50 L 10.84 17.36 L 10.92 18.97 L 11.34 21.00 L 14.45 21.00 L 14.22 16.28 L 14.50 12.01 L 14.41 9.49 L 15.07 8.22 L 16.93 6.62 L 16.46 5.52 L 14.86 3.00 Z"/></svg>`,
+    wellspa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 13.90 7.47 L 12.10 7.63 L 10.05 8.09 L 8.02 8.89 L 6.96 9.59 L 6.40 10.27 L 6.28 11.02 L 7.17 12.58 L 7.12 13.25 L 6.31 13.78 L 3.72 14.33 L 3.32 14.55 L 3.03 14.97 L 3.11 15.83 L 3.90 16.20 L 4.13 16.53 L 19.88 16.53 L 20.14 15.99 L 20.90 15.59 L 20.89 14.61 L 20.34 14.17 L 18.22 13.37 L 17.71 12.90 L 17.55 12.46 L 17.69 11.80 L 18.62 10.38 L 18.71 9.51 L 18.51 8.87 L 17.80 8.19 L 17.07 7.84 L 16.03 7.58 L 14.40 7.47 Z"/></svg>`,
     document: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`,
     people: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-2a5.5 5.5 0 0 1 11 0v2M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8V20"/></svg>`,
     tools: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5-5L12 4 9 7 6.5 4.5a4 4 0 0 0 5 5L4 17a2.1 2.1 0 1 0 3 3l7.5-7.5a4 4 0 0 0 5-5L17 10l-3-3 2.5-2.5Z"/></svg>`
@@ -167,6 +173,18 @@
     });
   }
 
+  // NU APP · SILUETAS REALES DE PRODUCTOS V123
+  const PRODUCT_COMMAND_ICONS_V123 = {
+    "como usar boost": "boost",
+    "como usar lumi spa": "lumispa",
+    "como usar facial spa": "facialspa",
+    "como usar well spa": "wellspa",
+    "como usar face wash 180": "facewash",
+    "box colageno": "collagen",
+    "como asesorar lumi spa": "lumispa",
+    "estrategia colageno europa": "collagen"
+  };
+
   function renderCommandList(sheet, category, categories) {
     activeCategory = category.id;
     const title = sheet.querySelector(".bot-quick-access-title");
@@ -184,7 +202,10 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = `bot-quick-access-row is-command tone-${category.tone}`;
-      const icon = iconNode(category.icon, "bot-quick-access-row-icon");
+      const productIcon = category.id === "productos-asesoramiento"
+        ? PRODUCT_COMMAND_ICONS_V123[item.command]
+        : null;
+      const icon = iconNode(productIcon || category.icon, "bot-quick-access-row-icon");
       const copy = document.createElement("span");
       copy.className = "bot-quick-access-row-copy";
       const strong = document.createElement("strong");
