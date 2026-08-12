@@ -25,6 +25,9 @@ const {
   shouldHonorRangeV114,
   shouldReturnNotModifiedV114
 } = require("./http-cache-v114");
+const {
+  consumeSharedRateLimitV115
+} = require("./shared-rate-limit-v115");
 
 const app = express();
 
@@ -231,115 +234,60 @@ function targetUserRateKey(req) {
 }
 
 function createRateLimiter({
+  namespace,
   windowMs,
   max,
   keyFn = requestRateKey,
-  message =
-    "Demasiadas solicitudes. Esperá un momento e intentá nuevamente."
+  message = "Demasiadas solicitudes. Esperá un momento e intentá nuevamente."
 }) {
-  const buckets =
-    new Map();
-
-  return (req, res, next) => {
-    const now = Date.now();
-    const key =
-      String(
-        keyFn(req) ||
-        requestRateKey(req)
-      );
-
-    let bucket =
-      buckets.get(key);
-
-    if (
-      !bucket ||
-      now >= bucket.resetAt
-    ) {
-      bucket = {
-        count: 0,
-        resetAt:
-          now + windowMs
-      };
-
-      buckets.set(
-        key,
-        bucket
-      );
-    }
-
-    if (bucket.count >= max) {
-      const retryAfter =
-        Math.max(
-          Math.ceil(
-            (
-              bucket.resetAt -
-              now
-            ) / 1000
-          ),
-          1
-        );
-
-      res.set(
-        "Retry-After",
-        String(retryAfter)
-      );
-
-      return res
-        .status(429)
-        .json({
-          ok: false,
-          error: message,
-          retryAfter
+  const fallbackBuckets = new Map();
+  return async (req, res, next) => {
+    try {
+      const now = Date.now();
+      const key = String(keyFn(req) || requestRateKey(req));
+      let decision;
+      if (pool) {
+        decision = await consumeSharedRateLimitV115(pool, {
+          namespace, key, windowMs, max, now
         });
-    }
-
-    bucket.count += 1;
-
-    // Limpieza oportunista para que el Map no crezca sin límite.
-    if (
-      buckets.size > 500 &&
-      bucket.count === 1
-    ) {
-      for (
-        const [
-          existingKey,
-          existing
-        ] of buckets
-      ) {
-        if (
-          now >=
-          existing.resetAt
-        ) {
-          buckets.delete(
-            existingKey
-          );
+      } else {
+        let bucket = fallbackBuckets.get(key);
+        if (!bucket || now >= bucket.resetAt) {
+          bucket = { count: 0, resetAt: now + windowMs };
+          fallbackBuckets.set(key, bucket);
         }
+        bucket.count += 1;
+        decision = {
+          allowed: bucket.count <= max,
+          remaining: Math.max(max - bucket.count, 0),
+          retryAfter: Math.max(Math.ceil((bucket.resetAt - now) / 1000), 1)
+        };
       }
-
-      // Cota defensiva para que un barrido de claves distintas
-      // no haga crecer memoria indefinidamente durante la ventana.
-      while (buckets.size > 2000) {
-        const oldestKey =
-          buckets.keys().next().value;
-
-        if (!oldestKey) break;
-
-        buckets.delete(oldestKey);
+      res.set("X-RateLimit-Limit", String(max));
+      res.set("X-RateLimit-Remaining", String(decision.remaining));
+      if (!decision.allowed) {
+        res.set("Retry-After", String(decision.retryAfter));
+        return res.status(429).json({
+          ok: false, error: message, retryAfter: decision.retryAfter
+        });
       }
+      return next();
+    } catch (error) {
+      return next(error);
     }
-
-    return next();
   };
 }
 
 const apiWriteLimiter =
   createRateLimiter({
+    namespace: "api-write",
     windowMs: 60 * 1000,
     max: 120
   });
 
 const pushLimiter =
   createRateLimiter({
+    namespace: "push",
     windowMs: 10 * 60 * 1000,
     max: 30,
     message:
@@ -348,6 +296,7 @@ const pushLimiter =
 
 const pushTestLimiter =
   createRateLimiter({
+    namespace: "push-test",
     windowMs: 60 * 60 * 1000,
     max: 5,
     keyFn: targetUserRateKey,
@@ -357,6 +306,7 @@ const pushTestLimiter =
 
 const adminLimiter =
   createRateLimiter({
+    namespace: "admin",
     windowMs: 10 * 60 * 1000,
     max: 10,
     keyFn: req =>
@@ -683,7 +633,25 @@ async function initDatabase() {
       "utf8"
     );
 
-  await pool.query(schema);
+  const client = await pool.connect();
+  const schemaLockV115 = 11520260811;
+
+  try {
+    await client.query(
+      "SELECT pg_advisory_lock($1)",
+      [schemaLockV115]
+    );
+    await client.query(schema);
+  } finally {
+    try {
+      await client.query(
+        "SELECT pg_advisory_unlock($1)",
+        [schemaLockV115]
+      );
+    } finally {
+      client.release();
+    }
+  }
 
   console.log(
     "Base de datos inicializada."

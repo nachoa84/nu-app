@@ -179,3 +179,18 @@ CREATE INDEX IF NOT EXISTS idx_notification_deliveries_batch
 CREATE INDEX IF NOT EXISTS idx_notification_deliveries_processing
   ON notification_deliveries(processing_at)
   WHERE status = 'processing';
+
+
+-- NU APP · RATE LIMITING COMPARTIDO V115
+CREATE TABLE IF NOT EXISTS rate_limit_buckets (
+  namespace TEXT NOT NULL,
+  key_hash TEXT NOT NULL,
+  window_started_at TIMESTAMPTZ NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  request_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (namespace, key_hash, window_started_at),
+  CHECK (request_count >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limit_buckets_expires
+  ON rate_limit_buckets(expires_at);
