@@ -1,4 +1,4 @@
-const CACHE="nuapp-v122a-community-restored";
+const CACHE="nuapp-v122b-community-single";
 
 const CORE=[
   "./",

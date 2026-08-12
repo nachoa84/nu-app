@@ -42,7 +42,7 @@
       description: "Encuentros, comunidad y acompañamiento.",
       tone: "pink",
       icon: "people",
-      commands: ["comunidad ok", "llamada"]
+      commands: ["comunidad ok"]
     },
     {
       id: "herramientas",
