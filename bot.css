@@ -1394,3 +1394,17 @@ body.bot-quick-access-open {
   background: #34b56a;
   box-shadow: 0 0 0 4px rgba(52, 181, 106, .14);
 }
+
+
+/* NU APP · LOGO NUSKIN EN ACCESO DE PRODUCTOS V125 */
+.bot-quick-access-row.is-category.tone-blue .bot-quick-access-row-icon {
+  background: #fff;
+  border: 1px solid rgba(47, 105, 179, .12);
+}
+
+.bot-quick-access-row.is-category.tone-blue .bot-quick-access-row-icon img {
+  width: 31px;
+  height: 31px;
+  display: block;
+  object-fit: contain;
+}

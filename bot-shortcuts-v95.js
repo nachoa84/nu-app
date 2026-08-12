@@ -60,7 +60,7 @@
     back: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>`,
     arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`,
     briefcase: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg>`,
-    products: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l2 5-7 11L5 9l2-5Z"/><path d="M5 9h14M9 4l3 5 3-5"/></svg>`,
+    products: `<img src="assets/custom/nuskin-logo-icon.svg" alt="" aria-hidden="true" />`,
     boost: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 11.26 3.00 L 10.89 3.32 L 10.80 4.17 L 10.52 4.46 L 10.34 5.08 L 10.48 6.14 L 11.10 8.06 L 11.18 9.14 L 10.14 14.28 L 10.00 16.93 L 10.25 18.58 L 10.63 19.77 L 11.28 20.69 L 11.95 21.00 L 12.11 21.00 L 12.72 20.75 L 13.18 20.24 L 13.58 19.32 L 13.81 18.20 L 13.91 14.72 L 13.23 8.64 L 13.30 7.91 L 13.84 7.46 L 14.01 6.53 L 13.79 5.55 L 13.12 4.29 L 12.27 3.38 L 11.51 3.00 Z"/></svg>`,
     collagen: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 8.62 4.62 L 4.63 4.93 L 3.41 5.23 L 3.09 5.54 L 3.07 7.93 L 3.44 8.19 L 3.11 8.47 L 3.02 8.82 L 3.04 17.94 L 3.52 18.68 L 4.55 19.07 L 6.81 19.29 L 11.03 19.38 L 13.01 19.38 L 17.13 19.29 L 19.41 19.07 L 20.35 18.79 L 20.83 18.31 L 21.00 17.83 L 21.00 8.76 L 20.56 8.19 L 20.93 7.93 L 20.91 5.49 L 20.15 5.08 L 18.21 4.80 L 9.01 4.62 Z"/></svg>`,
     facewash: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M 14.96 3.00 L 8.94 3.04 L 9.55 8.75 L 10.25 20.59 L 10.61 20.86 L 11.51 21.00 L 12.41 21.00 L 13.54 20.81 L 13.88 20.54 L 14.39 10.21 L 15.03 3.00 Z"/></svg>`,
