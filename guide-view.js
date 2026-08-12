@@ -239,7 +239,7 @@ function renderGuideDetail(stepId) {
             <p>${done ? "Tu avance quedó guardado en este dispositivo." : "Marcala para actualizar tu progreso en la guía."}</p>
           </div>
         </div>
-        <button id="guideCompleteBtn" type="button">${done ? "Marcar como pendiente" : "Marcar como completada"}</button>
+        <button id="guideCompleteBtn" type="button" ${done ? 'disabled aria-disabled="true"' : ""}>${done ? "Etapa completada ✓" : "Marcar como completada"}</button>
       </section>
 
       <div class="guide-detail-footer">
@@ -253,13 +253,13 @@ function renderGuideDetail(stepId) {
   `;
 
   const completeButton = document.getElementById("guideCompleteBtn");
-  if (completeButton) {
+  if (completeButton && !done) {
     completeButton.onclick = () => {
       const latest = readGuideProgress();
-      latest[step.id] = !done;
+      latest[step.id] = true;
       writeGuideProgress(latest);
-      toast(!done ? "Etapa completada" : "Etapa marcada como pendiente", {
-        type: !done ? "success" : "info"
+      toast("Etapa completada", {
+        type: "success"
       });
       renderGuideDetail(step.id);
     };
