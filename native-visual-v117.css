@@ -1,0 +1,155 @@
+/* =========================================================
+   NU APP · PULIDO VISUAL NATIVO V117
+   Ajustes estructurales aprobados:
+   - navegación inferior flotante
+   - encabezados compactos
+   - menor uso de mayúsculas
+   - Plus Jakarta Sans en títulos e Inter en cuerpo/UI
+
+   Esta capa no redefine colores, imágenes ni lógica.
+   ========================================================= */
+
+:root {
+  --native-nav-gap-v117: 10px;
+}
+
+/* Tipografía con roles claros. */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.app-page-header h1,
+.home-routine-heading h2,
+.home-guide-feature h2,
+.guide-root strong {
+  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+/* Navegación principal como superficie flotante y segura. */
+#app {
+  padding-bottom:
+    calc(var(--nav-height) + var(--native-nav-gap-v117) + var(--safe-bottom));
+}
+
+.bottom-nav {
+  bottom: calc(var(--native-nav-gap-v117) + var(--safe-bottom));
+  width: min(398px, calc(100% - 24px));
+  min-height: 64px;
+  padding: 5px 10px;
+  border: 1px solid rgba(23, 34, 61, .075);
+  border-radius: 22px;
+  box-shadow:
+    0 14px 34px rgba(21, 33, 61, .10),
+    0 2px 8px rgba(21, 33, 61, .045);
+  overflow: hidden;
+}
+
+.nav-btn {
+  min-height: 54px;
+  border-radius: 16px;
+}
+
+.nav-btn > span:last-child {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+body.keyboard-open .bottom-nav {
+  transform:
+    translate(-50%, calc(100% + var(--native-nav-gap-v117) + 18px));
+}
+
+/* Encabezados más compactos sin perder áreas táctiles. */
+.app-page-header {
+  min-height: 50px;
+  gap: 12px;
+  padding-bottom: 10px;
+}
+
+.app-page-header h1 {
+  margin-top: 3px;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.home-page-header {
+  padding: 4px 0 14px;
+}
+
+.home-greeting {
+  margin-bottom: 6px;
+}
+
+.home-page-header h1,
+#view-hoy .home-page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+body.is-scrolled .app-page-header {
+  min-height: 50px;
+  padding-bottom: 7px;
+}
+
+body.is-scrolled .app-page-header h1,
+body.is-scrolled #view-hoy .home-page-header h1,
+body.is-scrolled #view-favoritos .app-page-header h1,
+body.is-scrolled #view-bot .app-page-header h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Etiquetas editoriales: menos mayúsculas y tracking más natural. */
+.page-kicker,
+.home-guide-kicker,
+.home-section-heading span,
+[class*="eyebrow"],
+[class*="kicker"] {
+  text-transform: none;
+  letter-spacing: .015em;
+}
+
+/* Mantener aire suficiente sobre la navegación flotante. */
+.view {
+  padding-bottom: 34px;
+}
+
+.toast-host {
+  bottom:
+    calc(var(--nav-height) + var(--native-nav-gap-v117) + 18px + var(--safe-bottom));
+}
+
+@media (max-width: 370px) {
+  :root {
+    --native-nav-gap-v117: 8px;
+  }
+
+  .bottom-nav {
+    width: calc(100% - 18px);
+    border-radius: 20px;
+  }
+
+  .app-page-header h1 {
+    font-size: 22px;
+  }
+}
