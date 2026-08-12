@@ -1,4 +1,4 @@
-const CACHE="nuapp-v125-nuskin-category-logo";
+const CACHE="nuapp-v126-mobile-spacing-iris-nav";
 
 const CORE=[
   "./",
@@ -14,12 +14,12 @@ const CORE=[
   "./shared.css?v=87-shared-ui-legibility",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
-  "./home.css?v=81-home-navigation-legibility",
+  "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=125-nuskin-category-logo",
+  "./bot.css?v=126-assistant-spacing",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
-  "./ui-core.js?v=63e-ios-thumbnails",
+  "./ui-core.js?v=126-iris-navigation",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=123-pharmanex-card",
