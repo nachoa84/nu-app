@@ -66,6 +66,111 @@ if (installBtn) installBtn.onclick = async () => {
   installBtn?.classList.add("hidden");
 };
 
+// NU APP · ACTUALIZACIÓN AUTOMÁTICA CONTROLADA V128
+const APP_VERSION_V128 = "128-controlled-auto-update";
+localStorage.setItem("nuapp:active-version", APP_VERSION_V128);
+const APP_UPDATE_RELOAD_KEY_V128 = "nuapp:update-reload-v128";
+const APP_UPDATED_NOTICE_KEY_V128 = "nuapp:updated-notice-v128";
+
+function botDraftIsActiveV128() {
+  const input = document.getElementById("botInput");
+  return Boolean(input && String(input.value || "").trim());
+}
+
+function reloadForAppUpdateV128() {
+  if (sessionStorage.getItem(APP_UPDATE_RELOAD_KEY_V128) === "1") return;
+  sessionStorage.setItem(APP_UPDATE_RELOAD_KEY_V128, "1");
+  sessionStorage.setItem(APP_UPDATED_NOTICE_KEY_V128, "1");
+  window.location.reload();
+}
+
+function activateWaitingWorkerV128(registration) {
+  if (!registration?.waiting) return false;
+  registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V128" });
+  return true;
+}
+
+async function registerAppServiceWorker() {
+  const registration = await navigator.serviceWorker.register(
+    "./service-worker.js",
+    { updateViaCache: "none" }
+  );
+
+  let updating = false;
+
+  const handleReadyUpdate = () => {
+    if (!registration.waiting || updating) return;
+    updating = true;
+
+    if (botDraftIsActiveV128() && typeof toast === "function") {
+      toast("Hay una actualización lista.", {
+        type: "info",
+        actionLabel: "Actualizar",
+        duration: 10000,
+        onAction: () => activateWaitingWorkerV128(registration)
+      });
+      updating = false;
+      return;
+    }
+
+    activateWaitingWorkerV128(registration);
+  };
+
+  if (registration.waiting && navigator.serviceWorker.controller) {
+    handleReadyUpdate();
+  }
+
+  registration.addEventListener("updatefound", () => {
+    const worker = registration.installing;
+    worker?.addEventListener("statechange", () => {
+      if (
+        worker.state === "installed" &&
+        navigator.serviceWorker.controller
+      ) {
+        handleReadyUpdate();
+      }
+    });
+  });
+
+  let checking = false;
+  const checkForUpdate = async () => {
+    if (checking) return;
+    checking = true;
+    try {
+      await registration.update();
+      handleReadyUpdate();
+    } catch (error) {
+      console.warn("No se pudo comprobar la actualización:", error);
+    } finally {
+      checking = false;
+    }
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") checkForUpdate();
+  });
+
+  window.addEventListener("pageshow", checkForUpdate);
+  setTimeout(checkForUpdate, 1500);
+
+  return registration;
+}
+
+navigator.serviceWorker?.addEventListener("controllerchange", () => {
+  reloadForAppUpdateV128();
+});
+
+window.addEventListener("pageshow", () => {
+  if (sessionStorage.getItem(APP_UPDATED_NOTICE_KEY_V128) !== "1") return;
+  sessionStorage.removeItem(APP_UPDATED_NOTICE_KEY_V128);
+  sessionStorage.removeItem(APP_UPDATE_RELOAD_KEY_V128);
+  setTimeout(() => {
+    if (typeof toast === "function") {
+      toast("Nu App se actualizó", { type: "success", duration: 2600 });
+    }
+  }, 500);
+});
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     registerAppServiceWorker().catch(error => {
