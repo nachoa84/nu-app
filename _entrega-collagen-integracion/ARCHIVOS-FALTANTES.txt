@@ -1,3 +1,0 @@
-Compartir/UI compartida: shared.js
-Service Worker: serviceworker.js
-Service Worker: sw.js

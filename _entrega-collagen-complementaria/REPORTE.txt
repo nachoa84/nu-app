@@ -1,6 +1,0 @@
-Fecha: 2026-08-05T02:16:52+00:00
-Raíz: /home/runner/workspace
-Archivos solicitados: 11
-Archivos faltantes: 0
-
-Este paquete no incluye multimedia, secretos, node_modules ni base de datos.
