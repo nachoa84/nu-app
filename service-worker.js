@@ -1,4 +1,4 @@
-const CACHE="nuapp-v117-native-visual-polish";
+const CACHE="nuapp-v118-bot-resource-actions";
 
 const CORE=[
   "./",
@@ -16,7 +16,7 @@ const CORE=[
   "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=95-quick-access",
+  "./bot.css?v=118-bot-resource-actions",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
