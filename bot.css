@@ -1320,6 +1320,11 @@ body.bot-quick-access-open {
   border-radius: 16px;
 }
 
+#view-bot .bot-response-stack > .bot-resource-card:first-child:not(:has(+ .bot-resource-card)),
+#view-bot .bot-response-stack > .bubble.bot + .bot-resource-card:not(:has(+ .bot-resource-card)) {
+  border-radius: 16px;
+}
+
 #view-bot .bot-message-actions {
   gap: 8px;
 }
