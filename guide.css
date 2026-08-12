@@ -840,6 +840,8 @@
 .guide-complete-card.is-done button {
   background: #edf2e8;
   color: #65794f;
+  cursor: default;
+  opacity: 1;
 }
 
 .guide-detail-footer {
