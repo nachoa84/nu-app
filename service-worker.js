@@ -1,4 +1,4 @@
-const CACHE="nuapp-v127-native-text-selection";
+const CACHE="nuapp-v128-controlled-auto-update";
 
 const CORE=[
   "./",
@@ -36,7 +36,7 @@ const CORE=[
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
-  "./app.js?v=63e-ios-thumbnails",
+  "./app.js?v=128-controlled-auto-update",
   "./backend-client.js?v=100-immediate-progress",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
@@ -139,6 +139,12 @@ self.addEventListener("install",event=>{
       })
       .then(()=>self.skipWaiting())
   );
+});
+
+self.addEventListener("message", event => {
+  if (event.data?.type === "NUAPP_SKIP_WAITING_V128") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate",event=>{
