@@ -40,4 +40,4 @@ run = "npm start"
 deploymentTarget = "cloudrun"
 
 [objectStorage]
-defaultBucketID = "replit-objstore-50624829-087f-45db-a646-5b4f9b13c175"
+defaultBucketID = "replit-objstore-380426e5-ae05-40ac-b5b7-ec4ee33953e7"
