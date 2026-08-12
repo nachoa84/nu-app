@@ -306,7 +306,7 @@ function createFixedRoutineCardV92b(config) {
   return card;
 }
 
-renderRoutineCardsV92a = // NU APP · PORTADA PHARMANEX PRÓXIMAMENTE V123
+// NU APP · PORTADA PHARMANEX PRÓXIMAMENTE V123
 function createUpcomingPharmanexCardV123() {
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-placeholder";
@@ -323,7 +323,7 @@ function createUpcomingPharmanexCardV123() {
   return card;
 }
 
-function renderRoutineCardsV92b() {
+renderRoutineCardsV92a = function renderRoutineCardsV92b() {
   const container = document.querySelector(".home-routines");
   if (!container) return;
   document.querySelector(".home-routine-selector")?.remove();
