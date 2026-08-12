@@ -1,4 +1,4 @@
-const CACHE="nuapp-v124b-green-status";
+const CACHE="nuapp-v125-nuskin-category-logo";
 
 const CORE=[
   "./",
@@ -16,7 +16,7 @@ const CORE=[
   "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=81-home-navigation-legibility",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=124b-green-status",
+  "./bot.css?v=125-nuskin-category-logo",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=63e-ios-thumbnails",
@@ -27,7 +27,8 @@ const CORE=[
   "./routine-state.js?v=100-immediate-progress",
   "./routine-sync.js?v=100a-stay-completed-day",
   "./bot.js?v=124a-iris-layout",
-  "./bot-shortcuts-v95.js?v=123-product-contours",
+  "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
+  "./assets/custom/nuskin-logo-icon.svg",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
