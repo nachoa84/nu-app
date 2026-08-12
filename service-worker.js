@@ -1,10 +1,10 @@
-const CACHE="nuapp-v126-mobile-spacing-iris-nav";
+const CACHE="nuapp-v127-native-text-selection";
 
 const CORE=[
   "./",
   "./index.html",
   "./tokens.css?v=61b-progress-canonical",
-  "./base.css?v=61b-progress-canonical",
+  "./base.css?v=127-native-text-selection",
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",

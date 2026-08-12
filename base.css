@@ -322,3 +322,29 @@ small,
   height: 48px;
   border-radius: 17px;
 }
+
+
+/* NU APP · SELECCIÓN DE TEXTO CONTROLADA V127 */
+/* La interfaz se comporta como una app nativa y evita el menú “Buscar en Google”. */
+#app,
+#app button,
+#app nav,
+#app header,
+#app article,
+#app .icon-button,
+#app .nav-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Escritura y lectura documental conservan selección, cursor y menú nativos. */
+#app input,
+#app textarea,
+#app [contenteditable="true"],
+#app .bot-document-body,
+#app .native-day-content {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
