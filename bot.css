@@ -1408,3 +1408,9 @@ body.bot-quick-access-open {
   display: block;
   object-fit: contain;
 }
+
+
+/* NU APP · RESPIRACIÓN ENTRE CABECERA Y ASISTENTE V126 */
+#view-bot .bot-native-welcome {
+  padding-top: 56px;
+}
