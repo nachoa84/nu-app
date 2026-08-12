@@ -249,3 +249,9 @@
     min-height: 116px;
   }
 }
+
+
+/* NU APP · MARGEN SEGURO DE CABECERA MÓVIL V126 */
+#view-hoy .home-page-header {
+  margin-inline: 2px;
+}
