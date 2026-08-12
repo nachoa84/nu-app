@@ -4,6 +4,23 @@
 
   if (!splash) return;
 
+  // V122 · La intro se muestra una sola vez por sesión de la app.
+  // Al volver desde segundo plano, sessionStorage conserva esta marca.
+  const sessionKey = "nuapp:intro-shown:v122";
+  let introShown = false;
+  try {
+    introShown = window.sessionStorage.getItem(sessionKey) === "1";
+    if (!introShown) window.sessionStorage.setItem(sessionKey, "1");
+  } catch (error) {
+    introShown = false;
+  }
+
+  if (introShown) {
+    video?.pause?.();
+    splash.remove();
+    return;
+  }
+
   let brandShown = false;
   let exitStarted = false;
   const timers = new Set();
