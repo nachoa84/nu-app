@@ -1,4 +1,4 @@
-const CACHE="nuapp-v119a-guide-completion-lock";
+const CACHE="nuapp-v121-crear-oferta-link";
 
 const CORE=[
   "./",
