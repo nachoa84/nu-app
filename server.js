@@ -1960,23 +1960,26 @@ async function runSchedulerCycle() {
 
   try {
     const deadline = startedAt + NOTIFICATION_CYCLE_BUDGET_MS_V109;
-    const maintenance = await runLeaderMaintenanceV116(deadline);
+    const emptyNotifications = {
+      processed: 0,
+      sent: 0,
+      retryableFailed: 0,
+      permanentFailed: 0,
+      deliveries: 0,
+      deviceSent: 0,
+      deviceRetryable: 0,
+      devicePermanent: 0,
+      subscriptionsRemoved: 0
+    };
 
-    // Cada instancia procesa trabajos. Los reclamos usan FOR UPDATE SKIP LOCKED,
-    // por lo que dos workers no pueden apropiarse del mismo trabajo.
-    const notifications = Date.now() < deadline
-      ? await processUnifiedRoutineNotificationJobsV109(deadline)
-      : {
-          processed: 0,
-          sent: 0,
-          retryableFailed: 0,
-          permanentFailed: 0,
-          deliveries: 0,
-          deviceSent: 0,
-          deviceRetryable: 0,
-          devicePermanent: 0,
-          subscriptionsRemoved: 0
-        };
+    // Mantenimiento y entrega empiezan juntos. Así el worker líder no queda
+    // rezagado mientras los demás reclaman todos los trabajos pendientes.
+    const [maintenance, notifications] = await Promise.all([
+      runLeaderMaintenanceV116(deadline),
+      Date.now() < deadline
+        ? processUnifiedRoutineNotificationJobsV109(deadline)
+        : Promise.resolve(emptyNotifications)
+    ]);
 
     if (
       maintenance.advanced > 0 ||
