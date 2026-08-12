@@ -244,7 +244,10 @@ function renderGuideDetail(stepId) {
 
       <div class="guide-detail-footer">
         <button id="guideIndexBtn" class="guide-secondary-button" type="button">Ver todas las etapas</button>
-        ${nextStep ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Siguiente: ${nextStep.shortTitle}</span>${ICONS.arrow}</button>` : ""}
+        ${nextStep ? (done
+          ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Siguiente: ${nextStep.shortTitle}</span>${ICONS.arrow}</button>`
+          : `<button id="guideNextBtn" class="guide-primary-button" type="button" disabled aria-disabled="true"><span>Marcá como completada para continuar</span>${ICONS.arrow}</button>`
+        ) : ""}
       </div>
     </article>
   `;
@@ -266,7 +269,9 @@ function renderGuideDetail(stepId) {
   if (indexButton) indexButton.onclick = renderGuideOverview;
 
   const nextButton = document.getElementById("guideNextBtn");
-  if (nextButton && nextStep) nextButton.onclick = () => renderGuideDetail(nextStep.id);
+  if (nextButton && nextStep && done) {
+    nextButton.onclick = () => renderGuideDetail(nextStep.id);
+  }
 
   window.scrollTo({ top: 0, behavior: "auto" });
 }
