@@ -1,6 +1,6 @@
 const BOT_THREAD_KEY = "routineBotThreadV35";
 const BOT_SAVED_KEY = "routineBotSavedResponsesV35";
-const BOT_GREETING = "Hola 👋 Preguntame algo o buscá el recurso que necesitás.";
+const BOT_GREETING = "Hola 👋 Soy Iris. ¿En qué te puedo ayudar hoy?";
 
 function normalizeBotText(value) {
   return String(value || "")
@@ -51,7 +51,13 @@ function createBotMessage(role, payload) {
 function loadBotConversation() {
   try {
     const saved = JSON.parse(localStorage.getItem(BOT_THREAD_KEY) || "null");
-    if (Array.isArray(saved) && saved.length) return saved;
+    if (Array.isArray(saved) && saved.length) {
+      return saved.map(message =>
+        message?.id === "greeting"
+          ? { ...message, text: BOT_GREETING }
+          : message
+      );
+    }
   } catch (error) {}
 
   return [{ id: "greeting", role: "bot", text: BOT_GREETING }];
