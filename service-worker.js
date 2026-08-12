@@ -1,4 +1,4 @@
-const CACHE="nuapp-v122-intro-bot-shortcuts";
+const CACHE="nuapp-v122a-community-restored";
 
 const CORE=[
   "./",
