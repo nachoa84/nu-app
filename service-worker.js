@@ -1,4 +1,4 @@
-const CACHE="nuapp-v119-cron-guide-gate";
+const CACHE="nuapp-v119a-guide-completion-lock";
 
 const CORE=[
   "./",
@@ -40,10 +40,10 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",
-  "./guide.css?v=119-guide-gate",
+  "./guide.css?v=119a-completion-lock",
   "./native-visual-v117.css?v=117-native-visual-polish",
   "./guide-content.js?v=61c-guide-prototype",
-  "./guide-view.js?v=119-guide-gate",
+  "./guide-view.js?v=119a-completion-lock",
   "./manifest.webmanifest?v=61b-progress-canonical",
   "./assets/guide/logo-nu-comunidad-transparent.png",
   "./assets/guide/community/community-01.jpg",
