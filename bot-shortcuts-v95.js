@@ -37,6 +37,14 @@
       commands: ["tramites", "info argentina"]
     },
     {
+      id: "comunidad-llamadas",
+      title: "Comunidad y llamadas",
+      description: "Encuentros, comunidad y acompañamiento.",
+      tone: "pink",
+      icon: "people",
+      commands: ["comunidad ok", "llamada"]
+    },
+    {
       id: "herramientas",
       title: "Herramientas",
       description: "Aplicaciones y funciones de la plataforma.",
@@ -55,24 +63,7 @@
     products: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l2 5-7 11L5 9l2-5Z"/><path d="M5 9h14M9 4l3 5 3-5"/></svg>`,
     document: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`,
     people: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-2a5.5 5.5 0 0 1 11 0v2M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8V20"/></svg>`,
-    tools: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5-5L12 4 9 7 6.5 4.5a4 4 0 0 0 5 5L4 17a2.1 2.1 0 1 0 3 3l7.5-7.5a4 4 0 0 0 5-5L17 10l-3-3 2.5-2.5Z"/></svg>`,
-    boost: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M10 7h4M12 10v7M9.5 14h5"/></svg>`,
-    lumispa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4l2 3v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-9l2-3V3Z"/><path d="M9 7h6M9 13c2-1.5 4-1.5 6 0M9 16c2-1.5 4-1.5 6 0"/></svg>`,
-    facialspa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3 9 14l3 1-2 6 7-11-3-1 3-6h-3Z"/><path d="M5 6c1.4-1.3 3-2 5-2M4 10c1.1-.8 2.2-1.2 3.5-1.3"/></svg>`,
-    wellspa: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M9 8h6M9 12c2 1 4 1 6 0M9 16h6"/></svg>`,
-    cleanser: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4l2 3v10H7V10l2-3V3Z"/><path d="M9 7h6M10 13h4M10 16h4"/></svg>`,
-    collagen: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="m4 8v8l8 4 8-4V8M12 12v8"/><path d="m8 6 8 4"/></svg>`
-  };
-
-  const PRODUCT_ICONS_V122 = {
-    "como usar boost": "boost",
-    "como usar lumi spa": "lumispa",
-    "como usar facial spa": "facialspa",
-    "como usar well spa": "wellspa",
-    "como usar face wash 180": "cleanser",
-    "box colageno": "collagen",
-    "como asesorar lumi spa": "lumispa",
-    "estrategia colageno europa": "collagen"
+    tools: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5-5L12 4 9 7 6.5 4.5a4 4 0 0 0 5 5L4 17a2.1 2.1 0 1 0 3 3l7.5-7.5a4 4 0 0 0 5-5L17 10l-3-3 2.5-2.5Z"/></svg>`
   };
 
   let activeLayer = null;
@@ -193,10 +184,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = `bot-quick-access-row is-command tone-${category.tone}`;
-      const itemIcon = category.id === "productos-asesoramiento"
-        ? PRODUCT_ICONS_V122[normalizedCommand(item.command)] || category.icon
-        : category.icon;
-      const icon = iconNode(itemIcon, "bot-quick-access-row-icon");
+      const icon = iconNode(category.icon, "bot-quick-access-row-icon");
       const copy = document.createElement("span");
       copy.className = "bot-quick-access-row-copy";
       const strong = document.createElement("strong");
