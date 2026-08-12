@@ -42,3 +42,12 @@ test("la observabilidad identifica worker y liderazgo", () => {
   assert.match(source, /worker=\$\{process\.pid\}/);
   assert.match(source, /lider=\$\{maintenance\.leader/);
 });
+
+
+test("mantenimiento y entrega comienzan en paralelo", () => {
+  const start = source.indexOf("async function runSchedulerCycle");
+  const section = source.slice(start, start + 2200);
+  assert.match(section, /Promise\.all/);
+  assert.match(section, /runLeaderMaintenanceV116\(deadline\)/);
+  assert.match(section, /processUnifiedRoutineNotificationJobsV109\(deadline\)/);
+});
