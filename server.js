@@ -320,6 +320,21 @@ const adminLimiter =
       "Demasiados intentos administrativos."
   });
 
+// V119b: margen operativo para el cron de un minuto.
+// La autenticación por CRON_SECRET sigue siendo obligatoria.
+const cronLimiter =
+  createRateLimiter({
+    namespace: "cron",
+    windowMs: 10 * 60 * 1000,
+    max: 30,
+    keyFn: req =>
+      `cron:${String(
+        req.ip || "unknown"
+      )}`,
+    message:
+      "Demasiadas ejecuciones del cron."
+  });
+
 app.use(
   "/api",
   assertAllowedWriteOrigin
@@ -3419,7 +3434,7 @@ app.post(
 // Endpoint exclusivo para el cron externo; no habilita rutas administrativas.
 app.post(
   "/api/cron/scheduler-run",
-  adminLimiter,
+  cronLimiter,
   async (req, res, next) => {
     try {
       assertCronSecret(req);
