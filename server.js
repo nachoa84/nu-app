@@ -1917,12 +1917,9 @@ async function processUnifiedRoutineNotificationJobsV109(deadline) {
   return summary;
 }
 
-async function runSchedulerCycle() {
-  if (schedulerRunning || !pool || !pushConfigured) return;
-  schedulerRunning = true;
+async function runLeaderMaintenanceV116(deadline) {
   const lockClient = await pool.connect();
   let leader = false;
-  const startedAt = Date.now();
 
   try {
     const lockResult = await lockClient.query(
@@ -1930,13 +1927,43 @@ async function runSchedulerCycle() {
       [SCHEDULER_ADVISORY_LOCK_V109]
     );
     leader = Boolean(lockResult.rows[0]?.locked);
-    if (!leader) return;
 
-    const deadline = startedAt + NOTIFICATION_CYCLE_BUDGET_MS_V109;
+    if (!leader) {
+      return { leader: false, recovered: 0, recoveredDeliveries: 0, advanced: 0 };
+    }
+
     const recovered = await recoverStaleNotificationJobsV109();
     const recoveredDeliveries =
       await recoverStaleNotificationDeliveriesV111();
     const advanced = await enqueueDueUnlocksV109(deadline);
+
+    return { leader: true, recovered, recoveredDeliveries, advanced };
+  } finally {
+    if (leader) {
+      try {
+        await lockClient.query(
+          `SELECT pg_advisory_unlock($1)`,
+          [SCHEDULER_ADVISORY_LOCK_V109]
+        );
+      } catch (unlockError) {
+        console.error("[scheduler-v116] error liberando lock:", unlockError);
+      }
+    }
+    lockClient.release();
+  }
+}
+
+async function runSchedulerCycle() {
+  if (schedulerRunning || !pool || !pushConfigured) return;
+  schedulerRunning = true;
+  const startedAt = Date.now();
+
+  try {
+    const deadline = startedAt + NOTIFICATION_CYCLE_BUDGET_MS_V109;
+    const maintenance = await runLeaderMaintenanceV116(deadline);
+
+    // Cada instancia procesa trabajos. Los reclamos usan FOR UPDATE SKIP LOCKED,
+    // por lo que dos workers no pueden apropiarse del mismo trabajo.
     const notifications = Date.now() < deadline
       ? await processUnifiedRoutineNotificationJobsV109(deadline)
       : {
@@ -1952,15 +1979,16 @@ async function runSchedulerCycle() {
         };
 
     if (
-      advanced > 0 ||
-      recovered > 0 ||
-      recoveredDeliveries > 0 ||
+      maintenance.advanced > 0 ||
+      maintenance.recovered > 0 ||
+      maintenance.recoveredDeliveries > 0 ||
       notifications.processed > 0
     ) {
       console.log(
-        `[scheduler-v111] ms=${Date.now() - startedAt} ` +
-        `desbloqueos=${advanced} recuperados=${recovered} ` +
-        `entregas_recuperadas=${recoveredDeliveries} ` +
+        `[scheduler-v116] worker=${process.pid} lider=${maintenance.leader ? 1 : 0} ` +
+        `ms=${Date.now() - startedAt} ` +
+        `desbloqueos=${maintenance.advanced} recuperados=${maintenance.recovered} ` +
+        `entregas_recuperadas=${maintenance.recoveredDeliveries} ` +
         `procesados=${notifications.processed} enviados=${notifications.sent} ` +
         `reintentables=${notifications.retryableFailed} ` +
         `permanentes=${notifications.permanentFailed} ` +
@@ -1972,19 +2000,8 @@ async function runSchedulerCycle() {
       );
     }
   } catch (error) {
-    console.error("[scheduler-v109] error:", error);
+    console.error("[scheduler-v116] error:", error);
   } finally {
-    if (leader) {
-      try {
-        await lockClient.query(
-          `SELECT pg_advisory_unlock($1)`,
-          [SCHEDULER_ADVISORY_LOCK_V109]
-        );
-      } catch (unlockError) {
-        console.error("[scheduler-v109] error liberando lock:", unlockError);
-      }
-    }
-    lockClient.release();
     schedulerRunning = false;
   }
 }
