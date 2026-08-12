@@ -464,7 +464,7 @@ const NAV_LABELS = {
   hoy: "Inicio",
   rutina: "Rutina",
   favoritos: "Favoritos",
-  bot: "Bot"
+  bot: "Iris"
 };
 
 const NAV_ICONS = {
