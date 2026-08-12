@@ -82,6 +82,9 @@ const VAPID_SUBJECT =
 const ADMIN_TEST_TOKEN =
   process.env.ADMIN_TEST_TOKEN || "";
 
+const CRON_SECRET =
+  process.env.CRON_SECRET || "";
+
 const ADMIN_TEST_ROUTES_ENABLED =
   String(
     process.env.ENABLE_ADMIN_TEST_ROUTES ||
@@ -476,6 +479,24 @@ function assertPushConfigured() {
   }
 }
 
+
+function assertCronSecret(req) {
+  if (!CRON_SECRET) {
+    const error = new Error("CRON_SECRET no configurado.");
+    error.status = 503;
+    throw error;
+  }
+
+  const provided = String(req.headers["x-cron-secret"] || "");
+  const expectedDigest = crypto.createHash("sha256").update(CRON_SECRET).digest();
+  const providedDigest = crypto.createHash("sha256").update(provided).digest();
+
+  if (!provided || !crypto.timingSafeEqual(providedDigest, expectedDigest)) {
+    const error = new Error("Secreto de cron inválido.");
+    error.status = 401;
+    throw error;
+  }
+}
 
 function assertAdminTestRoutesEnabled() {
   if (!ADMIN_TEST_ROUTES_ENABLED) {
@@ -3388,6 +3409,22 @@ app.post(
             .next_unlock_at,
         seconds
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// NU APP V119 · Despertador seguro para Autoscale.
+// Endpoint exclusivo para el cron externo; no habilita rutas administrativas.
+app.post(
+  "/api/cron/scheduler-run",
+  adminLimiter,
+  async (req, res, next) => {
+    try {
+      assertCronSecret(req);
+      await runSchedulerCycle();
+      res.json({ ok: true });
     } catch (error) {
       next(error);
     }
