@@ -1,4 +1,4 @@
-const CACHE="nuapp-v121-crear-oferta-link";
+const CACHE="nuapp-v122-intro-bot-shortcuts";
 
 const CORE=[
   "./",
