@@ -1,4 +1,4 @@
-const CACHE="nuapp-v111-reliable-push-delivery";
+const CACHE="nuapp-v117-native-visual-polish";
 
 const CORE=[
   "./",
@@ -40,7 +40,7 @@ const CORE=[
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",
-  "./guide.css?v=82-guide-legibility",
+  "./guide.css?v=82-guide-legibility",\n  "./native-visual-v117.css?v=117-native-visual-polish",
   "./guide-content.js?v=61c-guide-prototype",
   "./guide-view.js?v=61e-guide-home-sections",
   "./manifest.webmanifest?v=61b-progress-canonical",
