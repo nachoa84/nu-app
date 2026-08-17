@@ -1,10 +1,10 @@
-const CACHE="nuapp-v128-controlled-auto-update";
+const CACHE="nuapp-v129-ios-horizontal-stability";
 
 const CORE=[
   "./",
   "./index.html",
   "./tokens.css?v=61b-progress-canonical",
-  "./base.css?v=127-native-text-selection",
+  "./base.css?v=129-ios-horizontal-stability",
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
