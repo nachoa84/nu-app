@@ -61,11 +61,20 @@ function makeDeterministicCrypto() {
 }
 
 // ============================================================
-// MOCK DE POOL POSTGRESQL CON TIEMPO CONFIGURABLE
+// MOCK DE POOL POSTGRESQL CON TIEMPO CONFIGURABLE Y SNAPSHOTS
 // ============================================================
-// El mock permite establecer un "now" de PostgreSQL distinto del
-// reloj local de JavaScript para demostrar que el store usa
-// exclusivamente el tiempo retornado por PostgreSQL.
+
+function cloneMap(map) {
+  const copy = new Map();
+  for (const [k, v] of map.entries()) {
+    copy.set(k, typeof v === "object" && v !== null ? { ...v } : v);
+  }
+  return copy;
+}
+
+function normalizeSql(sql) {
+  return String(sql || "").replace(/\s+/g, " ").trim();
+}
 
 class MockPgPool {
   constructor(options = {}) {
@@ -107,14 +116,15 @@ class MockPgPool {
   }
 
   _executeQuery(sql, params) {
-    this.queries.push({ sql, params });
+    const normSql = normalizeSql(sql);
+    this.queries.push({ sql: normSql, params });
 
-    if (sql === "BEGIN" || sql === "COMMIT" || sql === "ROLLBACK") {
+    if (normSql === "BEGIN" || normSql === "COMMIT" || normSql === "ROLLBACK") {
       return { rows: [], rowCount: 0 };
     }
 
     // SELECT user_id FROM pilot_credentials WHERE token_hmac = $1
-    if (sql.includes("SELECT user_id FROM pilot_credentials WHERE token_hmac")) {
+    if (normSql.includes("SELECT user_id FROM pilot_credentials WHERE token_hmac")) {
       for (const cred of this.credentials.values()) {
         if (cred.token_hmac === params[0] && !cred.revoked_at) {
           return { rows: [{ user_id: cred.user_id }], rowCount: 1 };
@@ -124,7 +134,7 @@ class MockPgPool {
     }
 
     // SELECT recovery_user_id FROM pilot_invitations WHERE code_hmac = $1
-    if (sql.includes("SELECT recovery_user_id FROM pilot_invitations WHERE code_hmac")) {
+    if (normSql.includes("SELECT recovery_user_id FROM pilot_invitations WHERE code_hmac")) {
       for (const inv of this.invitations.values()) {
         if (inv.code_hmac === params[0]) {
           return { rows: [{ recovery_user_id: inv.recovery_user_id }], rowCount: 1 };
@@ -134,7 +144,7 @@ class MockPgPool {
     }
 
     // SELECT id FROM users WHERE id = $1 FOR UPDATE / FOR KEY SHARE
-    if (sql.includes("SELECT id FROM users WHERE id = $1")) {
+    if (normSql.includes("SELECT id FROM users WHERE id = $1")) {
       const user = this.users.get(params[0]);
       if (user) {
         return { rows: [{ id: params[0] }], rowCount: 1 };
@@ -143,7 +153,7 @@ class MockPgPool {
     }
 
     // SELECT invitation... FROM pilot_invitations WHERE code_hmac = $1 FOR UPDATE
-    if (sql.includes("FROM pilot_invitations") && sql.includes("FOR UPDATE") && sql.includes("code_hmac")) {
+    if (normSql.includes("FROM pilot_invitations") && normSql.includes("FOR UPDATE") && normSql.includes("code_hmac")) {
       for (const inv of this.invitations.values()) {
         if (inv.code_hmac === params[0]) {
           const now = this._now();
@@ -166,7 +176,7 @@ class MockPgPool {
     }
 
     // SELECT credential... FROM pilot_credentials WHERE token_hmac = $1 FOR UPDATE
-    if (sql.includes("FROM pilot_credentials") && sql.includes("FOR UPDATE") && sql.includes("token_hmac")) {
+    if (normSql.includes("FROM pilot_credentials") && normSql.includes("FOR UPDATE") && normSql.includes("WHERE token_hmac = $1")) {
       for (const cred of this.credentials.values()) {
         if (cred.token_hmac === params[0]) {
           const now = this._now();
@@ -187,7 +197,7 @@ class MockPgPool {
     }
 
     // SELECT credential active FOR UPDATE by user_id
-    if (sql.includes("FROM pilot_credentials") && sql.includes("FOR UPDATE") && sql.includes("user_id") && sql.includes("revoked_at IS NULL")) {
+    if (normSql.includes("FROM pilot_credentials") && normSql.includes("FOR UPDATE") && normSql.includes("WHERE user_id = $1") && normSql.includes("revoked_at IS NULL")) {
       const results = [];
       for (const cred of this.credentials.values()) {
         if (cred.user_id === params[0] && !cred.revoked_at) {
@@ -205,7 +215,7 @@ class MockPgPool {
     }
 
     // SELECT user data
-    if (sql.includes("SELECT id, name, country, timezone, notification_time FROM users WHERE id = $1")) {
+    if (normSql.includes("SELECT id, name, country, timezone, notification_time FROM users WHERE id = $1")) {
       const user = this.users.get(params[0]);
       if (user) {
         return {
@@ -223,7 +233,7 @@ class MockPgPool {
     }
 
     // SELECT authenticateCredential
-    if (sql.includes("SELECT user_id, expires_at FROM pilot_credentials") && !sql.includes("FOR UPDATE")) {
+    if (normSql.includes("SELECT user_id, expires_at FROM pilot_credentials") && !normSql.includes("FOR UPDATE")) {
       for (const cred of this.credentials.values()) {
         if (cred.token_hmac === params[0] && !cred.revoked_at && new Date(cred.expires_at) > this._now()) {
           return { rows: [{ user_id: cred.user_id, expires_at: cred.expires_at }], rowCount: 1 };
@@ -233,7 +243,7 @@ class MockPgPool {
     }
 
     // SELECT getCredentialExpiry
-    if (sql.includes("days_until_expiry")) {
+    if (normSql.includes("days_until_expiry")) {
       for (const cred of this.credentials.values()) {
         if (cred.token_hmac === params[0] && !cred.revoked_at && new Date(cred.expires_at) > this._now()) {
           const now = this._now();
@@ -249,7 +259,7 @@ class MockPgPool {
     }
 
     // INSERT INTO users
-    if (sql.includes("INSERT INTO users")) {
+    if (normSql.includes("INSERT INTO users")) {
       const user = {
         id: params[0],
         name: params[1],
@@ -264,7 +274,7 @@ class MockPgPool {
     }
 
     // INSERT INTO pilot_credentials
-    if (sql.includes("INSERT INTO pilot_credentials")) {
+    if (normSql.includes("INSERT INTO pilot_credentials")) {
       for (const cred of this.credentials.values()) {
         if (cred.token_hmac === params[1]) {
           const err = new Error('duplicate key value violates unique constraint "pilot_credentials_token_hmac_unique"');
@@ -273,7 +283,7 @@ class MockPgPool {
           throw err;
         }
       }
-      if (!sql.includes("revoked_at = CURRENT_TIMESTAMP")) {
+      if (!normSql.includes("revoked_at = CURRENT_TIMESTAMP")) {
         for (const cred of this.credentials.values()) {
           if (cred.user_id === params[0] && !cred.revoked_at) {
             const err = new Error('duplicate key value violates unique constraint "idx_pilot_credentials_one_active_per_user"');
@@ -297,15 +307,14 @@ class MockPgPool {
         last_used_at: now
       };
       this.credentials.set(id, cred);
-      // If RETURNING expires_at is requested, return it
-      if (sql.includes("RETURNING expires_at")) {
+      if (normSql.includes("RETURNING expires_at")) {
         return { rows: [{ expires_at: expiresAt }], rowCount: 1 };
       }
       return { rows: [], rowCount: 1 };
     }
 
     // INSERT INTO pilot_invitations
-    if (sql.includes("INSERT INTO pilot_invitations")) {
+    if (normSql.includes("INSERT INTO pilot_invitations")) {
       for (const inv of this.invitations.values()) {
         if (inv.code_hmac === params[0]) {
           return { rows: [], rowCount: 0 };
@@ -313,13 +322,13 @@ class MockPgPool {
       }
       const id = this.nextId.invitations++;
       const now = this._now();
-      const ttlHours = sql.includes("'registration'") ? params[1] : params[2];
+      const ttlHours = normSql.includes("'registration'") ? params[1] : params[2];
       const expiresAt = new Date(now.getTime() + ttlHours * 60 * 60 * 1000);
       const inv = {
         id,
         code_hmac: params[0],
-        invitation_type: sql.includes("'registration'") ? "registration" : "recovery",
-        recovery_user_id: sql.includes("'registration'") ? null : params[1],
+        invitation_type: normSql.includes("'registration'") ? "registration" : "recovery",
+        recovery_user_id: normSql.includes("'registration'") ? null : params[1],
         created_at: now,
         expires_at: expiresAt,
         used_at: null,
@@ -338,15 +347,43 @@ class MockPgPool {
     }
 
     // INSERT INTO pilot_admin_audit
-    if (sql.includes("INSERT INTO pilot_admin_audit")) {
+    if (normSql.includes("INSERT INTO pilot_admin_audit")) {
       const id = this.nextId.audit++;
+      let admin_key_id, action, target_user_id, details, client_ip;
+
+      if (normSql.includes("'create_registration_invitation'")) {
+        admin_key_id = params[0];
+        action = "create_registration_invitation";
+        target_user_id = null;
+        details = null;
+        client_ip = params[1];
+      } else if (normSql.includes("'create_recovery_invitation'")) {
+        admin_key_id = params[0];
+        action = "create_recovery_invitation";
+        target_user_id = params[1];
+        details = null;
+        client_ip = params[2];
+      } else if (normSql.includes("'revoke_all_credentials'")) {
+        admin_key_id = params[0];
+        action = "revoke_all_credentials";
+        target_user_id = params[1];
+        details = null;
+        client_ip = params[2];
+      } else {
+        admin_key_id = params[0];
+        action = params[1];
+        target_user_id = params[2];
+        details = params[3];
+        client_ip = params[4];
+      }
+
       const audit = {
         id,
-        admin_key_id: params[0],
-        action: params[1],
-        target_user_id: params[2],
-        details: params[3],
-        client_ip: params[4],
+        admin_key_id,
+        action,
+        target_user_id,
+        details,
+        client_ip,
         created_at: this._now()
       };
       this.audit.set(id, audit);
@@ -354,7 +391,7 @@ class MockPgPool {
     }
 
     // UPDATE pilot_invitations SET used_at
-    if (sql.includes("UPDATE pilot_invitations SET used_at")) {
+    if (normSql.includes("UPDATE pilot_invitations SET used_at")) {
       for (const inv of this.invitations.values()) {
         if (inv.id === params[1]) {
           inv.used_at = this._now();
@@ -365,8 +402,19 @@ class MockPgPool {
       return { rows: [], rowCount: 0 };
     }
 
+    // UPDATE pilot_credentials SET revoked_at WHERE id = $1
+    if (normSql.includes("UPDATE pilot_credentials SET revoked_at = CURRENT_TIMESTAMP WHERE id = $1")) {
+      for (const cred of this.credentials.values()) {
+        if (cred.id === params[0]) {
+          cred.revoked_at = this._now();
+          return { rows: [], rowCount: 1 };
+        }
+      }
+      return { rows: [], rowCount: 0 };
+    }
+
     // UPDATE pilot_credentials SET revoked_at by user_id
-    if (sql.includes("UPDATE pilot_credentials SET revoked_at") && sql.includes("user_id = $1")) {
+    if (normSql.includes("UPDATE pilot_credentials SET revoked_at") && normSql.includes("user_id = $1")) {
       let count = 0;
       for (const cred of this.credentials.values()) {
         if (cred.user_id === params[0] && !cred.revoked_at) {
@@ -377,17 +425,6 @@ class MockPgPool {
       return { rows: [], rowCount: count };
     }
 
-    // UPDATE pilot_credentials SET revoked_at WHERE id = $1
-    if (sql.includes("UPDATE pilot_credentials SET revoked_at = CURRENT_TIMESTAMP WHERE id = $1")) {
-      for (const cred of this.credentials.values()) {
-        if (cred.id === params[0]) {
-          cred.revoked_at = this._now();
-          return { rows: [], rowCount: 1 };
-        }
-      }
-      return { rows: [], rowCount: 0 };
-    }
-
     return { rows: [], rowCount: 0 };
   }
 }
@@ -396,21 +433,52 @@ class MockPgClient {
   constructor(pool) {
     this.pool = pool;
     this.inTransaction = false;
+    this.snapshot = null;
   }
 
   async query(sql, params) {
-    if (sql === "BEGIN") {
+    const normSql = normalizeSql(sql);
+
+    if (this.pool.failNext) {
+      const err = this.pool.failNext;
+      this.pool.failNext = null;
+      throw err;
+    }
+
+    if (normSql === "BEGIN") {
       this.inTransaction = true;
+      this.snapshot = {
+        users: cloneMap(this.pool.users),
+        invitations: cloneMap(this.pool.invitations),
+        credentials: cloneMap(this.pool.credentials),
+        audit: cloneMap(this.pool.audit),
+        nextId: { ...this.pool.nextId }
+      };
+      this.pool.queries.push({ sql: normSql, params });
       return { rows: [], rowCount: 0 };
     }
-    if (sql === "COMMIT") {
+
+    if (normSql === "COMMIT") {
       this.inTransaction = false;
+      this.snapshot = null;
+      this.pool.queries.push({ sql: normSql, params });
       return { rows: [], rowCount: 0 };
     }
-    if (sql === "ROLLBACK") {
+
+    if (normSql === "ROLLBACK") {
       this.inTransaction = false;
+      if (this.snapshot) {
+        this.pool.users = this.snapshot.users;
+        this.pool.invitations = this.snapshot.invitations;
+        this.pool.credentials = this.snapshot.credentials;
+        this.pool.audit = this.snapshot.audit;
+        this.pool.nextId = this.snapshot.nextId;
+        this.snapshot = null;
+      }
+      this.pool.queries.push({ sql: normSql, params });
       return { rows: [], rowCount: 0 };
     }
+
     return this.pool._executeQuery(sql, params);
   }
 
@@ -424,15 +492,15 @@ class MockPgClient {
 // ============================================================
 
 function makeStore(overrides = {}) {
-  const pool = overrides.pool || new MockPgPool();
-  const cryptoModule = overrides.crypto || makeDeterministicCrypto();
-  const logError = overrides.logError || (() => {});
+  const pool = overrides.pool ?? new MockPgPool();
+  const cryptoModule = overrides.crypto ?? makeDeterministicCrypto();
+  const logError = overrides.logError ?? (() => {});
   let userIdCounter = 0;
-  const generateUserId = overrides.generateUserId || (() => {
+  const generateUserId = overrides.generateUserId ?? (() => {
     userIdCounter++;
     return `user_${String(userIdCounter).padStart(4, "0")}`;
   });
-  const normalizeProfile = overrides.normalizeProfile || ((p) => ({
+  const normalizeProfile = overrides.normalizeProfile ?? ((p) => ({
     userId: p.userId,
     name: p.name || "Test User",
     country: p.country || "AR",
@@ -447,10 +515,10 @@ function makeStore(overrides = {}) {
       logError,
       generateUserId,
       normalizeProfile,
-      credentialTtlDays: overrides.credentialTtlDays || 30,
-      registrationInvitationTtlHours: overrides.registrationInvitationTtlHours || 48,
-      recoveryInvitationTtlHours: overrides.recoveryInvitationTtlHours || 24,
-      maxCollisionRetries: overrides.maxCollisionRetries || 5
+      credentialTtlDays: overrides.credentialTtlDays ?? 30,
+      registrationInvitationTtlHours: overrides.registrationInvitationTtlHours ?? 48,
+      recoveryInvitationTtlHours: overrides.recoveryInvitationTtlHours ?? 24,
+      maxCollisionRetries: overrides.maxCollisionRetries ?? 5
     }),
     pool,
     crypto: cryptoModule,
@@ -757,11 +825,10 @@ describe("Registro de usuario", () => {
   });
 
   it("rechaza invitacion vencida", async () => {
-    const { store, pool } = makeStore({ registrationInvitationTtlHours: -1 });
+    const { store, pool } = makeStore({ registrationInvitationTtlHours: 48 });
 
     const invResult = await store.createRegistrationInvitation({ adminKeyId: "admin1" });
-    const inv = Array.from(pool.invitations.values()).find(i => i.id === invResult.invitation.id);
-    inv.expires_at = new Date(Date.now() - 1000);
+    pool.setPgNow(new Date(Date.now() + 50 * 3600 * 1000));
 
     await assert.rejects(
       () => store.registerUser({
@@ -1008,7 +1075,7 @@ describe("Recuperacion de acceso", () => {
   });
 
   it("rechaza invitacion de recuperacion vencida", async () => {
-    const { store, pool } = makeStore({ recoveryInvitationTtlHours: -1 });
+    const { store, pool } = makeStore({ recoveryInvitationTtlHours: 24 });
 
     const invReg = await store.createRegistrationInvitation({ adminKeyId: "admin1" });
     const regResult = await store.registerUser({
@@ -1021,8 +1088,7 @@ describe("Recuperacion de acceso", () => {
       adminKeyId: "admin1"
     });
 
-    const inv = Array.from(pool.invitations.values()).find(i => i.id === invRec.invitation.id);
-    inv.expires_at = new Date(Date.now() - 1000);
+    pool.setPgNow(new Date(Date.now() + 25 * 3600 * 1000));
 
     await assert.rejects(
       () => store.recoverAccess({ invitationCode: invRec.invitation.code }),
@@ -1056,7 +1122,7 @@ describe("Renovacion de credencial", () => {
   });
 
   it("rechaza credencial vencida", async () => {
-    const { store, pool } = makeStore({ credentialTtlDays: -1 });
+    const { store, pool } = makeStore({ credentialTtlDays: 30 });
 
     const invReg = await store.createRegistrationInvitation({ adminKeyId: "admin1" });
     const regResult = await store.registerUser({
@@ -1064,8 +1130,7 @@ describe("Renovacion de credencial", () => {
       profile: { name: "Test", country: "AR", timezone: "UTC" }
     });
 
-    const cred = Array.from(pool.credentials.values()).find(c => c.user_id === regResult.user.userId);
-    cred.expires_at = new Date(Date.now() - 1000);
+    pool.setPgNow(new Date(Date.now() + 31 * 24 * 3600 * 1000));
 
     await assert.rejects(
       () => store.renewCredential({ currentToken: regResult.credential.token }),
@@ -1109,7 +1174,7 @@ describe("Renovacion de credencial", () => {
 
 describe("Un solo dispositivo activo", () => {
   it("no permite dos credenciales activas para el mismo usuario", async () => {
-    const { store, pool } = makeStore();
+    const { store, pool, crypto } = makeStore();
 
     const invReg = await store.createRegistrationInvitation({ adminKeyId: "admin1" });
     const regResult = await store.registerUser({
@@ -1123,7 +1188,7 @@ describe("Un solo dispositivo activo", () => {
       c.user_id === regResult.user.userId && !c.revoked_at
     );
     assert.strictEqual(activeCreds.length, 1);
-    assert.strictEqual(activeCreds[0].token_hmac, pool.crypto.hmacToken(renewResult.credential.token));
+    assert.strictEqual(activeCreds[0].token_hmac, crypto.hmacToken(renewResult.credential.token));
   });
 });
 
@@ -2018,7 +2083,7 @@ describe("Autenticacion y expiracion", () => {
   });
 
   it("getCredentialExpiry rechaza token vencido", async () => {
-    const { store, pool } = makeStore({ credentialTtlDays: -1 });
+    const { store, pool } = makeStore({ credentialTtlDays: 30 });
 
     const invReg = await store.createRegistrationInvitation({ adminKeyId: "admin1" });
     const regResult = await store.registerUser({
@@ -2026,10 +2091,7 @@ describe("Autenticacion y expiracion", () => {
       profile: { name: "Test", country: "AR", timezone: "UTC" }
     });
 
-    const cred = Array.from(pool.credentials.values()).find(c =>
-      c.user_id === regResult.user.userId && !c.revoked_at
-    );
-    cred.expires_at = new Date(Date.now() - 1000);
+    pool.setPgNow(new Date(Date.now() + 31 * 24 * 3600 * 1000));
 
     await assert.rejects(
       () => store.getCredentialExpiry({ token: regResult.credential.token }),

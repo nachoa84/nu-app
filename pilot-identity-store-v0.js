@@ -8,6 +8,8 @@
  *   - Nunca devuelve, almacena ni registra secretos.
  */
 
+const { isIP } = require("node:net");
+
 // ============================================================
 // ERRORES
 // ============================================================
@@ -42,65 +44,89 @@ const FORBIDDEN_KEYS = [
 
 function validateAuditDetails(details) {
   if (details === null || details === undefined) {
-    return true;
+    return "VALID";
   }
 
   if (typeof details !== "object") {
-    return false;
+    return "INVALID_STRUCTURE";
   }
 
-  let serialized;
+  let jsonStr;
   try {
-    serialized = JSON.stringify(details);
+    jsonStr = JSON.stringify(details);
   } catch {
-    return false;
+    return "INVALID_STRUCTURE";
   }
 
-  if (serialized.length > MAX_AUDIT_DETAILS_SIZE) {
-    return false;
+  if (jsonStr === undefined || Buffer.byteLength(jsonStr, "utf8") > MAX_AUDIT_DETAILS_SIZE) {
+    return "INVALID_STRUCTURE";
   }
 
+  let hasForbiddenKey = false;
   const seen = new WeakSet();
 
-  function checkValue(value) {
-    if (value === null || value === undefined) {
-      return true;
+  function check(val) {
+    if (val === null) {
+      return "VALID";
     }
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      return true;
+    if (val === undefined) {
+      return "INVALID_STRUCTURE";
     }
-    if (typeof value !== "object") {
-      return false;
+    const type = typeof val;
+    if (type === "boolean" || type === "string") {
+      return "VALID";
     }
-    if (seen.has(value)) {
-      return false;
+    if (type === "number") {
+      if (!Number.isFinite(val)) {
+        return "INVALID_STRUCTURE";
+      }
+      return "VALID";
     }
-    seen.add(value);
+    if (type === "function" || type === "symbol" || type === "bigint") {
+      return "INVALID_STRUCTURE";
+    }
+    if (type !== "object") {
+      return "INVALID_STRUCTURE";
+    }
 
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (!checkValue(item)) {
-          return false;
+    if (seen.has(val)) {
+      return "INVALID_STRUCTURE";
+    }
+    seen.add(val);
+
+    if (Array.isArray(val)) {
+      for (let i = 0; i < val.length; i++) {
+        if (!(i in val) || val[i] === undefined) {
+          return "INVALID_STRUCTURE";
+        }
+        const res = check(val[i]);
+        if (res !== "VALID") {
+          return res;
         }
       }
-      return true;
+      return "VALID";
     }
 
-    for (const key of Object.keys(value)) {
+    const keys = Object.keys(val);
+    for (const key of keys) {
       const lowerKey = String(key).toLowerCase();
-      for (const forbidden of FORBIDDEN_KEYS) {
-        if (lowerKey === forbidden) {
-          return false;
-        }
+      if (FORBIDDEN_KEYS.includes(lowerKey)) {
+        hasForbiddenKey = true;
       }
-      if (!checkValue(value[key])) {
-        return false;
+      const propVal = val[key];
+      if (propVal === undefined) {
+        return "INVALID_STRUCTURE";
+      }
+      const res = check(propVal);
+      if (res === "INVALID_STRUCTURE") {
+        return "INVALID_STRUCTURE";
       }
     }
-    return true;
+
+    return hasForbiddenKey ? "FORBIDDEN_KEY" : "VALID";
   }
 
-  return checkValue(details);
+  return check(details);
 }
 
 // ============================================================
@@ -122,7 +148,7 @@ function isValidClientIp(value) {
   if (typeof value !== "string") {
     return false;
   }
-  return value.trim().length > 0;
+  return isIP(value.trim()) !== 0;
 }
 
 // ============================================================
@@ -177,7 +203,7 @@ function createPilotIdentityStoreV0({
   maxCollisionRetries = 5
 }) {
   // ── Validación de parámetros de factory ──
-  if (!pool || typeof pool.connect !== "function") {
+  if (!pool || typeof pool.connect !== "function" || typeof pool.query !== "function") {
     throw new PilotStoreError("El pool de PostgreSQL no es valido.");
   }
   if (!crypto || typeof crypto.generateInvitationCode !== "function") {
@@ -940,8 +966,12 @@ function createPilotIdentityStoreV0({
     }
 
     if (details !== null && details !== undefined) {
-      if (!validateAuditDetails(details)) {
+      const result = validateAuditDetails(details);
+      if (result === "FORBIDDEN_KEY") {
         throw new PilotStoreError("Los detalles de auditoria contienen campos no permitidos.");
+      }
+      if (result === "INVALID_STRUCTURE") {
+        throw new PilotStoreError("Los detalles de auditoria no son validos.");
       }
     }
 
