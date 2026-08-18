@@ -4,8 +4,8 @@
  *
  * Responsabilidad exclusiva:
  *   - Endpoints REST para usuario (/api/pilot/*) y administración (/api/pilot-admin/*).
- *   - Normalización estricta de configuración al instanciar.
- *   - Validation de bodies con allowlists exactas.
+ *   - Normalización estricta y validación de dependencias al instanciar (fail-closed).
+ *   - Validación de bodies con allowlists exactas.
  *   - Rate limiting por IP y por usuario mediante shared-rate-limit-v115.
  *   - PostgreSQL como única fuente de autenticación/tiempo a través de store.
  */
@@ -44,35 +44,69 @@ function validateAllowlist(obj, allowedKeys) {
   return true;
 }
 
-function extractBearerToken(req) {
+function inspectBearerToken(req) {
+  if (req.rawHeaders) {
+    let authHeaderCount = 0;
+    for (let i = 0; i < req.rawHeaders.length; i += 2) {
+      if (String(req.rawHeaders[i]).toLowerCase() === "authorization") {
+        authHeaderCount++;
+      }
+    }
+    if (authHeaderCount > 1) {
+      return { token: null, malformed: true };
+    }
+  }
   const authHeader = req.headers["authorization"];
-  if (!authHeader || typeof authHeader !== "string") {
-    return null;
+  if (!authHeader) {
+    return { token: null, malformed: true };
+  }
+  if (Array.isArray(authHeader) || (typeof authHeader === "string" && authHeader.includes(","))) {
+    return { token: null, malformed: true };
+  }
+  if (typeof authHeader !== "string") {
+    return { token: null, malformed: true };
+  }
+  if (authHeader.length > 10240) {
+    return { token: null, malformed: true };
   }
   const parts = authHeader.trim().split(/\s+/);
   if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
-    return null;
+    return { token: null, malformed: true };
   }
   const token = parts[1];
   if (!token.startsWith("npt_") || token.length !== 47) {
-    return null;
+    return { token: null, malformed: true };
   }
   const b64Part = token.slice(4);
   if (!/^[A-Za-z0-9_-]{43}$/.test(b64Part)) {
-    return null;
+    return { token: null, malformed: true };
   }
-  return token;
+  return { token, malformed: false };
 }
 
 function validateAdminToken(req, expectedToken, nodeCrypto) {
   const provided = req.headers["x-pilot-admin-token"];
-  if (!provided || typeof provided !== "string") {
+  if (!provided || typeof provided !== "string" || Array.isArray(provided)) {
+    return false;
+  }
+  if (provided.length > 10240) {
     return false;
   }
   const cryptoLib = nodeCrypto || require("node:crypto");
   const providedHash = cryptoLib.createHash("sha256").update(provided).digest();
   const expectedHash = cryptoLib.createHash("sha256").update(expectedToken).digest();
   return cryptoLib.timingSafeEqual(providedHash, expectedHash);
+}
+
+function sanitizeForLog(val) {
+  if (val === null || val === undefined) return "";
+  let str = typeof val === "string" ? val : String(val);
+  str = str.replace(/npi_[A-Za-z0-9_-]+/gi, "[REDACTED_CODE]");
+  str = str.replace(/npt_[A-Za-z0-9_-]+/gi, "[REDACTED_TOKEN]");
+  str = str.replace(/hmac/gi, "[REDACTED]");
+  str = str.replace(/authorization/gi, "[REDACTED]");
+  str = str.replace(/pilot_admin_token/gi, "[REDACTED]");
+  return str;
 }
 
 function createPilotIdentityRoutesV0({
@@ -93,7 +127,52 @@ function createPilotIdentityRoutesV0({
   const normPilotAdminToken = String(pilotAdminToken || "").trim();
   const normPilotAdminKeyId = String(pilotAdminKeyId || "").trim();
 
+  // Strict Factory Dependency Validation (fail-closed)
+  if (normPilotEnabled || normPilotAdminRoutesEnabled) {
+    if (!express || typeof express.Router !== "function") {
+      throw new Error("El módulo express o express.Router no es válido.");
+    }
+    if (!pool || typeof pool.query !== "function") {
+      throw new Error("El pool de PostgreSQL no es válido.");
+    }
+    if (typeof consumeSharedRateLimit !== "function") {
+      throw new Error("La función consumeSharedRateLimit no es válida.");
+    }
+    if (!store || typeof store !== "object") {
+      throw new Error("El store de identidad piloto no es válido.");
+    }
+  }
+
+  if (normPilotEnabled) {
+    const requiredUserMethods = [
+      "registerUser",
+      "recoverAccess",
+      "renewCredential",
+      "authenticateCredential",
+      "getCredentialExpiry"
+    ];
+    for (const method of requiredUserMethods) {
+      if (typeof store[method] !== "function") {
+        throw new Error(`El store no implementa el método requerido '${method}'.`);
+      }
+    }
+  }
+
   if (normPilotAdminRoutesEnabled) {
+    const requiredAdminMethods = [
+      "createRegistrationInvitation",
+      "createRecoveryInvitation",
+      "revokeAllCredentials"
+    ];
+    for (const method of requiredAdminMethods) {
+      if (typeof store[method] !== "function") {
+        throw new Error(`El store no implementa el método requerido '${method}'.`);
+      }
+    }
+    const cryptoLib = nodeCrypto || require("node:crypto");
+    if (!cryptoLib || typeof cryptoLib.createHash !== "function" || typeof cryptoLib.timingSafeEqual !== "function") {
+      throw new Error("El módulo nodeCrypto no provee createHash o timingSafeEqual.");
+    }
     if (!normPilotAdminToken || !normPilotAdminKeyId) {
       throw new Error(
         "Falta la configuración de administración (PILOT_ADMIN_TOKEN y PILOT_ADMIN_KEY_ID son requeridos)."
@@ -104,9 +183,6 @@ function createPilotIdentityRoutesV0({
   const router = express.Router();
 
   async function applyRateLimit(req, res, { namespace, key, windowMs, max }) {
-    if (typeof consumeSharedRateLimit !== "function" || !pool) {
-      return true;
-    }
     const decision = await consumeSharedRateLimit(pool, {
       namespace,
       key,
@@ -131,10 +207,42 @@ function createPilotIdentityRoutesV0({
   function handleGenericError(res, err, operationName) {
     if (typeof logError === "function") {
       try {
-        logError({ operation: operationName, errorCode: err?.code || "", constraint: err?.constraint || "" });
+        logError({
+          operation: sanitizeForLog(operationName),
+          errorCode: sanitizeForLog(err?.code || ""),
+          constraint: sanitizeForLog(err?.constraint || "")
+        });
       } catch {}
     }
     return res.status(500).json({ ok: false, error: "Error interno del servidor." });
+  }
+
+  async function parseRequestBody(req) {
+    if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
+      if (Object.keys(req.body).length > 0) {
+        return req.body;
+      }
+    }
+    const hasBodyHeader = (req.headers["content-length"] && Number(req.headers["content-length"]) > 0) || Boolean(req.headers["transfer-encoding"]);
+    if (!hasBodyHeader) {
+      return {};
+    }
+    if (req.readableEnded || req.complete) {
+      return req.body || {};
+    }
+    return new Promise((resolve) => {
+      let data = "";
+      req.on("data", (chunk) => { data += chunk; });
+      req.on("end", () => {
+        if (!data.trim()) return resolve({});
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          resolve("INVALID_JSON");
+        }
+      });
+      req.on("error", () => resolve("INVALID_JSON"));
+    });
   }
 
   // ------------------------------------------------------------
@@ -238,11 +346,6 @@ function createPilotIdentityRoutesV0({
         return res.status(400).json({ ok: false, error: "La solicitud contiene campos no permitidos." });
       }
 
-      const token = extractBearerToken(req);
-      if (!token) {
-        return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
-      }
-
       const clientIp = extractClientIp(req, getClientIp);
       const ipLimitOk = await applyRateLimit(req, res, {
         namespace: "pilot-renew-ip",
@@ -252,9 +355,14 @@ function createPilotIdentityRoutesV0({
       });
       if (!ipLimitOk) return;
 
+      const bearerInfo = inspectBearerToken(req);
+      if (bearerInfo.malformed || !bearerInfo.token) {
+        return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
+      }
+
       let authResult;
       try {
-        authResult = await store.authenticateCredential({ token });
+        authResult = await store.authenticateCredential({ token: bearerInfo.token });
       } catch (authErr) {
         if (authErr?.name === "PilotStoreError") {
           return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
@@ -270,7 +378,7 @@ function createPilotIdentityRoutesV0({
       });
       if (!userLimitOk) return;
 
-      const result = await store.renewCredential({ currentToken: token });
+      const result = await store.renewCredential({ currentToken: bearerInfo.token });
       return res.status(200).json(result);
     } catch (err) {
       if (err?.name === "PilotStoreError") {
@@ -280,48 +388,14 @@ function createPilotIdentityRoutesV0({
     }
   });
 
-  // Helper to get or parse body even on GET
-  async function parseRequestBody(req) {
-    if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
-      if (Object.keys(req.body).length > 0) {
-        return req.body;
-      }
-    }
-    const hasBodyHeader = (req.headers["content-length"] && Number(req.headers["content-length"]) > 0) || Boolean(req.headers["transfer-encoding"]);
-    if (!hasBodyHeader) {
-      return {};
-    }
-    if (req.readableEnded || req.complete) {
-      return req.body || {};
-    }
-    return new Promise((resolve) => {
-      let data = "";
-      req.on("data", (chunk) => { data += chunk; });
-      req.on("end", () => {
-        if (!data.trim()) return resolve({});
-        try {
-          resolve(JSON.parse(data));
-        } catch {
-          resolve("INVALID_JSON");
-        }
-      });
-      req.on("error", () => resolve("INVALID_JSON"));
-    });
-  }
-
   // ------------------------------------------------------------
   // 4. GET /api/pilot/me
   // ------------------------------------------------------------
   router.get("/api/pilot/me", async (req, res) => {
     try {
       const body = await parseRequestBody(req);
-      if (body === "INVALID_JSON" || (body && typeof body === "object" && !Array.isArray(body) && Object.keys(body).length > 0)) {
+      if (body === "INVALID_JSON" || (body && typeof body === "object" && (Array.isArray(body) || Object.keys(body).length > 0))) {
         return res.status(400).json({ ok: false, error: "La solicitud contiene campos no permitidos." });
-      }
-
-      const token = extractBearerToken(req);
-      if (!token) {
-        return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
       }
 
       const clientIp = extractClientIp(req, getClientIp);
@@ -333,9 +407,14 @@ function createPilotIdentityRoutesV0({
       });
       if (!ipLimitOk) return;
 
+      const bearerInfo = inspectBearerToken(req);
+      if (bearerInfo.malformed || !bearerInfo.token) {
+        return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
+      }
+
       let authResult;
       try {
-        authResult = await store.authenticateCredential({ token });
+        authResult = await store.authenticateCredential({ token: bearerInfo.token });
       } catch (authErr) {
         if (authErr?.name === "PilotStoreError") {
           return res.status(401).json({ ok: false, error: "La sesión no es válida o ha expirado." });
@@ -351,7 +430,7 @@ function createPilotIdentityRoutesV0({
       });
       if (!userLimitOk) return;
 
-      const expiryResult = await store.getCredentialExpiry({ token });
+      const expiryResult = await store.getCredentialExpiry({ token: bearerInfo.token });
       return res.status(200).json({
         ok: true,
         user: {

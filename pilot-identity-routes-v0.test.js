@@ -48,7 +48,10 @@ function createMockStore() {
         throw new PilotStoreError("La invitacion no es valida o ya fue utilizada.");
       }
       if (invitationCode === "db_error_code") {
-        throw new PilotStoreOperationalError("DB_FAIL");
+        const err = new PilotStoreOperationalError("DB_FAIL");
+        err.code = "npi_secret_error_code";
+        err.constraint = "npt_secret_token_constraint";
+        throw err;
       }
       const userId = "usr_gen123";
       const token = "npt_0123456789abcdef0123456789abcdef0123456789a";
@@ -174,8 +177,6 @@ class TestServer {
     const pilotEnabled = appOptions.pilotEnabled !== undefined ? appOptions.pilotEnabled : true;
     const pilotAdminRoutesEnabled = appOptions.pilotAdminRoutesEnabled !== undefined ? appOptions.pilotAdminRoutesEnabled : true;
 
-    // Conforme a la Sección 9 del diseño técnico, los gatekeepers de Feature Flags
-    // deben registrarse ANTES del middleware assertAllowedWriteOrigin
     this.app.use("/api/pilot", (req, res, next) => {
       if (!pilotEnabled) {
         return res.status(404).json({ ok: false, error: "Ruta no disponible." });
@@ -205,7 +206,7 @@ class TestServer {
       express,
       store,
       nodeCrypto: crypto,
-      pool: appOptions.pool !== undefined ? appOptions.pool : {},
+      pool: appOptions.pool !== undefined ? appOptions.pool : { query: async () => ({ rows: [] }) },
       consumeSharedRateLimit,
       pilotEnabled,
       pilotAdminRoutesEnabled,
@@ -217,7 +218,6 @@ class TestServer {
 
     this.app.use(routes);
 
-    // Ruta existente de prueba para no regresión
     this.app.get("/api/bootstrap", (req, res) => res.json({ ok: true, bootstrap: true }));
 
     this.server = null;
@@ -245,15 +245,17 @@ class TestServer {
   }
 }
 
-function sendHttpRequest({ port, path, method = "GET", headers = {}, body = null }) {
+function sendHttpRequest({ port, path, method = "GET", headers = {}, rawHeaders = null, body = null }) {
   return new Promise((resolve, reject) => {
-    const req = http.request({
+    const options = {
       hostname: "127.0.0.1",
       port,
       path,
       method,
       headers
-    }, (res) => {
+    };
+
+    const req = http.request(options, (res) => {
       let data = "";
       res.on("data", (chunk) => { data += chunk; });
       res.on("end", () => {
@@ -262,7 +264,15 @@ function sendHttpRequest({ port, path, method = "GET", headers = {}, body = null
         resolve({ status: res.statusCode, headers: res.headers, body: json, text: data });
       });
     });
+
     req.on("error", reject);
+
+    if (rawHeaders && Array.isArray(rawHeaders)) {
+      for (let i = 0; i < rawHeaders.length; i += 2) {
+        req.setHeader(rawHeaders[i], rawHeaders[i + 1]);
+      }
+    }
+
     if (body) {
       req.write(typeof body === "string" ? body : JSON.stringify(body));
     }
@@ -271,15 +281,17 @@ function sendHttpRequest({ port, path, method = "GET", headers = {}, body = null
 }
 
 // ============================================================
-// SUITE: INICIALIZACIÓN Y CONFIGURACIÓN
+// SUITE: INICIALIZACIÓN Y VALIDACIÓN DE DEPENDENCIAS (FAIL-CLOSED)
 // ============================================================
 
-describe("Inicialización y configuración de rutas del piloto V0", () => {
+describe("Inicialización y validación estricta de dependencias (fail-closed)", () => {
   it("lanza excepción si pilotAdminRoutesEnabled es true pero falta pilotAdminToken o pilotAdminKeyId", () => {
     assert.throws(
       () => createPilotIdentityRoutesV0({
         express,
         store: createMockStore(),
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: async () => {},
         pilotAdminRoutesEnabled: true,
         pilotAdminToken: "",
         pilotAdminKeyId: "key1"
@@ -291,6 +303,8 @@ describe("Inicialización y configuración de rutas del piloto V0", () => {
       () => createPilotIdentityRoutesV0({
         express,
         store: createMockStore(),
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: async () => {},
         pilotAdminRoutesEnabled: true,
         pilotAdminToken: "token1",
         pilotAdminKeyId: "   "
@@ -299,10 +313,97 @@ describe("Inicialización y configuración de rutas del piloto V0", () => {
     );
   });
 
-  it("permite instanciar correctamente si pilotAdminRoutesEnabled es false sin tokens", () => {
+  it("lanza excepción si falta express cuando rutas están habilitadas", () => {
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express: null,
+        store: createMockStore(),
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: async () => {},
+        pilotEnabled: true
+      }),
+      (err) => err.message.includes("express")
+    );
+  });
+
+  it("lanza excepción si falta pool o pool.query no es función cuando rutas están habilitadas", () => {
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express,
+        store: createMockStore(),
+        pool: null,
+        consumeSharedRateLimit: async () => {},
+        pilotEnabled: true
+      }),
+      (err) => err.message.includes("PostgreSQL")
+    );
+
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express,
+        store: createMockStore(),
+        pool: {},
+        consumeSharedRateLimit: async () => {},
+        pilotEnabled: true
+      }),
+      (err) => err.message.includes("PostgreSQL")
+    );
+  });
+
+  it("lanza excepción si falta consumeSharedRateLimit cuando rutas están habilitadas", () => {
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express,
+        store: createMockStore(),
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: null,
+        pilotEnabled: true
+      }),
+      (err) => err.message.includes("consumeSharedRateLimit")
+    );
+  });
+
+  it("lanza excepción si el store no implementa los métodos requeridos para rutas de usuario", () => {
+    const incompleteStore = { registerUser: async () => {} };
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express,
+        store: incompleteStore,
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: async () => {},
+        pilotEnabled: true
+      }),
+      (err) => err.message.includes("recoverAccess")
+    );
+  });
+
+  it("lanza excepción si el store no implementa los métodos requeridos para rutas administrativas", () => {
+    const userOnlyStore = {
+      registerUser: async () => {},
+      recoverAccess: async () => {},
+      renewCredential: async () => {},
+      authenticateCredential: async () => {},
+      getCredentialExpiry: async () => {}
+    };
+    assert.throws(
+      () => createPilotIdentityRoutesV0({
+        express,
+        store: userOnlyStore,
+        pool: { query: async () => {} },
+        consumeSharedRateLimit: async () => {},
+        pilotAdminRoutesEnabled: true,
+        pilotAdminToken: "secret",
+        pilotAdminKeyId: "key1"
+      }),
+      (err) => err.message.includes("createRegistrationInvitation")
+    );
+  });
+
+  it("permite instanciar correctamente si pilotEnabled y pilotAdminRoutesEnabled son false sin validar tokens", () => {
     const router = createPilotIdentityRoutesV0({
       express,
-      store: createMockStore(),
+      store: {},
+      pilotEnabled: false,
       pilotAdminRoutesEnabled: false
     });
     assert.ok(router);
@@ -470,6 +571,23 @@ describe("Validación estricta de bodies y allowlists", () => {
     assert.strictEqual(response.body.error, "La solicitud contiene campos no permitidos.");
   });
 
+  it("GET /api/pilot/me rechaza array como payload con HTTP 400", async () => {
+    const response = await sendHttpRequest({
+      port: ts.port,
+      path: "/api/pilot/me",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(JSON.stringify([1, 2, 3])),
+        "Authorization": "Bearer npt_0123456789abcdef0123456789abcdef0123456789a"
+      },
+      body: JSON.stringify([1, 2, 3])
+    });
+
+    assert.strictEqual(response.status, 400);
+    assert.strictEqual(response.body.error, "La solicitud contiene campos no permitidos.");
+  });
+
   it("Rutas administrativas rechazan campos extra o ausentes con HTTP 400", async () => {
     // registration invitation extra field
     const res1 = await fetch(ts.url("/api/pilot-admin/invitations/registration"), {
@@ -522,7 +640,7 @@ describe("Tokens Bearer y Tokens Administrativos", () => {
     if (ts) await ts.stop();
   });
 
-  it("rechaza Bearer tokens ausentes, malformados, duplicados o >10KB con HTTP 401", async () => {
+  it("rechaza Bearer tokens ausentes, malformados, duplicados o >10KB con HTTP 401 y consume rate limit IP", async () => {
     // Sin cabecera
     const res1 = await fetch(ts.url("/api/pilot/me"));
     assert.strictEqual(res1.status, 401);
@@ -556,6 +674,40 @@ describe("Tokens Bearer y Tokens Administrativos", () => {
     assert.strictEqual(body.error, "La sesión no es válida o ha expirado.");
   });
 
+  it("rechaza Authorization duplicada usando HTTP raw y consume rate limit IP sin consultar PostgreSQL", async () => {
+    const validToken = "npt_0123456789abcdef0123456789abcdef0123456789a";
+    const response = await sendHttpRequest({
+      port: ts.port,
+      path: "/api/pilot/renew",
+      method: "POST",
+      headers: {
+        "Authorization": [`Bearer ${validToken}`, `Bearer ${validToken}`],
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({})
+    });
+
+    assert.strictEqual(response.status, 401);
+    assert.strictEqual(response.body.error, "La sesión no es válida o ha expirado.");
+    assert.strictEqual(ts.mockStore.calls.authenticateCredential.length, 0);
+  });
+
+  it("si IP rate limit está bloqueado, un Bearer malformado devuelve 429 y registra 0 llamadas al store", async () => {
+    ts.rateLimitBlockedNamespaces.add("pilot-renew-ip");
+
+    const res = await fetch(ts.url("/api/pilot/renew"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer npt_malformed"
+      },
+      body: JSON.stringify({})
+    });
+
+    assert.strictEqual(res.status, 429);
+    assert.strictEqual(ts.mockStore.calls.authenticateCredential.length, 0);
+  });
+
   it("rechaza X-Pilot-Admin-Token ausente, incorrecto o muy largo con HTTP 401", async () => {
     // Ausente
     const res1 = await fetch(ts.url("/api/pilot-admin/invitations/registration"), {
@@ -576,7 +728,7 @@ describe("Tokens Bearer y Tokens Administrativos", () => {
     });
     assert.strictEqual(res2.status, 401);
 
-    // Excesivamente largo (e.g. 2000 chars)
+    // Excesivamente largo
     const res3 = await fetch(ts.url("/api/pilot-admin/invitations/registration"), {
       method: "POST",
       headers: {
@@ -819,7 +971,7 @@ describe("Sanitización de errores y ausencia de secretos", () => {
     if (ts) await ts.stop();
   });
 
-  it("devuelve 500 con mensaje genérico si ocurre un error operativo en DB", async () => {
+  it("devuelve 500 con mensaje genérico si ocurre un error operativo en DB y sanitiza logs", async () => {
     const res = await fetch(ts.url("/api/pilot/register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -833,6 +985,14 @@ describe("Sanitización de errores y ausencia de secretos", () => {
     const body = await res.json();
     assert.strictEqual(body.ok, false);
     assert.strictEqual(body.error, "Error interno del servidor.");
+
+    assert.ok(ts.logs.length > 0);
+    const logStr = JSON.stringify(ts.logs[0]);
+    assert.ok(!logStr.includes("npi_secret"));
+    assert.ok(!logStr.includes("npt_secret"));
+    assert.ok(!logStr.includes("hmac"));
+    assert.ok(!logStr.includes("Authorization"));
+    assert.ok(!logStr.includes("PILOT_ADMIN_TOKEN"));
   });
 
   it("no expone si un usuario existe o no mediante variaciones de error en admin", async () => {
