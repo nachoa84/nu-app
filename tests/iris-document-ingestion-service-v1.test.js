@@ -334,6 +334,27 @@ test("un logger defectuoso no reemplaza el error saneado", async () => {
   );
 });
 
+test("un fallo al liberar la conexión no deshace una ingesta confirmada", async () => {
+  const logs = [];
+  const h = harnessV1({ logError: entry => logs.push(entry) });
+  h.client.release = () => {
+    throw Object.assign(new Error("detalle privado"), {
+      code: "08006"
+    });
+  };
+
+  const result = await h.service.ingestPdf(requestV1());
+
+  assert.equal(result.status, "pending");
+  assert.equal(h.storageCalls.length, 1);
+  assert.deepEqual(logs, [{
+    operation: "release_database_client_v1",
+    errorCode: "08006",
+    constraint: "",
+    retryable: true
+  }]);
+});
+
 test("una clave aleatoria insegura nunca llega a Object Storage", async () => {
   const h = harnessV1({ randomUUID: () => "../escape" });
 
