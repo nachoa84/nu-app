@@ -2,12 +2,11 @@
 
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const { fileURLToPath } = require("node:url");
 const test = require("node:test");
 
 const {
   createIrisPdfJsTextExtractorV1,
-  pdfJsAssetUrlV1
+  pdfJsAssetPathV1
 } = require("../iris-pdfjs-text-extractor-v1");
 
 function createSyntheticTextPdfV1(text) {
@@ -93,12 +92,14 @@ test("resuelve recursos PDF.js desde el paquete fijado", () => {
     "standard_fonts",
     "wasm"
   ]) {
-    const url = pdfJsAssetUrlV1(directory);
+    const assetPath = pdfJsAssetPathV1(directory);
 
-    assert.equal(url.startsWith("file:"), true);
-    assert.equal(url.endsWith("/"), true);
     assert.equal(
-      fs.statSync(fileURLToPath(url)).isDirectory(),
+      assetPath.endsWith(require("node:path").sep),
+      true
+    );
+    assert.equal(
+      fs.statSync(assetPath).isDirectory(),
       true
     );
   }
