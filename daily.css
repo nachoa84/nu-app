@@ -566,7 +566,7 @@
 
 .action-step summary {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 20px;
+  grid-template-columns: 32px minmax(0, 1fr) 26px;
   align-items: center;
   gap: 11px;
   min-height: 65px;
@@ -616,16 +616,26 @@
 }
 
 .action-step-arrow {
-  color: var(--app-muted);
-  transition: transform .2s cubic-bezier(.22,.8,.24,1);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-dark);
+  transition: transform .2s cubic-bezier(.22,.8,.24,1),
+    background .16s ease,
+    color .16s ease;
 }
 
 .action-step-arrow svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .action-step[open] .action-step-arrow {
+  background: var(--app-accent);
+  color: #fff;
   transform: rotate(180deg);
 }
 
@@ -833,7 +843,7 @@
 }
 
 #view-hoy.day-open .action-step summary {
-  grid-template-columns: 27px minmax(0, 1fr) 20px;
+  grid-template-columns: 27px minmax(0, 1fr) 24px;
   gap: 10px;
 }
 
@@ -858,7 +868,15 @@
 }
 
 #view-hoy.day-open .action-step-arrow {
-  color: #939796;
+  width: 24px;
+  height: 24px;
+  background: var(--day-olive-soft);
+  color: var(--day-olive);
+}
+
+#view-hoy.day-open .action-step[open] .action-step-arrow {
+  background: var(--day-olive);
+  color: #fff;
 }
 
 #view-hoy.day-open .action-step-body {

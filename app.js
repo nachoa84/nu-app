@@ -3,6 +3,7 @@ const chatWrap = document.getElementById("chatWrap");
 const progressText = document.getElementById("progressText");
 const dailyNativeHeader = document.getElementById("dailyNativeHeader");
 const dailyNativeDayLabel = document.getElementById("dailyNativeDayLabel");
+const dailyNativeRoutineTitle = document.getElementById("dailyNativeRoutineTitle");
 const chatTitle = document.querySelector(".chat-header strong");
 
 const params = new URLSearchParams(window.location.search);

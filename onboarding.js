@@ -68,6 +68,31 @@
     }
   }
 
+  // Muestra una ubicación legible ("Córdoba (GMT-3)") en vez del
+  // identificador IANA interno ("America/Argentina/Cordoba").
+  // No modifica cómo se guarda la zona horaria: solo su presentación.
+  function friendlyTimezoneLabel(timezone) {
+    if (!timezone) return "Zona horaria local";
+
+    const place = String(timezone)
+      .split("/")
+      .pop()
+      .replace(/_/g, " ");
+
+    try {
+      const offset = new Intl.DateTimeFormat("es-AR", {
+        timeZone: timezone,
+        timeZoneName: "shortOffset"
+      })
+        .formatToParts(new Date())
+        .find(part => part.type === "timeZoneName")?.value;
+
+      return offset ? `${place} (${offset})` : place;
+    } catch (error) {
+      return place;
+    }
+  }
+
   function resetRoutineForNewUser() {
     localStorage.setItem(
       "routineState",
@@ -438,7 +463,7 @@
               <span class="time-card-icon">${icon("clock")}</span>
               <span class="time-card-copy">
                 <strong>${time}</strong>
-                <small>Todos los días · ${escapeHtml(state.timezone)}</small>
+                <small>Todos los días · ${escapeHtml(friendlyTimezoneLabel(state.timezone))}</small>
               </span>
               <span class="time-card-chevron">${icon("chevron")}</span>
             </button>
@@ -677,7 +702,7 @@
 
           <p class="time-sheet-note">
             Tu siguiente acción se habilitará a esta hora según
-            <strong>${escapeHtml(state.timezone)}</strong>.
+            <strong>${escapeHtml(friendlyTimezoneLabel(state.timezone))}</strong>.
           </p>
 
           <button id="confirmTimeBtn" class="onboarding-primary sheet-confirm" type="button">

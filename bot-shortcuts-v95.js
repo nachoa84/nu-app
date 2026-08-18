@@ -80,7 +80,7 @@
     return String(value || "").trim().toLowerCase();
   }
 
-  function commandCatalog() {
+  function buildCommandIndex() {
     // NU APP · TECNOLOGÍAS DIRECTAS V105
     // Incluye los temas ocultos de detalle únicamente para resolver accesos
     // rápidos; no altera la búsqueda normal ni la biblioteca visible del Bot.
@@ -97,10 +97,32 @@
         .filter(Boolean)
         .forEach(command => byCommand.set(normalizedCommand(command), item));
     });
+    return byCommand;
+  }
+
+  function commandCatalog() {
+    const byCommand = buildCommandIndex();
     return QUICK_ACCESS_CATEGORIES.map(category => ({
       ...category,
       items: category.commands.map(command => byCommand.get(command)).filter(Boolean)
     })).filter(category => category.items.length);
+  }
+
+  // NU APP · SUBMENÚ DE TRÁMITES POR PAÍS V95E
+  // El comando "tramites" abre un segundo nivel dentro del mismo modal con
+  // los mercados disponibles; cada país reutiliza el comando ya existente
+  // en bot-content.js (no se duplica contenido).
+  const TRAMITES_COUNTRY_COMMANDS = [
+    "tramites argentina",
+    "tramites espana",
+    "tramites italia",
+    "tramites mexico",
+    "tramites peru"
+  ];
+
+  function resolveCommandItems(commands) {
+    const byCommand = buildCommandIndex();
+    return commands.map(command => byCommand.get(normalizedCommand(command))).filter(Boolean);
   }
 
   function closeBotQuickAccess() {
@@ -211,6 +233,43 @@
       const strong = document.createElement("strong");
       strong.textContent = item.label || item.command;
       // NU APP · ETIQUETAS LIMPIAS V95B
+      copy.appendChild(strong);
+      button.append(icon, copy, iconNode("arrow", "bot-quick-access-row-arrow"));
+      const isTramitesEntry = category.id === "tramites-informacion" && item.command === "tramites";
+      button.onclick = isTramitesEntry
+        ? () => renderTramitesCountryList(sheet, category, categories, item)
+        : () => chooseBotCommand(item);
+      list.appendChild(button);
+    });
+  }
+
+  function tramitesCountryLabel(item) {
+    const label = item.label || item.title || item.command;
+    return String(label).replace(/^Trámites\s*·\s*/i, "");
+  }
+
+  function renderTramitesCountryList(sheet, category, categories, parentItem) {
+    activeCategory = category.id;
+    const title = sheet.querySelector(".bot-quick-access-title");
+    const subtitle = sheet.querySelector(".bot-quick-access-subtitle");
+    const back = sheet.querySelector(".bot-quick-access-back");
+    const list = sheet.querySelector(".bot-quick-access-list");
+    title.textContent = parentItem.label || parentItem.title || "Trámites";
+    subtitle.textContent = "Elegí un país";
+    back.hidden = false;
+    back.onclick = () => renderCommandList(sheet, category, categories);
+    list.className = "bot-quick-access-list is-commands";
+    list.innerHTML = "";
+
+    resolveCommandItems(TRAMITES_COUNTRY_COMMANDS).forEach(item => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `bot-quick-access-row is-command tone-${category.tone}`;
+      const icon = iconNode(category.icon, "bot-quick-access-row-icon");
+      const copy = document.createElement("span");
+      copy.className = "bot-quick-access-row-copy";
+      const strong = document.createElement("strong");
+      strong.textContent = tramitesCountryLabel(item);
       copy.appendChild(strong);
       button.append(icon, copy, iconNode("arrow", "bot-quick-access-row-arrow"));
       button.onclick = () => chooseBotCommand(item);
