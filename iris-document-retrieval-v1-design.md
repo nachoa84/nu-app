@@ -2,8 +2,8 @@
 
 ## 1. Estado
 
-**Fase:** diseño para revisión  
-**Base:** `57154b916bbc413a57aae04bc7046e2d34dd736c`  
+**Fase:** diseño para revisión
+**Base:** `57154b916bbc413a57aae04bc7046e2d34dd736c`
 **Implementación y migración:** fuera de alcance de este documento
 
 Este diseño define la primera capa de recuperación documental de Iris. No incorpora Groq, no modifica el comportamiento determinista actual y no habilita funciones para usuarios.
