@@ -1,12 +1,39 @@
 "use strict";
 
+const path = require("node:path");
+const { pathToFileURL } = require("node:url");
 const {
   IrisPdfTextExtractorOperationalErrorV1,
   createIrisPdfTextExtractorV1
 } = require("./iris-pdf-text-extractor-v1");
 
-function defaultLoadPdfJsV1() {
-  return import("pdfjs-dist/legacy/build/pdf.mjs");
+function pdfJsAssetUrlV1(directoryName) {
+  const packageDirectory = path.dirname(
+    require.resolve("pdfjs-dist/package.json")
+  );
+
+  return pathToFileURL(
+    path.join(packageDirectory, directoryName, path.sep)
+  ).href;
+}
+
+async function defaultLoadPdfJsV1() {
+  const pdfJs = await import(
+    "pdfjs-dist/legacy/build/pdf.mjs"
+  );
+
+  return {
+    getDocument(options) {
+      return pdfJs.getDocument({
+        ...options,
+        cMapUrl: pdfJsAssetUrlV1("cmaps"),
+        cMapPacked: true,
+        standardFontDataUrl:
+          pdfJsAssetUrlV1("standard_fonts"),
+        wasmUrl: pdfJsAssetUrlV1("wasm")
+      });
+    }
+  };
 }
 
 function createIrisPdfJsTextExtractorV1({
@@ -56,5 +83,6 @@ function createIrisPdfJsTextExtractorV1({
 
 module.exports = {
   createIrisPdfJsTextExtractorV1,
-  defaultLoadPdfJsV1
+  defaultLoadPdfJsV1,
+  pdfJsAssetUrlV1
 };
