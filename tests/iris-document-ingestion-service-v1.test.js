@@ -198,7 +198,10 @@ test("ingesta en pendiente dentro de una transacción y por lote", async () => {
     /^iris\/documents\/v1\/family_family-id\/doc_document-id\/[a-f0-9]{64}\/original\.pdf$/
   );
   assert.equal(h.storageCalls[0].contentType, "application/pdf");
-  assert.equal(h.storageCalls[0].bytes, requestV1().file.bytes);
+  assert.deepEqual(
+    h.storageCalls[0].bytes,
+    requestV1().file.bytes
+  );
 
   const sql = h.calls.map(item => item.text);
   assert.ok(sql.includes("BEGIN"));
