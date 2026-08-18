@@ -151,6 +151,47 @@ function isValidClientIp(value) {
   return isIP(value.trim()) !== 0;
 }
 
+function anonymizeIpv4(ip) {
+  const octets = ip.split(".");
+  octets[3] = "0";
+  return octets.join(".");
+}
+
+function anonymizeClientIp(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const ip = value.trim();
+  const version = isIP(ip);
+
+  if (version === 4) {
+    return anonymizeIpv4(ip);
+  }
+
+  if (version !== 6) {
+    return null;
+  }
+
+  // Conserva el formato IPv4-mapped, pero elimina el último octeto.
+  const embeddedIpv4 = ip.match(/^(.*:)(\d+\.\d+\.\d+\.\d+)$/);
+  if (embeddedIpv4 && isIP(embeddedIpv4[2]) === 4) {
+    return `${embeddedIpv4[1]}${anonymizeIpv4(embeddedIpv4[2])}`;
+  }
+
+  // Expande IPv6 y conserva únicamente los primeros 64 bits.
+  const address = ip.split("%", 1)[0].toLowerCase();
+  const halves = address.split("::");
+  const left = halves[0] ? halves[0].split(":") : [];
+  const right = halves.length > 1 && halves[1] ? halves[1].split(":") : [];
+  const omitted = 8 - left.length - right.length;
+  const hextets = halves.length > 1
+    ? [...left, ...Array(omitted).fill("0"), ...right]
+    : left;
+
+  return [...hextets.slice(0, 4), "0", "0", "0", "0"].join(":");
+}
+
 // ============================================================
 // SANITIZACIÓN DE ERRORES PARA LOGGING
 // ============================================================
@@ -305,7 +346,7 @@ function createPilotIdentityStoreV0({
             ) VALUES (
               $1, 'create_registration_invitation', NULL, NULL, $2::inet, CURRENT_TIMESTAMP
             )`,
-            [adminKeyId, clientIp]
+            [adminKeyId, anonymizeClientIp(clientIp)]
           );
 
           return {
@@ -389,7 +430,7 @@ function createPilotIdentityStoreV0({
             ) VALUES (
               $1, 'create_recovery_invitation', $2, NULL, $3::inet, CURRENT_TIMESTAMP
             )`,
-            [adminKeyId, userId, clientIp]
+            [adminKeyId, userId, anonymizeClientIp(clientIp)]
           );
 
           return {
@@ -886,7 +927,7 @@ function createPilotIdentityStoreV0({
           ) VALUES (
             $1, 'revoke_all_credentials', $2, NULL, $3::inet, CURRENT_TIMESTAMP
           )`,
-          [adminKeyId, userId, clientIp]
+          [adminKeyId, userId, anonymizeClientIp(clientIp)]
         );
 
         return { revokedCount: revokeRes.rowCount };
@@ -990,7 +1031,13 @@ function createPilotIdentityStoreV0({
             $1, $2, $3, $4::jsonb, $5::inet, CURRENT_TIMESTAMP
           )
           RETURNING id`,
-          [adminKeyId, action, targetUserId, details !== null ? JSON.stringify(details) : null, clientIp]
+          [
+            adminKeyId,
+            action,
+            targetUserId,
+            details !== null ? JSON.stringify(details) : null,
+            anonymizeClientIp(clientIp)
+          ]
         );
 
         return { auditId: Number(res.rows[0].id) };

@@ -1910,17 +1910,18 @@ describe("Administracion", () => {
     assert.ok(result.invitation.code);
   });
 
-  it("createRegistrationInvitation acepta clientIp valido", async () => {
+  it("createRegistrationInvitation anonimiza IPv4 antes de persistir", async () => {
     const { store, pool } = makeStore();
 
     const result = await store.createRegistrationInvitation({
       adminKeyId: "admin1",
-      clientIp: "192.168.1.0"
+      clientIp: "192.168.1.87"
     });
     assert.strictEqual(result.ok, true);
 
     const audits = Array.from(pool.audit.values());
     assert.strictEqual(audits[0].client_ip, "192.168.1.0");
+    assert.notStrictEqual(audits[0].client_ip, "192.168.1.87");
   });
 
   it("createRegistrationInvitation rechaza clientIp invalido", async () => {
@@ -2205,6 +2206,47 @@ describe("recordAdminAudit", () => {
     });
 
     assert.strictEqual(result.ok, true);
+  });
+
+  it("anonimiza IPv4 en recordAdminAudit", async () => {
+    const { store, pool } = makeStore();
+
+    await store.recordAdminAudit({
+      adminKeyId: "admin1",
+      action: "test",
+      clientIp: "203.0.113.45"
+    });
+
+    const [audit] = Array.from(pool.audit.values());
+    assert.strictEqual(audit.client_ip, "203.0.113.0");
+    assert.notStrictEqual(audit.client_ip, "203.0.113.45");
+  });
+
+  it("anonimiza IPv6 conservando solo el prefijo de 64 bits", async () => {
+    const { store, pool } = makeStore();
+
+    await store.recordAdminAudit({
+      adminKeyId: "admin1",
+      action: "test",
+      clientIp: "2001:db8:abcd:12:3456:789a:bcde:f012"
+    });
+
+    const [audit] = Array.from(pool.audit.values());
+    assert.strictEqual(audit.client_ip, "2001:db8:abcd:12:0:0:0:0");
+    assert.ok(!audit.client_ip.includes("3456"));
+  });
+
+  it("anonimiza IPv4 embebida en IPv6", async () => {
+    const { store, pool } = makeStore();
+
+    await store.recordAdminAudit({
+      adminKeyId: "admin1",
+      action: "test",
+      clientIp: "::ffff:203.0.113.45"
+    });
+
+    const [audit] = Array.from(pool.audit.values());
+    assert.strictEqual(audit.client_ip, "::ffff:203.0.113.0");
   });
 });
 
