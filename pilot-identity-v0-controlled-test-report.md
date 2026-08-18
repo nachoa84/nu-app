@@ -1,8 +1,8 @@
 # Informe de prueba controlada — Identidad Piloto V0
 
-**Fecha:** 18 de agosto de 2026  
-**Repositorio:** `nachoa84/nu-app`  
-**Base verificada:** `57154b916bbc413a57aae04bc7046e2d34dd736c`  
+**Fecha:** 18 de agosto de 2026
+**Repositorio:** `nachoa84/nu-app`
+**Base verificada:** `57154b916bbc413a57aae04bc7046e2d34dd736c`
 **Alcance:** validación operativa de Identidad Piloto V0 incorporada por V130.
 
 ## 1. Reglas de seguridad aplicadas
