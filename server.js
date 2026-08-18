@@ -28,6 +28,15 @@ const {
 const {
   consumeSharedRateLimitV115
 } = require("./shared-rate-limit-v115");
+const {
+  createPilotCryptoV0
+} = require("./pilot-crypto-v0");
+const {
+  createPilotIdentityStoreV0
+} = require("./pilot-identity-store-v0");
+const {
+  createPilotIdentityRoutesV0
+} = require("./pilot-identity-routes-v0");
 
 const app = express();
 
@@ -96,6 +105,30 @@ const DEMO_ROUTES_ENABLED =
     process.env.ENABLE_DEMO_ROUTES ||
     ""
   ).toLowerCase() === "true";
+
+const PILOT_ENABLED =
+  String(
+    process.env.PILOT_ENABLED ||
+    ""
+  ).toLowerCase() === "true";
+
+const PILOT_ADMIN_ROUTES_ENABLED =
+  String(
+    process.env.PILOT_ADMIN_ROUTES_ENABLED ||
+    ""
+  ).toLowerCase() === "true";
+
+const PILOT_INVITATION_HMAC_KEY =
+  process.env.PILOT_INVITATION_HMAC_KEY || "";
+
+const PILOT_TOKEN_HMAC_KEY =
+  process.env.PILOT_TOKEN_HMAC_KEY || "";
+
+const PILOT_ADMIN_TOKEN =
+  process.env.PILOT_ADMIN_TOKEN || "";
+
+const PILOT_ADMIN_KEY_ID =
+  process.env.PILOT_ADMIN_KEY_ID || "";
 
 const EXTRA_ALLOWED_ORIGINS =
   new Set(
@@ -335,10 +368,70 @@ const cronLimiter =
       "Demasiadas ejecuciones del cron."
   });
 
+// Gatekeepers de Identidad Piloto V0 (deben responder 404 antes de Origin check si están desactivados)
+app.use(
+  "/api/pilot",
+  (req, res, next) => {
+    if (!PILOT_ENABLED) {
+      return res.status(404).json({ ok: false, error: "Ruta no disponible." });
+    }
+    next();
+  }
+);
+
+app.use(
+  "/api/pilot-admin",
+  (req, res, next) => {
+    if (!PILOT_ADMIN_ROUTES_ENABLED) {
+      return res.status(404).json({ ok: false, error: "Ruta no disponible." });
+    }
+    next();
+  }
+);
+
 app.use(
   "/api",
   assertAllowedWriteOrigin
 );
+
+// Inicialización condicional de Identidad Piloto V0
+let pilotRoutes = null;
+if (PILOT_ENABLED || PILOT_ADMIN_ROUTES_ENABLED) {
+  try {
+    const pilotCrypto = createPilotCryptoV0({
+      invitationHmacKey: PILOT_INVITATION_HMAC_KEY,
+      tokenHmacKey: PILOT_TOKEN_HMAC_KEY
+    });
+
+    const pilotStore = createPilotIdentityStoreV0({
+      pool,
+      crypto: pilotCrypto,
+      logError: console.error,
+      generateUserId: () => crypto.randomUUID(),
+      normalizeProfile
+    });
+
+    pilotRoutes = createPilotIdentityRoutesV0({
+      express,
+      store: pilotStore,
+      nodeCrypto: crypto,
+      pool,
+      consumeSharedRateLimit: consumeSharedRateLimitV115,
+      pilotEnabled: PILOT_ENABLED,
+      pilotAdminRoutesEnabled: PILOT_ADMIN_ROUTES_ENABLED,
+      pilotAdminToken: PILOT_ADMIN_TOKEN,
+      pilotAdminKeyId: PILOT_ADMIN_KEY_ID,
+      logError: console.error
+    });
+  } catch (error) {
+    console.error("Error al inicializar la Identidad Piloto V0:", error.message);
+    throw error;
+  }
+}
+
+if (pilotRoutes) {
+  app.use(pilotRoutes);
+}
 
 app.use(
   "/api",
