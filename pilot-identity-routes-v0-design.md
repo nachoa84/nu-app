@@ -46,7 +46,7 @@ Los gatekeepers de rutas y los handlers utilizan exclusivamente estos valores ya
   - `POST /api/pilot/register` y `POST /api/pilot/recover` son públicos (protegidos por el código de invitación en el request body y rate limiting por IP).
 - **Endpoints de Sesión de Usuario**:
   - `POST /api/pilot/renew` y `GET /api/pilot/me` requieren la cabecera HTTP `Authorization: Bearer <token>`.
-  - El token es validado exclusivamente mediante `store.authenticateCredential({ token })` (o `store.renewCredential({ currentToken })`).
+  - La autenticación de la credencial se realiza exclusivamente mediante `store.authenticateCredential({ token })`.
 - **Rutas Administrativas**:
   - Exigen la cabecera HTTP `X-Pilot-Admin-Token`.
   - Comparación en tiempo constante: Se calcula el hash SHA-256 (usando `node:crypto`) de la cabecera provista y de `pilotAdminToken`, y se comparan con `crypto.timingSafeEqual`.
@@ -257,38 +257,65 @@ Se aplica una validación estricta con **allowlists exactas** por endpoint. Cual
 
 ---
 
-## 7. Rate Limiting, Claves de Aislamiento y Orden de Ejecución
+## 7. Rate Limiting, Claves de Aislamiento y Secuencia Exacta de Ejecución
 
 Se reutiliza la función existente `consumeSharedRateLimitV115` de `shared-rate-limit-v115.js` con su firma real:
 `consumeSharedRateLimitV115(pool, { namespace, key, windowMs, max, now = Date.now() })`.
 
-### Orden Crítico de Ejecución en `renew` y `me` (Protección contra DDoS a PostgreSQL):
-Para evitar que clientes no autenticados realicen consultas ilimitadas a la base de datos, las solicitudes a `/api/pilot/renew` y `/api/pilot/me` deben seguir estrictamente este orden secuencial:
+### 7.1. Secuencia Exacta para `POST /api/pilot/renew`
 
-1. **Validación Superficial de Cabecera**: Verificar formato sintáctico de `Authorization: Bearer <token>` (prefijo `npt_`, longitud exacta, caracteres válidos). Si es inválido, rechazar inmediatamente con HTTP 401.
-2. **Consumo de Rate Limit por IP (ANTES de tocar la DB)**:
-   - Se consume el rate limit con clave `ip:<clientIp>`.
-   - Si se supera el límite por IP, responder HTTP 429 sin consultar la base de datos.
-3. **Autenticación / Consulta en la DB**:
-   - Se ejecuta `store.authenticateCredential` o `store.renewCredential`.
-   - Si la sesión es inválida, expirada o revocada, el handler responde HTTP 401 (el intento ya fue contabilizado en el límite por IP).
+Para evitar revocar la credencial activa prematuramente en caso de que la solicitud sea bloqueada posteriormente por el rate limit por usuario, `POST /api/pilot/renew` sigue de forma estricta la siguiente secuencia:
+
+1. **Validación Superficial de Cabecera**:
+   - Verificar formato sintáctico de `Authorization: Bearer <token>` (prefijo `npt_`, longitud exacta de 47 caracteres, juego de caracteres Base64URL válido).
+   - Si la cabecera es nula, malformada o inválida sintácticamente, responder HTTP 401 inmediatamente (`"La sesión no es válida o ha expirado."`).
+2. **Consumo de Rate Limit por IP (ANTES de consultar PostgreSQL)**:
+   - Consumir rate limit en namespace `"pilot-renew-ip"` con clave `ip:<clientIp>` (máximo 20 req / 10 min).
+   - Si se supera el límite por IP, responder HTTP 429 (`Retry-After`) **sin realizar ninguna consulta a PostgreSQL**.
+3. **Autenticación en PostgreSQL sin Revocar**:
+   - Ejecutar exclusivamente `store.authenticateCredential({ token })` para validar la sesión y obtener `userId`.
+   - Si la credencial no existe, está expirada o revocado, responder HTTP 401 (`"La sesión no es válida o ha expirado."`).
 4. **Consumo de Rate Limit por Usuario**:
-   - Una vez autenticado el `userId`, se consume opcionalmente el límite del namespace con clave `user:<userId>`.
-   - Si se supera, responder HTTP 429.
-5. **Ejecución de la Operación Principal**.
+   - Consumir rate limit en namespace `"pilot-renew-user"` con clave `user:<userId>` (máximo 20 req / 10 min).
+   - Si se supera el límite por usuario, responder HTTP 429 (`Retry-After`). La credencial actual sigue intacta y válida.
+5. **Renovación de Credencial**:
+   - Ejecutar `store.renewCredential({ currentToken: token })`. Esto revoca atómicamente el token actual y genera la nueva credencial con 30 días de vigencia en PostgreSQL.
+6. **Retorno de Respuesta**:
+   - Responder HTTP 200 OK con la nueva credencial y su fecha de expiración.
 
-### Resumen de Namespaces y LÍmites:
-1. **`POST /api/pilot/register`**:
-   - **Namespace**: `"pilot-register"` | **Límite**: 10 req / 10 min | **Clave**: `ip:<clientIp>`
-2. **`POST /api/pilot/recover`**:
-   - **Namespace**: `"pilot-recover"` | **Límite**: 5 req / 10 min | **Clave**: `ip:<clientIp>`
-3. **`POST /api/pilot/renew`**:
-   - **Namespace**: `"pilot-renew-ip"` / `"pilot-renew-user"` | **Límite**: 20 req / 10 min
-4. **`GET /api/pilot/me`**:
-   - **Namespace**: `"pilot-me-ip"` / `"pilot-me-user"` | **Límite**: 60 req / 10 min
-5. **Rutas Administrativas `/api/pilot-admin/*`**:
-   - **Namespace**: `"pilot-admin"` | **Límite**: 10 req / 10 min | **Clave**: `admin:<clientIp>`
-   - **Ejecución**: El rate limit por IP se consume **antes** de validar `X-Pilot-Admin-Token`.
+### 7.2. Secuencia Exacta para `GET /api/pilot/me`
+
+1. **Validación Superficial de Cabecera**:
+   - Verificar formato sintáctico de `Authorization: Bearer <token>`. Si es inválido, responder HTTP 401.
+2. **Consumo de Rate Limit por IP (ANTES de consultar PostgreSQL)**:
+   - Consumir rate limit en namespace `"pilot-me-ip"` con clave `ip:<clientIp>` (máximo 60 req / 10 min).
+   - Si se supera, responder HTTP 429 sin consultar PostgreSQL.
+3. **Autenticación en PostgreSQL**:
+   - Ejecutar `store.authenticateCredential({ token })` para validar la credencial y obtener `userId`.
+   - Si falla, responder HTTP 401.
+4. **Consumo de Rate Limit por Usuario**:
+   - Consumir rate limit en namespace `"pilot-me-user"` con clave `user:<userId>` (máximo 60 req / 10 min).
+   - Si se supera, responder HTTP 429.
+5. **Consulta de Expiración**:
+   - Ejecutar `store.getCredentialExpiry({ token })`.
+6. **Construcción y Envío de Respuesta**:
+   - Responder HTTP 200 OK con `userId` y datos de vigencia de la sesión (`expiresAt`, `daysUntilExpiry`).
+
+### 7.3. Secuencia para Endpoints Públicos y Administrativos
+
+- **`POST /api/pilot/register`**:
+  1. Validar body y allowlist.
+  2. Consumir rate limit en namespace `"pilot-register"` con clave `ip:<clientIp>` (10 req / 10 min).
+  3. Ejecutar `store.registerUser`.
+- **`POST /api/pilot/recover`**:
+  1. Validar body y allowlist.
+  2. Consumir rate limit en namespace `"pilot-recover"` con clave `ip:<clientIp>` (5 req / 10 min).
+  3. Ejecutar `store.recoverAccess`.
+- **Rutas Administrativas `/api/pilot-admin/*`**:
+  1. Consumir rate limit en namespace `"pilot-admin"` con clave `admin:<clientIp>` (10 req / 10 min) **ANTES** de verificar `X-Pilot-Admin-Token`.
+  2. Verificar `X-Pilot-Admin-Token` con `crypto.timingSafeEqual`.
+  3. Validar body y allowlist.
+  4. Ejecutar operación administrativa en el store pasando `pilotAdminKeyId`.
 
 ---
 
@@ -402,6 +429,7 @@ Se creará el archivo `pilot-identity-routes-v0.test.js` usando `node:test` y `s
 4. **Pruebas de Formato de Bearer Token y Secuencia Rate Limit**:
    - Bearer malformado, duplicado, esquema `Basic` o cadena >10KB debe ser rechazado con HTTP 401.
    - Confirmar que intentos no autenticados en `renew` y `me` consumen el rate limit por IP **antes** de consultar PostgreSQL.
+   - En `renew`, verificar que si falla el rate limit por usuario en el paso 4, la credencial actual **no** fue revocada.
 5. **Pruebas de Token Administrativo y Auditoría**:
    - `X-Pilot-Admin-Token` ausente o no coincidente retorna HTTP 401 (sin consultar la DB de auditoría).
    - Token válido ejecuta la acción y registra auditoría asociando `PILOT_ADMIN_KEY_ID`.
