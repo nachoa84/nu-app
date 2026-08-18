@@ -514,7 +514,15 @@ function createIrisDocumentIngestionServiceV1({
         }
         throw error;
       } finally {
-        client.release();
+        try {
+          client.release();
+        } catch (releaseError) {
+          emitSafeLogV1(
+            logError,
+            releaseError,
+            "release_database_client_v1"
+          );
+        }
       }
     } catch (error) {
       if (uploaded) {
