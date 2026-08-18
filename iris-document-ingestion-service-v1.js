@@ -123,7 +123,7 @@ function normalizeMetadataV1(metadata = {}) {
       metadata.versionLabel,
       "versionLabel"
     ),
-    documentFamilyKey: optionalTextV1(
+    documentFamilyKey: normalizeOptionalKeyV1(
       metadata.documentFamilyKey,
       "documentFamilyKey"
     ),
@@ -136,6 +136,20 @@ function normalizeMetadataV1(metadata = {}) {
       "effectiveUntil"
     )
   };
+}
+
+function normalizeOptionalKeyV1(value, label) {
+  const normalized = optionalTextV1(value, label, 200);
+  if (
+    normalized &&
+    !/^[a-z0-9][a-z0-9_-]{0,199}$/.test(normalized)
+  ) {
+    throw new IrisIngestionErrorV1(
+      `${label} no tiene un formato seguro.`
+    );
+  }
+
+  return normalized;
 }
 
 function normalizeOptionalDateV1(value, label) {
@@ -216,6 +230,26 @@ function safeLogV1(error, operation) {
   };
 }
 
+function emitSafeLogV1(logError, error, operation) {
+  try {
+    logError(safeLogV1(error, operation));
+  } catch {
+    // El registrador no debe alterar el resultado de la ingesta.
+  }
+}
+
+function generatedKeyV1(prefix, randomUUID) {
+  const value = randomUUID();
+  if (
+    typeof value !== "string" ||
+    !/^[a-zA-Z0-9-]{1,100}$/.test(value)
+  ) {
+    throw new IrisIngestionOperationalErrorV1();
+  }
+
+  return `${prefix}_${value}`;
+}
+
 function createIrisDocumentIngestionServiceV1({
   pool,
   objectStorage,
@@ -280,13 +314,19 @@ function createIrisDocumentIngestionServiceV1({
       .update(pdfBytes)
       .digest("hex");
 
-    const duplicate = await pool.query(
-      `SELECT document_key
-       FROM iris_documents
-       WHERE content_sha256 = $1
-       LIMIT 1`,
-      [contentSha256]
-    );
+    let duplicate;
+    try {
+      duplicate = await pool.query(
+        `SELECT document_key
+         FROM iris_documents
+         WHERE content_sha256 = $1
+         LIMIT 1`,
+        [contentSha256]
+      );
+    } catch (error) {
+      emitSafeLogV1(logError, error, "check_duplicate_pdf_v1");
+      throw new IrisIngestionOperationalErrorV1();
+    }
 
     if (duplicate.rows.length > 0) {
       throw new IrisIngestionErrorV1(
@@ -298,15 +338,23 @@ function createIrisDocumentIngestionServiceV1({
     try {
       extractedText = await extractPdfText(pdfBytes);
     } catch (error) {
-      logError(safeLogV1(error, "extract_pdf_v1"));
+      emitSafeLogV1(logError, error, "extract_pdf_v1");
       throw new IrisIngestionOperationalErrorV1();
     }
 
-    const chunked = chunkDocument(extractedText);
-    const documentKey = `doc_${randomUUID()}`;
-    const documentFamilyKey =
-      normalizedMetadata.documentFamilyKey ||
-      `family_${randomUUID()}`;
+    let chunked;
+    let documentKey;
+    let documentFamilyKey;
+    try {
+      chunked = chunkDocument(extractedText);
+      documentKey = generatedKeyV1("doc", randomUUID);
+      documentFamilyKey =
+        normalizedMetadata.documentFamilyKey ||
+        generatedKeyV1("family", randomUUID);
+    } catch (error) {
+      emitSafeLogV1(logError, error, "prepare_document_v1");
+      throw new IrisIngestionOperationalErrorV1();
+    }
     const objectKey = [
       "iris",
       "documents",
@@ -473,11 +521,10 @@ function createIrisDocumentIngestionServiceV1({
         try {
           await objectStorage.deleteObject({ key: objectKey });
         } catch (cleanupError) {
-          logError(
-            safeLogV1(
-              cleanupError,
-              "cleanup_uploaded_object_v1"
-            )
+          emitSafeLogV1(
+            logError,
+            cleanupError,
+            "cleanup_uploaded_object_v1"
           );
         }
       }
@@ -489,7 +536,7 @@ function createIrisDocumentIngestionServiceV1({
         throw error;
       }
 
-      logError(safeLogV1(error, "ingest_pdf_v1"));
+      emitSafeLogV1(logError, error, "ingest_pdf_v1");
       throw new IrisIngestionOperationalErrorV1();
     }
   }
