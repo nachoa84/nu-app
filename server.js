@@ -3928,6 +3928,15 @@ function isBlockedPublicPath(requestPath) {
 
   const blockedFiles =
     new Set([
+      "/migration-pilot-identity-v0.sql",
+      "/pilot-crypto-v0.js",
+      "/pilot-crypto-v0.test.js",
+      "/pilot-identity-routes-v0-design.md",
+      "/pilot-identity-routes-v0.js",
+      "/pilot-identity-routes-v0.test.js",
+      "/pilot-identity-server-v0.test.js",
+      "/pilot-identity-store-v0.js",
+      "/pilot-identity-store-v0.test.js",
       "/server.js",
       "/package.json",
       "/package-lock.json",

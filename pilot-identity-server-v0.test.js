@@ -90,8 +90,24 @@ test("configuración incompleta falla de forma segura sin imprimir secretos", ()
   assert.match(initSection, /throw error;/);
 });
 
-test("no se ejecuta ni incluye migration-pilot-identity-v0.sql", () => {
-  assert.equal(serverSource.includes("migration-pilot-identity-v0.sql"), false, "server.js no debe referenciar ni ejecutar la migracion");
+test("la migración solo se menciona para bloquear su descarga y nunca se ejecuta", () => {
+  const blockStart =
+    serverSource.indexOf("function isBlockedPublicPath(requestPath)");
+  const staticStart =
+    serverSource.indexOf("express.static(", blockStart);
+
+  assert.notEqual(blockStart, -1, "falta isBlockedPublicPath");
+  assert.notEqual(staticStart, -1, "falta express.static");
+
+  const sourceOutsidePublicBlock =
+    serverSource.slice(0, blockStart) +
+    serverSource.slice(staticStart);
+
+  assert.equal(
+    sourceOutsidePublicBlock.includes("migration-pilot-identity-v0.sql"),
+    false,
+    "la migración no debe cargarse ni ejecutarse fuera del bloqueo público"
+  );
 });
 
 test("secretos no aparecen en logs ni respuestas", () => {
@@ -115,4 +131,37 @@ test("/api/health y rutas existentes no sufren modificaciones", () => {
   assert.match(serverSource, /app\.patch\(\s*\"\/api\/profile\/:userId\",/);
   assert.match(serverSource, /app\.post\(\s*\"\/api\/routine\/open\",/);
   assert.match(serverSource, /app\.post\(\s*\"\/api\/routine\/complete\",/);
+});
+
+
+test("archivos internos V0 quedan bloqueados para descarga pública", () => {
+  const blockStart =
+    serverSource.indexOf("function isBlockedPublicPath(requestPath)");
+  const staticStart =
+    serverSource.indexOf("express.static(", blockStart);
+
+  assert.notEqual(blockStart, -1, "falta isBlockedPublicPath");
+  assert.notEqual(staticStart, -1, "falta express.static");
+
+  const blockedSection =
+    serverSource.slice(blockStart, staticStart);
+
+  const internalFiles = [
+    "/migration-pilot-identity-v0.sql",
+    "/pilot-crypto-v0.js",
+    "/pilot-crypto-v0.test.js",
+    "/pilot-identity-routes-v0-design.md",
+    "/pilot-identity-routes-v0.js",
+    "/pilot-identity-routes-v0.test.js",
+    "/pilot-identity-server-v0.test.js",
+    "/pilot-identity-store-v0.js",
+    "/pilot-identity-store-v0.test.js"
+  ];
+
+  for (const file of internalFiles) {
+    assert.ok(
+      blockedSection.includes(JSON.stringify(file)),
+      `${file} debe estar en blockedFiles`
+    );
+  }
 });
