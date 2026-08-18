@@ -81,12 +81,13 @@ Representa la versión lógica y documental de cada fuente.
 | Columna | Tipo | Regla |
 |---|---|---|
 | `id` | `BIGSERIAL` | Clave primaria |
-| `document_key` | `TEXT` | Identificador estable generado por servidor, único |
+| `document_key` | `TEXT` | Identificador único de una versión concreta, generado por servidor |
+| `document_family_key` | `TEXT` | Identificador estable que agrupa todas las versiones de una misma fuente |
 | `title` | `TEXT` | Obligatorio |
 | `source_name` | `TEXT` | Nombre de la fuente autorizada |
 | `source_reference` | `TEXT` | Referencia verificable; no contiene credenciales |
 | `rights_holder` | `TEXT` | Titular o responsable del contenido |
-| `authorization_status` | `TEXT` | `approved` o `rejected` |
+| `authorization_status` | `TEXT` | `pending`, `approved` o `rejected`; `pending` por defecto |
 | `authorization_reference` | `TEXT` | Evidencia o referencia interna, sin secretos |
 | `language` | `TEXT` | Código normalizado, por ejemplo `es` |
 | `country` | `TEXT` | Código ISO o `GLOBAL` |
@@ -105,9 +106,12 @@ Representa la versión lógica y documental de cada fuente.
 
 Restricciones mínimas:
 
-- `document_key` único y no vacío.
-- `content_sha256` con 64 caracteres hexadecimales.
-- `authorization_status='approved'` para activar un documento.
+- `document_key`, `document_family_key`, `object_key`, `source_reference` y `rights_holder` son obligatorios y no vacíos.
+- `document_key`, `object_key` y `content_sha256` son únicos; un original idéntico no se duplica con otra etiqueta de versión.
+- La combinación `(document_family_key, version_label, language, country)` es única usando semántica `NULLS NOT DISTINCT` o expresiones `COALESCE` equivalentes.
+- Solo puede existir una versión activa y no retirada por `(document_family_key, language, country)`.
+- `content_sha256` tiene 64 caracteres hexadecimales.
+- `authorization_status='approved'` y `authorization_reference` no vacío son obligatorios para activar un documento.
 - `effective_until > effective_from` cuando ambas fechas existen.
 - `retired_at IS NOT NULL` implica `is_active=false`.
 - `object_key` nunca se devuelve al cliente.
@@ -125,9 +129,10 @@ Representa fragmentos recuperables.
 | `heading` | `TEXT` | Encabezado contextual opcional |
 | `content` | `TEXT` | Entre 1 y 2.000 caracteres |
 | `content_sha256` | `TEXT` | Integridad y deduplicación local |
+| `search_text_normalized` | `TEXT` | Copia normalizada para búsqueda; no reemplaza el contenido original |
 | `character_start` | `INTEGER` | Posición inicial en el texto normalizado |
 | `character_end` | `INTEGER` | Posición final exclusiva |
-| `search_vector` | `TSVECTOR` | Generado con configuración `simple` |
+| `search_vector` | `TSVECTOR` | Generado desde encabezado y `search_text_normalized` con configuración `simple` |
 | `created_at` | `TIMESTAMPTZ` | Reloj de PostgreSQL |
 
 Restricciones mínimas:
@@ -137,9 +142,10 @@ Restricciones mínimas:
 - Posiciones no negativas y `character_end > character_start`.
 - `content_sha256` hexadecimal de 64 caracteres.
 - La FK usa `ON DELETE RESTRICT`; el retiro es lógico.
-- El vector se genera en PostgreSQL para evitar divergencias entre procesos.
+- `search_text_normalized` se genera de forma determinista en la ingesta: minúsculas, Unicode NFKD, eliminación de marcas diacríticas y compactación de espacios. El campo `content` original no se altera.
+- El vector se genera en PostgreSQL para evitar divergencias entre procesos, ponderando el encabezado por encima del cuerpo.
 
-Se propone `to_tsvector('simple', content)` porque el corpus inicial es multilingüe. No se mezcla stemming específico por idioma hasta medir calidad con un conjunto de evaluación.
+Se propone una expresión equivalente a `setweight(to_tsvector('simple', coalesce(heading, '')), 'A') || setweight(to_tsvector('simple', search_text_normalized), 'B')`. La configuración `simple` evita mezclar stemming por idioma hasta medir calidad con un conjunto de evaluación.
 
 ### 5.3. `iris_search_aliases`
 
@@ -157,7 +163,7 @@ Normaliza términos de productos y variantes aprobadas.
 | `created_at` | `TIMESTAMPTZ` | Reloj de PostgreSQL |
 | `updated_at` | `TIMESTAMPTZ` | Reloj de PostgreSQL |
 
-La unicidad debe considerar alias, idioma y país normalizados. No se permiten alias vacíos ni destinos canónicos desconocidos.
+La unicidad debe considerar alias, idioma y país normalizados usando `NULLS NOT DISTINCT` o `COALESCE`, para que los valores opcionales no permitan duplicados. No se permiten alias vacíos ni destinos canónicos desconocidos.
 
 Alias iniciales a revisar antes de incorporar datos:
 
@@ -169,17 +175,46 @@ Alias iniciales a revisar antes de incorporar datos:
 
 La lista final se construye a partir de documentos autorizados; no se inventan claims ni equivalencias comerciales.
 
+### 5.4. `iris_document_audit`
+
+Registra cambios administrativos de contenido sin reutilizar la auditoría de Identidad Piloto.
+
+| Columna | Tipo | Regla |
+|---|---|---|
+| `id` | `BIGSERIAL` | Clave primaria |
+| `document_id` | `BIGINT` | FK opcional a `iris_documents(id)`, con `ON DELETE RESTRICT` |
+| `actor_key_id` | `TEXT` | Identificador administrativo no secreto |
+| `action` | `TEXT` | Acción allowlisted |
+| `details` | `JSONB` | Metadatos mínimos sin contenido, objetos ni credenciales |
+| `client_ip` | `INET` | IP anonimizada antes de persistir, cuando corresponda |
+| `created_at` | `TIMESTAMPTZ` | Reloj de PostgreSQL |
+
+Acciones iniciales:
+
+- `document_created`
+- `document_reviewed`
+- `document_activated`
+- `document_rejected`
+- `document_retired`
+- `document_replaced`
+
+La activación y el retiro deben ocurrir en la misma transacción que su fila de auditoría. Nunca se registra contenido completo, `object_key`, hashes, URLs firmadas ni secretos.
+
 ## 6. Índices
 
 La migración futura deberá crear, como mínimo:
 
 - Índice único de `iris_documents(document_key)`.
-- Índice único de `iris_documents(content_sha256, version_label)`.
+- Índice único de `iris_documents(object_key)`.
+- Índice único de `iris_documents(content_sha256)`.
+- Índice único de versión con semántica `NULLS NOT DISTINCT` para `(document_family_key, version_label, language, country)`.
+- Índice único parcial para una sola versión activa por `(document_family_key, language, country)`.
 - Índice de filtros activos por `(language, country, category, product_slug)` con condición `is_active=true AND retired_at IS NULL`.
 - Índice de vigencia por `effective_from` y `effective_until`.
 - Índice GIN sobre `iris_document_chunks(search_vector)`.
 - Índice de `iris_document_chunks(document_id, chunk_index)`.
-- Índice único normalizado para aliases activos.
+- Índice único normalizado para aliases activos con semántica segura para valores nulos.
+- Índices de auditoría por `created_at`, `action` y `document_id`.
 
 No se instala ninguna extensión PostgreSQL en V1.
 
@@ -190,7 +225,7 @@ No se instala ninguna extensión PostgreSQL en V1.
 Los objetos de Iris deberán usar un prefijo dedicado, sin reutilizar ni renombrar objetos existentes:
 
 ```text
-iris/documents/v1/<document_key>/<content_sha256>/original
+iris/documents/v1/<document_family_key>/<document_key>/<content_sha256>/original
 ```
 
 ### 7.2. Privacidad
@@ -219,14 +254,15 @@ Antes de persistir:
 
 Algoritmo determinista propuesto:
 
-1. Normalizar saltos de línea y Unicode sin alterar el significado.
+1. Normalizar saltos de línea del contenido original sin eliminar acentos ni alterar el significado.
 2. Separar por títulos, párrafos y listas cuando sea posible.
 3. Construir fragmentos de máximo 2.000 caracteres.
 4. Conservar hasta 200 caracteres de solapamiento con el fragmento anterior.
 5. Evitar cortar palabras salvo que una unidad individual exceda el límite.
 6. Registrar posiciones en el texto normalizado.
-7. Calcular SHA-256 de cada fragmento.
-8. Repetir el proceso produce exactamente los mismos fragmentos.
+7. Calcular SHA-256 de cada fragmento original.
+8. Generar `search_text_normalized` mediante minúsculas, Unicode NFKD, eliminación de marcas diacríticas y compactación de espacios.
+9. Repetir el proceso produce exactamente los mismos fragmentos, posiciones, hashes y texto de búsqueda.
 
 El solapamiento real puede ser menor en límites naturales. Nunca puede superar 200 caracteres ni elevar el fragmento por encima de 2.000.
 
@@ -270,8 +306,9 @@ Solo se consideran documentos que cumplan simultáneamente:
 
 ### 9.3. Consulta
 
+- Normalizar la consulta con la misma función usada para `search_text_normalized`.
 - Resolver aliases antes de construir la consulta FTS.
-- Usar `websearch_to_tsquery('simple', ...)` con parámetros SQL.
+- Usar `websearch_to_tsquery('simple', normalizedQuery)` con parámetros SQL.
 - Nunca concatenar texto del usuario en SQL.
 - Ordenar por coincidencia de alias exacto, país exacto, producto, `ts_rank_cd`, versión vigente y orden estable por ID.
 - Limitar resultados después de aplicar todos los filtros.
@@ -284,6 +321,7 @@ Cada resultado interno contiene:
 ```javascript
 {
   documentKey,
+  documentFamilyKey,
   title,
   sourceName,
   sourceReference,
@@ -325,7 +363,7 @@ V1 no expone ingesta pública. La implementación futura debe separar:
 6. Revisión humana.
 7. Activación explícita.
 
-No se activa un documento en la misma operación que lo carga. La activación requiere una acción administrativa posterior y auditable.
+No se activa un documento en la misma operación que lo carga. La activación requiere una acción administrativa posterior y auditable. La operación debe bloquear la familia documental dentro de la transacción para evitar dos versiones activas concurrentes.
 
 ## 12. Seguridad
 
@@ -377,6 +415,8 @@ No registrar preguntas completas, fragmentos recuperados, IP legible, tokens ni 
 - Límite de 2.000 caracteres.
 - Solapamiento máximo de 200.
 - Unicode, títulos, listas y párrafos.
+- Normalización NFKD, acentos y equivalencia entre consulta y `search_text_normalized`.
+- El contenido original conserva sus acentos y caracteres.
 - Unidad individual mayor al límite.
 - Determinismo e integridad SHA-256.
 - Texto vacío y entradas malformadas.
@@ -389,10 +429,13 @@ No registrar preguntas completas, fragmentos recuperados, IP legible, tokens ni 
 - Preferencia de país exacto sobre `GLOBAL`.
 - Categoría y producto.
 - Vigencia, versión, activo y retirado.
+- Una sola versión activa por familia, idioma y país, incluso bajo concurrencia.
 - Ranking estable.
 - Límite de resultados.
 - Sin resultados y fallas de base de datos.
 - Ninguna exposición de `object_key`.
+- Auditoría atómica de creación, revisión, activación, rechazo, reemplazo y retiro.
+- IP administrativa anonimizada cuando corresponda.
 
 ### 15.4. No regresión
 
@@ -446,3 +489,14 @@ Antes de implementar:
 5. Responsable y evidencia de autorización.
 6. Política de versiones y retiro.
 7. Conjunto de preguntas para evaluar precisión.
+
+Valores iniciales recomendados para la primera implementación:
+
+- Idioma: español.
+- Países: `AR` y `GLOBAL`.
+- Formato: `application/pdf` únicamente.
+- Tamaño máximo: 15 MiB por original.
+- Estado inicial: `pending` e inactivo.
+- Activación: manual, con evidencia de autorización y auditoría atómica.
+- Versionado: una sola versión activa por familia, idioma y país.
+- Evaluación: conjunto cerrado de preguntas aprobado antes de cualquier activación para usuarios.
