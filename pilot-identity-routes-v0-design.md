@@ -27,8 +27,21 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
 
 ---
 
-## 3. Autenticación, Claves y Secretos
+## 3. Autenticación, Claves y Configuración Normalizada
 
+### 3.1. Normalización de Variables de Configuración
+La configuración se evalúa y normaliza **una sola vez** al instanciar la capa de rutas:
+- `pilotEnabled`: booleano (`true` o `false`).
+- `pilotAdminRoutesEnabled`: booleano (`true` o `false`).
+- `pilotAdminToken`: cadena de texto normalizada (`trim()`).
+- `pilotAdminKeyId`: cadena de texto normalizada (`trim()`).
+
+**Validación Estricta de Inicialización**:
+Si `pilotAdminRoutesEnabled === true`, la inicialización **falla inmediatamente** (lanzando una excepción explícita) si `pilotAdminToken` o `pilotAdminKeyId` están ausentes, vacíos o contienen únicamente espacios. **No se utiliza ningún valor por defecto ni fallback silencioso.**
+
+Los gatekeepers de rutas y los handlers utilizan exclusivamente estos valores ya normalizados, sin realizar lecturas posteriores de `process.env`.
+
+### 3.2. Mecanismos de Autenticación
 - **Endpoints de Usuario de Registro/Recuperación**:
   - `POST /api/pilot/register` y `POST /api/pilot/recover` son públicos (protegidos por el código de invitación en el request body y rate limiting por IP).
 - **Endpoints de Sesión de Usuario**:
@@ -36,15 +49,38 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   - El token es validado exclusivamente mediante `store.authenticateCredential({ token })` (o `store.renewCredential({ currentToken })`).
 - **Rutas Administrativas**:
   - Exigen la cabecera HTTP `X-Pilot-Admin-Token`.
-  - Comparación en tiempo constante: Se calcula el hash SHA-256 (usando `node:crypto`) de la cabecera provista y de la variable `PILOT_ADMIN_TOKEN`, y se comparan usando `crypto.timingSafeEqual` para prevenir ataques de canal lateral (timing attacks).
+  - Comparación en tiempo constante: Se calcula el hash SHA-256 (usando `node:crypto`) de la cabecera provista y de `pilotAdminToken`, y se comparan con `crypto.timingSafeEqual`.
   - **Independencia Estricta**: `PILOT_ADMIN_TOKEN` es un secreto independiente que no se comparte con `ADMIN_TEST_TOKEN` ni `CRON_SECRET`.
-  - **Identificador de Auditoría (`PILOT_ADMIN_KEY_ID`)**: `PILOT_ADMIN_TOKEN` es un secreto y NUNCA se almacena, persiste ni registra. Se requiere la variable de configuración `PILOT_ADMIN_KEY_ID` (p. ej. `"admin-key-v0"`), que es un identificador público/no-secreto que se pasa como parámetro `adminKeyId` a las funciones del store (`createRegistrationInvitation`, `createRecoveryInvitation`, `revokeAllCredentials`, `recordAdminAudit`).
+  - **Identificador de Auditoría (`PILOT_ADMIN_KEY_ID`)**: `PILOT_ADMIN_TOKEN` es un secreto y NUNCA se almacena, persiste ni registra. Se requiere `PILOT_ADMIN_KEY_ID`, un identificador público/no-secreto que se pasa como parámetro `adminKeyId` al store (`createRegistrationInvitation`, `createRecoveryInvitation`, `revokeAllCredentials`, `recordAdminAudit`).
 
 ---
 
-## 4. Esquemas Mínimos de Request y Response
+## 4. Validación Estricta de Bodies (Allowlists)
 
-### 4.1. `POST /api/pilot/register`
+Se aplica una validación estricta con **allowlists exactas** por endpoint. Cualquier propiedad adicional no declarada o la inyección de `userId` en endpoints no permitidos provoca un error HTTP 400 (`"La solicitud contiene campos no permitidos."`):
+
+1. **`POST /api/pilot/register`**:
+   - Permite **únicamente** las propiedades raíz: `invitationCode` y `profile`.
+   - `profile` permite **únicamente**: `name`, `country`, `timezone`, `notificationTime`.
+   - **Rechazo de Inyección**: Si se incluye `userId` en `profile` o en la raíz del body, la solicitud se rechaza inmediatamente con HTTP 400.
+2. **`POST /api/pilot/recover`**:
+   - Permite **únicamente**: `invitationCode`.
+3. **`POST /api/pilot/renew`**:
+   - Permite **únicamente** un body vacío (`{}`). Si se envían propiedades adicionales, se rechaza con HTTP 400.
+4. **`GET /api/pilot/me`**:
+   - Endpoint HTTP GET sin body. Si el cliente envía un payload con propiedades, se rechaza con HTTP 400.
+5. **`POST /api/pilot-admin/invitations/registration`**:
+   - Permite **únicamente**: `expiresInHours` (opcional).
+6. **`POST /api/pilot-admin/invitations/recovery`**:
+   - Permite **únicamente**: `userId` y `expiresInHours` (opcional).
+7. **`POST /api/pilot-admin/credentials/revoke-all`**:
+   - Permite **únicamente**: `userId`.
+
+---
+
+## 5. Esquemas Mínimos de Request y Response
+
+### 5.1. `POST /api/pilot/register`
 - **Headers**: `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -58,7 +94,6 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
     }
   }
   ```
-  *(Nota: Si el cliente inyecta `userId` dentro del objeto `profile`, la capa HTTP o la normalización del store lo ignora completamente y utiliza el `userId` generado en el servidor).*
 - **Response Body (201 Created)**:
   ```json
   {
@@ -79,7 +114,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.2. `POST /api/pilot/recover`
+### 5.2. `POST /api/pilot/recover`
 - **Headers**: `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -105,7 +140,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.3. `POST /api/pilot/renew`
+### 5.3. `POST /api/pilot/renew`
 - **Headers**: `Authorization: Bearer npt_...`, `Content-Type: application/json`
 - **Request Body**: `{}`
 - **Response Body (200 OK)**:
@@ -119,7 +154,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.4. `GET /api/pilot/me`
+### 5.4. `GET /api/pilot/me`
 - **Headers**: `Authorization: Bearer npt_...`
 - **Response Body (200 OK)**:
   ```json
@@ -135,7 +170,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.5. `POST /api/pilot-admin/invitations/registration`
+### 5.5. `POST /api/pilot-admin/invitations/registration`
 - **Headers**: `X-Pilot-Admin-Token: <secret>`, `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -155,7 +190,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.6. `POST /api/pilot-admin/invitations/recovery`
+### 5.6. `POST /api/pilot-admin/invitations/recovery`
 - **Headers**: `X-Pilot-Admin-Token: <secret>`, `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -177,7 +212,7 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
   }
   ```
 
-### 4.7. `POST /api/pilot-admin/credentials/revoke-all`
+### 5.7. `POST /api/pilot-admin/credentials/revoke-all`
 - **Headers**: `X-Pilot-Admin-Token: <secret>`, `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -195,23 +230,23 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
 
 ---
 
-## 5. Códigos HTTP Posibles y Sanitización de Errores
+## 6. Códigos HTTP Posibles y Sanitización de Errores
 
 - **`200 OK`**: Operación completada exitosamente.
 - **`201 Created`**: Invitación o usuario registrado exitosamente.
 - **`400 Bad Request`**:
-  - Request malformado o JSON inválido.
-  - Formato de código de invitación o perfil no válido.
+  - Request malformado, JSON inválido o presencia de propiedades no permitidas/extra en el body.
+  - Inyección de `userId` en el registro.
   - Para `register` y `recover`: Cuando el store lanza `PilotStoreError`, se retorna mensaje genérico: `"La invitación no es válida o ya fue utilizada."`
   - Para endpoints administrativos: Cuando la entrada es inválida o el store lanza `PilotStoreError`, se retorna mensaje genérico: `"No se pudo completar la operación solicitada."`
 - **`401 Unauthorized`**:
-  - Para `renew` y `me`: Token de sesión ausente, malformado, o cuando el store lanza `PilotStoreError`, se retorna mensaje genérico: `"La sesión no es válida o ha expirado."`
+  - Para `renew` y `me`: Token de sesión ausente, malformado, expirado, revocado o cuando el store lanza `PilotStoreError`. Mensaje genérico: `"La sesión no es válida o ha expirado."`
   - Para `/api/pilot-admin/*`: Token `X-Pilot-Admin-Token` ausente o no coincidente. Mensaje genérico: `"Token de administración inválido."`
 - **`403 Forbidden`**:
   - Violación de validación de origen en operaciones de escritura (`assertAllowedWriteOrigin`).
 - **`404 Not Found`**:
-  - Cuando `PILOT_ENABLED=false`, todas las rutas `/api/pilot/*` responden 404 independientemente del método, origen o contenido.
-  - Cuando `PILOT_ADMIN_ROUTES_ENABLED=false`, todas las rutas `/api/pilot-admin/*` responden 404 independientemente del método, origen o contenido.
+  - Cuando `pilotEnabled === false`, todas las rutas `/api/pilot/*` responden 404 independientemente del método, origen o contenido.
+  - Cuando `pilotAdminRoutesEnabled === false`, todas las rutas `/api/pilot-admin/*` responden 404 independientemente del método, origen o contenido.
 - **`429 Too Many Requests`**: Rate limit excedido (retorna respuesta JSON con `retryAfter`).
 - **`500 Internal Server Error`**:
   - Cuando ocurre un `PilotStoreOperationalError` o cualquier excepción no controlada. Mensaje genérico: `"Error interno del servidor."`
@@ -222,36 +257,42 @@ Este documento especifica el diseño técnico corregido de la capa HTTP de Ident
 
 ---
 
-## 6. Rate Limiting y Claves de Aislamiento
+## 7. Rate Limiting, Claves de Aislamiento y Orden de Ejecución
 
 Se reutiliza la función existente `consumeSharedRateLimitV115` de `shared-rate-limit-v115.js` con su firma real:
 `consumeSharedRateLimitV115(pool, { namespace, key, windowMs, max, now = Date.now() })`.
 
+### Orden Crítico de Ejecución en `renew` y `me` (Protección contra DDoS a PostgreSQL):
+Para evitar que clientes no autenticados realicen consultas ilimitadas a la base de datos, las solicitudes a `/api/pilot/renew` y `/api/pilot/me` deben seguir estrictamente este orden secuencial:
+
+1. **Validación Superficial de Cabecera**: Verificar formato sintáctico de `Authorization: Bearer <token>` (prefijo `npt_`, longitud exacta, caracteres válidos). Si es inválido, rechazar inmediatamente con HTTP 401.
+2. **Consumo de Rate Limit por IP (ANTES de tocar la DB)**:
+   - Se consume el rate limit con clave `ip:<clientIp>`.
+   - Si se supera el límite por IP, responder HTTP 429 sin consultar la base de datos.
+3. **Autenticación / Consulta en la DB**:
+   - Se ejecuta `store.authenticateCredential` o `store.renewCredential`.
+   - Si la sesión es inválida, expirada o revocada, el handler responde HTTP 401 (el intento ya fue contabilizado en el límite por IP).
+4. **Consumo de Rate Limit por Usuario**:
+   - Una vez autenticado el `userId`, se consume opcionalmente el límite del namespace con clave `user:<userId>`.
+   - Si se supera, responder HTTP 429.
+5. **Ejecución de la Operación Principal**.
+
+### Resumen de Namespaces y LÍmites:
 1. **`POST /api/pilot/register`**:
-   - **Namespace**: `"pilot-register"`
-   - **Límite**: 10 req / 10 min.
-   - **Clave**: `ip:<clientIp>`
+   - **Namespace**: `"pilot-register"` | **Límite**: 10 req / 10 min | **Clave**: `ip:<clientIp>`
 2. **`POST /api/pilot/recover`**:
-   - **Namespace**: `"pilot-recover"`
-   - **Límite**: 5 req / 10 min.
-   - **Clave**: `ip:<clientIp>`
+   - **Namespace**: `"pilot-recover"` | **Límite**: 5 req / 10 min | **Clave**: `ip:<clientIp>`
 3. **`POST /api/pilot/renew`**:
-   - **Namespace**: `"pilot-renew"`
-   - **Límite**: 20 req / 10 min.
-   - **Clave**: Si la autenticación Bearer es exitosa, se aísla por `user:<userId>`. Si la autenticación falla o el token es inválido/ausente, se aísla por `ip:<clientIp>` para mitigar ataques de fuerza bruta por IP.
+   - **Namespace**: `"pilot-renew-ip"` / `"pilot-renew-user"` | **Límite**: 20 req / 10 min
 4. **`GET /api/pilot/me`**:
-   - **Namespace**: `"pilot-me"`
-   - **Límite**: 60 req / 10 min.
-   - **Clave**: Igual a renew, `user:<userId>` tras autenticación exitosa, fallback a `ip:<clientIp>` si falla.
+   - **Namespace**: `"pilot-me-ip"` / `"pilot-me-user"` | **Límite**: 60 req / 10 min
 5. **Rutas Administrativas `/api/pilot-admin/*`**:
-   - **Namespace**: `"pilot-admin"`
-   - **Límite**: 10 req / 10 min.
-   - **Clave**: `admin:<clientIp>`
-   - **Orden Crítico**: El rate limiter administrativo se ejecuta **antes** de evaluar el token `X-Pilot-Admin-Token` para evitar intentos ilimitados de adivinación de token.
+   - **Namespace**: `"pilot-admin"` | **Límite**: 10 req / 10 min | **Clave**: `admin:<clientIp>`
+   - **Ejecución**: El rate limit por IP se consume **antes** de validar `X-Pilot-Admin-Token`.
 
 ---
 
-## 7. Obtención y Normalización de `clientIp`
+## 8. Obtención y Normalización de `clientIp`
 
 - `server.js` ya posee la configuración `app.set("trust proxy", 1)`.
 - La capa HTTP obtiene la IP del cliente mediante `req.ip`. No se lee directamente la cabecera `X-Forwarded-For` no confiable enviada por el cliente.
@@ -259,64 +300,61 @@ Se reutiliza la función existente `consumeSharedRateLimitV115` de `shared-rate-
 
 ---
 
-## 8. Procesamiento de Body JSON y Límite de Payload
-
-- En `server.js`, el parser global `express.json({ limit: "256kb" })` ya está registrado antes de la subida de rutas.
-- Las rutas del piloto asumirán el body parseado por Express. Se aplicará además una validación estricta de esquema (descartando propiedades inesperadas o excesivamente grandes) para garantizar payloads mínimos y seguros.
-
----
-
 ## 9. Orden Real de Middlewares y Registro en `server.js`
 
-Para garantizar que `PILOT_ENABLED=false` y `PILOT_ADMIN_ROUTES_ENABLED=false` devuelvan **siempre 404** sin importar si el cliente envía cabeceras `Origin` inválidas o prohibidas, los gatekeepers de las rutas piloto deben registrarse en `server.js` **antes** del middleware `assertAllowedWriteOrigin` de `/api`.
+Para garantizar que `pilotEnabled === false` y `pilotAdminRoutesEnabled === false` devuelvan **siempre 404** sin importar si el cliente envía cabeceras `Origin` inválidas o prohibidas, los gatekeepers deben registrarse en `server.js` **antes** del middleware `assertAllowedWriteOrigin` de `/api`.
 
 Ubicación exacta propuesta en `server.js`:
 
 ```javascript
-// 1. Instanciación del router del piloto
+// 1. Normalización de banderas de forma previa y única
+const pilotEnabled = String(process.env.PILOT_ENABLED || "").toLowerCase() === "true";
+const pilotAdminRoutesEnabled = String(process.env.PILOT_ADMIN_ROUTES_ENABLED || "").toLowerCase() === "true";
+
+// 2. Instanciación del router del piloto
 const pilotRoutes = createPilotIdentityRoutesV0({
   express,
   store: pilotStore,
   nodeCrypto: crypto,
   pool,
   consumeSharedRateLimit: consumeSharedRateLimitV115,
-  pilotEnabled: String(process.env.PILOT_ENABLED || "").toLowerCase() === "true",
-  pilotAdminRoutesEnabled: String(process.env.PILOT_ADMIN_ROUTES_ENABLED || "").toLowerCase() === "true",
-  pilotAdminToken: process.env.PILOT_ADMIN_TOKEN || "",
-  pilotAdminKeyId: process.env.PILOT_ADMIN_KEY_ID || "admin-key-v0",
+  pilotEnabled,
+  pilotAdminRoutesEnabled,
+  pilotAdminToken: process.env.PILOT_ADMIN_TOKEN,
+  pilotAdminKeyId: process.env.PILOT_ADMIN_KEY_ID,
   logError: console.error,
   getClientIp: (req) => (net.isIP(req.ip || "") !== 0 ? req.ip : null)
 });
 
-// 2. Montaje de Gatekeepers de Feature Flags (404 inmediato si desactivado)
+// 3. Gatekeepers de Feature Flags (404 inmediato usando banderas ya normalizadas)
 app.use("/api/pilot", (req, res, next) => {
-  if (String(process.env.PILOT_ENABLED || "").toLowerCase() !== "true") {
+  if (!pilotEnabled) {
     return res.status(404).json({ ok: false, error: "Ruta no disponible." });
   }
   next();
 });
 
 app.use("/api/pilot-admin", (req, res, next) => {
-  if (String(process.env.PILOT_ADMIN_ROUTES_ENABLED || "").toLowerCase() !== "true") {
+  if (!pilotAdminRoutesEnabled) {
     return res.status(404).json({ ok: false, error: "Ruta no disponible." });
   }
   next();
 });
 
-// 3. Middlewares globales de /api (assertAllowedWriteOrigin, rate limiting general, etc.)
+// 4. Middlewares globales de /api (assertAllowedWriteOrigin, rate limiting general, etc.)
 app.use("/api", assertAllowedWriteOrigin);
 
-// 4. Montaje de sub-routers de la API
+// 5. Montaje del router de la API del piloto
 app.use(pilotRoutes);
 
-// 5. Servidor estático y manejador global de errores...
+// 6. Servidor estático y manejador global de errores...
 ```
 
 ---
 
 ## 10. Dependencias Exactas de `createPilotIdentityRoutesV0`
 
-La factory inyectará explícitamente las siguientes dependencias sin depender de `process.env` disperso de forma ambigua:
+La factory inyectará explícitamente las siguientes dependencias:
 
 ```javascript
 function createPilotIdentityRoutesV0({
@@ -325,14 +363,24 @@ function createPilotIdentityRoutesV0({
   nodeCrypto,               // Módulo node:crypto
   pool,                     // Pool de PostgreSQL
   consumeSharedRateLimit,   // Función consumeSharedRateLimitV115
-  pilotEnabled = false,     // Boolean o string normalizado de flag usuario
-  pilotAdminRoutesEnabled = false, // Boolean de flag administrativo
-  pilotAdminToken = "",     // Secreto de token admin
-  pilotAdminKeyId = "",     // Identificador para auditoría
+  pilotEnabled = false,     // Boolean ya normalizado
+  pilotAdminRoutesEnabled = false, // Boolean ya normalizado
+  pilotAdminToken,          // Secreto de token admin (string)
+  pilotAdminKeyId,          // Identificador para auditoría (string)
   logError,                 // Función de logging seguro
   getClientIp               // Función para extraer/validar req.ip
 }) {
-  // Configuración estricta de las rutas y retorno de router Express
+  if (pilotAdminRoutesEnabled) {
+    const token = String(pilotAdminToken || "").trim();
+    const keyId = String(pilotAdminKeyId || "").trim();
+    if (!token || !keyId) {
+      throw new Error(
+        "Falta la configuración de administración (PILOT_ADMIN_TOKEN y PILOT_ADMIN_KEY_ID son requeridos)."
+      );
+    }
+  }
+
+  // Configuración de rutas y retorno de router Express
 }
 ```
 
@@ -342,23 +390,26 @@ function createPilotIdentityRoutesV0({
 
 Se creará el archivo `pilot-identity-routes-v0.test.js` usando `node:test` y `supertest` o un servidor HTTP en memoria:
 
-1. **Pruebas de Feature Flags y Origen**:
-   - Con `PILOT_ENABLED=false`, verificar 404 en `/api/pilot/*` incluso con cabeceras `Origin` no permitidas o métodos POST.
-   - Con `PILOT_ADMIN_ROUTES_ENABLED=false`, verificar 404 en `/api/pilot-admin/*` con cualquier request.
-2. **Pruebas de Formato de Bearer Token**:
-   - Intentos con Bearer malformado, duplicado, esquema `Basic`, o cadena mayor a 10KB deben ser rechazados con HTTP 401.
-3. **Pruebas de Token Administrativo**:
-   - `X-Pilot-Admin-Token` ausente, incorrecto o de longitud excesiva debe retornar HTTP 401.
-   - Token válido ejecuta la operación y genera registro de auditoría con `PILOT_ADMIN_KEY_ID`.
-4. **Pruebas de Rate Limiting por IP**:
-   - Intentos fallidos repetidos de autenticación o de tokens inválidos provocan un bloqueo HTTP 429 con cabecera `Retry-After`.
-5. **Pruebas de Inyección y Payloads**:
-   - Requests con campos extra o `userId` inyectado en `/api/pilot/register` ignoran el `userId` inyectado y procesan el registro con el ID generado en el servidor.
+1. **Pruebas de Inicialización y Configuración**:
+   - Instanciar con `pilotAdminRoutesEnabled=true` sin `pilotAdminToken` o sin `pilotAdminKeyId` debe lanzar error explícito de inicialización.
+2. **Pruebas de Feature Flags y Origen**:
+   - Con `pilotEnabled=false`, verificar HTTP 404 en `/api/pilot/*` incluso si el cliente envía una cabecera `Origin` no permitida o un método POST.
+   - Con `pilotAdminRoutesEnabled=false`, verificar HTTP 404 en `/api/pilot-admin/*`.
+3. **Pruebas de Validación Estricta de Bodies (Allowlists)**:
+   - Request a `/api/pilot/register` con propiedades no permitidas o con `userId` inyectado en `profile` o en la raíz debe retornar HTTP 400.
+   - Request a `/api/pilot/renew` con body no vacío debe retornar HTTP 400.
+   - Requests a endpoints administrativos con campos extra deben retornar HTTP 400.
+4. **Pruebas de Formato de Bearer Token y Secuencia Rate Limit**:
+   - Bearer malformado, duplicado, esquema `Basic` o cadena >10KB debe ser rechazado con HTTP 401.
+   - Confirmar que intentos no autenticados en `renew` y `me` consumen el rate limit por IP **antes** de consultar PostgreSQL.
+5. **Pruebas de Token Administrativo y Auditoría**:
+   - `X-Pilot-Admin-Token` ausente o no coincidente retorna HTTP 401 (sin consultar la DB de auditoría).
+   - Token válido ejecuta la acción y registra auditoría asociando `PILOT_ADMIN_KEY_ID`.
 6. **Pruebas de Sanitización de Errores y Logs**:
-   - Forzar fallos de base de datos o de conexión y verificar que la respuesta HTTP sea genérica (`500 Internal Server Error`).
-   - Verificar que ningún token (`npt_`), código (`npi_`), HMAC o secreto aparezca en respuestas o en el logger.
+   - Forzar errores de base de datos o de conexión y verificar respuesta genérica (`500 Internal Server Error`).
+   - Confirmar la usencia total de tokens (`npt_`), códigos (`npi_`), HMACs o secretos en logs y respuestas.
 7. **Pruebas de No Regresión**:
-   - Confirmar que las rutas existentes (`/api/bootstrap`, `/api/state`, `/api/profile`, `/api/routine/*`, `/api/product-routines/*`, `/api/push/*`) siguen funcionando exactamente igual sin alteraciones.
+   - Confirmar que las rutas existentes (`/api/bootstrap`, `/api/state`, `/api/profile`, `/api/routine/*`, `/api/product-routines/*`, `/api/push/*`) continúan funcionando sin alteraciones.
 
 ---
 
@@ -372,6 +423,6 @@ Se creará el archivo `pilot-identity-routes-v0.test.js` usando `node:test` y `s
 ## 13. Decisiones y Riesgos Pendientes
 
 1. **Estrategia de Renovación en el Frontend**:
-   - En fases futuras, la PWA llamará periódicamente a `GET /api/pilot/me` y renovará automáticamente vía `POST /api/pilot/renew` cuando `daysUntilExpiry` sea menor a 7 días.
+   - En fases futuras, la PWA llamará a `GET /api/pilot/me` y renovará automáticamente vía `POST /api/pilot/renew` cuando `daysUntilExpiry` sea menor a 7 días.
 2. **Vinculación Progresiva de Rutas Existentes**:
    - Mantener desacopladas las rutas existentes (`/api/bootstrap`, `/api/state`) hasta que la fase de migración de frontend conecte la identidad del piloto.
