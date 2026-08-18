@@ -20,6 +20,29 @@ body {
   text-size-adjust: 100%;
 }
 
+/* NU APP · ESTABILIDAD HORIZONTAL IOS V129
+   Bloquea el desplazamiento elástico de la página completa sin
+   interferir con el scroll vertical ni los carruseles internos. */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overscroll-behavior-x: none;
+}
+
+html,
+#app {
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  html,
+  body,
+  #app {
+    overflow-x: clip;
+  }
+}
+
 body {
   min-height: 100%;
   margin: 0;
