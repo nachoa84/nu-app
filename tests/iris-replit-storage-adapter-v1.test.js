@@ -5,6 +5,7 @@ const test = require("node:test");
 
 const {
   IRIS_STORAGE_PREFIX_V1,
+  MAX_PDF_BYTES_V1,
   IrisStorageAdapterErrorV1,
   IrisStorageAdapterOperationalErrorV1,
   createIrisReplitStorageAdapterV1,
@@ -73,7 +74,10 @@ test("solo permite claves dentro del prefijo privado Iris", () => {
     "iris/documents/v1/family//doc/hash/original.pdf",
     "iris/documents/v1/family\\doc/hash/original.pdf",
     "iris/documents/v1/family/doc/hash/not-original.pdf",
-    `iris/documents/v1/family/doc/${"a".repeat(1100)}/original.pdf`
+    "iris/documents/v1/family/doc_1/not-a-hash/original.pdf",
+    "iris/documents/v1/family/doc_1/" +
+      `${"a".repeat(64)}/extra/original.pdf`,
+    `iris/documents/v1/family/doc_1/${"a".repeat(1100)}/original.pdf`
   ]) {
     assert.throws(
       () => validateIrisObjectKeyV1(key),
@@ -110,6 +114,19 @@ test("rechaza contenido vacío, no binario o de otro tipo", async () => {
     {
       key: VALID_KEY_V1,
       bytes: Buffer.alloc(0),
+      contentType: "application/pdf"
+    },
+    {
+      key: VALID_KEY_V1,
+      bytes: Buffer.from("no-es-un-pdf"),
+      contentType: "application/pdf"
+    },
+    {
+      key: VALID_KEY_V1,
+      bytes: Buffer.concat([
+        Buffer.from("%PDF-"),
+        Buffer.alloc(MAX_PDF_BYTES_V1)
+      ]),
       contentType: "application/pdf"
     },
     {
