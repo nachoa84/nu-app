@@ -1,10 +1,13 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const { fileURLToPath } = require("node:url");
 const test = require("node:test");
 
 const {
-  createIrisPdfJsTextExtractorV1
+  createIrisPdfJsTextExtractorV1,
+  pdfJsAssetUrlV1
 } = require("../iris-pdfjs-text-extractor-v1");
 
 function createSyntheticTextPdfV1(text) {
@@ -83,6 +86,23 @@ test(
     );
   }
 );
+
+test("resuelve recursos PDF.js desde el paquete fijado", () => {
+  for (const directory of [
+    "cmaps",
+    "standard_fonts",
+    "wasm"
+  ]) {
+    const url = pdfJsAssetUrlV1(directory);
+
+    assert.equal(url.startsWith("file:"), true);
+    assert.equal(url.endsWith("/"), true);
+    assert.equal(
+      fs.statSync(fileURLToPath(url)).isDirectory(),
+      true
+    );
+  }
+});
 
 test("el PDF sintético es determinista y no contiene datos externos", () => {
   const first = createSyntheticTextPdfV1("Documento de prueba");
