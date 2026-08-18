@@ -10,6 +10,11 @@ function renderDays() {
 
   if (!grid) return;
 
+  const routineHeaderKicker = document.getElementById("routineHeaderKicker");
+  if (routineHeaderKicker) {
+    routineHeaderKicker.textContent = getActiveRoutineConfig().title;
+  }
+
   grid.innerHTML = "";
   grid.className = "app-routine";
 
@@ -141,7 +146,6 @@ function renderDays() {
         hasContent &&
         (
           isPreviewMode ||
-          !isBackendManagedRoutine() ||
           day <= state.currentDay
         );
       const complete = isDayComplete(day);

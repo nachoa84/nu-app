@@ -11,6 +11,7 @@ function getRoutineState() {
     currentDay: 1,
     openedDays: {},
     nextUnlockAt: null,
+    pendingNextDay: null,
     scheduleProfileSignature: null
   };
 
@@ -21,16 +22,40 @@ function getRoutineState() {
 
     if (!saved) return fallback;
 
-    return {
+    return resolvePendingUnlockV131({
       currentDay: Number(saved.currentDay || 1),
       openedDays: saved.openedDays || {},
       nextUnlockAt: saved.nextUnlockAt || null,
+      pendingNextDay: saved.pendingNextDay || null,
       scheduleProfileSignature:
         saved.scheduleProfileSignature || null
-    };
+    });
   } catch (e) {
     return fallback;
   }
+}
+
+// NU APP · DESBLOQUEO DIFERIDO MULTIRUTINA V131
+// Reutiliza el mismo concepto y las mismas funciones que ya usaba Collagen
+// para calcular el próximo horario habilitado (nextUnlockTimestampFromProfile,
+// basado en getScheduleProfile/zonedWallTimeToTimestamp), sin timers
+// paralelos: el avance de currentDay se resuelve de forma perezosa cada vez
+// que se lee el estado. Solo aplica a rutinas no gestionadas por backend
+// (LumiSpa, WellSpa, Galvanic); Collagen sigue avanzando exclusivamente con
+// estado confirmado por backend.
+function resolvePendingUnlockV131(state) {
+  if (isBackendManagedRoutine()) return state;
+  if (!state.nextUnlockAt || !state.pendingNextDay) return state;
+  if (Date.now() < Number(state.nextUnlockAt)) return state;
+
+  state.currentDay = Number(state.pendingNextDay);
+  state.pendingNextDay = null;
+  state.nextUnlockAt = null;
+  localStorage.setItem(
+    getRoutineStateStorageKey(),
+    JSON.stringify(state)
+  );
+  return state;
 }
 
 function saveRoutineState(state) {
@@ -313,7 +338,18 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
   const totalDays = Number(getActiveRoutineConfig()?.totalDays || 10);
   const nextDay = getNextPendingProductRoutineDayV100(routineId, totalDays);
   const state = getRoutineState();
-  state.currentDay = nextDay;
+
+  // V131: el día siguiente queda pendiente de desbloqueo hasta el próximo
+  // horario configurado (mismo concepto que Collagen), en vez de habilitarse
+  // apenas se completa el día actual.
+  if (complete && nextDay !== state.currentDay) {
+    state.pendingNextDay = nextDay;
+    state.nextUnlockAt = nextUnlockTimestampFromProfile(Date.now());
+  } else if (!complete) {
+    state.pendingNextDay = null;
+    state.nextUnlockAt = null;
+  }
+
   localStorage.setItem(`routineState:${routineId}`, JSON.stringify(state));
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();

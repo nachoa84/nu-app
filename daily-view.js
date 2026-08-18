@@ -758,6 +758,10 @@ function renderSelectedDayHeader() {
     dailyNativeDayLabel.textContent = `Día ${selectedDay} de ${TOTAL_PROGRAM_DAYS}`;
   }
 
+  if (dailyNativeRoutineTitle) {
+    dailyNativeRoutineTitle.textContent = getActiveRoutineConfig().title;
+  }
+
   if (chatTitle) chatTitle.textContent = day.title;
 
   localStorage.setItem(
@@ -807,7 +811,7 @@ function startProgressive() {
 function selectDay(day, showImmediately = false) {
   if (!days[day]) return;
 
-  if (!isPreviewMode && isBackendManagedRoutine()) {
+  if (!isPreviewMode) {
     const state = getRoutineState();
 
     if (day > state.currentDay) {
