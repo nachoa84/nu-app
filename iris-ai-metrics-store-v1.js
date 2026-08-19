@@ -20,6 +20,8 @@ const ALLOWED_METRIC_NAMES_V1 = new Set([
   "latency_ms_total"
 ]);
 
+const ALLOWED_EVENT_KEYS_V1 = new Set(["name", "value"]);
+
 class IrisAiMetricsStoreErrorV1 extends Error {
   constructor(message) {
     super(message);
@@ -41,20 +43,8 @@ function createInMemoryIrisMetricsStoreV1() {
   }
 
   function record(event = {}) {
-    const forbiddenKeys = [
-      "question",
-      "answer",
-      "prompt",
-      "content",
-      "userId",
-      "deviceId",
-      "ip",
-      "documentKey",
-      "documentFamilyKey",
-      "storageKey"
-    ];
-    for (const key of forbiddenKeys) {
-      if (Object.prototype.hasOwnProperty.call(event, key)) {
+    for (const key of Object.keys(event)) {
+      if (!ALLOWED_EVENT_KEYS_V1.has(key)) {
         throw new IrisAiMetricsStoreErrorV1("El evento contiene datos no permitidos.");
       }
     }
