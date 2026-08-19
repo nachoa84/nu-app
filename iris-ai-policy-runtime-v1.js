@@ -39,8 +39,13 @@ function createIrisAiPolicyRuntimeV1({
   const monthlyQuestionCounts = new Map();
 
   function metric(name, value = 1) {
-    if (!config.metricsEnabled) return;
-    metricsStore.record({ name, value });
+    if (!config.metricsEnabled) return false;
+    try {
+      metricsStore.record({ name, value });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   function beginQuestion({ userScope, deviceScope = null, now = new Date() } = {}) {
