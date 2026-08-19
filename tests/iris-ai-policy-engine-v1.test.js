@@ -48,8 +48,13 @@ const highRetrieval = {
   hasContradiction: false
 };
 
-test("defaults are fail-closed for provider escalation", () => {
-  const config = createIrisAiPolicyConfigV1({});
+test("defaults remain fail-closed and require explicit budget timezone", () => {
+  assert.throws(
+    () => createIrisAiPolicyConfigV1({}),
+    /Zona horaria/
+  );
+
+  const config = createIrisAiPolicyConfigV1({ IRIS_AI_BUDGET_TIMEZONE: "UTC" });
   assert.equal(config.aiEnabled, false);
   assert.equal(config.provider, "noop");
   assert.equal(config.providerEmergencyStop, true);
@@ -58,7 +63,10 @@ test("defaults are fail-closed for provider escalation", () => {
 
 test("invalid percentage is rejected", () => {
   assert.throws(
-    () => createIrisAiPolicyConfigV1({ IRIS_AI_MAX_PROVIDER_ESCALATION_PERCENT: "101" }),
+    () => createIrisAiPolicyConfigV1({
+      IRIS_AI_BUDGET_TIMEZONE: "UTC",
+      IRIS_AI_MAX_PROVIDER_ESCALATION_PERCENT: "101"
+    }),
     /Porcentaje/
   );
 });
@@ -102,13 +110,14 @@ test("high-confidence direct retrieval never needs provider", () => {
   assert.equal(result.allowProvider, false);
 });
 
-test("medium retrieval can safely fall back locally when provider is stopped", () => {
+test("medium retrieval does not become direct retrieval when provider is blocked", () => {
   const result = evaluateIrisAiPolicyV1({
     config: baseConfig({ providerEmergencyStop: true }),
     retrieval: mediumRetrieval
   });
-  assert.equal(result.decision, DECISIONS_V1.DIRECT_RETRIEVAL);
-  assert.equal(result.reason, "provider_blocked_local_fallback");
+  assert.equal(result.decision, DECISIONS_V1.INSUFFICIENT);
+  assert.equal(result.reason, "provider_emergency_stop");
+  assert.equal(result.confidence, "medium");
 });
 
 test("low-confidence retrieval remains insufficient when provider is blocked", () => {
@@ -127,32 +136,41 @@ test("low-confidence retrieval remains insufficient when provider is blocked", (
   assert.equal(result.reason, "provider_emergency_stop");
 });
 
-test("provider assisted requires atomic reservation when required", () => {
+test("provider assisted always requires prior reservation", () => {
+  const missing = evaluateIrisAiPolicyV1({
+    config: baseConfig(),
+    retrieval: mediumRetrieval
+  });
+  assert.equal(missing.decision, DECISIONS_V1.INSUFFICIENT);
+  assert.equal(missing.reason, "provider_budget_not_reserved");
+  assert.equal(missing.allowProvider, false);
+
   const blocked = evaluateIrisAiPolicyV1({
     config: baseConfig(),
     retrieval: mediumRetrieval,
-    reservationState: { required: true, reserved: false }
+    reservationState: { reserved: false }
   });
-  assert.equal(blocked.decision, DECISIONS_V1.DIRECT_RETRIEVAL);
-  assert.equal(blocked.allowProvider, false);
+  assert.equal(blocked.decision, DECISIONS_V1.INSUFFICIENT);
+  assert.equal(blocked.reason, "provider_budget_not_reserved");
 
   const allowed = evaluateIrisAiPolicyV1({
     config: baseConfig(),
     retrieval: mediumRetrieval,
-    reservationState: { required: true, reserved: true }
+    reservationState: { reserved: true }
   });
   assert.equal(allowed.decision, DECISIONS_V1.PROVIDER_ASSISTED);
   assert.equal(allowed.allowProvider, true);
 });
 
-test("daily, monthly and escalation budgets block external calls without blocking local fallback", () => {
+test("daily, monthly and escalation budgets block external calls", () => {
   for (const key of ["daily", "monthly", "escalationPercent"]) {
     const result = evaluateIrisAiPolicyV1({
       config: baseConfig(),
       retrieval: mediumRetrieval,
-      providerBudgetState: { [key]: { available: false } }
+      providerBudgetState: { [key]: { available: false } },
+      reservationState: { reserved: true }
     });
-    assert.equal(result.decision, DECISIONS_V1.DIRECT_RETRIEVAL);
+    assert.equal(result.decision, DECISIONS_V1.INSUFFICIENT);
     assert.equal(result.allowProvider, false);
   }
 });
@@ -160,7 +178,8 @@ test("daily, monthly and escalation budgets block external calls without blockin
 test("no authorized context never calls provider", () => {
   const result = evaluateIrisAiPolicyV1({
     config: baseConfig(),
-    retrieval: { authorized: false, fragmentCount: 0 }
+    retrieval: { authorized: false, fragmentCount: 0 },
+    reservationState: { reserved: true }
   });
   assert.equal(result.decision, DECISIONS_V1.INSUFFICIENT);
   assert.equal(result.reason, "no_authorized_context");
