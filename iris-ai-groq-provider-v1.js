@@ -9,6 +9,7 @@ const MAX_GROQ_CONTEXT_CHARS_V1 = 6000;
 const MAX_GROQ_QUESTION_CHARS_V1 = 500;
 const MAX_GROQ_ANSWER_CHARS_V1 = 2000;
 const MAX_GROQ_CITATIONS_V1 = 5;
+const MAX_GROQ_OUTPUT_TOKENS_V1 = 4096;
 
 class IrisAiGroqProviderErrorV1 extends IrisAiProviderErrorV1 {
   constructor(message, { code = "IRIS_GROQ_ERROR", status = null } = {}) {
@@ -26,10 +27,10 @@ function nonEmptyStringV1(value, label) {
   return value.trim();
 }
 
-function positiveIntOrNullV1(value, label) {
+function positiveIntOrNullV1(value, label, max = Number.MAX_SAFE_INTEGER) {
   if (value == null || value === "") return null;
   const number = Number(value);
-  if (!Number.isSafeInteger(number) || number <= 0) {
+  if (!Number.isSafeInteger(number) || number <= 0 || number > max) {
     throw new IrisAiGroqProviderErrorV1(`${label} inválido.`, { code: "IRIS_GROQ_CONFIG" });
   }
   return number;
@@ -86,7 +87,8 @@ function buildGroqRequestBodyV1({ question, fragments, model, maxOutputTokens = 
   }
   const safeFragments = sanitizeProviderFragmentsV1(fragments);
   const safeModel = nonEmptyStringV1(model, "model");
-  const outputLimit = positiveIntOrNullV1(maxOutputTokens, "maxOutputTokens");
+  const outputLimit = positiveIntOrNullV1(maxOutputTokens, "maxOutputTokens", MAX_GROQ_OUTPUT_TOKENS_V1);
+  const allowedRefs = safeFragments.map(fragment => fragment.ref);
 
   const body = {
     model: safeModel,
@@ -122,7 +124,7 @@ function buildGroqRequestBodyV1({ question, fragments, model, maxOutputTokens = 
               items: {
                 type: "object",
                 additionalProperties: false,
-                properties: { ref: { type: "string" } },
+                properties: { ref: { type: "string", enum: allowedRefs } },
                 required: ["ref"]
               }
             }
@@ -204,7 +206,7 @@ function createGroqIrisAiProviderV1({
 } = {}) {
   const safeApiKey = nonEmptyStringV1(apiKey, "apiKey");
   const safeModel = nonEmptyStringV1(model, "model");
-  positiveIntOrNullV1(maxOutputTokens, "maxOutputTokens");
+  positiveIntOrNullV1(maxOutputTokens, "maxOutputTokens", MAX_GROQ_OUTPUT_TOKENS_V1);
   if (typeof fetchImpl !== "function") {
     throw new IrisAiGroqProviderErrorV1("fetchImpl requerido.", { code: "IRIS_GROQ_CONFIG" });
   }
@@ -264,6 +266,7 @@ module.exports = {
   MAX_GROQ_CONTEXT_CHARS_V1,
   MAX_GROQ_FRAGMENT_CHARS_V1,
   MAX_GROQ_FRAGMENTS_V1,
+  MAX_GROQ_OUTPUT_TOKENS_V1,
   MAX_GROQ_QUESTION_CHARS_V1,
   IrisAiGroqProviderErrorV1,
   buildGroqRequestBodyV1,
