@@ -88,7 +88,7 @@ test("deterministic response wins before retrieval and provider", async () => {
   assert.equal(bundle.metricsStore.snapshot().response_deterministic, 1);
 });
 
-test("verified cache is used before retrieval when deterministic has no match", async () => {
+test("verified cache is used before retrieval when source verification is current", async () => {
   const bundle = createBundle();
   let retrievalCalls = 0;
   const localResponseEngine = createIrisAiLocalResponseEngineV1({
@@ -96,6 +96,7 @@ test("verified cache is used before retrieval when deterministic has no match", 
     verifiedCacheResolver: async () => ({
       usable: true,
       valid: true,
+      sourceVerified: true,
       answer: "Respuesta cacheada y verificada.",
       citations: [{ documentKey: "doc_internal_1", versionLabel: "v1", chunkIndex: 0 }]
     })
@@ -183,7 +184,7 @@ test("invalid verified cache entry is ignored instead of being returned", async 
   const bundle = createBundle();
   let retrievalCalls = 0;
   const localResponseEngine = createIrisAiLocalResponseEngineV1({
-    verifiedCacheResolver: async () => ({ usable: true, valid: false, answer: "Cache vencido.", citations: [] })
+    verifiedCacheResolver: async () => ({ usable: true, valid: false, sourceVerified: true, answer: "Cache vencido.", citations: [] })
   });
   const orchestrator = createIrisAiOrchestratorV1({
     retrieveDocumentChunks: async () => { retrievalCalls += 1; return []; },
@@ -196,4 +197,52 @@ test("invalid verified cache entry is ignored instead of being returned", async 
   const result = await orchestrator.answerQuestion(input());
   assert.equal(result.reason, "no_authorized_context");
   assert.ok(retrievalCalls >= 1);
+});
+
+test("cache without verified current source is ignored", async () => {
+  const bundle = createBundle();
+  let retrievalCalls = 0;
+  const localResponseEngine = createIrisAiLocalResponseEngineV1({
+    verifiedCacheResolver: async () => ({
+      usable: true,
+      valid: true,
+      sourceVerified: false,
+      answer: "Cache que no debe usarse.",
+      citations: [{ documentKey: "doc_internal_1", versionLabel: "v1", chunkIndex: 0 }]
+    })
+  });
+  const orchestrator = createIrisAiOrchestratorV1({
+    retrieveDocumentChunks: async () => { retrievalCalls += 1; return []; },
+    provider: { name: "mock", async generate() { throw new Error("provider should not run"); } },
+    env: { IRIS_AI_ENABLED: "true" },
+    policyRuntime: bundle.policyRuntime,
+    localResponseEngine
+  });
+
+  const result = await orchestrator.answerQuestion(input());
+  assert.equal(result.reason, "no_authorized_context");
+  assert.ok(retrievalCalls >= 1);
+});
+
+test("local resolver timeout fails closed without retrieval or provider", async () => {
+  const bundle = createBundle();
+  let retrievalCalls = 0;
+  let providerCalls = 0;
+  const localResponseEngine = createIrisAiLocalResponseEngineV1({
+    deterministicResolver: async () => new Promise(() => {})
+  });
+  const orchestrator = createIrisAiOrchestratorV1({
+    retrieveDocumentChunks: async () => { retrievalCalls += 1; return [fragment()]; },
+    provider: { name: "mock", async generate() { providerCalls += 1; return null; } },
+    env: { IRIS_AI_ENABLED: "true" },
+    policyRuntime: bundle.policyRuntime,
+    localResponseEngine,
+    timeoutMs: 10
+  });
+
+  const result = await orchestrator.answerQuestion(input());
+  assert.equal(result.status, "fallback");
+  assert.equal(result.reason, "local_response_timeout");
+  assert.equal(retrievalCalls, 0);
+  assert.equal(providerCalls, 0);
 });
