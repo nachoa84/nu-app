@@ -22,6 +22,13 @@ test("period keys honor configured timezone instead of server timezone", () => {
   });
 });
 
+test("usage quota requires a user daily limit", () => {
+  assert.throws(
+    () => createInMemoryIrisUsageQuotaStoreV1({ timeZone: TZ }),
+    /userDailyLimit requerido/
+  );
+});
+
 test("usage quota enforces user limit before a new consumption", () => {
   const store = createInMemoryIrisUsageQuotaStoreV1({
     timeZone: TZ,
@@ -46,6 +53,25 @@ test("usage quota enforces device limit independently", () => {
   const blocked = store.consume({ userScope: "u2", deviceScope: "d_hash", now });
   assert.equal(blocked.allowed, false);
   assert.equal(blocked.reason, "device_usage_limit_exhausted");
+});
+
+test("provider budget requires daily and monthly caps", () => {
+  assert.throws(
+    () => createInMemoryIrisProviderBudgetStoreV1({
+      timeZone: TZ,
+      monthlyLimit: 100,
+      maxEscalationPercent: 20
+    }),
+    /dailyLimit requerido/
+  );
+  assert.throws(
+    () => createInMemoryIrisProviderBudgetStoreV1({
+      timeZone: TZ,
+      dailyLimit: 10,
+      maxEscalationPercent: 20
+    }),
+    /monthlyLimit requerido/
+  );
 });
 
 test("provider reservation is fail-closed when escalation percentage is exceeded", () => {
@@ -146,16 +172,17 @@ test("metrics store accepts only aggregate allowlisted metrics", () => {
   });
 });
 
-test("metrics store rejects question, answer, user and internal identifiers", () => {
-  const forbidden = [
+test("metrics store rejects any extra field, including sensitive data under unknown names", () => {
+  const extras = [
     { question: "texto" },
     { answer: "texto" },
     { userId: "123" },
     { deviceId: "abc" },
     { documentKey: "doc_secret" },
-    { storageKey: "private/key" }
+    { storageKey: "private/key" },
+    { arbitraryMetadata: "could-be-sensitive" }
   ];
-  for (const extra of forbidden) {
+  for (const extra of extras) {
     const metrics = createInMemoryIrisMetricsStoreV1();
     assert.throws(
       () => metrics.record({ name: "questions_total", ...extra }),
