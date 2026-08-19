@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 
 const {
   GROQ_CHAT_COMPLETIONS_URL_V1,
+  MAX_GROQ_OUTPUT_TOKENS_V1,
   IrisAiGroqProviderErrorV1,
   buildGroqRequestBodyV1,
   createGroqIrisAiProviderV1,
@@ -53,6 +54,15 @@ test("Groq adapter requires explicit key, model and fetch implementation", () =>
     () => createGroqIrisAiProviderV1({ apiKey: "test-key-not-secret", model: "openai/gpt-oss-20b", fetchImpl: null }),
     IrisAiGroqProviderErrorV1
   );
+  assert.throws(
+    () => createGroqIrisAiProviderV1({
+      apiKey: "test-key-not-secret",
+      model: "openai/gpt-oss-20b",
+      maxOutputTokens: MAX_GROQ_OUTPUT_TOKENS_V1 + 1,
+      fetchImpl: async () => null
+    }),
+    error => error instanceof IrisAiGroqProviderErrorV1 && error.code === "IRIS_GROQ_CONFIG"
+  );
 });
 
 test("request body uses configured model and strict structured output", () => {
@@ -69,6 +79,10 @@ test("request body uses configured model and strict structured output", () => {
   assert.equal(body.max_completion_tokens, 400);
   assert.equal(body.response_format.type, "json_schema");
   assert.equal(body.response_format.json_schema.strict, true);
+  assert.deepEqual(
+    body.response_format.json_schema.schema.properties.citations.items.properties.ref.enum,
+    ["frag_1"]
+  );
   const serialized = JSON.stringify(body);
   assert.ok(serialized.includes("frag_1"));
   assert.ok(!serialized.includes("documentKey"));
