@@ -7,6 +7,13 @@ const {
 const {
   prepareIrisRetrievalQueriesV1
 } = require("./iris-retrieval-query-prep-v1");
+const {
+  DEFAULT_OPERATION_TIMEOUT_MS_V1,
+  containsPromptInjectionV1,
+  sanitizeRetrievedContentV1,
+  validateStrictProviderResultV1,
+  withTimeoutV1
+} = require("./iris-ai-hardening-v1");
 
 const MAX_QUESTION_LENGTH_V1 = 500;
 const MAX_FRAGMENTS_V1 = 5;
@@ -60,7 +67,8 @@ function minimalFragmentV1(fragment) {
     versionLabel: fragment.versionLabel ?? null,
     chunkIndex: Number(fragment.chunkIndex),
     title: fragment.title ?? null,
-    content: String(fragment.content || "").slice(0, MAX_FRAGMENT_CHARS_V1)
+    content: sanitizeRetrievedContentV1(fragment.content)
+      .slice(0, MAX_FRAGMENT_CHARS_V1)
   };
 }
 
@@ -89,39 +97,15 @@ function citationKeyV1(value) {
 }
 
 function validateProviderResultV1(result, context) {
-  if (!result || result.status !== "ok") {
-    return null;
-  }
-
-  if (typeof result.answer !== "string" || !result.answer.trim()) {
-    return null;
-  }
-
-  if (!Array.isArray(result.citations) || result.citations.length === 0) {
-    return null;
-  }
-
-  const allowed = new Set(context.map(citationKeyV1));
-  const citations = result.citations.filter(citation =>
-    citation && allowed.has(citationKeyV1(citation))
-  );
-
-  if (citations.length !== result.citations.length) {
-    return null;
-  }
-
-  return {
-    status: "ok",
-    answer: result.answer.trim(),
-    citations
-  };
+  return validateStrictProviderResultV1(result, context, citationKeyV1);
 }
 
 function createIrisAiOrchestratorV1({
   retrieveDocumentChunks,
   provider = createNoopIrisAiProviderV1(),
   env = process.env,
-  prepareRetrievalQueries = prepareIrisRetrievalQueriesV1
+  prepareRetrievalQueries = prepareIrisRetrievalQueriesV1,
+  timeoutMs = DEFAULT_OPERATION_TIMEOUT_MS_V1
 } = {}) {
   if (typeof retrieveDocumentChunks !== "function") {
     throw new IrisAiOrchestratorErrorV1(
@@ -150,6 +134,10 @@ function createIrisAiOrchestratorV1({
       return deterministicFallbackV1("ai_disabled");
     }
 
+    if (containsPromptInjectionV1(normalizedQuestion)) {
+      return deterministicFallbackV1("unsafe_input");
+    }
+
     let fragments = [];
     try {
       const queries = prepareRetrievalQueries({
@@ -158,22 +146,27 @@ function createIrisAiOrchestratorV1({
       });
 
       for (const query of queries) {
-        const candidateFragments = await retrieveDocumentChunks({
-          query,
-          language,
-          country,
-          category,
-          productSlug,
-          limit: MAX_FRAGMENTS_V1
-        });
+        const candidateFragments = await withTimeoutV1(
+          () => retrieveDocumentChunks({
+            query,
+            language,
+            country,
+            category,
+            productSlug,
+            limit: MAX_FRAGMENTS_V1
+          }),
+          { timeoutMs }
+        );
 
         if (Array.isArray(candidateFragments) && candidateFragments.length > 0) {
           fragments = candidateFragments;
           break;
         }
       }
-    } catch {
-      return deterministicFallbackV1("retrieval_error");
+    } catch (error) {
+      return deterministicFallbackV1(
+        error?.code === "IRIS_TIMEOUT" ? "retrieval_timeout" : "retrieval_error"
+      );
     }
 
     if (!Array.isArray(fragments) || fragments.length === 0) {
@@ -187,12 +180,18 @@ function createIrisAiOrchestratorV1({
 
     let providerResult;
     try {
-      providerResult = await provider.generate({
-        question: normalizedQuestion,
-        fragments: context
-      });
-    } catch {
-      return deterministicFallbackV1("provider_error");
+      providerResult = await withTimeoutV1(
+        signal => provider.generate({
+          question: normalizedQuestion,
+          fragments: context,
+          signal
+        }),
+        { timeoutMs }
+      );
+    } catch (error) {
+      return deterministicFallbackV1(
+        error?.code === "IRIS_TIMEOUT" ? "provider_timeout" : "provider_error"
+      );
     }
 
     return validateProviderResultV1(providerResult, context) ||
