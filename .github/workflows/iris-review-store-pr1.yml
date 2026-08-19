@@ -46,9 +46,15 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          registry-url: https://registry.npmjs.org
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies from public npm registry
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm ci
+
+      - name: Verify pg dependency
+        run: node -e "require.resolve('pg'); console.log('pg dependency available')"
 
       - name: Unit test review store
         run: node --test tests/iris-document-review-store-v1.test.js
