@@ -20,6 +20,20 @@ function requireConfigV1(config) {
   return config;
 }
 
+function createBlockedProviderV1(name, reason) {
+  return Object.freeze({
+    name,
+    async generate() {
+      return Object.freeze({
+        status: "blocked",
+        reason,
+        answer: null,
+        citations: []
+      });
+    }
+  });
+}
+
 function createConfiguredIrisAiProviderV1({
   config,
   secrets = process.env,
@@ -40,8 +54,12 @@ function createConfiguredIrisAiProviderV1({
     throw new IrisAiProviderFactoryErrorV1("provider no soportado.");
   }
 
-  if (safeConfig.aiEnabled !== true || safeConfig.providerEmergencyStop === true) {
+  if (safeConfig.aiEnabled !== true) {
     return createNoopIrisAiProviderV1();
+  }
+
+  if (safeConfig.providerEmergencyStop === true) {
+    return createBlockedProviderV1("groq", "provider_emergency_stop");
   }
 
   const model = String(safeConfig.model || "").trim();
@@ -73,5 +91,6 @@ function createConfiguredIrisAiProviderV1({
 
 module.exports = {
   IrisAiProviderFactoryErrorV1,
+  createBlockedProviderV1,
   createConfiguredIrisAiProviderV1
 };
