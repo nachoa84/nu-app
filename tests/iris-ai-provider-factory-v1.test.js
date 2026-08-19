@@ -20,19 +20,22 @@ function baseConfig(overrides = {}) {
 }
 
 test("Groq config stays noop while AI is disabled", () => {
-  const provider = createConfiguredIrisAiProviderV1({
-    config: baseConfig(),
-    secrets: {}
-  });
+  const provider = createConfiguredIrisAiProviderV1({ config: baseConfig(), secrets: {} });
   assert.equal(provider.name, "noop");
 });
 
-test("Groq config stays noop while provider emergency stop is enabled", () => {
+test("emergency stop preserves Groq identity without requiring secret or network", async () => {
+  let fetchCalls = 0;
   const provider = createConfiguredIrisAiProviderV1({
     config: baseConfig({ aiEnabled: true }),
-    secrets: {}
+    secrets: {},
+    fetchImpl: async () => { fetchCalls += 1; throw new Error("should not run"); }
   });
-  assert.equal(provider.name, "noop");
+  assert.equal(provider.name, "groq");
+  const result = await provider.generate();
+  assert.equal(result.status, "blocked");
+  assert.equal(result.reason, "provider_emergency_stop");
+  assert.equal(fetchCalls, 0);
 });
 
 test("explicit noop provider never requires Groq secret", () => {
