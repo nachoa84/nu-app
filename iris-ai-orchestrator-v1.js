@@ -4,6 +4,9 @@ const {
   assertIrisAiProviderV1,
   createNoopIrisAiProviderV1
 } = require("./iris-ai-provider-v1");
+const {
+  prepareIrisRetrievalQueriesV1
+} = require("./iris-retrieval-query-prep-v1");
 
 const MAX_QUESTION_LENGTH_V1 = 500;
 const MAX_FRAGMENTS_V1 = 5;
@@ -117,11 +120,18 @@ function validateProviderResultV1(result, context) {
 function createIrisAiOrchestratorV1({
   retrieveDocumentChunks,
   provider = createNoopIrisAiProviderV1(),
-  env = process.env
+  env = process.env,
+  prepareRetrievalQueries = prepareIrisRetrievalQueriesV1
 } = {}) {
   if (typeof retrieveDocumentChunks !== "function") {
     throw new IrisAiOrchestratorErrorV1(
       "Se requiere retrieveDocumentChunks."
+    );
+  }
+
+  if (typeof prepareRetrievalQueries !== "function") {
+    throw new IrisAiOrchestratorErrorV1(
+      "Se requiere prepareRetrievalQueries."
     );
   }
 
@@ -140,16 +150,28 @@ function createIrisAiOrchestratorV1({
       return deterministicFallbackV1("ai_disabled");
     }
 
-    let fragments;
+    let fragments = [];
     try {
-      fragments = await retrieveDocumentChunks({
-        query: normalizedQuestion,
-        language,
-        country,
-        category,
-        productSlug,
-        limit: MAX_FRAGMENTS_V1
+      const queries = prepareRetrievalQueries({
+        question: normalizedQuestion,
+        productSlug
       });
+
+      for (const query of queries) {
+        const candidateFragments = await retrieveDocumentChunks({
+          query,
+          language,
+          country,
+          category,
+          productSlug,
+          limit: MAX_FRAGMENTS_V1
+        });
+
+        if (Array.isArray(candidateFragments) && candidateFragments.length > 0) {
+          fragments = candidateFragments;
+          break;
+        }
+      }
     } catch {
       return deterministicFallbackV1("retrieval_error");
     }
