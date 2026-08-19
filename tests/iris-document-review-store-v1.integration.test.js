@@ -94,9 +94,7 @@ test(
     const actorKeyId = "iris-review-integration-actor-v1";
     const client = new Client({
       connectionString,
-      ssl: connectionString.includes("localhost")
-        ? false
-        : { rejectUnauthorized: false }
+      ssl: false
     });
 
     await client.connect();
