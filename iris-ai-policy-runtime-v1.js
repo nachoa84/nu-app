@@ -74,7 +74,6 @@ function createIrisAiPolicyRuntimeV1({
     });
 
     if (preflight.decision !== DECISIONS_V1.PROVIDER_ASSISTED || preflight.allowProvider !== true) {
-      metric("response_insufficient");
       return Object.freeze({
         allowed: false,
         reason: preflight.reason,
@@ -86,7 +85,6 @@ function createIrisAiPolicyRuntimeV1({
     const reservation = providerBudgetStore.reserve({ now, totalQuestionsInPeriod });
     if (!reservation.reserved) {
       metric("provider_quota_blocked");
-      metric("response_insufficient");
       return Object.freeze({
         allowed: false,
         reason: reservation.reason,
@@ -111,7 +109,6 @@ function createIrisAiPolicyRuntimeV1({
     if (finalDecision.decision !== DECISIONS_V1.PROVIDER_ASSISTED || finalDecision.allowProvider !== true) {
       providerBudgetStore.release(reservation.reservationId);
       metric("budget_reservations_released");
-      metric("response_insufficient");
       return Object.freeze({
         allowed: false,
         reason: finalDecision.reason,
@@ -160,6 +157,7 @@ function createIrisAiPolicyRuntimeV1({
   }
 
   return Object.freeze({
+    providerName: config.provider,
     beginQuestion,
     authorizeProviderCall,
     completeProviderCall,
