@@ -38,10 +38,10 @@ function parsePercentV1(value, fallback) {
 function createIrisAiPolicyConfigV1(env = process.env) {
   const provider = String(env.IRIS_AI_PROVIDER || "noop").trim().toLowerCase();
   const model = String(env.IRIS_AI_MODEL || "").trim();
-  const budgetTimezone = String(env.IRIS_AI_BUDGET_TIMEZONE || "UTC").trim();
+  const budgetTimezone = String(env.IRIS_AI_BUDGET_TIMEZONE || "").trim();
 
   if (!provider) throw new IrisAiPolicyConfigErrorV1("Provider vacío.");
-  if (!budgetTimezone) throw new IrisAiPolicyConfigErrorV1("Zona horaria vacía.");
+  if (!budgetTimezone) throw new IrisAiPolicyConfigErrorV1("Zona horaria de presupuesto requerida.");
 
   return Object.freeze({
     aiEnabled: parseBooleanV1(env.IRIS_AI_ENABLED, false),
