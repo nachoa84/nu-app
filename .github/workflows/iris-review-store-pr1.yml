@@ -49,9 +49,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies from public npm registry
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm ci
+        run: npm install --no-package-lock --registry=https://registry.npmjs.org/
 
       - name: Verify pg dependency
         run: node -e "require.resolve('pg'); console.log('pg dependency available')"
