@@ -7,6 +7,8 @@ const MAX_GROQ_FRAGMENTS_V1 = 5;
 const MAX_GROQ_FRAGMENT_CHARS_V1 = 2000;
 const MAX_GROQ_CONTEXT_CHARS_V1 = 6000;
 const MAX_GROQ_QUESTION_CHARS_V1 = 500;
+const MAX_GROQ_ANSWER_CHARS_V1 = 2000;
+const MAX_GROQ_CITATIONS_V1 = 5;
 
 class IrisAiGroqProviderErrorV1 extends IrisAiProviderErrorV1 {
   constructor(message, { code = "IRIS_GROQ_ERROR", status = null } = {}) {
@@ -116,7 +118,7 @@ function buildGroqRequestBodyV1({ question, fragments, model, maxOutputTokens = 
             citations: {
               type: "array",
               minItems: 1,
-              maxItems: 5,
+              maxItems: MAX_GROQ_CITATIONS_V1,
               items: {
                 type: "object",
                 additionalProperties: false,
@@ -156,15 +158,36 @@ function parseGroqCompletionV1(payload) {
   if (Object.keys(parsed).some(key => !["answer", "citations"].includes(key))) {
     throw new IrisAiGroqProviderErrorV1("Respuesta estructurada de Groq contiene campos no permitidos.", { code: "IRIS_GROQ_RESPONSE" });
   }
-  if (typeof parsed.answer !== "string" || !parsed.answer.trim() || !Array.isArray(parsed.citations)) {
+
+  const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";
+  if (!answer || answer.length > MAX_GROQ_ANSWER_CHARS_V1) {
     throw new IrisAiGroqProviderErrorV1("Respuesta estructurada de Groq incompleta.", { code: "IRIS_GROQ_RESPONSE" });
   }
+  if (!Array.isArray(parsed.citations) || parsed.citations.length === 0 || parsed.citations.length > MAX_GROQ_CITATIONS_V1) {
+    throw new IrisAiGroqProviderErrorV1("Citas de Groq inválidas.", { code: "IRIS_GROQ_RESPONSE" });
+  }
+
+  const seenRefs = new Set();
+  const citations = parsed.citations.map(citation => {
+    if (!citation || typeof citation !== "object" || Array.isArray(citation)) {
+      throw new IrisAiGroqProviderErrorV1("Cita de Groq inválida.", { code: "IRIS_GROQ_RESPONSE" });
+    }
+    if (Object.keys(citation).some(key => key !== "ref")) {
+      throw new IrisAiGroqProviderErrorV1("Cita de Groq contiene campos no permitidos.", { code: "IRIS_GROQ_RESPONSE" });
+    }
+    const ref = typeof citation.ref === "string" ? citation.ref.trim() : "";
+    if (!/^frag_[1-9][0-9]*$/.test(ref) || seenRefs.has(ref)) {
+      throw new IrisAiGroqProviderErrorV1("Cita de Groq inválida.", { code: "IRIS_GROQ_RESPONSE" });
+    }
+    seenRefs.add(ref);
+    return { ref };
+  });
 
   const usage = payload?.usage || {};
   return {
     status: "ok",
-    answer: parsed.answer.trim(),
-    citations: parsed.citations,
+    answer,
+    citations,
     usage: {
       inputTokens: Number.isSafeInteger(usage.prompt_tokens) ? usage.prompt_tokens : null,
       outputTokens: Number.isSafeInteger(usage.completion_tokens) ? usage.completion_tokens : null,
@@ -236,6 +259,8 @@ function createGroqIrisAiProviderV1({
 
 module.exports = {
   GROQ_CHAT_COMPLETIONS_URL_V1,
+  MAX_GROQ_ANSWER_CHARS_V1,
+  MAX_GROQ_CITATIONS_V1,
   MAX_GROQ_CONTEXT_CHARS_V1,
   MAX_GROQ_FRAGMENT_CHARS_V1,
   MAX_GROQ_FRAGMENTS_V1,
