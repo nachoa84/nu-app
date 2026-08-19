@@ -66,6 +66,17 @@ function createIrisAiPolicyRuntimeV1({
     });
   }
 
+  function decideLocal({ deterministicMatch = null, verifiedCacheMatch = null, retrieval = null } = {}) {
+    return evaluateIrisAiPolicyV1({
+      config,
+      deterministicMatch,
+      verifiedCacheMatch,
+      retrieval,
+      providerBudgetState: {},
+      reservationState: {}
+    });
+  }
+
   function authorizeProviderCall({ retrieval, totalQuestionsInPeriod, now = new Date() } = {}) {
     const preflight = evaluateIrisAiPolicyV1({
       config,
@@ -164,6 +175,7 @@ function createIrisAiPolicyRuntimeV1({
   return Object.freeze({
     providerName: config.provider,
     beginQuestion,
+    decideLocal,
     authorizeProviderCall,
     completeProviderCall,
     recordResponse
