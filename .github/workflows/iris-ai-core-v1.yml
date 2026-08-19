@@ -7,9 +7,12 @@ on:
       - "iris-ai-orchestrator-v1.js"
       - "iris-ai-hardening-v1.js"
       - "iris-retrieval-query-prep-v1.js"
+      - "iris-ai-policy-config-v1.js"
+      - "iris-ai-policy-engine-v1.js"
       - "tests/iris-ai-orchestrator-v1.test.js"
       - "tests/iris-ai-hardening-v1.test.js"
       - "tests/iris-retrieval-query-prep-v1.test.js"
+      - "tests/iris-ai-policy-engine-v1.test.js"
       - ".github/workflows/iris-ai-core-v1.yml"
   workflow_dispatch:
 
@@ -26,4 +29,4 @@ jobs:
         with:
           node-version: "20"
       - name: Run Iris AI core tests
-        run: node --test tests/iris-ai-orchestrator-v1.test.js tests/iris-ai-hardening-v1.test.js tests/iris-retrieval-query-prep-v1.test.js
+        run: node --test tests/iris-ai-orchestrator-v1.test.js tests/iris-ai-hardening-v1.test.js tests/iris-retrieval-query-prep-v1.test.js tests/iris-ai-policy-engine-v1.test.js
