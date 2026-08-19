@@ -37,10 +37,14 @@ function safeCitationsV1(citations = []) {
   return output;
 }
 
-function validateCandidateV1(candidate, classification, { requireValid = false } = {}) {
+function validateCandidateV1(candidate, classification, {
+  requireValid = false,
+  requireSourceVerified = false
+} = {}) {
   if (!candidate || typeof candidate !== "object") return null;
   if (candidate.usable !== true) return null;
   if (requireValid && candidate.valid !== true) return null;
+  if (requireSourceVerified && candidate.sourceVerified !== true) return null;
   const answer = safeAnswerV1(candidate.answer);
   const citations = safeCitationsV1(candidate.citations || []);
   if (!answer || !citations) return null;
@@ -49,7 +53,8 @@ function validateCandidateV1(candidate, classification, { requireValid = false }
     answer,
     citations,
     usable: true,
-    valid: requireValid ? true : candidate.valid === true
+    valid: requireValid ? true : candidate.valid === true,
+    sourceVerified: requireSourceVerified ? true : candidate.sourceVerified === true
   });
 }
 
@@ -101,7 +106,10 @@ function createIrisAiLocalResponseEngineV1({
     if (deterministic) return Object.freeze({ deterministic, verifiedCache: null });
 
     const cacheRaw = verifiedCacheResolver ? await verifiedCacheResolver(input) : null;
-    const verifiedCache = validateCandidateV1(cacheRaw, "verified_cache", { requireValid: true });
+    const verifiedCache = validateCandidateV1(cacheRaw, "verified_cache", {
+      requireValid: true,
+      requireSourceVerified: true
+    });
     return Object.freeze({ deterministic: null, verifiedCache });
   }
 
