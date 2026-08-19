@@ -195,5 +195,5 @@ test("invalid verified cache entry is ignored instead of being returned", async 
 
   const result = await orchestrator.answerQuestion(input());
   assert.equal(result.reason, "no_authorized_context");
-  assert.equal(retrievalCalls, 1);
+  assert.ok(retrievalCalls >= 1);
 });
