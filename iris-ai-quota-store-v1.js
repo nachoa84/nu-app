@@ -34,8 +34,11 @@ function periodKeysV1(now, timeZone) {
   return { day, month: `${parts.year}-${parts.month}` };
 }
 
-function assertLimitV1(value, name) {
-  if (value == null) return null;
+function assertLimitV1(value, name, { required = false } = {}) {
+  if (value == null) {
+    if (required) throw new IrisAiQuotaStoreErrorV1(`${name} requerido.`);
+    return null;
+  }
   if (!Number.isSafeInteger(value) || value < 1) {
     throw new IrisAiQuotaStoreErrorV1(`${name} inválido.`);
   }
@@ -44,7 +47,7 @@ function assertLimitV1(value, name) {
 
 function createInMemoryIrisUsageQuotaStoreV1({ timeZone, userDailyLimit, deviceDailyLimit = null } = {}) {
   const safeTimezone = assertTimezoneV1(timeZone);
-  const safeUserLimit = assertLimitV1(userDailyLimit, "userDailyLimit");
+  const safeUserLimit = assertLimitV1(userDailyLimit, "userDailyLimit", { required: true });
   const safeDeviceLimit = assertLimitV1(deviceDailyLimit, "deviceDailyLimit");
   const counts = new Map();
 
@@ -83,8 +86,8 @@ function createInMemoryIrisProviderBudgetStoreV1({
   maxEscalationPercent
 } = {}) {
   const safeTimezone = assertTimezoneV1(timeZone);
-  const safeDailyLimit = assertLimitV1(dailyLimit, "dailyLimit");
-  const safeMonthlyLimit = assertLimitV1(monthlyLimit, "monthlyLimit");
+  const safeDailyLimit = assertLimitV1(dailyLimit, "dailyLimit", { required: true });
+  const safeMonthlyLimit = assertLimitV1(monthlyLimit, "monthlyLimit", { required: true });
   if (!Number.isFinite(maxEscalationPercent) || maxEscalationPercent < 0 || maxEscalationPercent > 100) {
     throw new IrisAiQuotaStoreErrorV1("maxEscalationPercent inválido.");
   }
@@ -103,10 +106,10 @@ function createInMemoryIrisProviderBudgetStoreV1({
     const monthlyUsed = monthlyCounts.get(month) || 0;
     const nextEscalationPercent = ((monthlyUsed + 1) / totalQuestionsInPeriod) * 100;
 
-    if (safeDailyLimit != null && dailyUsed >= safeDailyLimit) {
+    if (dailyUsed >= safeDailyLimit) {
       return { reserved: false, reason: "provider_daily_budget_exhausted" };
     }
-    if (safeMonthlyLimit != null && monthlyUsed >= safeMonthlyLimit) {
+    if (monthlyUsed >= safeMonthlyLimit) {
       return { reserved: false, reason: "provider_monthly_budget_exhausted" };
     }
     if (nextEscalationPercent > maxEscalationPercent) {
