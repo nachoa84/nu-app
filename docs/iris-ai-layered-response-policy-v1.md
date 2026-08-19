@@ -15,26 +15,54 @@ El núcleo de Iris debe permanecer independiente del proveedor. Groq será el pr
 1. `IRIS_AI_ENABLED=false` por defecto.
 2. Toda exposición pública de Iris permanece desactivada por defecto.
 3. `PILOT_ENABLED=false` y `PILOT_ADMIN_ROUTES_ENABLED=false` permanecen sin cambios.
-4. Ninguna cuota agotada, error de proveedor o desactivación de IA puede afectar funciones no relacionadas de Nu App.
+4. Ninguna cuota agotada, error de proveedor o desactivación de llamadas externas puede afectar funciones no relacionadas de Nu App.
 5. No enviar a proveedores externos secretos, tokens, credenciales, datos personales, IPs, archivos completos, claves de almacenamiento, hashes internos ni datos ajenos a la consulta.
 6. Nunca asumir que recuperar un fragmento implica tener una respuesta suficientemente respaldada.
 7. Nunca inventar una respuesta cuando el material autorizado sea insuficiente.
 8. No guardar texto completo de preguntas o respuestas privadas salvo necesidad explícita y aprobada.
-9. Los límites por usuario, dispositivo y período deben aplicarse antes de cualquier escalamiento a proveedor.
-10. El interruptor general de emergencia debe poder impedir llamadas a proveedor sin afectar el resto de Iris.
+9. Los límites de uso general de Iris y los límites de escalamiento a proveedor son controles distintos y deben modelarse por separado.
+10. El interruptor general de emergencia del proveedor debe impedir llamadas externas sin desactivar las capas locales de Iris.
+11. Las cuotas globales de proveedor deben reservarse de forma atómica antes de cada llamada externa.
+12. Los períodos diarios y mensuales deben calcularse con zona horaria configurada explícitamente.
 
 ## Escala inicial
 
 Referencia del piloto:
 
 - aproximadamente 300 usuarios activos;
-- máximo inicial de 5 preguntas diarias por usuario, configurable;
+- máximo inicial de 5 preguntas diarias por usuario, configurable como límite general de uso de Iris;
 - máximo teórico de 45.000 preguntas mensuales;
 - Groq Free como primer entorno de prueba;
 - sin habilitar todavía facturación paga;
-- límites globales diarios y mensuales independientes del límite individual.
+- límites de proveedor diarios y mensuales globales independientes del límite individual de uso de Iris.
 
 Estos valores son configuración, no constantes de dominio.
+
+## Dos familias de límites
+
+### Límite de uso general de Iris
+
+Controla cuántas preguntas puede realizar un usuario o dispositivo en un período. Puede aplicarse antes de cualquier procesamiento de Iris.
+
+Ejemplo inicial:
+
+- 5 preguntas diarias por usuario;
+- límite de dispositivo configurable;
+- período calculado con zona horaria explícita.
+
+Este límite es independiente de Groq y de cualquier otro proveedor.
+
+### Presupuesto de escalamiento a proveedor
+
+Controla únicamente llamadas externas. Incluye:
+
+- cuota diaria global de provider;
+- cuota mensual global de provider;
+- porcentaje máximo de consultas que pueden escalar;
+- límites específicos del provider cuando corresponda;
+- emergency stop del provider.
+
+Agotar este presupuesto nunca debe bloquear respuestas `deterministic`, `verified_cache` o `direct_retrieval`.
 
 ## Tipos de respuesta
 
@@ -83,21 +111,24 @@ Orden obligatorio:
 
 1. validar formato y tamaño de la pregunta;
 2. aplicar protección contra prompt injection y entradas no permitidas;
-3. aplicar límites por usuario, dispositivo y período;
-4. aplicar límites globales diarios y mensuales;
-5. verificar interruptor general de emergencia y flags;
-6. normalizar consulta;
-7. intentar resolución determinística;
-8. consultar caché verificada;
-9. realizar retrieval únicamente sobre documentos Iris aprobados, activos, vigentes y autorizados;
-10. evaluar confianza y suficiencia del material recuperado;
-11. si la respuesta puede entregarse directamente, responder sin proveedor;
-12. si requiere interpretación/redacción y la política permite escalamiento, evaluar presupuesto de escalamiento;
-13. si se autoriza escalamiento, llamar al provider con contexto mínimo;
+3. aplicar límites de uso general por usuario, dispositivo y período;
+4. normalizar consulta;
+5. intentar resolución determinística;
+6. consultar caché verificada;
+7. realizar retrieval únicamente sobre documentos Iris aprobados, activos, vigentes y autorizados;
+8. evaluar confianza y suficiencia del material recuperado;
+9. si la respuesta puede entregarse directamente, responder sin proveedor;
+10. si requiere interpretación/redacción, evaluar si el provider está habilitado y si el emergency stop del provider está inactivo;
+11. evaluar presupuesto de escalamiento: cuota global diaria, mensual y porcentaje máximo;
+12. reservar atómicamente una unidad de escalamiento o presupuesto equivalente antes de la llamada externa;
+13. si la reserva es exitosa y todas las barreras se cumplen, llamar al provider con contexto mínimo;
 14. validar respuesta y citas contra el contexto recuperado;
-15. si el provider falla, devuelve 429, se agota cuota o está deshabilitado, intentar fallback seguro desde recuperación directa;
-16. si no existe fallback seguro, responder `insufficient`;
-17. registrar métricas anonimizadas.
+15. finalizar la reserva con el resultado real y métricas de uso; si la llamada no llegó a ejecutarse, liberar/reconciliar según la política definida;
+16. si el provider falla, devuelve 429, se agota cuota o está deshabilitado, intentar fallback seguro desde recuperación directa;
+17. si no existe fallback seguro, responder `insufficient`;
+18. registrar métricas anonimizadas.
+
+Los pasos de presupuesto y emergency stop del provider nunca deben impedir las capas 5, 6 y 7.
 
 ## Política de confianza
 
@@ -133,8 +164,8 @@ Entrada conceptual:
   retrieval,
   deterministicMatch,
   verifiedCacheMatch,
-  quotaState,
-  globalBudgetState,
+  usageLimitState,
+  providerBudgetState,
   escalationState,
   flags
 }
@@ -155,7 +186,7 @@ Salida conceptual:
 }
 ```
 
-`allowProvider` solo puede ser `true` cuando `decision` sea `provider_assisted` y todas las barreras estén satisfechas.
+`allowProvider` solo puede ser `true` cuando `decision` sea `provider_assisted` y todas las barreras de escalamiento estén satisfechas.
 
 Las razones deben ser códigos estables y no incluir datos privados.
 
@@ -165,21 +196,51 @@ Antes de cada llamada a provider deben cumplirse simultáneamente:
 
 - `IRIS_AI_ENABLED=true`;
 - provider habilitado por configuración;
-- emergency kill switch no activo;
+- emergency stop del provider no activo;
 - pregunta válida y segura;
 - contexto autorizado disponible;
 - la política de confianza determina que no alcanza resolución local;
-- cuota individual disponible;
-- cuota de dispositivo/período disponible;
-- cuota diaria global disponible;
-- cuota mensual global disponible;
+- cuota individual de escalamiento disponible si se configura una;
+- cuota de dispositivo/período de escalamiento disponible si se configura una;
+- cuota diaria global del provider disponible;
+- cuota mensual global del provider disponible;
 - porcentaje máximo de escalamiento no excedido;
 - provider configurado;
 - modelo configurado;
 - límites de tokens válidos;
-- timeout válido.
+- timeout válido;
+- reserva atómica de presupuesto aprobada.
 
-Si una barrera falla, no se llama al provider.
+Si una barrera falla, no se llama al provider. Las capas locales siguen disponibles salvo que el límite general de uso de Iris se haya agotado.
+
+## Reserva atómica de presupuesto
+
+Para evitar sobrepasar cuotas por concurrencia, la verificación y consumo del presupuesto de provider no pueden implementarse como operaciones separadas de tipo “leer y luego incrementar”.
+
+Se requiere un contrato equivalente a:
+
+```text
+reserve -> call -> finalize
+                -> release/reconcile
+```
+
+Propiedades mínimas:
+
+- `reserve` debe ser atómico para el período y alcance correspondientes;
+- dos solicitudes concurrentes no pueden consumir la misma unidad disponible;
+- una reserva debe tener identificador interno no expuesto al provider;
+- si la llamada no se inicia, la reserva debe liberarse o reconciliarse de forma segura;
+- si la llamada se ejecuta, `finalize` registra únicamente métricas permitidas y uso real;
+- el mecanismo debe tolerar caídas sin permitir gasto por encima del límite;
+- la implementación concreta de persistencia se diseñará en un PR separado.
+
+## Períodos y zona horaria
+
+Los límites diarios y mensuales deben utilizar una zona horaria configurada explícitamente, por ejemplo mediante una futura configuración como `IRIS_AI_BUDGET_TIMEZONE`.
+
+No usar la zona horaria implícita del servidor ni depender accidentalmente de UTC.
+
+La definición exacta de “día” y “mes” debe ser estable y testeable, incluyendo cambios de horario cuando apliquen.
 
 ## Configuración propuesta
 
@@ -189,21 +250,24 @@ Nombres conceptuales, sujetos a revisión antes de implementar:
 IRIS_AI_ENABLED=false
 IRIS_AI_PROVIDER=noop
 IRIS_AI_MODEL=
-IRIS_AI_EMERGENCY_STOP=true
+IRIS_AI_PROVIDER_EMERGENCY_STOP=true
 IRIS_AI_MAX_INPUT_TOKENS=
 IRIS_AI_MAX_OUTPUT_TOKENS=
 IRIS_AI_TIMEOUT_MS=5000
 IRIS_AI_USER_DAILY_LIMIT=5
 IRIS_AI_DEVICE_DAILY_LIMIT=
-IRIS_AI_GLOBAL_DAILY_LIMIT=
-IRIS_AI_GLOBAL_MONTHLY_LIMIT=
+IRIS_AI_PROVIDER_GLOBAL_DAILY_LIMIT=
+IRIS_AI_PROVIDER_GLOBAL_MONTHLY_LIMIT=
 IRIS_AI_MAX_PROVIDER_ESCALATION_PERCENT=
+IRIS_AI_BUDGET_TIMEZONE=
 IRIS_AI_METRICS_ENABLED=false
 ```
 
 La configuración debe validarse en un único módulo. No dispersar nombres de provider/modelo/límites por el código.
 
 El modelo concreto de Groq debe ser variable de entorno. No debe quedar fijado rígidamente en múltiples archivos.
+
+`IRIS_AI_PROVIDER_EMERGENCY_STOP=true` significa bloquear llamadas externas. No significa deshabilitar respuestas locales de Iris.
 
 ## Provider contract
 
@@ -222,13 +286,28 @@ Entrada mínima esperada:
 
 `fragments` solo puede contener contenido autorizado y metadatos públicos mínimos requeridos para citas.
 
+El provider no debe recibir `documentKey`, `documentFamilyKey` ni otros IDs internos reales. Iris debe generar una referencia pública o efímera por fragmento para la llamada y mantener el mapeo de esa referencia al identificador interno únicamente dentro del backend.
+
+Ejemplo conceptual enviado al provider:
+
+```js
+{
+  ref: "frag_1",
+  title: "Collagen Plus",
+  versionLabel: "v1",
+  content: "...fragmento autorizado..."
+}
+```
+
+El backend puede mapear después `frag_1` al documento/fragmento interno para validar y presentar la cita sin revelar identificadores privados al proveedor.
+
 Salida mínima esperada:
 
 ```js
 {
   status: "ok" | "rate_limited" | "quota_exhausted" | "error",
   answer,
-  citations,
+  citations: ["frag_1"],
   usage: {
     inputTokens,
     outputTokens
@@ -240,9 +319,10 @@ El provider adapter no decide si puede ser llamado. Esa decisión pertenece al p
 
 ## Tratamiento de errores y cuotas
 
-### Provider deshabilitado
+### Provider deshabilitado o emergency stop activo
 
-- no intentar llamada;
+- no intentar llamada externa;
+- mantener `deterministic`, `verified_cache` y retrieval operativos;
 - usar `direct_retrieval` si el contenido permite respuesta segura;
 - de lo contrario `insufficient`.
 
@@ -250,12 +330,13 @@ El provider adapter no decide si puede ser llamado. Esa decisión pertenece al p
 
 - no reintentar indefinidamente;
 - registrar métrica anonimizada;
+- reconciliar correctamente la reserva de presupuesto;
 - fallback local si existe;
 - nunca afectar otras funciones de Nu App.
 
-### Cuota diaria/mensual agotada
+### Cuota diaria/mensual de provider agotada
 
-- bloquear nuevos escalamientos;
+- bloquear nuevos escalamientos externos;
 - no generar cargos automáticos;
 - mantener capas determinísticas, caché y retrieval operativas;
 - devolver fallback local o `insufficient`.
@@ -264,6 +345,7 @@ El provider adapter no decide si puede ser llamado. Esa decisión pertenece al p
 
 - cancelar cuando sea posible;
 - no exponer errores internos;
+- reconciliar la reserva según política;
 - fallback local o `insufficient`.
 
 ## Privacidad y datos enviados al proveedor
@@ -273,7 +355,8 @@ Permitido:
 - pregunta normalizada estrictamente necesaria;
 - instrucciones mínimas del sistema;
 - fragmentos autorizados mínimos;
-- título/version/fragmento u otros metadatos públicos mínimos para citas.
+- referencias públicas/efímeras de fragmento;
+- título, versión u otros metadatos públicos mínimos necesarios para citas.
 
 Prohibido:
 
@@ -281,6 +364,7 @@ Prohibido:
 - API keys;
 - credenciales;
 - direcciones IP;
+- `documentKey` y `documentFamilyKey` internos;
 - IDs internos innecesarios;
 - claves de Object Storage;
 - hashes internos;
@@ -320,6 +404,7 @@ Registrar de forma anonimizada y agregada:
 - errores del provider;
 - 429;
 - bloqueos por cuota;
+- reservas de presupuesto creadas/finalizadas/reconciliadas;
 - latencia por capa;
 - valoración de utilidad cuando exista mecanismo aprobado.
 
@@ -351,14 +436,18 @@ La implementación debe probar al menos:
 6. respuesta excesivamente larga;
 7. provider lento o que no responde;
 8. HTTP 429;
-9. cuota global agotada;
+9. cuota global de provider agotada sin bloquear respuestas locales;
 10. cuota individual agotada;
 11. escalamiento porcentual agotado;
-12. emergency stop activo;
+12. emergency stop de provider activo sin bloquear respuestas locales;
 13. AI deshabilitada;
 14. ausencia de contexto autorizado;
 15. documento retirado o vencido después de generar caché;
-16. intento de enviar metadata interna no permitida al provider.
+16. intento de enviar metadata interna no permitida al provider;
+17. dos o más reservas concurrentes disputando la última unidad de cuota;
+18. caída entre `reserve` y `finalize`;
+19. cálculo de cambio de día/mes con la zona horaria configurada;
+20. intento del provider de citar una referencia efímera no entregada.
 
 ## Plan de implementación incremental
 
@@ -368,8 +457,10 @@ Implementar únicamente:
 
 - tipos de decisión;
 - evaluación de confianza determinista;
+- separación entre límite general de uso y presupuesto de provider;
 - barreras de escalamiento simuladas;
 - configuración validada;
+- referencias públicas/efímeras simuladas para fragmentos;
 - provider `noop`/mock;
 - tests unitarios exhaustivos.
 
@@ -377,7 +468,7 @@ No incluir Groq, red real, DB nueva, rutas públicas ni migraciones.
 
 ### PR posterior: cuotas y métricas
 
-Agregar stores/interfaces inyectables para contadores y métricas, primero simulados. Diseñar persistencia separadamente si fuera necesaria.
+Agregar stores/interfaces inyectables para contadores, reserva atómica y métricas, primero simulados. Diseñar persistencia separadamente si fuera necesaria.
 
 ### PR posterior: adapter Groq
 
