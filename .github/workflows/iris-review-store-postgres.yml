@@ -12,6 +12,9 @@ on:
       - "migration-iris-document-retrieval-v1.sql"
       - ".github/workflows/iris-review-store-postgres.yml"
 
+permissions:
+  contents: read
+
 jobs:
   iris-review-store-postgres:
     runs-on: ubuntu-latest
