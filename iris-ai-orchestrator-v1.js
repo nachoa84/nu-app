@@ -178,7 +178,10 @@ function createIrisAiOrchestratorV1({
     const localInput = { question: normalizedQuestion, language, country, category, productSlug, now };
     if (localEngine) {
       try {
-        const local = await localEngine.resolveBeforeRetrieval(localInput);
+        const local = await withTimeoutV1(
+          () => localEngine.resolveBeforeRetrieval(localInput),
+          { timeoutMs }
+        );
         const decision = runtime.decideLocal({ deterministicMatch: local.deterministic, verifiedCacheMatch: local.verifiedCache });
         if (decision.decision === "deterministic" && local.deterministic) {
           runtime.recordResponse("deterministic");
@@ -188,8 +191,8 @@ function createIrisAiOrchestratorV1({
           runtime.recordResponse("verified_cache");
           return localOkV1(local.verifiedCache);
         }
-      } catch {
-        return fallback("local_response_error");
+      } catch (error) {
+        return fallback(error?.code === "IRIS_TIMEOUT" ? "local_response_timeout" : "local_response_error");
       }
     }
 
@@ -214,15 +217,18 @@ function createIrisAiOrchestratorV1({
     let retrievalAssessment = conservativeRetrievalAssessmentV1(context);
     if (localEngine) {
       try {
-        const local = await localEngine.resolveAfterRetrieval({ ...localInput, context });
+        const local = await withTimeoutV1(
+          () => localEngine.resolveAfterRetrieval({ ...localInput, context }),
+          { timeoutMs }
+        );
         retrievalAssessment = local.retrieval;
         const decision = runtime.decideLocal({ retrieval: retrievalAssessment });
         if (decision.decision === "direct_retrieval" && local.directRetrieval) {
           runtime.recordResponse("direct_retrieval");
           return localOkV1(local.directRetrieval);
         }
-      } catch {
-        return fallback("local_response_error");
+      } catch (error) {
+        return fallback(error?.code === "IRIS_TIMEOUT" ? "local_response_timeout" : "local_response_error");
       }
     }
 
