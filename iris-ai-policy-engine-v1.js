@@ -36,7 +36,7 @@ function providerBarriersSatisfiedV1({ config, providerBudgetState = {}, reserva
   if (!isAvailableV1(providerBudgetState.daily)) return { ok: false, reason: "provider_daily_budget_exhausted" };
   if (!isAvailableV1(providerBudgetState.monthly)) return { ok: false, reason: "provider_monthly_budget_exhausted" };
   if (!isAvailableV1(providerBudgetState.escalationPercent)) return { ok: false, reason: "provider_escalation_budget_exhausted" };
-  if (reservationState.required === true && reservationState.reserved !== true) {
+  if (reservationState.reserved !== true) {
     return { ok: false, reason: "provider_budget_not_reserved" };
   }
   return { ok: true, reason: "provider_allowed" };
@@ -81,10 +81,7 @@ function evaluateIrisAiPolicyV1({
 
   const barrier = providerBarriersSatisfiedV1({ config, providerBudgetState, reservationState });
   if (!barrier.ok) {
-    if (confidence === "medium") {
-      return createDecisionV1(DECISIONS_V1.DIRECT_RETRIEVAL, "provider_blocked_local_fallback", "medium");
-    }
-    return createDecisionV1(DECISIONS_V1.INSUFFICIENT, barrier.reason, "low");
+    return createDecisionV1(DECISIONS_V1.INSUFFICIENT, barrier.reason, confidence);
   }
 
   return createDecisionV1(DECISIONS_V1.PROVIDER_ASSISTED, "provider_needed", confidence, true);
