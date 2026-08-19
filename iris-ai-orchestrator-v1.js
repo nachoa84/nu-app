@@ -202,6 +202,10 @@ function createIrisAiOrchestratorV1({
       return deterministicFallbackV1("ai_disabled");
     }
 
+    if (containsPromptInjectionV1(normalizedQuestion)) {
+      return deterministicFallbackV1("unsafe_input");
+    }
+
     if (runtime) {
       let start;
       try {
@@ -214,10 +218,6 @@ function createIrisAiOrchestratorV1({
       }
       runtimeStarted = true;
       totalQuestionsInPeriod = start.totalQuestionsInPeriod;
-    }
-
-    if (containsPromptInjectionV1(normalizedQuestion)) {
-      return fallback("unsafe_input");
     }
 
     let fragments = [];
