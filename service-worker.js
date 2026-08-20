@@ -1,4 +1,4 @@
-const CACHE="nuapp-v129-ios-horizontal-stability";
+const CACHE="nuapp-v130-tramites-country-menu";
 
 const CORE=[
   "./",
@@ -177,7 +177,6 @@ function parseByteRange(rangeHeader, totalSize) {
 
   let start;
   let end;
-
   // Suffix range: bytes=-500
   if (rawStart === "") {
     const suffixLength = Number(rawEnd);
@@ -357,7 +356,6 @@ self.addEventListener("fetch",event=>{
     );
     return;
   }
-
   // Para el resto de los assets usamos cache-first y guardamos lo que falte.
   event.respondWith(
     caches.match(req).then(cached=>
