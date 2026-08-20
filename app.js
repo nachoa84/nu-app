@@ -207,8 +207,29 @@ renderDays();
 renderFavorites();
 ensureDemoControls();
 
+// NU APP · HERO GALVANIC SPA V4
+// Mantiene la misma estructura de las otras rutinas y muestra el dispositivo completo.
+if (typeof ROUTINE_CATALOG !== "undefined" && ROUTINE_CATALOG["galvanicspa-10"]) {
+  ROUTINE_CATALOG["galvanicspa-10"].hero = "assets/custom/routine-galvanicspa-hero-v4.png";
+}
 
-
-
+if (!document.getElementById("galvanicSpaHeroV4Style")) {
+  const galvanicHeroStyle = document.createElement("style");
+  galvanicHeroStyle.id = "galvanicSpaHeroV4Style";
+  galvanicHeroStyle.textContent = `
+    .native-day-hero-media img[src*="routine-galvanicspa-hero-v4.png"] {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      object-fit: contain;
+      object-position: center;
+      background: transparent;
+      transform: none;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  `;
+  document.head.appendChild(galvanicHeroStyle);
+}
 
 setupMultiRoutineV92();
