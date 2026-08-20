@@ -174,14 +174,14 @@ test(
       assert.equal(fetchCalls, 0);
 
       const usage = await client.query(
-        `SELECT count_value
+        `SELECT used_count
          FROM iris_ai_usage_counters
          WHERE scope_key = $1`,
         [SYNTHETIC_SCOPE]
       );
 
       assert.equal(usage.rowCount, 1);
-      assert.equal(Number(usage.rows[0].count_value), 1);
+      assert.equal(Number(usage.rows[0].used_count), 1);
 
       const insufficient = await client.query(
         `SELECT metric_value
