@@ -48,6 +48,26 @@ function assertPoolV1(pool) {
   }
 }
 
+function assertProviderBudgetConfigV1(config) {
+  if (
+    config.provider === "noop" ||
+    config.providerEmergencyStop === true
+  ) {
+    return;
+  }
+
+  for (const [label, value] of [
+    ["IRIS_AI_PROVIDER_GLOBAL_DAILY_LIMIT", config.providerGlobalDailyLimit],
+    ["IRIS_AI_PROVIDER_GLOBAL_MONTHLY_LIMIT", config.providerGlobalMonthlyLimit]
+  ]) {
+    if (!Number.isSafeInteger(value) || value < 1) {
+      throw new IrisAiRuntimeBootstrapErrorV1(
+        `${label} requerido antes de habilitar llamadas al provider.`
+      );
+    }
+  }
+}
+
 function disabledBootstrapV1(reason) {
   return Object.freeze({
     enabled: false,
@@ -86,6 +106,8 @@ function createIrisAiRuntimeBootstrapV1({
   if (config.aiEnabled !== true) {
     return disabledBootstrapV1("ai_disabled");
   }
+
+  assertProviderBudgetConfigV1(config);
 
   const persistenceStore = createPostgresIrisAiStoreV1({
     pool,
@@ -139,6 +161,7 @@ function createIrisAiRuntimeBootstrapV1({
 
 module.exports = {
   IrisAiRuntimeBootstrapErrorV1,
+  assertProviderBudgetConfigV1,
   createIrisAiRuntimeBootstrapV1,
   enabledFlagV1
 };
