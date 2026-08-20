@@ -280,7 +280,10 @@ function createIrisAiOrchestratorV1({
     const validated = runtime ? validateEphemeralProviderResultV1(providerResult, providerFragments, internalMap) : validateProviderResultV1(providerResult, context);
     if (!validated) return fallback("provider_unusable");
     if (runtimeStarted) await runtime.recordResponse("provider_assisted");
-    return validated;
+    return {
+      ...validated,
+      classification: "provider_assisted"
+    };
   }
 
   return { answerQuestion };
