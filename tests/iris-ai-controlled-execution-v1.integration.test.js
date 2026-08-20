@@ -186,7 +186,7 @@ test(
       const insufficient = await client.query(
         `SELECT metric_value
          FROM iris_ai_metrics
-         WHERE metric_name = 'responses_insufficient'`
+         WHERE metric_name = 'response_insufficient'`
       );
 
       assert.equal(insufficient.rowCount, 1);
