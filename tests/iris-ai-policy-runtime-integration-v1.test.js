@@ -276,3 +276,43 @@ test("successful provider-assisted response records aggregate metrics only", asy
   assert.ok(!JSON.stringify(metrics).includes("texto privado"));
   assert.ok(!JSON.stringify(metrics).includes("u_hash_1"));
 });
+
+test("runtime usa contador mensual persistente cuando el usage store lo provee", async () => {
+  const config = configV1();
+
+  const policyRuntime = createIrisAiPolicyRuntimeV1({
+    config,
+    usageQuotaStore: {
+      async consume() {
+        return {
+          allowed: true,
+          reason: "usage_reserved",
+          totalQuestionsInPeriod: 47
+        };
+      }
+    },
+    providerBudgetStore: {
+      async reserve() {
+        return {
+          reserved: false,
+          reason: "provider_daily_budget_exhausted"
+        };
+      },
+      async finalize() {
+        return { finalized: true };
+      },
+      async release() {
+        return { released: true };
+      }
+    },
+    metricsStore: createInMemoryIrisMetricsStoreV1()
+  });
+
+  const started = await policyRuntime.beginQuestion({
+    userScope: "u_hash_persistent_test",
+    now: NOW
+  });
+
+  assert.equal(started.allowed, true);
+  assert.equal(started.totalQuestionsInPeriod, 47);
+});

@@ -155,8 +155,8 @@ function createIrisAiOrchestratorV1({
     let runtimeStarted = false;
     let totalQuestionsInPeriod = 0;
 
-    function fallback(reason) {
-      if (runtimeStarted) runtime.recordResponse("insufficient");
+    async function fallback(reason) {
+      if (runtimeStarted) await runtime.recordResponse("insufficient");
       return deterministicFallbackV1(reason);
     }
 
@@ -166,7 +166,7 @@ function createIrisAiOrchestratorV1({
     if (runtime) {
       let start;
       try {
-        start = runtime.beginQuestion({ userScope, deviceScope, now });
+        start = await runtime.beginQuestion({ userScope, deviceScope, now });
       } catch {
         return deterministicFallbackV1("policy_runtime_error");
       }
@@ -184,11 +184,11 @@ function createIrisAiOrchestratorV1({
         );
         const decision = runtime.decideLocal({ deterministicMatch: local.deterministic, verifiedCacheMatch: local.verifiedCache });
         if (decision.decision === "deterministic" && local.deterministic) {
-          runtime.recordResponse("deterministic");
+          await runtime.recordResponse("deterministic");
           return localOkV1(local.deterministic);
         }
         if (decision.decision === "verified_cache" && local.verifiedCache) {
-          runtime.recordResponse("verified_cache");
+          await runtime.recordResponse("verified_cache");
           return localOkV1(local.verifiedCache);
         }
       } catch (error) {
@@ -224,7 +224,7 @@ function createIrisAiOrchestratorV1({
         retrievalAssessment = local.retrieval;
         const decision = runtime.decideLocal({ retrieval: retrievalAssessment });
         if (decision.decision === "direct_retrieval" && local.directRetrieval) {
-          runtime.recordResponse("direct_retrieval");
+          await runtime.recordResponse("direct_retrieval");
           return localOkV1(local.directRetrieval);
         }
       } catch (error) {
@@ -240,7 +240,7 @@ function createIrisAiOrchestratorV1({
       if (!provider.name || provider.name !== runtime.providerName) return fallback("provider_mismatch");
       let authorization;
       try {
-        authorization = runtime.authorizeProviderCall({ retrieval: retrievalAssessment, totalQuestionsInPeriod, now });
+        authorization = await runtime.authorizeProviderCall({ retrieval: retrievalAssessment, totalQuestionsInPeriod, now });
       } catch {
         return fallback("policy_runtime_error");
       }
@@ -261,7 +261,7 @@ function createIrisAiOrchestratorV1({
       providerOutcome = error?.status === 429 || error?.code === 429 || error?.code === "429" ? "429" : "error";
       if (runtime && reservationId) {
         try {
-          runtime.completeProviderCall({ reservationId, started: providerStarted, outcome: providerOutcome });
+          await runtime.completeProviderCall({ reservationId, started: providerStarted, outcome: providerOutcome });
         } catch {
           return fallback("policy_runtime_error");
         }
@@ -271,7 +271,7 @@ function createIrisAiOrchestratorV1({
 
     if (runtime && reservationId) {
       try {
-        runtime.completeProviderCall({ reservationId, started: providerStarted, outcome: providerOutcome });
+        await runtime.completeProviderCall({ reservationId, started: providerStarted, outcome: providerOutcome });
       } catch {
         return fallback("policy_runtime_error");
       }
@@ -279,7 +279,7 @@ function createIrisAiOrchestratorV1({
 
     const validated = runtime ? validateEphemeralProviderResultV1(providerResult, providerFragments, internalMap) : validateProviderResultV1(providerResult, context);
     if (!validated) return fallback("provider_unusable");
-    if (runtimeStarted) runtime.recordResponse("provider_assisted");
+    if (runtimeStarted) await runtime.recordResponse("provider_assisted");
     return validated;
   }
 

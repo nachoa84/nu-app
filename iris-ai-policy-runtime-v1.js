@@ -38,26 +38,43 @@ function createIrisAiPolicyRuntimeV1({
 
   const monthlyQuestionCounts = new Map();
 
-  function metric(name, value = 1) {
+  async function metric(name, value = 1) {
     if (!config.metricsEnabled) return false;
     try {
-      metricsStore.record({ name, value });
+      await metricsStore.record({ name, value });
       return true;
     } catch {
       return false;
     }
   }
 
-  function beginQuestion({ userScope, deviceScope = null, now = new Date() } = {}) {
-    const usage = usageQuotaStore.consume({ userScope, deviceScope, now });
+  async function beginQuestion({ userScope, deviceScope = null, now = new Date() } = {}) {
+    const usage = await usageQuotaStore.consume({ userScope, deviceScope, now });
     if (!usage.allowed) {
       return Object.freeze({ allowed: false, reason: usage.reason, totalQuestionsInPeriod: 0 });
     }
 
-    const { month } = periodKeysV1(now, config.budgetTimezone);
-    const totalQuestionsInPeriod = (monthlyQuestionCounts.get(month) || 0) + 1;
-    monthlyQuestionCounts.set(month, totalQuestionsInPeriod);
-    metric("questions_total");
+    let totalQuestionsInPeriod;
+
+    if (
+      Number.isSafeInteger(usage.totalQuestionsInPeriod) &&
+      usage.totalQuestionsInPeriod >= 1
+    ) {
+      totalQuestionsInPeriod = usage.totalQuestionsInPeriod;
+    } else {
+      const { month } = periodKeysV1(
+        now,
+        config.budgetTimezone
+      );
+      totalQuestionsInPeriod =
+        (monthlyQuestionCounts.get(month) || 0) + 1;
+      monthlyQuestionCounts.set(
+        month,
+        totalQuestionsInPeriod
+      );
+    }
+
+    await metric("questions_total");
 
     return Object.freeze({
       allowed: true,
@@ -77,7 +94,7 @@ function createIrisAiPolicyRuntimeV1({
     });
   }
 
-  function authorizeProviderCall({ retrieval, totalQuestionsInPeriod, now = new Date() } = {}) {
+  async function authorizeProviderCall({ retrieval, totalQuestionsInPeriod, now = new Date() } = {}) {
     const preflight = evaluateIrisAiPolicyV1({
       config,
       retrieval,
@@ -98,9 +115,9 @@ function createIrisAiPolicyRuntimeV1({
       });
     }
 
-    const reservation = providerBudgetStore.reserve({ now, totalQuestionsInPeriod });
+    const reservation = await providerBudgetStore.reserve({ now, totalQuestionsInPeriod });
     if (!reservation.reserved) {
-      metric("provider_quota_blocked");
+      await metric("provider_quota_blocked");
       return Object.freeze({
         allowed: false,
         reason: reservation.reason,
@@ -109,7 +126,7 @@ function createIrisAiPolicyRuntimeV1({
       });
     }
 
-    metric("budget_reservations_created");
+    await metric("budget_reservations_created");
 
     const finalDecision = evaluateIrisAiPolicyV1({
       config,
@@ -123,8 +140,8 @@ function createIrisAiPolicyRuntimeV1({
     });
 
     if (finalDecision.decision !== DECISIONS_V1.PROVIDER_ASSISTED || finalDecision.allowProvider !== true) {
-      providerBudgetStore.release(reservation.reservationId);
-      metric("budget_reservations_released");
+      await providerBudgetStore.release(reservation.reservationId);
+      await metric("budget_reservations_released");
       return Object.freeze({
         allowed: false,
         reason: finalDecision.reason,
@@ -141,26 +158,26 @@ function createIrisAiPolicyRuntimeV1({
     });
   }
 
-  function completeProviderCall({ reservationId, started, outcome = "ok" } = {}) {
+  async function completeProviderCall({ reservationId, started, outcome = "ok" } = {}) {
     if (!reservationId) {
       throw new IrisAiPolicyRuntimeErrorV1("reservationId requerido.");
     }
 
     if (started === true) {
-      providerBudgetStore.finalize(reservationId);
-      metric("budget_reservations_finalized");
-      metric("provider_calls");
-      if (outcome === "error") metric("provider_errors");
-      if (outcome === "429") metric("provider_429");
+      await providerBudgetStore.finalize(reservationId);
+      await metric("budget_reservations_finalized");
+      await metric("provider_calls");
+      if (outcome === "error") await metric("provider_errors");
+      if (outcome === "429") await metric("provider_429");
       return Object.freeze({ finalized: true, released: false });
     }
 
-    providerBudgetStore.release(reservationId);
-    metric("budget_reservations_released");
+    await providerBudgetStore.release(reservationId);
+    await metric("budget_reservations_released");
     return Object.freeze({ finalized: false, released: true });
   }
 
-  function recordResponse(kind) {
+  async function recordResponse(kind) {
     const metricByKind = {
       deterministic: "response_deterministic",
       verified_cache: "response_verified_cache",
@@ -169,7 +186,7 @@ function createIrisAiPolicyRuntimeV1({
       insufficient: "response_insufficient"
     };
     const name = metricByKind[kind];
-    if (name) metric(name);
+    if (name) await metric(name);
   }
 
   return Object.freeze({
