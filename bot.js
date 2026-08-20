@@ -1306,7 +1306,7 @@ function showBotTyping() {
   scrollBotToEnd("smooth");
 }
 
-function botAsk(q) {
+async function botAsk(q) {
   const question = String(q || "").trim();
   if (!question) return;
 
@@ -1337,10 +1337,40 @@ function botAsk(q) {
   showBotTyping();
 
   const response = resolveBotAnswer(question);
+  let finalResponse = response;
+
+  const irisEscalation =
+    window.IrisAiClientEscalationV1;
+
+  if (
+    irisEscalation?.isDeterministicMissV1(
+      response
+    )
+  ) {
+    const escalated =
+      await irisEscalation
+        .tryIrisAiBotEscalationV1({
+          question,
+          deterministicResponse: response,
+          profile:
+            typeof getRoutineProfile === "function"
+              ? getRoutineProfile()
+              : null
+        });
+
+    if (escalated) {
+      finalResponse = escalated;
+    }
+  }
 
   setTimeout(() => {
     const nextMessages = loadBotConversation();
-    nextMessages.push(createBotMessage("bot", response));
+    nextMessages.push(
+      createBotMessage(
+        "bot",
+        finalResponse
+      )
+    );
     saveBotConversation(nextMessages);
     renderBotConversation({ scroll: true });
   }, 420);
