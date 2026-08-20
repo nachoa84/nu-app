@@ -1,6 +1,9 @@
 "use strict";
 
 const crypto = require("node:crypto");
+const {
+  createIrisAiPilotControlV1
+} = require("./iris-ai-pilot-control-v1");
 
 const MAX_USER_ID_CHARS_V1 = 128;
 const MAX_QUESTION_CHARS_V1 = 500;
@@ -18,6 +21,14 @@ class IrisAiUserRouteErrorV1 extends Error {
 
 function enabledFlagV1(value) {
   return String(value || "").trim().toLowerCase() === "true";
+}
+
+function controlledPilotBypassV1(env = {}) {
+  return (
+    env.NODE_ENV === "development" &&
+    env.IRIS_AI_TEST_ENVIRONMENT === "development" &&
+    env.IRIS_AI_CONTROLLED_EXECUTION === "true"
+  );
 }
 
 function normalizeRequestV1(body = {}) {
@@ -129,16 +140,30 @@ function createIrisAiUserRouteV1({
   runtime,
   env = process.env,
   logError = () => {},
-  hashImpl = crypto.createHash
+  hashImpl = crypto.createHash,
+  pilotControl = null
 } = {}) {
   if (typeof logError !== "function") {
     throw new TypeError("logError debe ser una función.");
   }
 
   const routeEnabled = enabledFlagV1(env?.IRIS_AI_USER_ROUTE_ENABLED);
+  const pilot = pilotControl || createIrisAiPilotControlV1({ env, hashImpl });
+  const controlledBypass = controlledPilotBypassV1(env);
 
   return async function irisAiUserRouteV1(req, res) {
     if (!routeEnabled) {
+      return res.status(404).json({
+        ok: false,
+        error: "Ruta no disponible."
+      });
+    }
+
+    const pilotUserId = String(req?.body?.userId || "").trim();
+    if (
+      !controlledBypass &&
+      (!pilot?.isEligible || pilot.isEligible(pilotUserId) !== true)
+    ) {
       return res.status(404).json({
         ok: false,
         error: "Ruta no disponible."
@@ -203,6 +228,7 @@ module.exports = {
   MAX_QUESTION_CHARS_V1,
   MAX_USER_ID_CHARS_V1,
   USER_ID_PATTERN_V1,
+  controlledPilotBypassV1,
   createIrisAiUserRouteV1,
   enabledFlagV1,
   hashScopeV1,

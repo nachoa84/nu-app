@@ -10,6 +10,12 @@ const {
   sanitizeResultV1
 } = require("../iris-ai-user-route-v1");
 
+const eligiblePilotV1 = Object.freeze({
+  isEligible() {
+    return true;
+  }
+});
+
 function responseRecorder() {
   return {
     statusCode: null,
@@ -29,6 +35,7 @@ test("ruta apagada responde 404 sin tocar orchestrator", async () => {
   let calls = 0;
   const route = createIrisAiUserRouteV1({
     env: { IRIS_AI_USER_ROUTE_ENABLED: "false" },
+    pilotControl: eligiblePilotV1,
     runtime: {
       status: { enabled: true },
       orchestrator: {
@@ -47,6 +54,7 @@ test("ruta apagada responde 404 sin tocar orchestrator", async () => {
 test("ruta abierta sigue fail-closed si runtime está apagado", async () => {
   const route = createIrisAiUserRouteV1({
     env: { IRIS_AI_USER_ROUTE_ENABLED: "true" },
+    pilotControl: eligiblePilotV1,
     runtime: { status: { enabled: false }, orchestrator: null }
   });
   const res = responseRecorder();
@@ -94,6 +102,7 @@ test("ruta pasa solo entrada mínima con scopes hash al orchestrator", async () 
   let received = null;
   const route = createIrisAiUserRouteV1({
     env: { IRIS_AI_USER_ROUTE_ENABLED: "true" },
+    pilotControl: eligiblePilotV1,
     runtime: {
       status: { enabled: true },
       orchestrator: {
@@ -139,6 +148,7 @@ test("ruta pasa solo entrada mínima con scopes hash al orchestrator", async () 
 test("fallback del runtime se mantiene fallback y no fabrica respuesta", async () => {
   const route = createIrisAiUserRouteV1({
     env: { IRIS_AI_USER_ROUTE_ENABLED: "true" },
+    pilotControl: eligiblePilotV1,
     runtime: {
       status: { enabled: true },
       orchestrator: {
@@ -168,6 +178,7 @@ test("errores internos se sanitizan", async () => {
   const logs = [];
   const route = createIrisAiUserRouteV1({
     env: { IRIS_AI_USER_ROUTE_ENABLED: "true" },
+    pilotControl: eligiblePilotV1,
     logError: entry => logs.push(entry),
     runtime: {
       status: { enabled: true },
