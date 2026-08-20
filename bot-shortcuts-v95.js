@@ -81,9 +81,6 @@
   }
 
   function buildCommandIndex() {
-    // NU APP · TECNOLOGÍAS DIRECTAS V105
-    // Incluye los temas ocultos de detalle únicamente para resolver accesos
-    // rápidos; no altera la búsqueda normal ni la biblioteca visible del Bot.
     const catalog = [
       ...(Array.isArray(window.BotCommandCatalog) ? window.BotCommandCatalog : []),
       ...(Array.isArray(window.BotContent) ? window.BotContent : [])
@@ -108,10 +105,6 @@
     })).filter(category => category.items.length);
   }
 
-  // NU APP · SUBMENÚ DE TRÁMITES POR PAÍS V95E
-  // El comando "tramites" abre un segundo nivel dentro del mismo modal con
-  // los mercados disponibles; cada país reutiliza el comando ya existente
-  // en bot-content.js (no se duplica contenido).
   const TRAMITES_COUNTRY_COMMANDS = [
     "tramites argentina",
     "tramites espana",
@@ -138,7 +131,6 @@
   }
 
   function chooseBotCommand(item) {
-    // NU APP · RESPUESTA DIRECTA V95A
     if (!item?.command) return;
     const command = item.command;
     closeBotQuickAccess();
@@ -147,8 +139,6 @@
         botAsk(command);
         return;
       }
-
-      // Respaldo defensivo: usa el envío normal si botAsk no estuviera disponible.
       const input = document.getElementById("botInput");
       if (!input) return;
       input.value = command;
@@ -195,7 +185,6 @@
     });
   }
 
-  // NU APP · SILUETAS REALES DE PRODUCTOS V123
   const PRODUCT_COMMAND_ICONS_V123 = {
     "como usar boost": "boost",
     "como usar lumi spa": "lumispa",
@@ -232,7 +221,6 @@
       copy.className = "bot-quick-access-row-copy";
       const strong = document.createElement("strong");
       strong.textContent = item.label || item.command;
-      // NU APP · ETIQUETAS LIMPIAS V95B
       copy.appendChild(strong);
       button.append(icon, copy, iconNode("arrow", "bot-quick-access-row-arrow"));
       const isTramitesEntry = category.id === "tramites-informacion" && item.command === "tramites";
@@ -351,7 +339,7 @@
     const title = header.querySelector("h1");
     if (title && title.dataset.irisTitlePolish !== "1") {
       title.dataset.irisTitlePolish = "1";
-      title.innerHTML = `Iris <span class="bot-title-note">- Tu Asistente</span>`;
+      title.innerHTML = `Iris <span class="bot-title-note">· Tu Asistente</span>`;
     }
 
     if (!document.getElementById("irisHeaderPolishV131")) {
