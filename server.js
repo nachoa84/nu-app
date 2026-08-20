@@ -40,6 +40,9 @@ const {
 const {
   initializeIrisAiServerRuntimeV1
 } = require("./iris-ai-server-runtime-v1");
+const {
+  createIrisAiUserRouteV1
+} = require("./iris-ai-user-route-v1");
 
 const app = express();
 
@@ -126,6 +129,12 @@ const PILOT_ENABLED =
 const PILOT_ADMIN_ROUTES_ENABLED =
   String(
     process.env.PILOT_ADMIN_ROUTES_ENABLED ||
+    ""
+  ).toLowerCase() === "true";
+
+const IRIS_AI_USER_ROUTE_ENABLED =
+  String(
+    process.env.IRIS_AI_USER_ROUTE_ENABLED ||
     ""
   ).toLowerCase() === "true";
 
@@ -401,6 +410,19 @@ app.use(
 );
 
 app.use(
+  "/api/iris-ai",
+  (req, res, next) => {
+    if (!IRIS_AI_USER_ROUTE_ENABLED) {
+      return res.status(404).json({
+        ok: false,
+        error: "Ruta no disponible."
+      });
+    }
+    next();
+  }
+);
+
+app.use(
   "/api",
   assertAllowedWriteOrigin
 );
@@ -463,6 +485,18 @@ app.use(
       next
     );
   }
+);
+
+const irisAiUserRouteV1 =
+  createIrisAiUserRouteV1({
+    runtime: irisAiServerRuntimeV1,
+    env: process.env,
+    logError: console.error
+  });
+
+app.post(
+  "/api/iris-ai/question",
+  irisAiUserRouteV1
 );
 
 app.use(
