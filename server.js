@@ -37,6 +37,9 @@ const {
 const {
   createPilotIdentityRoutesV0
 } = require("./pilot-identity-routes-v0");
+const {
+  initializeIrisAiServerRuntimeV1
+} = require("./iris-ai-server-runtime-v1");
 
 const app = express();
 
@@ -77,6 +80,14 @@ const poolOptionsV113 =
 const pool = poolOptionsV113
   ? new Pool(poolOptionsV113)
   : null;
+
+const irisAiServerRuntimeV1 =
+  initializeIrisAiServerRuntimeV1({
+    pool,
+    env: process.env,
+    secrets: process.env,
+    logError: console.error
+  });
 
 
 const VAPID_PUBLIC_KEY =
