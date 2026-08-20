@@ -35,26 +35,10 @@ function getRoutineState() {
   }
 }
 
-// NU APP · DESBLOQUEO DIFERIDO MULTIRUTINA V131
-// Reutiliza el mismo concepto y las mismas funciones que ya usaba Collagen
-// para calcular el próximo horario habilitado (nextUnlockTimestampFromProfile,
-// basado en getScheduleProfile/zonedWallTimeToTimestamp), sin timers
-// paralelos: el avance de currentDay se resuelve de forma perezosa cada vez
-// que se lee el estado. Solo aplica a rutinas no gestionadas por backend
-// (LumiSpa, WellSpa, Galvanic); Collagen sigue avanzando exclusivamente con
-// estado confirmado por backend.
+// El backend es la única fuente de verdad para desbloquear días.
+// El cliente conserva nextUnlockAt solo para mostrar el estado pendiente;
+// nunca adelanta currentDay por su cuenta.
 function resolvePendingUnlockV131(state) {
-  if (isBackendManagedRoutine()) return state;
-  if (!state.nextUnlockAt || !state.pendingNextDay) return state;
-  if (Date.now() < Number(state.nextUnlockAt)) return state;
-
-  state.currentDay = Number(state.pendingNextDay);
-  state.pendingNextDay = null;
-  state.nextUnlockAt = null;
-  localStorage.setItem(
-    getRoutineStateStorageKey(),
-    JSON.stringify(state)
-  );
   return state;
 }
 
@@ -73,6 +57,24 @@ function getDayCompleteStorageKey(day) {
   return isBackendManagedRoutine() ? `day${Number(day)}Complete` : `day:${getActiveRoutineId()}:${Number(day)}:complete`;
 }
 
+function getDayCompletedAtStorageKey(day) {
+  return isBackendManagedRoutine()
+    ? `day${Number(day)}CompletedAt`
+    : `day:${getActiveRoutineId()}:${Number(day)}:completedAt`;
+}
+
+function rememberDayCompletionTimestamp(day, complete = true) {
+  const key = getDayCompletedAtStorageKey(day);
+
+  if (complete) {
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, String(Date.now()));
+    }
+  } else {
+    localStorage.removeItem(key);
+  }
+}
+
 function isDayComplete(day) {
   return localStorage.getItem(
     getDayCompleteStorageKey(day)
@@ -87,6 +89,9 @@ function setDayComplete(day, complete = true) {
   } else {
     localStorage.removeItem(key);
   }
+
+  rememberDayCompletionTimestamp(day, complete);
+
   if (complete && !isBackendManagedRoutine() && window.BackendAPI) {
     window.BackendAPI.completeProductRoutineDay(getActiveRoutineId(), Number(day))
       .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
@@ -103,19 +108,28 @@ function replaceCompletedDays(
   completedDays = [],
   maxDays = TOTAL_PROGRAM_DAYS
 ) {
-  clearCompletedDays(maxDays);
+  const completedSet =
+    new Set(
+      completedDays
+        .map(Number)
+        .filter(day =>
+          Number.isInteger(day) &&
+          day >= 1 &&
+          day <= Number(maxDays)
+        )
+    );
 
-  completedDays.forEach(day => {
-    const safeDay = Number(day);
+  for (let day = 1; day <= Number(maxDays); day++) {
+    const completeKey = getDayCompleteStorageKey(day);
+    const completedAtKey = getDayCompletedAtStorageKey(day);
 
-    if (
-      Number.isInteger(safeDay) &&
-      safeDay >= 1 &&
-      safeDay <= Number(maxDays)
-    ) {
-      setDayComplete(safeDay, true);
+    if (completedSet.has(day)) {
+      localStorage.setItem(completeKey, "1");
+    } else {
+      localStorage.removeItem(completeKey);
+      localStorage.removeItem(completedAtKey);
     }
-  });
+  }
 }
 
 function getRoutineProfile() {
@@ -332,25 +346,18 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
   if (complete) localStorage.setItem(key, "1");
   else localStorage.removeItem(key);
 
+  rememberDayCompletionTimestamp(safeDay, complete);
+
   if (isBackendManagedRoutine()) return;
 
   const routineId = getActiveRoutineId();
-  const totalDays = Number(getActiveRoutineConfig()?.totalDays || 10);
-  const nextDay = getNextPendingProductRoutineDayV100(routineId, totalDays);
   const state = getRoutineState();
 
-  // V131: el día siguiente queda pendiente de desbloqueo hasta el próximo
-  // horario configurado (mismo concepto que Collagen), en vez de habilitarse
-  // apenas se completa el día actual.
-  if (complete && nextDay !== state.currentDay) {
-    state.pendingNextDay = nextDay;
-    state.nextUnlockAt = nextUnlockTimestampFromProfile(Date.now());
-  } else if (!complete) {
+  if (!complete) {
     state.pendingNextDay = null;
     state.nextUnlockAt = null;
+    localStorage.setItem(`routineState:${routineId}`, JSON.stringify(state));
   }
-
-  localStorage.setItem(`routineState:${routineId}`, JSON.stringify(state));
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
 

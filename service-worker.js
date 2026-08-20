@@ -1,4 +1,4 @@
-const CACHE="nuapp-v134-galvanic-hero-v4";
+const CACHE="nuapp-v136-unified-daily-unlock";
 
 const CORE=[
   "./",
@@ -24,8 +24,8 @@ const CORE=[
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=123-pharmanex-card",
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
-  "./routine-state.js?v=100-immediate-progress",
-  "./routine-sync.js?v=100a-stay-completed-day",
+  "./routine-state.js?v=136-unified-daily-unlock",
+  "./routine-sync.js?v=136-unified-daily-unlock",
   "./bot.js?v=124a-iris-layout",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
@@ -37,7 +37,7 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=128-controlled-auto-update",
-  "./backend-client.js?v=100-immediate-progress",
+  "./backend-client.js?v=136-unified-daily-unlock",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",

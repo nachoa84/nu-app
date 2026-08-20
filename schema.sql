@@ -70,11 +70,19 @@ CREATE TABLE IF NOT EXISTS product_routine_states (
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   routine_id TEXT NOT NULL,
   current_day INTEGER NOT NULL DEFAULT 1,
+  next_unlock_at TIMESTAMPTZ NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (user_id, routine_id),
   CHECK (current_day BETWEEN 1 AND 10)
 );
+
+ALTER TABLE product_routine_states
+  ADD COLUMN IF NOT EXISTS next_unlock_at TIMESTAMPTZ NULL;
+
+CREATE INDEX IF NOT EXISTS idx_product_routine_next_unlock
+  ON product_routine_states(next_unlock_at)
+  WHERE next_unlock_at IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS product_routine_day_progress (
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

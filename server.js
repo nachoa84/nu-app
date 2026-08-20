@@ -758,6 +758,32 @@ function normalizePushSubscription(input) {
   };
 }
 
+function normalizeClientCompletedAt(
+  rawValue,
+  { minAt = null, now = new Date() } = {}
+) {
+  const timestamp = Number(rawValue);
+  const nowMs = now.getTime();
+  const minMs = minAt ? new Date(minAt).getTime() : null;
+
+  if (!Number.isFinite(timestamp) || timestamp <= 0) {
+    return now;
+  }
+
+  const candidate = new Date(timestamp);
+  const candidateMs = candidate.getTime();
+
+  if (Number.isNaN(candidateMs) || candidateMs > nowMs) {
+    return now;
+  }
+
+  if (Number.isFinite(minMs) && candidateMs < minMs) {
+    return now;
+  }
+
+  return candidate;
+}
+
 function nextUnlockAt({
   openedAt,
   timezone,
@@ -1099,7 +1125,7 @@ async function recalculatePendingUnlock(
   const progressResult =
     await client.query(
       `
-      SELECT opened_at
+      SELECT completed_at
       FROM day_progress
       WHERE
         user_id = $1
@@ -1113,11 +1139,11 @@ async function recalculatePendingUnlock(
       ]
     );
 
-  const openedAt =
+  const completedAt =
     progressResult.rows[0]
-      ?.opened_at;
+      ?.completed_at;
 
-  if (!openedAt) {
+  if (!completedAt) {
     await client.query(
       `
       UPDATE users
@@ -1132,7 +1158,7 @@ async function recalculatePendingUnlock(
 
   const next =
     nextUnlockAt({
-      openedAt,
+      openedAt: completedAt,
       timezone:
         user.timezone,
       notificationTime:
@@ -2103,15 +2129,28 @@ async function runLeaderMaintenanceV116(deadline) {
     leader = Boolean(lockResult.rows[0]?.locked);
 
     if (!leader) {
-      return { leader: false, recovered: 0, recoveredDeliveries: 0, advanced: 0 };
+      return {
+        leader: false,
+        recovered: 0,
+        recoveredDeliveries: 0,
+        advanced: 0,
+        productAdvanced: 0
+      };
     }
 
     const recovered = await recoverStaleNotificationJobsV109();
     const recoveredDeliveries =
       await recoverStaleNotificationDeliveriesV111();
     const advanced = await enqueueDueUnlocksV109(deadline);
+    const productAdvances = await advanceProductRoutinesIfEligible(lockClient);
 
-    return { leader: true, recovered, recoveredDeliveries, advanced };
+    return {
+      leader: true,
+      recovered,
+      recoveredDeliveries,
+      advanced,
+      productAdvanced: productAdvances.length
+    };
   } finally {
     if (leader) {
       try {
@@ -2128,7 +2167,7 @@ async function runLeaderMaintenanceV116(deadline) {
 }
 
 async function runSchedulerCycle() {
-  if (schedulerRunning || !pool || !pushConfigured) return;
+  if (schedulerRunning || !pool) return;
   schedulerRunning = true;
   const startedAt = Date.now();
 
@@ -2150,13 +2189,14 @@ async function runSchedulerCycle() {
     // rezagado mientras los demás reclaman todos los trabajos pendientes.
     const [maintenance, notifications] = await Promise.all([
       runLeaderMaintenanceV116(deadline),
-      Date.now() < deadline
+      pushConfigured && Date.now() < deadline
         ? processUnifiedRoutineNotificationJobsV109(deadline)
         : Promise.resolve(emptyNotifications)
     ]);
 
     if (
       maintenance.advanced > 0 ||
+      maintenance.productAdvanced > 0 ||
       maintenance.recovered > 0 ||
       maintenance.recoveredDeliveries > 0 ||
       notifications.processed > 0
@@ -2164,7 +2204,8 @@ async function runSchedulerCycle() {
       console.log(
         `[scheduler-v116] worker=${process.pid} lider=${maintenance.leader ? 1 : 0} ` +
         `ms=${Date.now() - startedAt} ` +
-        `desbloqueos=${maintenance.advanced} recuperados=${maintenance.recovered} ` +
+        `desbloqueos=${maintenance.advanced} desbloqueos_producto=${maintenance.productAdvanced} ` +
+        `recuperados=${maintenance.recovered} ` +
         `entregas_recuperadas=${maintenance.recoveredDeliveries} ` +
         `procesados=${notifications.processed} enviados=${notifications.sent} ` +
         `reintentables=${notifications.retryableFailed} ` +
@@ -2184,15 +2225,17 @@ async function runSchedulerCycle() {
 }
 
 function startScheduler() {
-  if (
-    !pool ||
-    !pushConfigured
-  ) {
+  if (!pool) {
     console.warn(
-      "Scheduler no iniciado: falta base de datos o configuración push."
+      "Scheduler no iniciado: falta base de datos."
     );
-
     return;
+  }
+
+  if (!pushConfigured) {
+    console.warn(
+      "Push no configurado: los desbloqueos seguirán activos, pero los avisos no se enviarán hasta configurar Web Push."
+    );
   }
 
   console.log(
@@ -2256,6 +2299,12 @@ app.post(
         )
           ? req.body.completedDays
           : [];
+
+      const completedAtByDay =
+        req.body.completedAtByDay &&
+        typeof req.body.completedAtByDay === "object"
+          ? req.body.completedAtByDay
+          : {};
 
       const state =
         await withTransaction(
@@ -2362,42 +2411,6 @@ app.post(
                 );
               }
 
-              for (
-                const rawDay of
-                completedDays
-              ) {
-                const day =
-                  clampDay(rawDay);
-
-                await client.query(
-                  `
-                  INSERT INTO day_progress (
-                    user_id,
-                    cycle,
-                    day,
-                    completed_at
-                  )
-                  VALUES (
-                    $1, 1, $2, NOW()
-                  )
-                  ON CONFLICT (
-                    user_id,
-                    cycle,
-                    day
-                  )
-                  DO UPDATE SET
-                    completed_at =
-                      COALESCE(
-                        day_progress.completed_at,
-                        EXCLUDED.completed_at
-                      )
-                  `,
-                  [
-                    profile.userId,
-                    day
-                  ]
-                );
-              }
             } else {
               // V13.1:
               // Para usuarios existentes, PostgreSQL es la fuente de verdad
@@ -2416,6 +2429,61 @@ app.post(
                 `,
                 [
                   profile.userId
+                ]
+              );
+            }
+
+            const canonicalUser = await client.query(
+              `SELECT cycle, current_day, created_at
+               FROM users
+               WHERE id = $1
+               FOR UPDATE`,
+              [profile.userId]
+            );
+
+            const canonicalCycle =
+              Number(canonicalUser.rows[0]?.cycle || 1);
+            const canonicalCurrentDay =
+              Number(canonicalUser.rows[0]?.current_day || 1);
+            const canonicalUserCreatedAt =
+              canonicalUser.rows[0]?.created_at || null;
+
+            for (const rawDay of completedDays) {
+              const day = parseRoutineDay(rawDay);
+              if (day > canonicalCurrentDay) continue;
+              if (!isNew && day !== canonicalCurrentDay) continue;
+
+              const rawCompletedAt =
+                completedAtByDay[String(day)];
+              const completedAt =
+                normalizeClientCompletedAt(
+                  rawCompletedAt,
+                  {
+                    minAt: isNew
+                      ? null
+                      : canonicalUserCreatedAt
+                  }
+                );
+
+              await client.query(
+                `INSERT INTO day_progress (
+                   user_id,
+                   cycle,
+                   day,
+                   completed_at
+                 )
+                 VALUES ($1, $2, $3, $4)
+                 ON CONFLICT (user_id, cycle, day)
+                 DO UPDATE SET
+                   completed_at = COALESCE(
+                     day_progress.completed_at,
+                     EXCLUDED.completed_at
+                   )`,
+                [
+                  profile.userId,
+                  canonicalCycle,
+                  day,
+                  completedAt
                 ]
               );
             }
@@ -2536,6 +2604,16 @@ app.patch(
             );
 
             await advanceIfEligible(
+              client,
+              profile.userId
+            );
+
+            await recalculateProductRoutinePendingUnlocks(
+              client,
+              profile.userId
+            );
+
+            await advanceProductRoutinesIfEligible(
               client,
               profile.userId
             );
@@ -2775,6 +2853,11 @@ app.post(
               ]
             );
 
+            await recalculatePendingUnlock(
+              client,
+              userId
+            );
+
             return getState(
               client,
               userId
@@ -2942,10 +3025,170 @@ async function assertProductRoutineUserV98(client, userId) {
   }
 }
 
+async function advanceProductRoutinesIfEligible(client, userId = null) {
+  const params = [];
+  let userFilter = "";
+
+  if (userId) {
+    params.push(userId);
+    userFilter = "AND state.user_id = $1";
+  }
+
+  const result = await client.query(
+    `WITH due AS (
+       SELECT
+         state.user_id,
+         state.routine_id,
+         state.current_day,
+         state.next_unlock_at
+       FROM product_routine_states AS state
+       WHERE state.current_day < 10
+         AND state.next_unlock_at IS NOT NULL
+         AND state.next_unlock_at <= NOW()
+         ${userFilter}
+       FOR UPDATE
+     ),
+     advanced AS (
+       UPDATE product_routine_states AS state
+       SET
+         current_day = LEAST(state.current_day + 1, 10),
+         next_unlock_at = NULL,
+         updated_at = NOW()
+       FROM due
+       WHERE state.user_id = due.user_id
+         AND state.routine_id = due.routine_id
+       RETURNING
+         state.user_id,
+         state.routine_id,
+         state.current_day
+     ),
+     queued AS (
+       INSERT INTO routine_notification_jobs (
+         user_id,
+         routine_id,
+         cycle,
+         day,
+         kind,
+         scheduled_for,
+         status
+       )
+       SELECT
+         advanced.user_id,
+         advanced.routine_id,
+         1,
+         advanced.current_day,
+         'day_available',
+         due.next_unlock_at,
+         'pending'
+       FROM advanced
+       JOIN due
+         ON due.user_id = advanced.user_id
+        AND due.routine_id = advanced.routine_id
+       ON CONFLICT (
+         user_id,
+         routine_id,
+         cycle,
+         day,
+         kind
+       )
+       DO NOTHING
+       RETURNING id
+     )
+     SELECT
+       advanced.user_id,
+       advanced.routine_id,
+       advanced.current_day
+     FROM advanced`,
+    params
+  );
+
+  return result.rows;
+}
+
+async function recalculateProductRoutinePendingUnlock(
+  client,
+  userId,
+  routineId
+) {
+  const stateResult = await client.query(
+    `SELECT
+       state.current_day,
+       user_profile.timezone,
+       user_profile.notification_time
+     FROM product_routine_states AS state
+     JOIN users AS user_profile
+       ON user_profile.id = state.user_id
+     WHERE state.user_id = $1
+       AND state.routine_id = $2
+     FOR UPDATE OF state`,
+    [userId, routineId]
+  );
+
+  if (!stateResult.rowCount) return;
+
+  const state = stateResult.rows[0];
+  const currentDay = Number(state.current_day);
+
+  if (currentDay >= 10) {
+    await client.query(
+      `UPDATE product_routine_states
+       SET next_unlock_at = NULL, updated_at = NOW()
+       WHERE user_id = $1 AND routine_id = $2`,
+      [userId, routineId]
+    );
+    return;
+  }
+
+  const progressResult = await client.query(
+    `SELECT completed_at
+     FROM product_routine_day_progress
+     WHERE user_id = $1
+       AND routine_id = $2
+       AND day = $3`,
+    [userId, routineId, currentDay]
+  );
+
+  const completedAt = progressResult.rows[0]?.completed_at;
+
+  if (!completedAt) {
+    await client.query(
+      `UPDATE product_routine_states
+       SET next_unlock_at = NULL, updated_at = NOW()
+       WHERE user_id = $1 AND routine_id = $2`,
+      [userId, routineId]
+    );
+    return;
+  }
+
+  const next = nextUnlockAt({
+    openedAt: completedAt,
+    timezone: state.timezone,
+    notificationTime: state.notification_time
+  });
+
+  await client.query(
+    `UPDATE product_routine_states
+     SET next_unlock_at = $3, updated_at = NOW()
+     WHERE user_id = $1 AND routine_id = $2`,
+    [userId, routineId, next]
+  );
+}
+
+async function recalculateProductRoutinePendingUnlocks(client, userId) {
+  for (const routineId of PRODUCT_ROUTINE_IDS_V98) {
+    await recalculateProductRoutinePendingUnlock(
+      client,
+      userId,
+      routineId
+    );
+  }
+}
+
 async function getProductRoutineStatesV98(client, userId) {
   await assertProductRoutineUserV98(client, userId);
   const states = await client.query(
-    `SELECT routine_id, current_day FROM product_routine_states
+    `SELECT routine_id, current_day, next_unlock_at
+     FROM product_routine_states
      WHERE user_id = $1 ORDER BY routine_id`,
     [userId]
   );
@@ -2957,12 +3200,21 @@ async function getProductRoutineStatesV98(client, userId) {
   );
   const routines = {};
   for (const id of PRODUCT_ROUTINE_IDS_V98) {
-    routines[id] = { initialized: false, currentDay: 1, openedDays: {}, completedDays: [] };
+    routines[id] = {
+      initialized: false,
+      currentDay: 1,
+      nextUnlockAt: null,
+      openedDays: {},
+      completedDays: []
+    };
   }
   for (const row of states.rows) {
     if (routines[row.routine_id]) {
       routines[row.routine_id].initialized = true;
       routines[row.routine_id].currentDay = Number(row.current_day);
+      routines[row.routine_id].nextUnlockAt = row.next_unlock_at
+        ? new Date(row.next_unlock_at).getTime()
+        : null;
     }
   }
   for (const row of progress.rows) {
@@ -2981,9 +3233,31 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
       ? req.body.routines : {};
     const state = await withTransaction(async client => {
       await assertProductRoutineUserV98(client, userId);
+
+      const userCreatedAtResult = await client.query(
+        `SELECT created_at FROM users WHERE id = $1`,
+        [userId]
+      );
+      const userCreatedAt =
+        userCreatedAtResult.rows[0]?.created_at || null;
+
       for (const routineId of PRODUCT_ROUTINE_IDS_V98) {
         const local = localRoutines[routineId] || {};
         const currentDay = parseProductRoutineDayV98(local.currentDay || 1);
+        const completedAtByDay =
+          local.completedAtByDay &&
+          typeof local.completedAtByDay === "object"
+            ? local.completedAtByDay
+            : {};
+        const existingState = await client.query(
+          `SELECT current_day
+           FROM product_routine_states
+           WHERE user_id = $1 AND routine_id = $2
+           FOR UPDATE`,
+          [userId, routineId]
+        );
+        const isNewProductState = !existingState.rowCount;
+
         await client.query(
           `INSERT INTO product_routine_states (user_id, routine_id, current_day)
            VALUES ($1, $2, $3)
@@ -3005,41 +3279,49 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
             [userId, routineId, day, openedAt]
           );
         }
+        const canonicalState = await client.query(
+          `SELECT current_day
+           FROM product_routine_states
+           WHERE user_id = $1 AND routine_id = $2
+           FOR UPDATE`,
+          [userId, routineId]
+        );
+        const canonicalCurrentDay =
+          Number(canonicalState.rows[0]?.current_day || 1);
+
         for (const rawDay of Array.isArray(local.completedDays) ? local.completedDays : []) {
           const day = parseProductRoutineDayV98(rawDay);
+          if (day > canonicalCurrentDay) continue;
+          if (!isNewProductState && day !== canonicalCurrentDay) continue;
+
+          const rawCompletedAt = completedAtByDay[String(day)];
+          const completedAt = normalizeClientCompletedAt(
+            rawCompletedAt,
+            {
+              minAt: isNewProductState
+                ? null
+                : userCreatedAt
+            }
+          );
+
           await client.query(
             `INSERT INTO product_routine_day_progress
              (user_id, routine_id, day, completed_at)
-             VALUES ($1, $2, $3, NOW())
+             VALUES ($1, $2, $3, $4)
              ON CONFLICT (user_id, routine_id, day) DO UPDATE
              SET completed_at = COALESCE(product_routine_day_progress.completed_at, EXCLUDED.completed_at),
                  updated_at = NOW()`,
-            [userId, routineId, day]
+            [userId, routineId, day, completedAt]
           );
         }
-        await client.query(
-          `UPDATE product_routine_states
-           SET current_day = COALESCE(
-             (
-               SELECT candidate.day
-               FROM generate_series(1, 10) AS candidate(day)
-               WHERE NOT EXISTS (
-                 SELECT 1
-                 FROM product_routine_day_progress progress
-                 WHERE progress.user_id = $1
-                   AND progress.routine_id = $2
-                   AND progress.day = candidate.day
-                   AND progress.completed_at IS NOT NULL
-               )
-               ORDER BY candidate.day
-               LIMIT 1
-             ),
-             10
-           ), updated_at = NOW()
-           WHERE user_id = $1 AND routine_id = $2`,
-          [userId, routineId]
+
+        await recalculateProductRoutinePendingUnlock(
+          client,
+          userId,
+          routineId
         );
       }
+      await advanceProductRoutinesIfEligible(client, userId);
       return getProductRoutineStatesV98(client, userId);
     });
     res.json({ ok: true, state });
@@ -3049,7 +3331,10 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
 app.get("/api/product-routines/state/:userId", async (req, res, next) => {
   try {
     const userId = String(req.params.userId || "").trim();
-    const state = await withTransaction(client => getProductRoutineStatesV98(client, userId));
+    const state = await withTransaction(async client => {
+      await advanceProductRoutinesIfEligible(client, userId);
+      return getProductRoutineStatesV98(client, userId);
+    });
     res.json({ ok: true, state });
   } catch (error) { next(error); }
 });
@@ -3068,6 +3353,23 @@ app.post("/api/product-routines/open", async (req, res, next) => {
          SET updated_at = NOW()`,
         [userId, routineId, 1]
       );
+
+      await advanceProductRoutinesIfEligible(client, userId);
+
+      const routineStateResult = await client.query(
+        `SELECT current_day
+         FROM product_routine_states
+         WHERE user_id = $1 AND routine_id = $2
+         FOR UPDATE`,
+        [userId, routineId]
+      );
+      const currentDay = Number(routineStateResult.rows[0]?.current_day || 1);
+      if (day > currentDay) {
+        const error = new Error("Ese día todavía no está disponible.");
+        error.status = 409;
+        throw error;
+      }
+
       await client.query(
         `INSERT INTO product_routine_day_progress (user_id, routine_id, day, opened_at)
          VALUES ($1, $2, $3, NOW())
@@ -3091,9 +3393,27 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
       await assertProductRoutineUserV98(client, userId);
       await client.query(
         `INSERT INTO product_routine_states (user_id, routine_id, current_day)
-         VALUES ($1, $2, $3) ON CONFLICT (user_id, routine_id) DO NOTHING`,
-        [userId, routineId, day]
+         VALUES ($1, $2, 1)
+         ON CONFLICT (user_id, routine_id) DO NOTHING`,
+        [userId, routineId]
       );
+
+      await advanceProductRoutinesIfEligible(client, userId);
+
+      const routineStateResult = await client.query(
+        `SELECT current_day
+         FROM product_routine_states
+         WHERE user_id = $1 AND routine_id = $2
+         FOR UPDATE`,
+        [userId, routineId]
+      );
+      const currentDay = Number(routineStateResult.rows[0]?.current_day || 1);
+      if (day > currentDay) {
+        const error = new Error("Ese día todavía no está disponible.");
+        error.status = 409;
+        throw error;
+      }
+
       await client.query(
         `INSERT INTO product_routine_day_progress (user_id, routine_id, day, completed_at)
          VALUES ($1, $2, $3, NOW())
@@ -3102,58 +3422,12 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
              updated_at = NOW()`,
         [userId, routineId, day]
       );
-      await client.query(
-        `UPDATE product_routine_states
-         SET current_day = COALESCE(
-           (
-             SELECT candidate.day
-             FROM generate_series(1, 10) AS candidate(day)
-             WHERE NOT EXISTS (
-               SELECT 1
-               FROM product_routine_day_progress progress
-               WHERE progress.user_id = $1
-                 AND progress.routine_id = $2
-                 AND progress.day = candidate.day
-                 AND progress.completed_at IS NOT NULL
-             )
-             ORDER BY candidate.day
-             LIMIT 1
-           ),
-           10
-         ), updated_at = NOW()
-         WHERE user_id = $1 AND routine_id = $2`,
-        [userId, routineId]
-      );
-      // NU APP · PROGRAMACIÓN UNIFICADA DE RUTINAS V101
-      // Completar hoy programa el contenido siguiente para mañana,
-      // respetando la hora y la zona horaria elegidas por la persona.
-      if (day < 10) {
-        const notificationProfile = await client.query(
-          `SELECT timezone, notification_time FROM users WHERE id = $1`,
-          [userId]
+      if (day === currentDay) {
+        await recalculateProductRoutinePendingUnlock(
+          client,
+          userId,
+          routineId
         );
-        const schedule = notificationProfile.rows[0];
-        if (schedule) {
-          const scheduledFor = nextUnlockAt({
-            openedAt: new Date(),
-            timezone: schedule.timezone,
-            notificationTime: schedule.notification_time
-          });
-          await client.query(
-            `INSERT INTO routine_notification_jobs (
-               user_id, routine_id, cycle, day, kind, scheduled_for, status
-             ) VALUES ($1, $2, 1, $3, 'day_available', $4, 'pending')
-             ON CONFLICT (user_id, routine_id, cycle, day, kind)
-             DO UPDATE SET
-               scheduled_for = CASE
-                 WHEN routine_notification_jobs.status = 'sent'
-                   THEN routine_notification_jobs.scheduled_for
-                 ELSE LEAST(routine_notification_jobs.scheduled_for, EXCLUDED.scheduled_for)
-               END,
-               updated_at = NOW()`,
-            [userId, routineId, day + 1, scheduledFor]
-          );
-        }
       }
       return getProductRoutineStatesV98(client, userId);
     });

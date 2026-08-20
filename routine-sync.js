@@ -205,17 +205,28 @@ window.addEventListener("product-routines-state-updated", event => {
   Object.entries(routines).forEach(([routineId, serverState]) => {
     if (!ROUTINE_CATALOG[routineId] || ROUTINE_CATALOG[routineId].backend) return;
     if (serverState.initialized !== true) return;
+    const currentDay = Math.max(1, Math.min(10, Number(serverState.currentDay || 1)));
+    const nextUnlockAt = serverState.nextUnlockAt
+      ? Number(serverState.nextUnlockAt)
+      : null;
     const localState = {
-      currentDay: Math.max(1, Math.min(10, Number(serverState.currentDay || 1))),
+      currentDay,
       openedDays: serverState.openedDays || {},
-      nextUnlockAt: null,
+      nextUnlockAt,
+      pendingNextDay: nextUnlockAt && currentDay < 10 ? currentDay + 1 : null,
       scheduleProfileSignature: null
     };
     localStorage.setItem(`routineState:${routineId}`, JSON.stringify(localState));
     for (let day = 1; day <= 10; day++) {
       const key = `day:${routineId}:${day}:complete`;
-      if ((serverState.completedDays || []).includes(day)) localStorage.setItem(key, "1");
-      else localStorage.removeItem(key);
+      const completedAtKey = `day:${routineId}:${day}:completedAt`;
+
+      if ((serverState.completedDays || []).includes(day)) {
+        localStorage.setItem(key, "1");
+      } else {
+        localStorage.removeItem(key);
+        localStorage.removeItem(completedAtKey);
+      }
     }
   });
 

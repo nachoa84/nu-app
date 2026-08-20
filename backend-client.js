@@ -86,6 +86,25 @@
     return days;
   }
 
+  function getCompletedAtByDay() {
+    const completedAtByDay = {};
+
+    for (let day = 1; day <= 30; day++) {
+      const value =
+        Number(
+          localStorage.getItem(
+            `day${day}CompletedAt`
+          )
+        );
+
+      if (Number.isFinite(value) && value > 0) {
+        completedAtByDay[day] = value;
+      }
+    }
+
+    return completedAtByDay;
+  }
+
   async function request(path, options = {}) {
     const response = await fetch(path, {
       ...options,
@@ -177,7 +196,9 @@
           localState:
             getLocalRoutineState(),
           completedDays:
-            getCompletedDays()
+            getCompletedDays(),
+          completedAtByDay:
+            getCompletedAtByDay()
         })
       }
     );
@@ -291,6 +312,15 @@
 
     publishState(payload.state);
 
+    await getProductRoutineStatesV136()
+      .catch(error => {
+        console.warn(
+          "No se pudo refrescar el horario de las rutinas de producto.",
+          error
+        );
+        return null;
+      });
+
     return payload.state;
   }
 
@@ -334,13 +364,28 @@
         local = JSON.parse(localStorage.getItem(`routineState:${routineId}`) || "null") || local;
       } catch (error) { void error; }
       const completedDays = [];
+      const completedAtByDay = {};
       for (let day = 1; day <= 10; day++) {
-        if (localStorage.getItem(`day:${routineId}:${day}:complete`) === "1") completedDays.push(day);
+        if (localStorage.getItem(`day:${routineId}:${day}:complete`) === "1") {
+          completedDays.push(day);
+        }
+
+        const completedAt =
+          Number(
+            localStorage.getItem(
+              `day:${routineId}:${day}:completedAt`
+            )
+          );
+
+        if (Number.isFinite(completedAt) && completedAt > 0) {
+          completedAtByDay[day] = completedAt;
+        }
       }
       routines[routineId] = {
         currentDay: Math.max(1, Math.min(10, Number(local.currentDay || 1))),
         openedDays: local.openedDays || {},
-        completedDays
+        completedDays,
+        completedAtByDay
       };
     });
     return routines;
@@ -360,6 +405,18 @@
         routines: getLocalProductRoutinesV98()
       })
     });
+    publishProductRoutineStatesV98(payload.state);
+    return payload.state;
+  }
+
+  async function getProductRoutineStatesV136() {
+    const profile = ensureUserId();
+    if (!profile?.userId) return null;
+
+    const payload = await request(
+      `/api/product-routines/state/${encodeURIComponent(profile.userId)}`
+    );
+
     publishProductRoutineStatesV98(payload.state);
     return payload.state;
   }
@@ -392,6 +449,7 @@
     openDay,
     completeDay,
     bootstrapProductRoutinesV98,
+    getProductRoutineStatesV136,
     openProductRoutineDay,
     completeProductRoutineDay,
     updateProfile,
