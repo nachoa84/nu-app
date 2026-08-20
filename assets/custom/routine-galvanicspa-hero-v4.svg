@@ -1,3 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" preserveAspectRatio="xMidYMid meet">
-  <image width="900" height="1200" preserveAspectRatio="xMidYMid meet" href="data:image/webp;base64,UklGRlw3AQBXRUJQVlA4WAoAAAAQAAAAwwMA//8AQUxQSOzQAAAABO9JUZFtt9ggMMQH5G8R/i8O4QwQYO82MuZ9D6t2H6lS..."/>
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="720" viewBox="0 0 540 720" preserveAspectRatio="xMidYMid meet">
+  <image href="galvanic-v4-slice-1.svg" x="0" y="0" width="540" height="120" preserveAspectRatio="none"/>
+  <image href="galvanic-v4-slice-2.svg" x="0" y="120" width="540" height="120" preserveAspectRatio="none"/>
+  <image href="galvanic-v4-slice-3.svg" x="0" y="240" width="540" height="120" preserveAspectRatio="none"/>
+  <image href="galvanic-v4-slice-4.svg" x="0" y="360" width="540" height="120" preserveAspectRatio="none"/>
+  <image href="galvanic-v4-slice-5.svg" x="0" y="480" width="540" height="120" preserveAspectRatio="none"/>
+  <image href="galvanic-v4-slice-6.svg" x="0" y="600" width="540" height="120" preserveAspectRatio="none"/>
 </svg>
