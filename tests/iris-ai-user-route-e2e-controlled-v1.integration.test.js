@@ -226,7 +226,7 @@ test(
            'synthetic-user-route-e2e-authorization-v1',
            'es',
            'US',
-           NULL,
+           'integration-test',
            NULL,
            'v1',
            '2026-08-20T00:00:00Z',
