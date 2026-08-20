@@ -157,7 +157,7 @@
     );
   }
 
-  async function subscribe() {
+  async function subscribe({ permissionAlreadyGranted = false } = {}) {
     if (
       isAppleMobileDevice() &&
       !isStandaloneWebApp()
@@ -185,8 +185,9 @@
     }
 
     const permission =
-      await Notification
-        .requestPermission();
+      permissionAlreadyGranted
+        ? Notification.permission
+        : await Notification.requestPermission();
 
     if (
       permission !== "granted"
