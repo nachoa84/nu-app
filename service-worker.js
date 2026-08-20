@@ -1,4 +1,4 @@
-const CACHE="nuapp-v133-preview-network-fresh";
+const CACHE="nuapp-v134-galvanic-hero-v4";
 
 const CORE=[
   "./",
@@ -67,6 +67,7 @@ const CORE=[
   "./assets/custom/routine-lumispa-hero-v4.png",
   "./assets/custom/routine-wellspa-hero-v3.png",
   "./assets/custom/routine-galvanicspa-hero-v3.png",
+  "./assets/custom/routine-galvanicspa-hero-v4.png",
   "./assets/custom/routine-wellspa-home.jpg",
   "./assets/custom/routine-galvanicspa-home.webp",
   "./assets/custom/routine-pharmanex-home.png",
