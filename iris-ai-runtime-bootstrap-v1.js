@@ -22,6 +22,9 @@ const {
   createIrisAiLocalResponseEngineV1
 } = require("./iris-ai-local-response-v1");
 const {
+  createConservativeDirectRetrievalAssessorV1
+} = require("./iris-ai-direct-retrieval-assessor-v1");
+const {
   createIrisAiOrchestratorV1
 } = require("./iris-ai-orchestrator-v1");
 
@@ -131,8 +134,15 @@ function createIrisAiRuntimeBootstrapV1({
     logError
   });
 
+  const directRetrievalEnabled =
+    enabledFlagV1(env?.IRIS_AI_DIRECT_RETRIEVAL_ENABLED);
+
   const localResponseEngine =
-    createIrisAiLocalResponseEngineV1();
+    createIrisAiLocalResponseEngineV1({
+      retrievalAssessor: directRetrievalEnabled
+        ? createConservativeDirectRetrievalAssessorV1()
+        : undefined
+    });
 
   const provider = createConfiguredIrisAiProviderV1({
     config,
