@@ -55,7 +55,7 @@
   ];
 
   const ICONS_V95 = {
-    sparkle: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.15 3.1L16 7.25l-2.85 1.15L12 11.5l-1.15-3.1L8 7.25l2.85-1.15L12 3ZM6.5 11l1.65 4.35L12.5 17l-4.35 1.65L6.5 23l-1.65-4.35L.5 17l4.35-1.65L6.5 11Zm11-1 1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1 1.1-2.9Z"/></svg>`,
+    sparkle: `<svg viewBox="0 0 24 24" aria-hidden="true"><path style="fill:#4285F4" d="M12 3l1.15 3.1L16 7.25l-2.85 1.15L12 11.5l-1.15-3.1L8 7.25l2.85-1.15L12 3Z"/><path style="fill:#FBBC05" d="M6.5 11l1.65 4.35L12.5 17l-4.35 1.65L6.5 23l-1.65-4.35L.5 17l4.35-1.65L6.5 11Z"/><path style="fill:#EA4335" d="M17.5 10l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1 1.1-2.9Z"/></svg>`,
     close: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`,
     back: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>`,
     arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`,
@@ -344,6 +344,98 @@
     window.requestAnimationFrame(() => layer.classList.add("is-visible"));
   }
 
+  function setupIrisHeaderPolish() {
+    const header = document.querySelector("#view-bot .bot-page-header");
+    if (!header) return;
+
+    const title = header.querySelector("h1");
+    if (title && title.dataset.irisTitlePolish !== "1") {
+      title.dataset.irisTitlePolish = "1";
+      title.innerHTML = `Iris <span class="bot-title-note">- Tu Asistente</span>`;
+    }
+
+    if (!document.getElementById("irisHeaderPolishV131")) {
+      const style = document.createElement("style");
+      style.id = "irisHeaderPolishV131";
+      style.textContent = `
+        #view-bot .bot-page-header > div:first-child {
+          display: grid;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        #view-bot .bot-page-header h1 {
+          margin: 0;
+          display: flex;
+          align-items: baseline;
+          flex-wrap: wrap;
+          gap: 6px;
+          line-height: 1.05;
+        }
+
+        #view-bot .bot-title-note {
+          color: #6f7b8c;
+          font-size: .62em;
+          font-weight: 650;
+          letter-spacing: -.02em;
+        }
+
+        #view-bot .bot-status {
+          margin-top: 2px;
+        }
+
+        #view-bot .bot-header-actions {
+          gap: 8px;
+        }
+
+        #view-bot .bot-header-actions .icon-button {
+          width: 44px;
+          height: 44px;
+          min-width: 44px;
+          display: grid;
+          place-items: center;
+          padding: 0;
+          border: 1px solid rgba(120, 134, 159, .18);
+          border-radius: 14px;
+          background: #fff;
+          color: #4b5565;
+          box-shadow: 0 8px 18px rgba(15, 23, 42, .06);
+          transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease, border-color .16s ease;
+        }
+
+        #view-bot .bot-header-actions .icon-button:active {
+          transform: scale(.97);
+          box-shadow: 0 4px 10px rgba(15, 23, 42, .08);
+        }
+
+        #view-bot .bot-header-actions .icon-button svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        #view-bot #botShortcutsBtn {
+          background: linear-gradient(180deg, #fff 0%, #faf7ff 100%);
+          border-color: rgba(142, 92, 255, .18);
+        }
+
+        #view-bot #botClearBtn {
+          background: #fff;
+        }
+
+        @media (max-width: 380px) {
+          #view-bot .bot-header-actions { gap: 6px; }
+          #view-bot .bot-header-actions .icon-button {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+          }
+          #view-bot .bot-title-note { font-size: .56em; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
   function setupBotQuickAccess() {
     const button = document.getElementById("botShortcutsBtn");
     if (!button || button.dataset.quickAccessReady === "1") return;
@@ -352,6 +444,7 @@
     button.onclick = openBotQuickAccess;
   }
 
+  setupIrisHeaderPolish();
   setupBotQuickAccess();
   window.openBotQuickAccess = openBotQuickAccess;
   window.closeBotQuickAccess = closeBotQuickAccess;
