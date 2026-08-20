@@ -35,6 +35,17 @@ test("coincidencia completa normalizada habilita direct retrieval", async () => 
   });
 });
 
+test("normaliza puntuación sin convertir una consulta segura en semántica", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const result = await assess(
+    [fragment({ content: "Ficha: Ácido Hialurónico. Información autorizada." })],
+    { question: "ácido hialurónico!" }
+  );
+
+  assert.equal(result.directAnswer, true);
+  assert.equal(result.termCoverage, "high");
+});
+
 test("más de un fragmento nunca habilita respuesta directa", async () => {
   const assess = createConservativeDirectRetrievalAssessorV1();
   const result = await assess(
@@ -58,6 +69,82 @@ test("coincidencia parcial no se considera alta confianza", async () => {
   assert.equal(result.directAnswer, false);
   assert.equal(result.scopeMatch, false);
   assert.equal(result.termCoverage, "low");
+});
+
+test("una palabra corta queda fail-closed aunque aparezca en el fragmento", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const result = await assess(
+    [fragment({ content: "collagen plus está autorizado" })],
+    { question: "plus" }
+  );
+
+  assert.equal(result.directAnswer, false);
+});
+
+test("un identificador sintético largo puede mantener pruebas controladas", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const result = await assess(
+    [fragment({ content: "zzqvdirect731946825 dato sintético autorizado" })],
+    { question: "zzqvdirect731946825" }
+  );
+
+  assert.equal(result.directAnswer, true);
+});
+
+test("coincidencia embebida dentro de otra palabra queda fail-closed", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const result = await assess(
+    [fragment({ content: "microacido hialuronicoide referencia interna" })],
+    { question: "acido hialuronico" }
+  );
+
+  assert.equal(result.directAnswer, false);
+});
+
+test("consulta comparativa queda fail-closed aunque aparezca literal", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const question = "comparar collagen plus";
+  const result = await assess(
+    [fragment({ content: `${question} figura como encabezado documental` })],
+    { question }
+  );
+
+  assert.equal(result.directAnswer, false);
+});
+
+test("consulta de dosis queda fail-closed aunque aparezca literal", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const question = "dosis diaria collagen";
+  const result = await assess(
+    [fragment({ content: `${question} referencia documental` })],
+    { question }
+  );
+
+  assert.equal(result.directAnswer, false);
+});
+
+test("consulta de recomendación queda fail-closed aunque aparezca literal", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const question = "recomendacion collagen plus";
+  const result = await assess(
+    [fragment({ content: `${question} texto autorizado` })],
+    { question }
+  );
+
+  assert.equal(result.directAnswer, false);
+});
+
+test("marcador de contradicción en el fragmento impide respuesta directa", async () => {
+  const assess = createConservativeDirectRetrievalAssessorV1();
+  const result = await assess(
+    [fragment({
+      content: "Ácido hialurónico está contemplado. Sin embargo, existen excepciones por contexto."
+    })],
+    { question: "ácido hialurónico" }
+  );
+
+  assert.equal(result.directAnswer, false);
+  assert.equal(result.hasContradiction, true);
 });
 
 test("pregunta demasiado corta queda fail-closed", async () => {
