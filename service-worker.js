@@ -1,4 +1,4 @@
-const CACHE="nuapp-v131-iris-header-polish";
+const CACHE="nuapp-v133-preview-network-fresh";
 
 const CORE=[
   "./",
@@ -170,14 +170,11 @@ function parseByteRange(rangeHeader, totalSize) {
     return null;
   }
 
-  // Los reproductores de Safari/iOS usan un rango por request.
-  // Si alguna vez llega una petición multipart, atendemos el primer rango.
   const rawRange = rangeHeader.slice(6).split(",")[0].trim();
   const [rawStart = "", rawEnd = ""] = rawRange.split("-");
 
   let start;
   let end;
-  // Suffix range: bytes=-500
   if (rawStart === "") {
     const suffixLength = Number(rawEnd);
 
@@ -246,9 +243,6 @@ async function createPartialContentResponse(fullResponse, rangeHeader) {
     `bytes ${range.start}-${range.end}/${range.totalSize}`
   );
   headers.set("Content-Length", String(chunk.byteLength));
-
-  // El body entregado por fetch ya está decodificado.
-  // Evitamos conservar un Content-Encoding incompatible con el slice.
   headers.delete("Content-Encoding");
 
   return new Response(chunk, {
@@ -261,9 +255,6 @@ async function createPartialContentResponse(fullResponse, rangeHeader) {
 async function handleRangeRequest(request) {
   const rangeHeader = request.headers.get("range");
 
-  // V35.11.1: online usamos primero el Range nativo del servidor.
-  // Esto evita leer el MP4 completo desde Cache Storage para cada pequeño
-  // fragmento que pide Safari y mejora mucho el tiempo de inicio del video.
   try {
     const networkResponse = await fetch(request);
 
@@ -271,8 +262,6 @@ async function handleRangeRequest(request) {
       return networkResponse;
     }
 
-    // Algunos servidores ignoran Range y devuelven el archivo entero con 200.
-    // En ese caso generamos nosotros el 206 para mantener compatibilidad iOS.
     if (networkResponse.ok && networkResponse.status === 200) {
       const cache = await caches.open(CACHE);
       cache.put(request.url, networkResponse.clone()).catch(() => {});
@@ -282,12 +271,8 @@ async function handleRangeRequest(request) {
         rangeHeader
       );
     }
-  } catch (error) {
-    // Sin red: seguimos abajo con el archivo completo ya cacheado.
-  }
+  } catch (error) {}
 
-  // Fallback offline: si tenemos la copia completa en Cache Storage,
-  // construimos el fragmento 206 que Safari necesita para reproducir.
   const cached = await caches.match(request.url);
 
   if (cached && cached.ok && cached.status === 200) {
@@ -305,8 +290,6 @@ self.addEventListener("fetch",event=>{
 
   if(req.method!=="GET") return;
 
-  // Safari/iOS pide MP4 y otros recursos multimedia mediante Range requests.
-  // Un asset completo cacheado debe convertirse en 206 Partial Content.
   if(req.headers.has("range")){
     event.respondWith(
       handleRangeRequest(req)
@@ -314,9 +297,14 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // Para páginas HTML/navegaciones usamos network-first.
-  // Esto evita que la URL base quede mostrando un index.html viejo
-  // mientras una URL con ?demo=1 carga la versión nueva.
+  // Replit Preview (replit.dev) debe mostrar siempre el workspace actual.
+  // Evitamos Cache Storage para que los cambios de desarrollo aparezcan
+  // inmediatamente y no diverjan de la PWA publicada.
+  if (self.location.hostname.endsWith("replit.dev")) {
+    event.respondWith(fetch(req, { cache: "no-store" }));
+    return;
+  }
+
   if(req.mode==="navigate"){
     event.respondWith(
       fetch(req)
@@ -337,8 +325,6 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // Los videos se sirven bajo demanda y no se guardan automáticamente
-  // en Cache Storage. Esto evita que la PWA acumule cientos de MB.
   const requestUrl = new URL(req.url);
   const isVideoAsset = /\.(mp4|mov|m4v|webm)$/i.test(requestUrl.pathname);
 
@@ -356,7 +342,7 @@ self.addEventListener("fetch",event=>{
     );
     return;
   }
-  // Para el resto de los assets usamos cache-first y guardamos lo que falte.
+
   event.respondWith(
     caches.match(req).then(cached=>
       cached ||
@@ -371,6 +357,7 @@ self.addEventListener("fetch",event=>{
     )
   );
 });
+
 self.addEventListener(
   "push",
   event => {
@@ -412,15 +399,11 @@ self.addEventListener(
         tag:
           data.tag ||
           "rutina30",
-        // V111: un reenvío del mismo trabajo conserva el tag y reemplaza
-        // la tarjeta anterior en vez de alertar como una notificación nueva.
         renotify: false
           }
         )
     ];
 
-    // iOS/iPadOS Home Screen web apps soportan Badging API.
-    // Si está disponible, marcamos que hay una acción nueva.
     if (
       self.navigator &&
       "setAppBadge" in
