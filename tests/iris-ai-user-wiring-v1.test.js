@@ -32,7 +32,7 @@ test("bot conserva determinista primero y escala solo después de miss", () => {
   assert.ok(deterministicIndex >= 0);
   assert.ok(adapterIndex > deterministicIndex);
   assert.ok(escalationIndex > deterministicIndex);
-  assert.match(bot, /isDeterministicMissV1\(response\)/);
+  assert.match(bot, /isDeterministicMissV1\s*\(\s*response\s*\)/);
 });
 
 test("index carga adaptador Iris antes del bot determinista", () => {
