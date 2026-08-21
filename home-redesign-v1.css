@@ -1,0 +1,451 @@
+/*
+  NU APP · Home Screen — Propuesta Visual v1
+  ─────────────────────────────────────────────────────────
+  Scope estricto: #view-hoy únicamente.
+  Solo capa visual: color, tipografía, espaciado, radios,
+  sombras, microinteracciones.
+  Sin cambios en estructura, lógica, navegación, backend,
+  service worker, caché ni versiones.
+*/
+
+
+/* ═══════════════════════════════════════════════════════════
+   Tokens locales del Home
+   ═══════════════════════════════════════════════════════════ */
+#view-hoy {
+  --hv1-accent:       #3b4ee8;
+  --hv1-accent-dark:  #2c3fda;
+  --hv1-accent-soft:  #eceffe;
+  --hv1-ink:          #0d1528;
+  --hv1-muted:        #64707e;
+  --hv1-surface:      #ffffff;
+  --hv1-line:         #e5e9f0;
+  --hv1-guide-bg:     #111827;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Header: saludo + título
+   ═══════════════════════════════════════════════════════════ */
+
+.home-greeting {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hv1-muted);
+  margin-bottom: 5px;
+}
+
+#view-hoy .home-page-header h1,
+.home-page-header h1 {
+  font-size: 29px;
+  font-weight: 820;
+  letter-spacing: -0.05em;
+  color: var(--hv1-ink);
+  line-height: 1.04;
+}
+
+/* Bell button */
+.home-bell-btn {
+  background: var(--hv1-surface) !important;
+  border: 1.5px solid var(--hv1-line) !important;
+  box-shadow: 0 3px 10px rgba(13, 21, 40, 0.06) !important;
+  transition: transform 0.12s cubic-bezier(0.32, 0.72, 0, 1),
+              background 0.12s ease !important;
+}
+.home-bell-btn:active {
+  transform: scale(0.93) !important;
+  background: #f2f4f8 !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Guide card — tarjeta de inicio oscura + acento eléctrico
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reemplaza el contenedor section */
+#homeGuideSection.home-guide-section {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 24px;
+  padding: 0;
+  border: none;
+  border-radius: 24px;
+  background: var(--hv1-guide-bg);
+  box-shadow:
+    0 16px 40px rgba(13, 21, 40, 0.20),
+    0 4px 10px rgba(13, 21, 40, 0.10);
+}
+
+/* Elimina el pseudo círculo decorativo del original */
+#homeGuideSection.home-guide-section::after {
+  display: none;
+}
+
+/* Franja de acento superior */
+#homeGuideSection.home-guide-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--hv1-accent), #8270f5 60%, #b06ee4 100%);
+  border-radius: 24px 24px 0 0;
+  z-index: 2;
+}
+
+/* Brillo radial de fondo */
+#homeGuideSection.home-guide-feature::after,
+#homeGuideSection.home-guide-section .home-guide-feature {
+  position: relative;
+}
+
+#homeGuideSection.home-guide-section .home-guide-feature::after {
+  content: '';
+  position: absolute;
+  top: -70px; right: -50px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 78, 232, 0.30) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Feature grid — preserva estructura original (2 col) */
+#homeGuideSection .home-guide-feature {
+  padding: 22px 20px 20px;
+  border-radius: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+#homeGuideSection .home-guide-feature-copy {
+  position: relative;
+  z-index: 1;
+}
+
+/* Kicker pill */
+#homeGuideSection .home-guide-kicker,
+.home-guide-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 11px;
+}
+
+/* Título */
+#homeGuideSection .home-guide-feature h2 {
+  margin: 0 0 9px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+/* Descripción */
+#homeGuideSection .home-guide-description {
+  max-width: 100%;
+  margin: 0 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 490;
+  line-height: 1.55;
+}
+
+/* Fila de progreso */
+#homeGuideSection .home-guide-progress-copy {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+  font-weight: 580;
+}
+
+#homeGuideSection .home-guide-progress-copy strong {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 740;
+}
+
+#homeGuideSection .home-guide-progress {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#homeGuideSection .home-guide-progress > span {
+  background: linear-gradient(90deg, var(--hv1-accent) 0%, #8270f5 100%);
+}
+
+/* Botón acción */
+#homeGuideSection .home-guide-action {
+  margin-top: 16px;
+  min-height: 39px;
+  padding: 0 15px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.90);
+  font-size: 13px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.15s ease, transform 0.12s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+#homeGuideSection .home-guide-action:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#homeGuideSection .home-guide-action:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Logo de marca: watermark sutil en el card oscuro */
+#homeGuideSection .home-guide-brand {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.10);
+  box-shadow: none;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+#homeGuideSection .home-guide-brand img {
+  width: 48px;
+  height: 48px;
+  opacity: 0.55;
+  filter: brightness(10) saturate(0);
+  drop-shadow: none;
+}
+
+/* Estado completado de guía */
+#homeGuideSection.home-guide-section.is-complete {
+  background: #1a1f2e;
+  box-shadow: 0 8px 20px rgba(13, 21, 40, 0.10);
+}
+
+#homeGuideSection.home-guide-section.is-complete .home-guide-action {
+  background: rgba(122, 200, 130, 0.12);
+  border-color: rgba(122, 200, 130, 0.22);
+  color: rgba(180, 230, 180, 0.85);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Section heading — "Mis rutinas"
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desacoplo el kicker del home-guide (que ya lo redefiní arriba)
+   y redefino solo el de .home-section-heading */
+.home-section-heading span {
+  color: var(--hv1-muted);
+  font-size: 10.5px;
+  font-weight: 740;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-section-heading h2 {
+  margin: 4px 0 0;
+  color: var(--hv1-ink);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.042em;
+  line-height: 1.08;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Routine cards — grid y espacio
+   ═══════════════════════════════════════════════════════════ */
+
+.home-routines {
+  gap: 10px;
+}
+
+
+/* ── Tarjeta activa ─────────────────────────────────────── */
+#view-hoy .home-routine-card-active {
+  background: var(--hv1-surface);
+  border: none;
+  border-radius: 22px;
+  box-shadow:
+    0 12px 32px rgba(13, 21, 40, 0.09),
+    0 2px 6px rgba(13, 21, 40, 0.04);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.14s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.14s ease;
+}
+
+/* Barra lateral de acento — señal visual de "activa" */
+#view-hoy .home-routine-card-active::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--hv1-accent) 0%, #7060f2 100%);
+  border-radius: 0 3px 3px 0;
+  z-index: 1;
+}
+
+#view-hoy .home-routine-card-active:active {
+  transform: scale(0.993);
+  box-shadow: 0 6px 18px rgba(13, 21, 40, 0.07);
+}
+
+/* Cover de la rutina activa */
+#view-hoy .home-routine-card-active .home-routine-cover {
+  background: linear-gradient(150deg, var(--hv1-accent-soft) 0%, #dde3fc 100%);
+  border-radius: 16px;
+}
+
+/* Título de rutina */
+#view-hoy .home-routine-card-active .home-routine-heading h2 {
+  font-size: 17.5px;
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  color: var(--hv1-ink);
+}
+
+/* "Día X de 30" */
+#view-hoy .home-routine-card-active .home-routine-day {
+  font-size: 13px;
+  font-weight: 530;
+  color: var(--hv1-muted);
+  margin: 4px 0 10px;
+}
+
+/* Barra de progreso */
+#view-hoy .home-routine-card-active .home-routine-progress {
+  height: 5px;
+  background: var(--hv1-accent-soft);
+  border-radius: 999px;
+}
+
+#view-hoy .home-routine-card-active .home-routine-progress > span {
+  background: linear-gradient(90deg, var(--hv1-accent) 0%, #7060f2 100%);
+  transition: width 360ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Porcentaje */
+#view-hoy .home-routine-card-active .home-routine-percent {
+  font-size: 11.5px;
+  font-weight: 740;
+  color: var(--hv1-accent);
+}
+
+
+/* ── Botón "Continuar Día X" ────────────────────────────── */
+#view-hoy .home-routine-continue {
+  background: var(--hv1-accent);
+  color: #ffffff;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 740;
+  letter-spacing: -0.015em;
+  box-shadow: 0 5px 16px rgba(59, 78, 232, 0.32);
+  transition:
+    transform 0.13s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.13s ease,
+    background 0.13s ease;
+}
+
+#view-hoy .home-routine-continue:hover {
+  background: var(--hv1-accent-dark);
+  box-shadow: 0 7px 20px rgba(59, 78, 232, 0.40);
+}
+
+#view-hoy .home-routine-continue:active {
+  transform: scale(0.95);
+  background: var(--hv1-accent-dark);
+  box-shadow: 0 2px 8px rgba(59, 78, 232, 0.20);
+  color: rgba(255, 255, 255, 0.90);
+}
+
+
+/* ── Tarjetas placeholder "Próximamente" ────────────────── */
+#view-hoy .home-routine-card-placeholder {
+  border: 1.5px dashed #d8dce5;
+  background: rgba(255, 255, 255, 0.50);
+  box-shadow: none;
+  border-radius: 22px;
+}
+
+#view-hoy .home-routine-card-placeholder .home-routine-cover {
+  background: linear-gradient(180deg, #f5f6f9 0%, #eef0f4 100%);
+}
+
+#view-hoy .home-routine-card-placeholder .home-routine-cover img {
+  opacity: 0.45;
+  filter: saturate(0.35) brightness(1.08);
+}
+
+#view-hoy .home-routine-card-placeholder .home-routine-heading h2 {
+  color: #8e97a5;
+  font-weight: 660;
+}
+
+#view-hoy .home-routine-card-placeholder .home-routine-day {
+  color: #aab0bb;
+}
+
+#view-hoy .home-routine-placeholder-label {
+  background: transparent;
+  border: 1.5px dashed #cdd2db;
+  color: #949daa;
+  font-size: 10.5px;
+  font-weight: 680;
+  letter-spacing: 0.01em;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Microinteracciones globales del Home
+   ═══════════════════════════════════════════════════════════ */
+
+/* Entrada suave de la vista Home */
+#view-hoy.active {
+  animation: home-v1-fadein 0.28s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes home-v1-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respeto por prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  #view-hoy.active {
+    animation: none !important;
+  }
+
+  #view-hoy .home-routine-continue,
+  .home-bell-btn,
+  #homeGuideSection .home-guide-action {
+    transition: none !important;
+  }
+}
