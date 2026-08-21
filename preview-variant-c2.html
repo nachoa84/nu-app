@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Variante C2 — Tierra refinada · Nu App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="navigation.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="ui-core.css" />
+  <link rel="stylesheet" href="home.css" />
+  <link rel="stylesheet" href="guide.css" />
+  <link rel="stylesheet" href="shell.css" />
+  <link rel="stylesheet" href="native-visual-v117.css" />
+  <link rel="stylesheet" href="home-redesign-v1.css" />
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       VARIANTE C2 — TIERRA REFINADA
+       Fondo: #1C1510 (carbón cálido, menos pesado que C1)
+       Acento: #C26248 (terracota desaturado, más arcilla/siena)
+       Nav:    #2A1E16 (superficie levantada, presencia clara)
+       ══════════════════════════════════════════════════════════ */
+
+    :root {
+      /* Fondo: carbón cálido — menos marrón cerrado, más
+         "dark warm neutral". Levantado ~15% vs la C1 original. */
+      --c2-bg:           #1C1510;
+      --c2-surface:      #261A12;   /* cards principales */
+      --c2-surface-2:    #2E2216;   /* capas secundarias */
+      --c2-guide:        #201610;   /* guide card — 1 tono más oscuro que surface */
+
+      /* Nav — claramente más claro que el fondo: da la
+         sensación de "plano levantado", no de extensión del bg. */
+      --c2-nav:          #2E2016;
+
+      /* Acento: terracota desaturada / siena quemada.
+         Más refinado que el naranja-terracota de C1. */
+      --c2-accent:       #C26248;
+      --c2-accent-hi:    #D47054;   /* estado hover / gradiente claro */
+      --c2-accent-dark:  #A85038;   /* press / gradiente oscuro */
+      --c2-accent-glow:  rgba(194, 98, 72, 0.36);
+      --c2-accent-soft:  rgba(194, 98, 72, 0.16);
+
+      /* Texto */
+      --c2-ink:          #F0E8E2;
+      --c2-muted:        rgba(240, 232, 226, 0.48);
+      --c2-muted-dim:    rgba(240, 232, 226, 0.28);
+
+      /* Bordes y líneas */
+      --c2-line:         rgba(194, 98, 72, 0.16);
+      --c2-line-strong:  rgba(194, 98, 72, 0.24);
+      --c2-progress-bg:  rgba(194, 98, 72, 0.14);
+    }
+
+    /* ── Layout base ──────────────────────────────────────── */
+    body {
+      background: var(--c2-bg);
+    }
+
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+      background: var(--c2-bg);
+    }
+
+    main {
+      background: var(--c2-bg);
+    }
+
+    #view-hoy { display: block !important; }
+    .bottom-nav { position: fixed; }
+
+    /* ── Tokens del Home ──────────────────────────────────── */
+    #view-hoy {
+      --hv1-ink:         var(--c2-ink);
+      --hv1-muted:       var(--c2-muted);
+      --hv1-surface:     var(--c2-surface);
+      --hv1-accent:      var(--c2-accent);
+      --hv1-accent-dark: var(--c2-accent-dark);
+      --hv1-accent-soft: var(--c2-accent-soft);
+      --hv1-line:        var(--c2-line);
+      --hv1-guide-bg:    var(--c2-guide);
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .home-greeting {
+      color: var(--c2-muted) !important;
+    }
+
+    #view-hoy .home-page-header h1,
+    .home-page-header h1 {
+      color: var(--c2-ink) !important;
+    }
+
+    .home-bell-btn {
+      background: var(--c2-surface) !important;
+      border: 1.5px solid var(--c2-line-strong) !important;
+      color: var(--c2-ink) !important;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.36) !important;
+    }
+
+    /* ── Guide card ───────────────────────────────────────── */
+    #homeGuideSection.home-guide-section {
+      background: var(--c2-guide) !important;
+      box-shadow:
+        0 20px 48px rgba(0, 0, 0, 0.42),
+        0 6px 16px rgba(194, 98, 72, 0.12) !important;
+    }
+
+    /* Franja superior: de terracota a siena oscuro */
+    #homeGuideSection.home-guide-section::before {
+      background: linear-gradient(90deg,
+        var(--c2-accent-hi) 0%,
+        var(--c2-accent)    50%,
+        var(--c2-accent-dark) 100%) !important;
+    }
+
+    /* Brillo radial interno */
+    #homeGuideSection.home-guide-section .home-guide-feature::after {
+      background: radial-gradient(circle,
+        rgba(194, 98, 72, 0.20) 0%,
+        transparent 70%) !important;
+    }
+
+    #homeGuideSection .home-guide-action {
+      border-color: var(--c2-line-strong) !important;
+      background: rgba(194, 98, 72, 0.10) !important;
+      color: rgba(255, 255, 255, 0.92) !important;
+    }
+
+    #homeGuideSection .home-guide-action:hover {
+      background: rgba(194, 98, 72, 0.18) !important;
+    }
+
+    #homeGuideSection .home-guide-progress > span {
+      background: linear-gradient(90deg,
+        var(--c2-accent-hi) 0%,
+        var(--c2-accent-dark) 100%) !important;
+    }
+
+    /* ── Section heading ──────────────────────────────────── */
+    .home-section-heading span {
+      color: var(--c2-muted) !important;
+    }
+
+    .home-section-heading h2 {
+      color: var(--c2-ink) !important;
+    }
+
+    /* ── Tarjeta activa ───────────────────────────────────── */
+    #view-hoy .home-routine-card-active {
+      background: var(--c2-surface) !important;
+      box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.38),
+        0 4px 10px rgba(194, 98, 72, 0.10) !important;
+    }
+
+    /* Barra lateral — degradado terracota */
+    #view-hoy .home-routine-card-active::before {
+      background: linear-gradient(180deg,
+        var(--c2-accent-hi) 0%,
+        var(--c2-accent-dark) 100%) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-cover {
+      background: linear-gradient(150deg,
+        rgba(194, 98, 72, 0.14) 0%,
+        rgba(140, 60, 30, 0.24) 100%) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-heading h2 {
+      color: var(--c2-ink) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-day {
+      color: var(--c2-muted) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-progress {
+      background: var(--c2-progress-bg) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-progress > span {
+      background: linear-gradient(90deg,
+        var(--c2-accent-hi) 0%,
+        var(--c2-accent-dark) 100%) !important;
+    }
+
+    #view-hoy .home-routine-card-active .home-routine-percent {
+      color: var(--c2-accent-hi) !important;
+    }
+
+    /* ── Botón "Continuar Día X" — premium ───────────────── */
+    /* Gradient sutil + sombra de color estratificada */
+    #view-hoy .home-routine-continue {
+      background: linear-gradient(160deg,
+        var(--c2-accent-hi) 0%,
+        var(--c2-accent-dark) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.10) !important;
+      box-shadow:
+        0 6px 22px var(--c2-accent-glow),
+        0 2px 6px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+      color: #fff !important;
+      font-weight: 780 !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    #view-hoy .home-routine-continue:hover {
+      background: linear-gradient(160deg,
+        #D87860 0%,
+        var(--c2-accent) 100%) !important;
+      box-shadow:
+        0 8px 28px var(--c2-accent-glow),
+        0 3px 8px rgba(0, 0, 0, 0.28) !important;
+    }
+
+    #view-hoy .home-routine-continue:active {
+      background: linear-gradient(160deg,
+        var(--c2-accent) 0%,
+        #923828 100%) !important;
+      box-shadow:
+        0 2px 8px rgba(194, 98, 72, 0.20),
+        0 1px 3px rgba(0, 0, 0, 0.30) !important;
+      transform: scale(0.95);
+    }
+
+    /* ── Tarjetas "próximamente" — aspiracionales ────────── */
+    /* No deben sentirse desactivadas, sino como una promesa futura */
+    #view-hoy .home-routine-card-placeholder {
+      background: rgba(38, 26, 18, 0.60) !important;
+      border: 1.5px solid rgba(194, 98, 72, 0.20) !important;
+      border-radius: 22px !important;
+      box-shadow: none !important;
+    }
+
+    #view-hoy .home-routine-card-placeholder .home-routine-cover {
+      background: linear-gradient(150deg,
+        rgba(194, 98, 72, 0.08) 0%,
+        rgba(100, 50, 20, 0.16) 100%) !important;
+    }
+
+    /* Imagen: desaturada pero visible — reconocible, no fantasmal */
+    #view-hoy .home-routine-card-placeholder .home-routine-cover img {
+      opacity: 0.70 !important;
+      filter: saturate(0.45) brightness(1.06) !important;
+    }
+
+    #view-hoy .home-routine-card-placeholder .home-routine-heading h2 {
+      color: rgba(240, 232, 226, 0.62) !important;
+      font-weight: 700 !important;
+    }
+
+    #view-hoy .home-routine-card-placeholder .home-routine-day {
+      color: rgba(240, 232, 226, 0.40) !important;
+    }
+
+    /* Label "Nueva rutina" — usa el acento como tono aspiraional */
+    #view-hoy .home-routine-placeholder-label {
+      background: rgba(194, 98, 72, 0.08) !important;
+      border: 1px solid rgba(194, 98, 72, 0.22) !important;
+      color: rgba(212, 130, 100, 0.85) !important;
+      font-size: 10.5px !important;
+      font-weight: 680 !important;
+      letter-spacing: 0.03em !important;
+      border-radius: 999px !important;
+      padding: 3px 9px !important;
+    }
+
+    /* ── Nav inferior — presencia clara ─────────────────── */
+    /* La superficie del nav se separa visiblemente del fondo:
+       más clara, borde superior con acento, glow cálido. */
+    .bottom-nav {
+      background: rgba(46, 32, 22, 0.98) !important;
+      border-top: 1.5px solid rgba(194, 98, 72, 0.22) !important;
+      box-shadow:
+        0 -14px 36px rgba(0, 0, 0, 0.50),
+        0 -2px 0 rgba(194, 98, 72, 0.08) !important;
+      backdrop-filter: blur(28px) saturate(150%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+    }
+
+    .nav-btn {
+      color: rgba(240, 232, 226, 0.36) !important;
+    }
+
+    /* Ítem activo: acento + pequeño punto indicador */
+    .nav-btn.active {
+      color: var(--c2-accent-hi) !important;
+    }
+
+    /* Punto indicador bajo el ítem activo */
+    .nav-btn.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--c2-accent-hi);
+      opacity: 0.80;
+    }
+
+    :root {
+      --app-accent: var(--c2-accent);
+    }
+  </style>
+</head>
+<body data-active-view="hoy">
+  <div id="app">
+    <div style="position:fixed;top:12px;right:12px;z-index:999;background:rgba(194,98,72,0.14);border:1px solid rgba(194,98,72,0.30);border-radius:999px;padding:5px 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;color:#D47054;letter-spacing:0.06em;text-transform:uppercase;backdrop-filter:blur(8px);">C2 · Tierra</div>
+
+    <main>
+      <section id="view-hoy" class="view active">
+        <header class="app-page-header home-page-header">
+          <div>
+            <span class="home-greeting">Buenos días</span>
+            <h1>Inicio</h1>
+          </div>
+          <button class="icon-button home-bell-btn" type="button" aria-label="Notificaciones">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+          </button>
+        </header>
+
+        <section id="homeGuideSection" class="home-guide-section" aria-labelledby="homeGuideTitle">
+          <article class="home-guide-feature">
+            <div class="home-guide-feature-copy">
+              <span class="home-guide-kicker">Empezá por acá</span>
+              <h2 id="homeGuideTitle">Guía de inicio</h2>
+              <p class="home-guide-description">
+                Tus primeros pasos para comenzar con claridad y acompañamiento.
+              </p>
+              <div class="home-guide-progress-row">
+                <div class="home-guide-progress-copy">
+                  <span>3 de 9 etapas</span>
+                  <strong>33%</strong>
+                </div>
+                <div class="home-guide-progress" aria-hidden="true">
+                  <span style="width:33%"></span>
+                </div>
+              </div>
+              <button class="home-guide-action home-guide-open" type="button">
+                <span>Continuar</span>
+                <span class="home-guide-open-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </button>
+            </div>
+            <div class="home-guide-brand" aria-hidden="true">
+              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" onerror="this.style.display='none'" />
+            </div>
+          </article>
+        </section>
+
+        <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
+          <div class="home-section-heading">
+            <div>
+              <span>Tu día a día</span>
+              <h2 id="homeRoutinesTitle">Mis rutinas</h2>
+            </div>
+          </div>
+
+          <div class="home-routines">
+            <!-- Tarjeta activa -->
+            <article class="home-routine-card home-routine-card-active">
+              <div class="home-routine-cover" aria-hidden="true">
+                <img src="assets/custom/routine-collagen-home.png" alt="Collagen+"
+                  onerror="this.style.background='rgba(194,98,72,0.16)'" />
+              </div>
+              <div class="home-routine-body">
+                <div class="home-routine-heading"><h2>Collagen+</h2></div>
+                <p class="home-routine-day">Día 3 de 30</p>
+                <div class="home-routine-progress-row">
+                  <div class="home-routine-progress" aria-hidden="true">
+                    <span style="width:10%"></span>
+                  </div>
+                  <span class="home-routine-percent">10%</span>
+                </div>
+                <button class="home-routine-continue" type="button">
+                  <span>Continuar Día 3</span>
+                  <span aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </span>
+                </button>
+              </div>
+            </article>
+
+            <!-- Tarjeta próximamente 1 -->
+            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+              <div class="home-routine-cover" aria-hidden="true">
+                <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa"
+                  onerror="this.style.background='rgba(60,36,18,0.50)'" />
+              </div>
+              <div class="home-routine-body">
+                <div class="home-routine-heading"><h2>LumiSpa</h2></div>
+                <p class="home-routine-day">Próximamente</p>
+                <span class="home-routine-placeholder-label">Nueva rutina</span>
+              </div>
+            </article>
+
+            <!-- Tarjeta próximamente 2 -->
+            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
+              <div class="home-routine-cover" aria-hidden="true">
+                <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex"
+                  onerror="this.style.background='rgba(60,36,18,0.50)'" />
+              </div>
+              <div class="home-routine-body">
+                <div class="home-routine-heading"><h2>Suplementos</h2></div>
+                <p class="home-routine-day">Próximamente</p>
+                <span class="home-routine-placeholder-label">Nueva rutina</span>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button class="nav-btn active" data-view="hoy">
+        <span class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+        </span>
+        <span>Inicio</span>
+      </button>
+      <button class="nav-btn" data-view="favoritos">
+        <span class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </span>
+        <span>Favoritos</span>
+      </button>
+      <button class="nav-btn" data-view="bot">
+        <span class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v4M8 11V7a4 4 0 018 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>
+        </span>
+        <span>Iris</span>
+      </button>
+    </nav>
+  </div>
+</body>
+</html>
