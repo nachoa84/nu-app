@@ -81,11 +81,13 @@ function renderGuideOverview() {
   const root = document.getElementById("guideRoot");
   const headerTitle = document.getElementById("guideHeaderTitle");
   const headerKicker = document.getElementById("guideHeaderKicker");
+  const resetButton = document.getElementById("guideResetBtn");
   if (!root) return;
 
   const { progress, completed, percent } = guideProgressSummary();
   if (headerTitle) headerTitle.textContent = "Guía de inicio";
   if (headerKicker) headerKicker.textContent = "Primeros pasos";
+  if (resetButton) resetButton.hidden = completed === 0;
 
   const nextStep = GUIDE_STEPS.find(step => progress[step.id] !== true) || GUIDE_STEPS[0];
 
@@ -141,7 +143,6 @@ function renderGuideOverview() {
         }).join("")}
       </div>
     </section>
-
   `;
 
   root.querySelectorAll("[data-guide-open]").forEach(button => {
@@ -156,6 +157,7 @@ function renderGuideDetail(stepId) {
   const root = document.getElementById("guideRoot");
   const headerTitle = document.getElementById("guideHeaderTitle");
   const headerKicker = document.getElementById("guideHeaderKicker");
+  const resetButton = document.getElementById("guideResetBtn");
   if (!step || !root) return;
 
   guideActiveStepId = step.id;
@@ -166,6 +168,7 @@ function renderGuideDetail(stepId) {
 
   if (headerTitle) headerTitle.textContent = step.title;
   if (headerKicker) headerKicker.textContent = step.kicker;
+  if (resetButton) resetButton.hidden = true;
 
   root.innerHTML = `
     <article class="guide-detail">
@@ -254,37 +257,18 @@ function renderGuideDetail(stepId) {
           <span>${done ? ICONS.checkCircleFilled : ICONS.check}</span>
           <div>
             <strong>${done ? "Etapa completada" : "¿Terminaste esta etapa?"}</strong>
+            <p>${done ? "Tu avance quedó guardado en este dispositivo." : "Marcala para actualizar tu progreso en la guía."}</p>
           </div>
         </div>
-        ${done
-          ? ""
-          : `<button id="guideCompleteBtn" type="button">Marcar como completada</button>`
-        }
+        <button id="guideCompleteBtn" type="button" ${done ? 'disabled aria-disabled="true"' : ""}>${done ? "Etapa completada ✓" : "Marcar como completada"}</button>
       </section>
 
       <div class="guide-detail-footer">
-        ${done && !nextStep
-          ? `
-            <div class="guide-finish-message">
-              <strong>Completaste la guía</strong>
-              <p>Ya recorriste las 9 etapas. Podés volver al inicio o reiniciar la guía cuando quieras.</p>
-            </div>
-            <button id="guideHomeBtn" class="guide-primary-button" type="button">
-              <span>Volver al inicio</span>${ICONS.arrow}
-            </button>
-            <button id="guideResetFinalBtn" class="guide-secondary-button" type="button">
-              Reiniciar guía
-            </button>
-          `
-          : nextStep && done
-            ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Continuar con ${nextStep.shortTitle}</span>${ICONS.arrow}</button>`
-            : ""
-        }
-
-        ${nextStep
-          ? `<button id="guideIndexBtn" class="guide-secondary-button" type="button">Volver a todas las etapas</button>`
-          : ""
-        }
+        <button id="guideIndexBtn" class="guide-secondary-button" type="button">Ver todas las etapas</button>
+        ${nextStep ? (done
+          ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Siguiente: ${nextStep.shortTitle}</span>${ICONS.arrow}</button>`
+          : `<button id="guideNextBtn" class="guide-primary-button" type="button" disabled aria-disabled="true"><span>Marcá como completada para continuar</span>${ICONS.arrow}</button>`
+        ) : ""}
       </div>
     </article>
   `;
@@ -308,16 +292,6 @@ function renderGuideDetail(stepId) {
   const nextButton = document.getElementById("guideNextBtn");
   if (nextButton && nextStep && done) {
     nextButton.onclick = () => renderGuideDetail(nextStep.id);
-  }
-
-  const homeButton = document.getElementById("guideHomeBtn");
-  if (homeButton) {
-    homeButton.onclick = () => activateMainView("hoy");
-  }
-
-  const resetFinalButton = document.getElementById("guideResetFinalBtn");
-  if (resetFinalButton) {
-    resetFinalButton.onclick = resetGuideProgress;
   }
 
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -346,6 +320,7 @@ function setupGuideView() {
   const openButton = document.getElementById("openGuideBtn");
   const openIcon = document.querySelector(".home-guide-open-icon");
   const backButton = document.getElementById("guideBackBtn");
+  const resetButton = document.getElementById("guideResetBtn");
 
   if (openIcon) openIcon.innerHTML = ICONS.arrow;
   if (openButton) openButton.onclick = openGuideView;
@@ -359,6 +334,11 @@ function setupGuideView() {
       }
       activateMainView("hoy");
     };
+  }
+
+  if (resetButton) {
+    resetButton.innerHTML = ICONS.trash;
+    resetButton.onclick = resetGuideProgress;
   }
 
   updateGuideHomeSummary();

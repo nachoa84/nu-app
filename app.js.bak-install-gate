@@ -50,8 +50,6 @@ window.addEventListener(
     e.preventDefault();
 
     deferredPrompt = e;
-    window.__nuDeferredInstallPrompt = e;
-    window.dispatchEvent(new Event("nu-install-ready"));
 
     installBtn?.classList.remove("hidden");
   }

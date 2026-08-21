@@ -1230,37 +1230,3 @@ body.onboarding-open {
   margin: 28px auto 30px;
   object-fit: contain;
 }
-
-
-.ios-install-step-body {
-  flex: 1;
-}
-
-.ios-install-step-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.ios-install-inline-icon {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: rgba(120, 100, 180, 0.12);
-  color: var(--primary, #7657d6);
-  flex: 0 0 28px;
-}
-
-.ios-install-inline-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.ios-install-step-body p {
-  margin: 0;
-  line-height: 1.5;
-}

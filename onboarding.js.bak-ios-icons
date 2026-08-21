@@ -290,51 +290,17 @@
               <div id="iosInstallGuide" class="ios-install-guide" hidden>
                 <div class="ios-install-step">
                   <span>1</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <path d="M12 16V4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M8.5 7.5L12 4l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M5 11v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Tocá Compartir</strong>
-                    </div>
-                    <p>Buscá el botón de Safari con el <strong>cuadrado y la flecha hacia arriba</strong>.</p>
-                  </div>
+                  <p>Tocá el botón <strong>Compartir</strong> de Safari.</p>
                 </div>
 
                 <div class="ios-install-step">
                   <span>2</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="2"/>
-                          <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Elegí “Agregar a pantalla de inicio”</strong>
-                    </div>
-                    <p>Dentro del menú, buscá la opción para agregar la app a tu pantalla de inicio.</p>
-                  </div>
+                  <p>Elegí <strong>Agregar a pantalla de inicio</strong>.</p>
                 </div>
 
                 <div class="ios-install-step">
                   <span>3</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <rect x="5" y="5" width="14" height="14" rx="4" stroke="currentColor" stroke-width="2"/>
-                          <path d="M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Abrila desde el nuevo ícono</strong>
-                    </div>
-                    <p>Confirmá <strong>Agregar</strong> y después abrí la app desde el nuevo ícono en tu iPhone.</p>
-                  </div>
+                  <p>Confirmá <strong>Agregar</strong> y abrila desde el nuevo ícono.</p>
                 </div>
               </div>
             `

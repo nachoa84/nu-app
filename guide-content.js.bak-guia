@@ -244,17 +244,11 @@ const GUIDE_STEPS = [
     summary: "Conectate con una tribu real para preguntar, compartir y celebrar avances.",
     highlight: "En este camino no estás sol@. Lo hacemos junt@s.",
     paragraphs: [
+      "En el transcurso de esta primera semana o en cuanto comiences a tener tus primeras ventas o socios, estarás list@ para unirte a la comunidad privada de WhatsApp.",
       "Si seguís este paso a paso con intención y acción, vas a empezar a tener tus primeras ventas, socios y comisiones.",
       "Es un espacio poderoso, creado para personas comprometidas como vos.",
       "Conectás con personas de distintos países, edades y profesiones, que ya están en movimiento y construyendo su negocio como vos. Ahí vas a poder compartir inquietudes, hacer preguntas, celebrar tus avances y sentirte sostenid@ y acompañad@ por una tribu real.",
-      "Si deseás formar parte y sentís que este espacio es para vos, sumate desde el enlace de la comunidad."
-    ],
-    resources: [
-      {
-        title: "Unirme a la comunidad",
-        url: "https://chat.whatsapp.com/EIsYLiPuGIQE8rODmRrKqD",
-        type: "community"
-      }
+      "Si deseás formar parte y sentís que este espacio es para vos, pedime el acceso."
     ],
     gallery: [
       "assets/guide/community/community-01.jpg",

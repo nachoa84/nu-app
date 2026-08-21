@@ -231,191 +231,6 @@
     );
   }
 
-  function isStandaloneApp() {
-    return Boolean(
-      window.matchMedia?.("(display-mode: standalone)")?.matches ||
-      window.navigator.standalone === true
-    );
-  }
-
-  function isMobileDevice() {
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  }
-
-  function isAppleMobile() {
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  }
-
-  function showInstallationGate() {
-    if (!isMobileDevice() || isStandaloneApp()) return false;
-
-    const overlay = document.createElement("div");
-    overlay.id = "installationGate";
-    overlay.className = "install-gate-overlay";
-
-    const apple = isAppleMobile();
-
-    overlay.innerHTML = `
-      <div class="install-gate-panel">
-        <img
-          src="./assets/guide/logo-nu-comunidad-transparent.png"
-          alt="Nu App"
-          class="install-gate-logo"
-        >
-
-        <span class="onboarding-eyebrow">
-          ${apple ? "EN TU IPHONE" : "EN TU TELÉFONO"}
-        </span>
-
-        <h1>Llevá tu comunidad siempre con vos</h1>
-
-        <p class="install-gate-lead">
-          Instalá la app para acceder a tu comunidad, tus rutinas y tus herramientas
-          desde un solo lugar, y recibir tus avisos directamente en el teléfono.
-        </p>
-
-        ${
-          apple
-            ? `
-              <button id="showIosInstallGuide" class="onboarding-primary" type="button">
-                Agregar a inicio
-              </button>
-
-              <p class="install-gate-hint">
-                Solo te va a tomar unos segundos.
-              </p>
-
-              <div id="iosInstallGuide" class="ios-install-guide" hidden>
-                <div class="ios-install-step">
-                  <span>1</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <path d="M12 16V4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M8.5 7.5L12 4l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M5 11v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Tocá Compartir</strong>
-                    </div>
-                    <p>Buscá el botón de Safari con el <strong>cuadrado y la flecha hacia arriba</strong>.</p>
-                  </div>
-                </div>
-
-                <div class="ios-install-step">
-                  <span>2</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="2"/>
-                          <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Elegí “Agregar a pantalla de inicio”</strong>
-                    </div>
-                    <p>Dentro del menú, buscá la opción para agregar la app a tu pantalla de inicio.</p>
-                  </div>
-                </div>
-
-                <div class="ios-install-step">
-                  <span>3</span>
-                  <div class="ios-install-step-body">
-                    <div class="ios-install-step-head">
-                      <span class="ios-install-inline-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <rect x="5" y="5" width="14" height="14" rx="4" stroke="currentColor" stroke-width="2"/>
-                          <path d="M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </span>
-                      <strong>Abrila desde el nuevo ícono</strong>
-                    </div>
-                    <p>Confirmá <strong>Agregar</strong> y después abrí la app desde el nuevo ícono en tu iPhone.</p>
-                  </div>
-                </div>
-              </div>
-            `
-            : `
-              <button id="androidInstallBtn" class="onboarding-primary" type="button">
-                Instalar Nu App
-              </button>
-
-              <p id="androidInstallMessage" class="install-gate-hint">
-                Instalación rápida y gratuita.
-              </p>
-            `
-        }
-      </div>
-    `;
-
-    document.body.classList.add("onboarding-open");
-    document.body.appendChild(overlay);
-
-    if (apple) {
-      document.getElementById("showIosInstallGuide")?.addEventListener("click", () => {
-        const guide = document.getElementById("iosInstallGuide");
-        if (guide) guide.hidden = false;
-      });
-    } else {
-      const installButton = document.getElementById("androidInstallBtn");
-      const message = document.getElementById("androidInstallMessage");
-
-      const updateInstallState = () => {
-        if (!installButton) return;
-
-        if (window.__nuDeferredInstallPrompt) {
-          installButton.disabled = false;
-          installButton.textContent = "Instalar app";
-        }
-      };
-
-      updateInstallState();
-      window.addEventListener("nu-install-ready", updateInstallState, { once: true });
-
-      installButton?.addEventListener("click", async () => {
-        const prompt = window.__nuDeferredInstallPrompt;
-
-        if (!prompt) {
-          if (message) {
-            message.textContent =
-              "Si no aparece el instalador, abrí el menú del navegador y elegí “Instalar app” o “Agregar a pantalla principal”.";
-          }
-          return;
-        }
-
-        installButton.disabled = true;
-        installButton.textContent = "Instalando…";
-
-        try {
-          await prompt.prompt();
-          const choice = await prompt.userChoice;
-
-          window.__nuDeferredInstallPrompt = null;
-
-          if (choice.outcome === "accepted") {
-            installButton.textContent = "Instalada ✓";
-            if (message) {
-              message.textContent =
-                "Listo. Ahora abrila desde el nuevo ícono de tu teléfono.";
-            }
-          } else {
-            installButton.disabled = false;
-            installButton.textContent = "Instalar app";
-          }
-        } catch (error) {
-          console.warn("No se pudo abrir el instalador.", error);
-          installButton.disabled = false;
-          installButton.textContent = "Instalar app";
-        }
-      });
-    }
-
-    return true;
-  }
-
   function openOnboarding({ mode = "create" } = {}) {
     removeOverlay();
 
@@ -451,14 +266,14 @@
         <div class="onboarding-progress" aria-label="Paso ${state.step} de 2">
           <div class="onboarding-progress-head">
             <span>${state.step} de 2</span>
-            <strong>${state.step === 1 ? "Presentación" : "Bienvenida"}</strong>
+            <strong>${state.step === 1 ? "Presentación" : "Objetivo"}</strong>
           </div>
           <div class="onboarding-progress-track">
             <span style="width:${state.step === 1 ? "50%" : "100%"}"></span>
           </div>
           <div class="onboarding-progress-labels" aria-hidden="true">
             <span class="${state.step >= 1 ? "is-active" : ""}">Presentación</span>
-            <span class="${state.step >= 2 ? "is-active" : ""}">Bienvenida</span>
+            <span class="${state.step >= 2 ? "is-active" : ""}">Objetivo</span>
           </div>
         </div>
       `;
@@ -608,49 +423,65 @@
     }
 
     function renderObjectiveStep() {
+      const time = formatTime(state.hour, state.minute);
+
       return `
-        <section class="onboarding-step onboarding-welcome-step">
+        <section class="onboarding-step">
           <div class="onboarding-heading">
-            <span class="onboarding-eyebrow">BIENVENID@</span>
-            <h1>Bienvenidos a nuestra comunidad global</h1>
+            <span class="onboarding-eyebrow">TU META</span>
+            <h1>¿Qué querés lograr en estos 30 días?</h1>
+            <p>Elegí el objetivo que mejor represente lo que querés trabajar primero.</p>
           </div>
 
-          <div class="onboarding-welcome-copy">
-            <p>
-              Esta app fue creada exclusivamente para quienes forman parte de este equipo y de esta comunidad.
-            </p>
+          <div class="objective-options" role="radiogroup" aria-label="Objetivo principal">
+            ${OBJECTIVES.map(item => `
+              <button
+                class="objective-option${state.objective === item.id ? " is-selected" : ""}"
+                type="button"
+                data-objective="${item.id}"
+                role="radio"
+                aria-checked="${state.objective === item.id ? "true" : "false"}"
+              >
+                <span class="objective-radio">
+                  ${state.objective === item.id ? icon("check") : ""}
+                </span>
+                <span class="objective-copy">
+                  <strong>${item.title}</strong>
+                  <small>${item.text}</small>
+                </span>
+              </button>
+            `).join("")}
+          </div>
 
-            <p>
-              Queremos que tengas en un solo lugar las herramientas, la formación y el acompañamiento que pueden ayudarte a crecer, avanzar con más claridad y construir tu negocio digital paso a paso.
-            </p>
-
-            <p>
-              Nos alegra muchísimo que estés acá. A partir de hoy empezás un camino acompañado, con recursos, rutinas y espacios pensados para que no tengas que hacer todo sol@ y puedas enfocarte en lo que realmente importa: aprender, accionar y crecer.
-            </p>
-
-            <div class="onboarding-welcome-note">
-              <strong>Antes de comenzar:</strong>
-              <p>
-                Buscá un cuaderno que sientas tuyo y elegí un lugar donde puedas trabajar con foco. Ese espacio va a ser tu punto de partida para anotar ideas, metas, aprendizajes y todo lo que vayas construyendo en este proceso.
-              </p>
+          <div class="onboarding-time-section">
+            <div class="onboarding-time-heading">
+              <span class="onboarding-eyebrow">TU HORARIO</span>
+              <h2>¿A qué hora querés recibir tu acción del día?</h2>
             </div>
 
-            <p>
-              Lo que empieza hoy puede crecer mucho más de lo que imaginás. Paso a paso, con constancia, con visión y con una comunidad caminando con vos.
-            </p>
+            <button id="onboardingTimeBtn" class="onboarding-time-card" type="button">
+              <span class="time-card-icon">${icon("clock")}</span>
+              <span class="time-card-copy">
+                <strong>${time}</strong>
+                <small>Todos los días · ${escapeHtml(friendlyTimezoneLabel(state.timezone))}</small>
+              </span>
+              <span class="time-card-chevron">${icon("chevron")}</span>
+            </button>
 
-            <p class="onboarding-welcome-closing">
-              Esto recién comienza.
+            <p class="onboarding-time-help">
+              Al empezar, te pediremos permiso para enviarte el recordatorio.
+              Podrás cambiar este horario más adelante.
             </p>
           </div>
 
-          <button
-            id="finishOnboardingBtn"
-            class="onboarding-primary"
-            type="button"
-          >
-            Empecemos
-          </button>
+          <div id="objectiveError" class="onboarding-error" role="alert" hidden></div>
+
+          <div class="onboarding-bottom-action">
+            <button id="finishOnboardingBtn" class="onboarding-primary" type="button">
+              ${isEdit ? "Guardar cambios" : "Empezar mi rutina"}
+              <span>${icon("chevron")}</span>
+            </button>
+          </div>
         </section>
       `;
     }
@@ -1044,6 +875,14 @@
     }
 
     async function finish() {
+      if (!state.objective) {
+        setError(
+          "objectiveError",
+          "Elegí un objetivo para personalizar tu experiencia."
+        );
+        return;
+      }
+
       const finishButton =
         document.getElementById("finishOnboardingBtn");
 
@@ -1229,10 +1068,6 @@
     const isForcedOnboarding = params.get("onboarding") === "1";
 
     handleNewUserTestParam();
-
-    if (!previewMode && showInstallationGate()) {
-      return;
-    }
 
     if (isNewUserTest) {
       openOnboarding({ mode: "create" });

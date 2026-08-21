@@ -142,11 +142,23 @@ function renderGuideOverview() {
       </div>
     </section>
 
+    ${completed > 0 ? `
+      <div class="guide-reset-area">
+        <button id="guideResetTextBtn" class="guide-reset-text-button" type="button">
+          Reiniciar progreso de la guía
+        </button>
+      </div>
+    ` : ""}
   `;
 
   root.querySelectorAll("[data-guide-open]").forEach(button => {
     button.onclick = () => renderGuideDetail(button.dataset.guideOpen);
   });
+
+  const resetTextButton = document.getElementById("guideResetTextBtn");
+  if (resetTextButton) {
+    resetTextButton.onclick = resetGuideProgress;
+  }
 
   window.scrollTo({ top: 0, behavior: "auto" });
 }
@@ -263,28 +275,11 @@ function renderGuideDetail(stepId) {
       </section>
 
       <div class="guide-detail-footer">
-        ${done && !nextStep
-          ? `
-            <div class="guide-finish-message">
-              <strong>Completaste la guía</strong>
-              <p>Ya recorriste las 9 etapas. Podés volver al inicio o reiniciar la guía cuando quieras.</p>
-            </div>
-            <button id="guideHomeBtn" class="guide-primary-button" type="button">
-              <span>Volver al inicio</span>${ICONS.arrow}
-            </button>
-            <button id="guideResetFinalBtn" class="guide-secondary-button" type="button">
-              Reiniciar guía
-            </button>
-          `
-          : nextStep && done
-            ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Continuar con ${nextStep.shortTitle}</span>${ICONS.arrow}</button>`
-            : ""
-        }
-
-        ${nextStep
-          ? `<button id="guideIndexBtn" class="guide-secondary-button" type="button">Volver a todas las etapas</button>`
+        ${nextStep && done
+          ? `<button id="guideNextBtn" class="guide-primary-button" type="button"><span>Continuar con ${nextStep.shortTitle}</span>${ICONS.arrow}</button>`
           : ""
         }
+        <button id="guideIndexBtn" class="guide-secondary-button" type="button">Volver a todas las etapas</button>
       </div>
     </article>
   `;
@@ -308,16 +303,6 @@ function renderGuideDetail(stepId) {
   const nextButton = document.getElementById("guideNextBtn");
   if (nextButton && nextStep && done) {
     nextButton.onclick = () => renderGuideDetail(nextStep.id);
-  }
-
-  const homeButton = document.getElementById("guideHomeBtn");
-  if (homeButton) {
-    homeButton.onclick = () => activateMainView("hoy");
-  }
-
-  const resetFinalButton = document.getElementById("guideResetFinalBtn");
-  if (resetFinalButton) {
-    resetFinalButton.onclick = resetGuideProgress;
   }
 
   window.scrollTo({ top: 0, behavior: "auto" });

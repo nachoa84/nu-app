@@ -1,0 +1,86 @@
+Quiero que hagas una propuesta de rediseño visual para Nu App, pero SIN cambiar la estructura, navegación, lógica ni funcionalidades existentes.
+
+Objetivo:
+La app funciona bien, pero visualmente todavía se siente demasiado estática, rígida y con algunos componentes “duros”, especialmente botones, tarjetas y notificaciones internas.
+
+Quiero que trabajes únicamente la capa visual.
+
+Qué podés modificar:
+- Tipografía
+- Tamaños y pesos tipográficos
+- Botones
+- Bordes y radios
+- Tarjetas
+- Sombras
+- Espaciados
+- Jerarquía visual
+- Colores
+- Iconografía
+- Estados activos
+- Notificaciones internas
+- Microinteracciones sutiles
+- Sensación general de fluidez y modernidad
+
+Qué NO quiero:
+- No cambiar estructura
+- No cambiar navegación
+- No mover secciones
+- No eliminar contenido
+- No modificar lógica
+- No modificar backend
+- No modificar onboarding funcional
+- No modificar recuperación documental
+- No tocar notificaciones push ni su funcionamiento
+- No cambiar service worker, caché ni versiones
+- No publicar ni desplegar cambios
+
+Dirección estética:
+Quiero que Nu App se vea más moderna, dinámica, profesional y con mayor identidad propia.
+
+Evitar:
+- Estética de app de relax
+- Wellness
+- Meditación
+- Pasteles demasiado suaves
+- Diseño infantil
+- Estilo dashboard corporativo genérico
+- Exceso de cajas dentro de cajas
+- Bordes grises duros
+- Sombras exageradas
+- Gradientes usados en exceso
+
+Me interesa especialmente:
+1. Botones más modernos y con mejor presencia.
+2. Una tipografía con más personalidad, sin perjudicar la legibilidad.
+3. Tarjetas menos rígidas.
+4. Notificaciones internas mucho más visuales y agradables, tipo feed de actividad moderno.
+5. Mejor uso del color para generar profundidad y jerarquía.
+6. Más aire entre componentes.
+7. Microinteracciones discretas que hagan que la app no se sienta estática.
+8. Mantener una sensación de comunidad, crecimiento y acción.
+
+IMPORTANTE:
+No quiero que rediseñes toda la app de una sola vez.
+
+Primero elegí UNA pantalla representativa de Nu App que ya exista y aplicá ahí una propuesta visual completa.
+
+Usá exactamente:
+- La estructura actual de esa pantalla
+- Los textos actuales
+- Las funcionalidades actuales
+- Los componentes actuales
+
+Solo quiero ver cómo quedaría con la nueva dirección visual.
+
+Antes de extender cualquier cambio al resto de la app, mostrame esa pantalla en Preview para que pueda evaluarla.
+
+También quiero que me expliques brevemente:
+- Qué tipografía elegiste y por qué
+- Qué paleta usaste
+- Qué cambiaste en botones
+- Qué cambiaste en tarjetas
+- Qué cambiaste en notificaciones
+- Qué microinteracciones agregaste
+
+No publiques nada.
+No extiendas el rediseño al resto de la app hasta que yo lo apruebe.

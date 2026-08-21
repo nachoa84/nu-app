@@ -200,7 +200,7 @@
             <span id="guideHeaderKicker" class="page-kicker">Primeros pasos</span>
             <h1 id="guideHeaderTitle">Guía de inicio</h1>
           </div>
-
+          <button id="guideResetBtn" class="icon-button guide-reset-btn" type="button" aria-label="Reiniciar progreso" hidden></button>
         </header>
         <div id="guideRoot" class="guide-root"></div>
       </section>
