@@ -528,6 +528,18 @@ body[data-active-view="favoritos"] .nav-btn.active {
   color: var(--fav-ref-ink);
 }
 
+body[data-active-view="favoritos"] .nav-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
 body[data-active-view="favoritos"] .nav-btn > span:last-child {
   position: absolute;
   width: 1px;
