@@ -190,9 +190,8 @@ function createRoutineChoiceCardV92a(config) {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>${config.title}</h2></div>
-      <p class="home-routine-day">Rutina de ${config.totalDays} días</p>
       <button class="home-routine-open" type="button" aria-label="Abrir rutina ${config.title}">
-        <span>${currentDay > 1 ? `Continuar Día ${currentDay}` : "Comenzar rutina"}</span>
+        <span>Continuar Día ${currentDay}</span>
         <span aria-hidden="true">›</span>
       </button>
     </div>`;
@@ -281,7 +280,6 @@ function getRoutineCardStateV92b(config) {
 function createFixedRoutineCardV92b(config) {
   const state = getRoutineCardStateV92b(config);
   const currentDay = Math.max(1, Math.min(Number(state.currentDay || 1), config.totalDays));
-  const percent = Math.min(100, Math.round((currentDay / config.totalDays) * 100));
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-active home-routine-card-fixed";
   card.dataset.routineId = config.id;
@@ -292,13 +290,8 @@ function createFixedRoutineCardV92b(config) {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>${config.title}</h2></div>
-      <p class="home-routine-day">Día ${currentDay} de ${config.totalDays}</p>
-      <div class="home-routine-progress-row">
-        <div class="home-routine-progress" aria-hidden="true"><span style="width:${percent}%"></span></div>
-        <span class="home-routine-percent">${percent}%</span>
-      </div>
       <button class="home-routine-continue" type="button" aria-label="Abrir rutina ${config.title}">
-        <span>${currentDay > 1 ? `Continuar Día ${currentDay}` : "Comenzar rutina"}</span>
+        <span>Continuar Día ${currentDay}</span>
         <span class="home-routine-continue-icon" aria-hidden="true">›</span>
       </button>
     </div>`;
@@ -317,8 +310,7 @@ function createUpcomingPharmanexCardV123() {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>Suplementos</h2></div>
-      <p class="home-routine-day">Pharmanex · Próximamente</p>
-      <span class="home-routine-placeholder-label">Nueva rutina</span>
+      <p class="home-routine-day">Próximamente</p>
     </div>`;
   return card;
 }
@@ -537,14 +529,7 @@ function getRoutineCardProgressV100(config) {
 
 createFixedRoutineCardV92b = function createFixedRoutineCardV100(config) {
   const progress = getRoutineCardProgressV100(config);
-  const action = progress.complete
-    ? "Rutina completada"
-    : progress.completed > 0
-      ? `Continuar Día ${progress.currentDay}`
-      : "Comenzar rutina";
-  const dayLabel = progress.complete
-    ? `${config.totalDays} de ${config.totalDays} días completados`
-    : `Día ${progress.currentDay} de ${config.totalDays}`;
+  const action = `Continuar Día ${progress.currentDay}`;
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-active home-routine-card-fixed";
   card.dataset.routineId = config.id;
@@ -555,11 +540,6 @@ createFixedRoutineCardV92b = function createFixedRoutineCardV100(config) {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>${config.title}</h2></div>
-      <p class="home-routine-day">${dayLabel}</p>
-      <div class="home-routine-progress-row">
-        <div class="home-routine-progress" aria-hidden="true"><span style="width:${progress.percent}%"></span></div>
-        <span class="home-routine-percent">${progress.percent}%</span>
-      </div>
       <button class="home-routine-continue" type="button" aria-label="Abrir rutina ${config.title}">
         <span>${action}</span>
         <span class="home-routine-continue-icon" aria-hidden="true">›</span>
