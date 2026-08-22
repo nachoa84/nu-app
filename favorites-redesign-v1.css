@@ -116,7 +116,6 @@
   min-width: 0;
 }
 
-/* Rutinas guardadas: tarjetas editoriales limpias */
 #view-favoritos .favorite-routine-tile {
   position: relative;
   width: 100%;
@@ -202,7 +201,6 @@
   height: 18px;
 }
 
-/* DÍAS: carrusel visual */
 #view-favoritos:not(.favorite-day-open) .favorite-routine-days,
 #view-favoritos:not(.favorite-day-open) .favorite-day-strip {
   display: flex;
@@ -224,8 +222,7 @@
   text-align: left;
 }
 
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview.favorite-folder-preview {
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
   width: 122px;
   min-width: 122px;
   height: 136px;
@@ -255,7 +252,6 @@
   line-height: 1.2;
 }
 
-/* GUARDADOS DE IRIS/BOT */
 #view-favoritos .bot-favorite-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 40px;
@@ -324,7 +320,6 @@
   box-shadow: none;
 }
 
-/* DETALLE */
 #view-favoritos.favorite-day-open {
   padding-top: calc(18px + var(--safe-top));
 }
@@ -408,7 +403,6 @@
   font-size: 11px;
 }
 
-/* BÚSQUEDA */
 #view-favoritos .favorites-search-panel {
   grid-template-columns: 42px minmax(0, 1fr);
   gap: 9px;
@@ -439,7 +433,6 @@
   font-size: 13px;
 }
 
-/* VACÍO */
 #view-favoritos .favorites-list.empty-state {
   min-height: 390px;
   display: flex;
@@ -502,7 +495,6 @@
   font-weight: 700;
 }
 
-/* NAV inferior: mismo lenguaje minimalista del Inicio */
 body[data-active-view="favoritos"] .bottom-nav {
   bottom: 0;
   width: min(430px, 100%);
@@ -533,8 +525,8 @@ body[data-active-view="favoritos"] .nav-btn.active::after {
   position: absolute;
   left: 50%;
   bottom: 4px;
-  width: 4px;
-  height: 4px;
+  width: 5.5px;
+  height: 5.5px;
   border-radius: 50%;
   background: currentColor;
   transform: translateX(-50%);
