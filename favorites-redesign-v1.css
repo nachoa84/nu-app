@@ -533,8 +533,8 @@ body[data-active-view="favoritos"] .nav-btn.active::after {
   position: absolute;
   left: 50%;
   bottom: 4px;
-  width: 7px;
-  height: 7px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: currentColor;
   transform: translateX(-50%);
