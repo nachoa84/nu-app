@@ -1,0 +1,350 @@
+/*
+  NU APP · PROGRESO REDESIGN V1
+  Scope visual exclusivo de la vista Progreso.
+  Mantiene intacta la logica de dias, estados, desbloqueo y check-in.
+*/
+
+#view-rutina {
+  --progress-v2-bg: #f3eef8;
+  --progress-v2-ink: #1c1734;
+  --progress-v2-muted: #8b84a3;
+  --progress-v2-line: rgba(39, 31, 66, .08);
+  --progress-v2-card: #ffffff;
+  --progress-v2-yellow: #f6be4d;
+  --progress-v2-orange: #ef4c22;
+  --progress-v2-rose: #a94f67;
+  --progress-v2-green: #3d7f6d;
+  --progress-v2-green-soft: #e6f1ed;
+  --progress-v2-lilac: #ece6f5;
+  min-height: 100%;
+  padding-top: calc(14px + var(--safe-top));
+  padding-bottom: 118px;
+  background: var(--progress-v2-bg);
+}
+
+body[data-active-view="rutina"] {
+  background: var(--progress-v2-bg);
+}
+
+body[data-active-view="rutina"] #app,
+body[data-active-view="rutina"] main,
+body[data-active-view="rutina"] #view-rutina {
+  background: var(--progress-v2-bg);
+}
+
+/* Header */
+#view-rutina .routine-page-header {
+  position: relative;
+  top: auto;
+  z-index: 1;
+  min-height: 74px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 4px 0 10px;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#view-rutina .routine-back-btn {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  align-self: start;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.88);
+  color: var(--progress-v2-ink);
+  box-shadow: 0 9px 22px rgba(44, 31, 70, .06);
+}
+
+#view-rutina .routine-page-header .page-kicker {
+  margin: 2px 0 4px;
+  color: #958daa;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+#view-rutina .routine-page-header h1 {
+  margin: 0;
+  color: var(--progress-v2-ink);
+  font-size: 31px;
+  font-weight: 760;
+  line-height: 1.02;
+  letter-spacing: -.045em;
+}
+
+/* Layout */
+#view-rutina .app-routine {
+  gap: 0;
+  padding: 0;
+}
+
+/* Resumen superior */
+#view-rutina .app-progress-card {
+  margin: 0 0 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-rutina .app-progress-row {
+  align-items: end;
+  gap: 16px;
+}
+
+#view-rutina .app-label {
+  margin: 0 0 8px;
+  color: #958daa;
+  font-size: 10.5px;
+  font-weight: 680;
+  line-height: 1.2;
+  letter-spacing: .18em;
+}
+
+#view-rutina .app-progress-row strong {
+  color: var(--progress-v2-ink);
+  font-size: 34px;
+  font-weight: 720;
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+#view-rutina .app-progress-percent {
+  min-width: auto;
+  padding-bottom: 2px;
+  color: var(--progress-v2-orange);
+  font-size: 20px;
+  font-weight: 720;
+  line-height: 1;
+}
+
+#view-rutina .app-progress-track {
+  position: relative;
+  height: 8px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.66);
+}
+
+#view-rutina .app-progress-fill {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--progress-v2-orange) 0%, #d64b43 52%, var(--progress-v2-rose) 100%);
+}
+
+/* Accion actual */
+#view-rutina .app-today-card {
+  margin: 0 0 34px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 26px;
+  background: var(--progress-v2-card);
+  color: var(--progress-v2-ink);
+  box-shadow: none;
+}
+
+#view-rutina .app-today-main {
+  min-height: 92px;
+  grid-template-columns: 52px minmax(0, 1fr) 24px;
+  gap: 14px;
+  padding: 17px 18px 13px;
+  color: var(--progress-v2-ink);
+}
+
+#view-rutina .app-today-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  background: linear-gradient(145deg, #f9d877 0%, var(--progress-v2-yellow) 100%);
+  color: var(--progress-v2-ink);
+}
+
+#view-rutina .app-today-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+  stroke: none;
+}
+
+#view-rutina .app-today-copy strong {
+  color: var(--progress-v2-ink);
+  font-size: 17px;
+  font-weight: 720;
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+#view-rutina .app-today-copy small {
+  margin-top: 5px;
+  color: var(--progress-v2-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+#view-rutina .app-today-arrow {
+  color: #aaa2bc;
+}
+
+#view-rutina .app-checkin-area {
+  padding: 0 18px 17px;
+}
+
+#view-rutina .app-checkin-btn {
+  min-height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: #f1edf6;
+  color: #5c526e;
+  font-size: 13px;
+  font-weight: 680;
+  box-shadow: none;
+}
+
+#view-rutina .app-checkin-btn.is-done {
+  background: var(--progress-v2-green-soft);
+  color: var(--progress-v2-green);
+}
+
+/* Semanas */
+#view-rutina .app-week-card {
+  margin: 0;
+  padding: 0 0 27px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-rutina .app-week-card + .app-week-card {
+  padding-top: 2px;
+}
+
+#view-rutina .app-week-open-head {
+  min-height: auto;
+  align-items: end;
+  padding: 0 2px 12px;
+}
+
+#view-rutina .app-week-open-head strong {
+  color: var(--progress-v2-ink);
+  font-size: 16px;
+  font-weight: 720;
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+#view-rutina .app-week-open-head span {
+  margin-top: 4px;
+  color: var(--progress-v2-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+#view-rutina .app-week-days {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#view-rutina .app-day-dot {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  aspect-ratio: 1;
+  justify-self: stretch;
+  border: 0;
+  border-radius: 13px;
+  background: rgba(255,255,255,.82);
+  color: #6e6681;
+  font-size: 12px;
+  font-weight: 680;
+  box-shadow: none;
+}
+
+#view-rutina .app-day-dot.is-complete {
+  border: 0;
+  background: var(--progress-v2-green-soft);
+  color: var(--progress-v2-green);
+}
+
+#view-rutina .app-day-dot.is-current {
+  border: 0;
+  background: var(--progress-v2-orange);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(239, 76, 34, .18);
+}
+
+#view-rutina .app-day-dot.is-current.is-complete {
+  background: var(--progress-v2-green);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(61, 127, 109, .17);
+}
+
+#view-rutina .app-day-dot.is-future {
+  border: 0;
+  background: rgba(226, 219, 237, .58);
+  color: #aaa2b8;
+  opacity: .9;
+}
+
+#view-rutina .app-week-locked-card {
+  opacity: 1;
+}
+
+#view-rutina .app-week-locked-head {
+  opacity: .68;
+}
+
+#view-rutina .app-week-lock {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.68);
+  color: #aaa3b8;
+}
+
+#view-rutina .app-week-days-locked {
+  background: transparent;
+  opacity: .72;
+}
+
+/* Press states */
+#view-rutina .app-today-main,
+#view-rutina .app-checkin-btn,
+#view-rutina .app-day-dot:not(:disabled) {
+  transition: transform .14s ease, opacity .14s ease;
+}
+
+#view-rutina .app-today-main:active,
+#view-rutina .app-checkin-btn:active,
+#view-rutina .app-day-dot:not(:disabled):active {
+  transform: scale(.97);
+}
+
+@media (max-width: 370px) {
+  #view-rutina .app-progress-row strong {
+    font-size: 31px;
+  }
+
+  #view-rutina .app-week-days {
+    gap: 6px;
+  }
+
+  #view-rutina .app-day-dot {
+    border-radius: 11px;
+    font-size: 11.5px;
+  }
+}
