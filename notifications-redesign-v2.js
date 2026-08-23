@@ -6,7 +6,8 @@
       { href: "daily-redesign-reference-v2.css?v=20260823-1332", key: "daily-redesign-reference-v2.css", tag: "v2" },
       { href: "daily-reference-force-v3.css?v=20260823-1836", key: "daily-reference-force-v3.css", tag: "v3" },
       { href: "typography-reference-v1.css?v=20260823-1836", key: "typography-reference-v1.css", tag: "type-v1" },
-      { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" }
+      { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" },
+      { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" }
     ];
 
     dailySheets.forEach(({ key }) => {
