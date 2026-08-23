@@ -6,7 +6,7 @@
       { href: "daily-redesign-reference-v2.css?v=20260823-1332", key: "daily-redesign-reference-v2.css", tag: "v2" },
       { href: "daily-reference-force-v3.css?v=20260823-1836", key: "daily-reference-force-v3.css", tag: "v3" },
       { href: "typography-reference-v1.css?v=20260823-1836", key: "typography-reference-v1.css", tag: "type-v1" },
-      { href: "toast-redesign-v1.css?v=20260823-1852", key: "toast-redesign-v1.css", tag: "toast-v1" }
+      { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" }
     ];
 
     dailySheets.forEach(({ key }) => {
@@ -48,7 +48,6 @@
     timeRow.setAttribute("aria-label", "Cambiar horario de notificaciones");
     timeRow.setAttribute("aria-expanded", "false");
 
-    // Picker inside the same Horario card, as in the approved reference.
     timeRow.appendChild(editor);
     legacyChange?.classList.add("notification-change-time-legacy");
 
