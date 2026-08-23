@@ -465,3 +465,31 @@ body:has(#view-hoy.day-open) #app {
   letter-spacing: .08em !important;
   text-transform: uppercase !important;
 }
+
+/* MATERIALES · conservar carrusel horizontal */
+#view-hoy.day-open .materials-section .resource-sequence {
+  display: flex !important;
+  grid-template-columns: none !important;
+  gap: 10px !important;
+  align-items: flex-start !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0 0 6px !important;
+  scroll-snap-type: x proximity !important;
+  scroll-padding-inline: 0 !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-x: contain !important;
+  scrollbar-width: none !important;
+  touch-action: pan-x pan-y !important;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence::-webkit-scrollbar {
+  display: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-row {
+  flex: 0 0 calc((100% - 20px) / 3) !important;
+  width: calc((100% - 20px) / 3) !important;
+  min-width: calc((100% - 20px) / 3) !important;
+  scroll-snap-align: start !important;
+}
