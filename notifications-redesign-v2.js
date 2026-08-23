@@ -1,6 +1,24 @@
 /* Notifications redesign v2 · visual interaction only.
    Keeps existing push/time handlers intact and reshapes the current DOM. */
 (() => {
+  function ensureDailyReferenceStylesLast() {
+    const href = "daily-redesign-reference-v2.css";
+    const existing = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+      .find(link => (link.getAttribute("href") || "").includes(href));
+
+    if (existing) {
+      existing.remove();
+    }
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    link.dataset.dailyReference = "v2";
+    document.head.appendChild(link);
+  }
+
+  ensureDailyReferenceStylesLast();
+
   function setupNotificationRedesignV2() {
     const modal = document.getElementById("notificationSettings");
     const list = modal?.querySelector(".notification-settings-list");
