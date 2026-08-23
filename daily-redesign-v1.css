@@ -1,0 +1,499 @@
+/* =========================================================
+   NU APP · DETALLE DIARIO REDESIGN V1
+   Capa visual únicamente. Conserva contenido y lógica diaria.
+   ========================================================= */
+
+#view-hoy.day-open {
+  --daily-ref-bg: #f3eef8;
+  --daily-ref-ink: #1c1734;
+  --daily-ref-copy: #655d73;
+  --daily-ref-muted: #9790aa;
+  --daily-ref-line: rgba(39,31,66,.08);
+  --daily-ref-lilac: #ece5f4;
+  --daily-ref-purple: #685bc0;
+  --daily-ref-green: #718a68;
+  padding-top: calc(20px + var(--safe-top));
+  padding-bottom: 128px;
+  background: var(--daily-ref-bg);
+  scroll-padding-bottom: 124px;
+}
+
+/* En el detalle manda el header propio de la rutina. */
+#view-hoy.day-open > .home-page-header,
+#view-hoy.day-open > .home-guide-section,
+#view-hoy.day-open > .home-routines-section,
+#view-hoy.day-open > .home-news-section {
+  display: none !important;
+}
+
+#view-hoy.day-open .chat-wrap {
+  margin-top: 0;
+  padding-bottom: 118px;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .daily-native-header:not([hidden]) {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 46px minmax(0,1fr) 46px;
+  align-items: center;
+  gap: 14px;
+  margin: 0 1px 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .daily-native-back,
+#view-hoy.day-open .daily-native-progress {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  border: 1px solid rgba(59,45,83,.07) !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.8) !important;
+  color: #746b82 !important;
+  box-shadow: 0 8px 22px rgba(59,45,83,.045) !important;
+}
+
+#view-hoy.day-open .daily-native-back svg,
+#view-hoy.day-open .daily-native-progress svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.7;
+}
+
+#view-hoy.day-open .daily-native-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#view-hoy.day-open .daily-native-title strong {
+  overflow: visible;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 31px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.045em;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+#view-hoy.day-open .daily-native-title span {
+  color: var(--daily-ref-muted);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+#view-hoy.day-open .chat-header {
+  display: none !important;
+}
+
+#view-hoy.day-open .chat,
+#view-hoy.day-open .continuous-day-detail,
+#view-hoy.day-open .daily-detail {
+  background: transparent;
+}
+
+#view-hoy.day-open .continuous-day-detail {
+  gap: 30px;
+}
+
+#view-hoy.day-open .daily-detail {
+  gap: 28px;
+}
+
+/* HERO DEL DÍA */
+#view-hoy.day-open .native-day-hero {
+  min-height: 172px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 112px;
+  align-items: center;
+  gap: 18px;
+  margin: 0;
+  padding: 4px 2px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .native-day-hero-copy h2 {
+  margin: 0 0 10px;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 9vw, 41px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+#view-hoy.day-open .native-day-hero-copy p {
+  margin: 0;
+  color: #70677d;
+  font-size: 14px;
+  font-weight: 470;
+  line-height: 1.5;
+}
+
+#view-hoy.day-open .native-day-hero-media {
+  width: 112px;
+  height: 124px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 27px;
+  background: linear-gradient(155deg, #eee7f6 0%, #ddd1ec 100%);
+  box-shadow: none;
+}
+
+#view-hoy.day-open .native-day-hero-media img {
+  width: 100%;
+  height: 100%;
+  padding: 9px;
+  object-fit: contain;
+}
+
+/* OBJETIVO + PLAN: sin caja externa de dashboard. */
+#view-hoy.day-open .day-plan-group {
+  overflow: visible;
+  display: grid;
+  gap: 26px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-objective,
+#view-hoy.day-open .objective-card,
+#view-hoy.day-open .native-section {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .objective-card-header {
+  margin: 0;
+}
+
+#view-hoy.day-open .objective-card-header span,
+#view-hoy.day-open .native-section-heading span,
+#view-hoy.day-open .training-card-heading > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #a099af;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+#view-hoy.day-open .objective-card-header h3,
+#view-hoy.day-open .native-section-heading h3,
+#view-hoy.day-open .native-section > h3 {
+  margin: 0;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.03em;
+}
+
+#view-hoy.day-open .native-details {
+  margin-top: 14px;
+  border: 0;
+  border-top: 1px solid var(--daily-ref-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .native-details summary {
+  min-height: 48px;
+  padding: 12px 0 0;
+  color: #776d83;
+  font-size: 12.5px;
+  font-weight: 620;
+}
+
+#view-hoy.day-open .native-details-body {
+  padding: 12px 0 2px;
+  color: var(--daily-ref-copy);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-steps {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .day-plan-steps::before {
+  content: "Tu plan de hoy";
+  display: block;
+  margin: 0 0 13px;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+/* PASOS: filas editoriales en vez de cards dentro de cards. */
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--daily-ref-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .action-step:last-child,
+#view-hoy.day-open .action-step-static:last-child {
+  border-bottom: 0;
+}
+
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-static-row {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr) 24px;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 1px;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  grid-template-columns: 42px minmax(0,1fr);
+}
+
+#view-hoy.day-open .action-step-number {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--daily-ref-lilac);
+  color: var(--daily-ref-purple);
+  font-size: 11px;
+  font-weight: 760;
+}
+
+#view-hoy.day-open .action-step-title {
+  color: #42384f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -.02em;
+}
+
+#view-hoy.day-open .action-step-arrow {
+  color: #aaa2b6;
+}
+
+#view-hoy.day-open .action-step-body {
+  padding: 0 2px 18px 55px;
+  color: var(--daily-ref-copy);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* MATERIALES */
+#view-hoy.day-open .materials-section,
+#view-hoy.day-open .resources-section {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .materials-section > h3,
+#view-hoy.day-open .materials-section .native-section-heading h3,
+#view-hoy.day-open .resources-section > h3 {
+  margin: 0 0 15px;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+#view-hoy.day-open .resource-list,
+#view-hoy.day-open .compact-media-list {
+  display: grid;
+  gap: 10px;
+}
+
+#view-hoy.day-open .resource-row {
+  min-height: 78px;
+  grid-template-columns: 0 58px minmax(0,1fr) 20px;
+  gap: 12px;
+  padding: 10px 12px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 21px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 8px 24px rgba(55,43,77,.035);
+}
+
+#view-hoy.day-open .resource-order {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+#view-hoy.day-open .resource-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: var(--daily-ref-lilac);
+}
+
+#view-hoy.day-open .resource-copy strong {
+  color: #453a53;
+  font-size: 13px;
+  font-weight: 690;
+  line-height: 1.3;
+}
+
+#view-hoy.day-open .resource-copy span {
+  margin-top: 3px;
+  color: #a29aaa;
+  font-size: 10.5px;
+}
+
+#view-hoy.day-open .resource-row-actions {
+  gap: 6px;
+}
+
+#view-hoy.day-open .resource-action-btn {
+  border-color: rgba(64,49,91,.08);
+  background: rgba(255,255,255,.7);
+}
+
+/* CAPACITACIÓN */
+#view-hoy.day-open .training-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 0;
+  border-radius: 26px;
+  background: rgba(255,255,255,.76);
+  box-shadow: none;
+}
+
+#view-hoy.day-open .training-card-heading strong {
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+#view-hoy.day-open .training-card-open {
+  min-height: 48px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--daily-ref-ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* COMPLETAR */
+#view-hoy.day-open .complete-card {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+  padding: 20px;
+  border: 0;
+  border-radius: 25px;
+  background: rgba(255,255,255,.76);
+  box-shadow: none;
+}
+
+#view-hoy.day-open .complete-card > h3,
+#view-hoy.day-open .complete-done-copy h3 {
+  margin: 0;
+  color: var(--daily-ref-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+#view-hoy.day-open .complete-card > p,
+#view-hoy.day-open .complete-done-copy p,
+#view-hoy.day-open .complete-helper {
+  color: #91899d;
+}
+
+#view-hoy.day-open .complete-day-btn {
+  min-height: 50px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 25px;
+  background: var(--daily-ref-ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .complete-card.done {
+  background: rgba(238,244,234,.82);
+}
+
+#view-hoy.day-open .complete-done-inline-check,
+#view-hoy.day-open .complete-action-check {
+  color: var(--daily-ref-green);
+}
+
+/* Enlaces internos */
+#view-hoy.day-open .resource-links {
+  gap: 8px;
+}
+
+#view-hoy.day-open .resource-link-row {
+  min-height: 48px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.7);
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .daily-native-header:not([hidden]) {
+    grid-template-columns: 42px minmax(0,1fr) 42px;
+    gap: 11px;
+  }
+  #view-hoy.day-open .daily-native-back,
+  #view-hoy.day-open .daily-native-progress {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+  }
+  #view-hoy.day-open .daily-native-title strong { font-size: 28px; }
+  #view-hoy.day-open .native-day-hero { grid-template-columns: minmax(0,1fr) 96px; gap: 12px; }
+  #view-hoy.day-open .native-day-hero-media { width: 96px; height: 108px; }
+  #view-hoy.day-open .native-day-hero-copy h2 { font-size: 32px; }
+  #view-hoy.day-open .action-step-title { font-size: 16px; }
+}
