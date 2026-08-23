@@ -1,43 +1,36 @@
-/* NU APP · TOAST REDESIGN V1
-   Referencia: tarjeta blanca flotante con icono de marca y barra de tiempo. */
+/* NU APP · TOAST REDESIGN V2
+   Toasts adaptativos por contexto: sin barra de tiempo, posicionados para no tapar CTAs. */
 
 .toast-host {
   left: 50% !important;
+  top: auto !important;
   bottom: calc(var(--nav-height) + 18px + var(--safe-bottom)) !important;
   width: min(330px, calc(100% - 32px)) !important;
   transform: translateX(-50%) !important;
   pointer-events: none !important;
 }
 
-body.keyboard-open .toast-host {
-  bottom: calc(14px + var(--safe-bottom)) !important;
-}
-
 .toast-host .toast {
   position: relative !important;
   width: 100% !important;
   max-width: 300px !important;
-  min-height: 58px !important;
+  min-height: 54px !important;
   display: grid !important;
-  grid-template-columns: 32px minmax(0, 1fr) auto !important;
+  grid-template-columns: 30px minmax(0,1fr) auto !important;
   align-items: center !important;
-  gap: 11px !important;
-  padding: 13px 14px !important;
+  gap: 10px !important;
+  padding: 11px 13px !important;
   overflow: hidden !important;
   border: 0 !important;
   border-radius: 16px !important;
-  background: #fff !important;
+  background: rgba(255,255,255,.97) !important;
   color: #2a2440 !important;
-  box-shadow:
-    0 18px 34px -14px rgba(42, 36, 64, .40),
-    0 0 0 1px rgba(42, 36, 64, .04) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 16px 32px -16px rgba(42,36,64,.34), 0 0 0 1px rgba(42,36,64,.045) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   opacity: 0 !important;
-  transform: translateY(16px) scale(.96) !important;
-  transition:
-    opacity .30s cubic-bezier(.25,.9,.35,1),
-    transform .30s cubic-bezier(.25,.9,.35,1) !important;
+  transform: translateY(12px) scale(.97) !important;
+  transition: opacity .24s cubic-bezier(.25,.9,.35,1), transform .24s cubic-bezier(.25,.9,.35,1) !important;
   pointer-events: auto !important;
 }
 
@@ -48,85 +41,117 @@ body.keyboard-open .toast-host {
 
 .toast-host .toast.is-leaving {
   opacity: 0 !important;
-  transform: translateY(10px) scale(.97) !important;
+  transform: translateY(8px) scale(.98) !important;
 }
 
+/* Sin barra/contador visual: el toast se cierra solo pero no lo muestra. */
 .toast-host .toast::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2.5px;
-  background: linear-gradient(90deg, #e2542e 0%, #5a3e6b 100%);
-  transform: scaleX(1);
-  transform-origin: left center;
-  pointer-events: none;
-}
-
-.toast-host .toast.is-visible::after {
-  animation: nu-toast-timer 2.4s linear forwards;
+  content: none !important;
+  display: none !important;
+  animation: none !important;
 }
 
 .toast-status {
-  width: 32px !important;
-  height: 32px !important;
+  width: 30px !important;
+  height: 30px !important;
   display: grid !important;
   place-items: center !important;
   border: 0 !important;
   border-radius: 50% !important;
-  background: linear-gradient(115deg, #e2542e 0%, #5a3e6b 100%) !important;
   color: #fff !important;
   font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   box-shadow: none !important;
 }
 
-.toast-success .toast-status,
-.toast-error .toast-status,
+.toast-success .toast-status {
+  background: linear-gradient(115deg,#e2542e 0%,#8d4260 100%) !important;
+}
+
+.toast-error .toast-status {
+  background: #d95c58 !important;
+}
+
 .toast-info .toast-status {
-  background: linear-gradient(115deg, #e2542e 0%, #5a3e6b 100%) !important;
-  color: #fff !important;
+  background: #6a5578 !important;
 }
 
 .toast-text {
   min-width: 0 !important;
   color: #2a2440 !important;
   font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  line-height: 1.25 !important;
-  letter-spacing: -.01em !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.28 !important;
+  letter-spacing: -.008em !important;
 }
 
 .toast-action {
-  min-height: 30px !important;
+  min-height: 28px !important;
   padding: 0 8px !important;
   border: 0 !important;
   border-radius: 999px !important;
   background: #f3eff8 !important;
   color: #5a3e6b !important;
   font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
-  font-size: 11px !important;
+  font-size: 10.5px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
 }
 
-body:has(#view-hoy.day-open) .toast-host {
-  bottom: calc(18px + var(--safe-bottom)) !important;
+/* Preview de material: arriba para no tapar Guardar/Compartir. */
+body:has(#mediaPreview:not([hidden])) .toast-host {
+  top: calc(68px + var(--safe-top)) !important;
+  bottom: auto !important;
+  width: min(286px, calc(100% - 40px)) !important;
 }
 
-@keyframes nu-toast-timer {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
+body:has(#mediaPreview:not([hidden])) .toast-host .toast {
+  max-width: 270px !important;
+  min-height: 48px !important;
+  grid-template-columns: 27px minmax(0,1fr) auto !important;
+  gap: 8px !important;
+  padding: 9px 11px !important;
+  border-radius: 14px !important;
+  transform: translateY(-8px) scale(.98) !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-host .toast.is-visible {
+  transform: translateY(0) scale(1) !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-status {
+  width: 27px !important;
+  height: 27px !important;
+  font-size: 12px !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-text {
+  font-size: 12px !important;
+}
+
+/* Detalle diario: abajo vive HOY LO HICE, por eso el aviso sube. */
+body:has(#view-hoy.day-open) .toast-host {
+  top: calc(78px + var(--safe-top)) !important;
+  bottom: auto !important;
+}
+
+/* Teclado abierto (Iris/campos): no competir con el compositor. */
+body.keyboard-open .toast-host {
+  top: calc(14px + var(--safe-top)) !important;
+  bottom: auto !important;
+}
+
+/* Onboarding, si genera aviso, queda separado del CTA inferior. */
+body:has(.onboarding-shell:not([hidden])) .toast-host {
+  top: calc(18px + var(--safe-top)) !important;
+  bottom: auto !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast-host .toast,
-  .toast-host .toast::after {
-    animation: none !important;
+  .toast-host .toast {
     transition: none !important;
   }
 }
