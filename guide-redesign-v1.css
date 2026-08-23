@@ -14,6 +14,7 @@
   --guide-ref-green: #718a68;
   --guide-ref-orange: #df6b3c;
   padding-top: calc(24px + var(--safe-top));
+  scroll-padding-bottom: calc(128px + var(--safe-bottom));
   background: transparent;
 }
 
@@ -59,7 +60,7 @@
 #view-guia .guide-step-status.is-done { color: var(--guide-ref-green); }
 
 /* DETALLE DE ETAPA · PULIDO V1.2 */
-#view-guia .guide-detail { display: grid; gap: 28px; padding-bottom: 76px; }
+#view-guia .guide-detail { display: grid; gap: 28px; padding-bottom: calc(132px + var(--safe-bottom)); }
 #view-guia .guide-detail-intro { grid-template-columns: 54px minmax(0,1fr); align-items: start; gap: 17px; padding: 8px 2px 6px; }
 #view-guia .guide-detail-number { width: 54px; height: 54px; border-radius: 18px; background: var(--guide-ref-lilac); color: var(--guide-ref-purple); font-size: 12px; }
 #view-guia .guide-detail-intro p { margin: 7px 0 0; color: #746b80; font-size: 14.5px; line-height: 1.62; }
