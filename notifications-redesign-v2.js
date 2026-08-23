@@ -2,19 +2,24 @@
    Keeps existing push/time handlers intact and reshapes the current DOM. */
 (() => {
   function ensureDailyReferenceStylesLast() {
-    const href = "daily-redesign-reference-v2.css";
-    const existing = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-      .find(link => (link.getAttribute("href") || "").includes(href));
+    const dailySheets = [
+      { href: "daily-redesign-reference-v2.css?v=20260823-1332", key: "daily-redesign-reference-v2.css", tag: "v2" },
+      { href: "daily-reference-force-v3.css?v=20260823-1332", key: "daily-reference-force-v3.css", tag: "v3" }
+    ];
 
-    if (existing) {
-      existing.remove();
-    }
+    dailySheets.forEach(({ key }) => {
+      Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+        .filter(link => (link.getAttribute("href") || "").includes(key))
+        .forEach(link => link.remove());
+    });
 
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    link.dataset.dailyReference = "v2";
-    document.head.appendChild(link);
+    dailySheets.forEach(({ href, tag }) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      link.dataset.dailyReference = tag;
+      document.head.appendChild(link);
+    });
   }
 
   ensureDailyReferenceStylesLast();
