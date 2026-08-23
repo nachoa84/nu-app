@@ -1,4 +1,4 @@
-/* NU APP · TOAST REDESIGN V4
+/* NU APP · TOAST REDESIGN V5
    Toasts adaptativos por contexto: sin barra de tiempo, posicionados para no tapar CTAs. */
 
 .toast-host {
@@ -100,11 +100,13 @@
   letter-spacing: 0 !important;
 }
 
-/* Preview de material: pegado a la acción, justo arriba de Guardar/Compartir. */
+/* Preview de material: pegado a la acción y alineado con el inicio de Guardar. */
 body:has(#mediaPreview:not([hidden])) .toast-host {
   top: auto !important;
   bottom: calc(66px + var(--safe-bottom)) !important;
-  width: min(286px, calc(100% - 40px)) !important;
+  left: calc(50% - min(215px, 50vw) + 22px) !important;
+  width: min(286px, calc(100% - 44px)) !important;
+  transform: none !important;
 }
 
 body:has(#mediaPreview:not([hidden])) .toast-host .toast {
@@ -149,12 +151,14 @@ body:has(.onboarding-shell:not([hidden])) .toast-host {
   bottom: auto !important;
 }
 
-/* PRIORIDAD FINAL: si el preview está abierto, siempre gana su posición inferior,
-   incluso si detrás sigue activo el detalle diario. */
+/* PRIORIDAD FINAL: si el preview está abierto, siempre gana su posición inferior
+   y su alineación con el botón Guardar, incluso si detrás sigue activo el detalle diario. */
 body:has(#mediaPreview:not([hidden])) .toast-host,
 body:has(#view-hoy.day-open):has(#mediaPreview:not([hidden])) .toast-host {
   top: auto !important;
   bottom: calc(66px + var(--safe-bottom)) !important;
+  left: calc(50% - min(215px, 50vw) + 22px) !important;
+  transform: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
