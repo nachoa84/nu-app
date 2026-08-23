@@ -1,0 +1,207 @@
+/* =========================================================
+   Notifications redesign · editorial/minimal
+   Visual-only overrides. No push/time logic changes.
+   ========================================================= */
+
+.notification-settings {
+  background: rgba(39, 31, 44, .34);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.notification-settings-sheet {
+  width: min(430px, 100%);
+  max-height: min(82dvh, 760px);
+  padding: 10px 22px calc(22px + var(--safe-bottom));
+  border-radius: 32px 32px 0 0;
+  background: #fbfaf8;
+  box-shadow: 0 -18px 56px rgba(40, 29, 43, .16);
+}
+
+.notification-settings-grabber {
+  width: 34px;
+  height: 4px;
+  margin: 2px auto 18px;
+  background: #d8d4d2;
+}
+
+.notification-settings-header {
+  min-height: 48px;
+  padding: 0 0 8px;
+}
+
+.notification-settings-header h2 {
+  color: #34243d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.notification-settings-close {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(72, 53, 76, .08);
+  background: rgba(255,255,255,.8);
+  color: #6f6573;
+  box-shadow: 0 7px 18px rgba(53, 38, 58, .06);
+}
+
+.notification-settings-intro {
+  max-width: 30ch;
+  margin: 2px 0 24px;
+  color: #837985;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.notification-settings-list {
+  border-top: 1px solid rgba(86, 71, 89, .11);
+}
+
+.notification-settings-row {
+  min-height: 84px;
+  padding: 16px 0;
+}
+
+.notification-settings-row + .notification-settings-row {
+  border-top-color: rgba(86, 71, 89, .11);
+}
+
+.notification-settings-copy {
+  gap: 5px;
+}
+
+.notification-settings-row strong {
+  color: #3d3044;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+}
+
+.notification-settings-copy span {
+  max-width: 26ch;
+  color: #8b828d;
+  font-size: 12.8px;
+  line-height: 1.45;
+}
+
+.notification-enable-btn {
+  min-width: 92px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #352342;
+  color: #fff;
+  font-size: 12.8px;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.notification-enable-btn.is-active {
+  background: #efe8f3;
+  color: #684b75;
+}
+
+.notification-time-value {
+  min-width: 72px;
+  color: #684b75;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+  letter-spacing: -.02em;
+}
+
+.notification-change-time-btn {
+  min-height: 62px;
+  margin-top: 0;
+  border-top-color: rgba(86, 71, 89, .11);
+  color: #46364d;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.notification-change-time-chevron {
+  color: #aaa1aa;
+  font-size: 24px;
+}
+
+.notification-time-editor {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.notification-time-picker {
+  padding: 14px 12px 12px;
+  border-radius: 22px;
+  background: #f2edf3;
+}
+
+.notification-time-picker-labels {
+  padding-bottom: 7px;
+  color: #8e8292;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.notification-time-selection {
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 4px 16px rgba(61, 45, 67, .05);
+}
+
+.notification-time-option {
+  color: #8d8390;
+  font-size: 19px;
+  font-weight: 600;
+  opacity: .42;
+}
+
+.notification-time-option.is-selected {
+  color: #3d2948;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.notification-time-separator {
+  color: #3d2948;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.notification-time-actions {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.notification-time-actions button {
+  min-height: 48px;
+  border: 1px solid rgba(82, 65, 87, .1);
+  border-radius: 999px;
+  background: rgba(255,255,255,.7);
+  color: #6f6572;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#notificationTimeSaveBtn {
+  border-color: transparent;
+  background: #352342;
+  color: #fff;
+}
+
+@media (min-width: 520px) {
+  .notification-settings-sheet {
+    border-radius: 32px;
+  }
+}
