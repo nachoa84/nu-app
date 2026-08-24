@@ -10,7 +10,8 @@
       { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" },
       { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
       { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" },
-      { href: "screens-reference-force-v1.css?v=20260823-2248", key: "screens-reference-force-v1.css", tag: "screens-ref-v2" }
+      { href: "screens-reference-force-v1.css?v=20260823-2248", key: "screens-reference-force-v1.css", tag: "screens-ref-v2" },
+      { href: "mobile-last-mile-v1.css?v=20260823-2251", key: "mobile-last-mile-v1.css", tag: "mobile-last-v1" }
     ];
 
     dailySheets.forEach(({ key }) => {
