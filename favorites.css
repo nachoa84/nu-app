@@ -40,12 +40,17 @@
 }
 
 /* Preview compartido dentro de Favoritos */
+
 #view-favoritos .favorite-folder-preview {
   position: relative;
   display: grid;
   place-items: center;
   overflow: hidden;
   isolation: isolate;
+  /* Fuerza el clip en WebKit/Chrome móvil aunque el hijo termine en su
+     propia capa compuesta (GPU) por el <video>: overflow:hidden por sí
+     solo no siempre alcanza a recortarla ahí, la máscara sí. Es un no-op
+     visual en navegadores donde overflow:hidden ya recortaba bien. */
   -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
   mask-image: radial-gradient(circle, #fff 100%, #fff 100%);
   background: #f1f1ee;
@@ -59,18 +64,30 @@
   display: block;
   width: 100%;
   height: 100%;
-  min-width: 0;
-  min-height: 0;
-  max-width: 100%;
-  max-height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  max-height: none;
   border-radius: inherit;
   object-fit: cover;
   object-position: center;
   pointer-events: none;
   -webkit-user-drag: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
+#view-favoritos .favorite-folder-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(22, 31, 42, .62);
+  color: #fff;
+  box-shadow: none;
+}
 
 #view-favoritos .favorite-folder-play svg {
   width: 15px;
@@ -87,6 +104,45 @@
   opacity: .92;
 }
 
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview {
+  position: relative;
+  flex: 0 0 128px;
+  width: 118px;
+  height: 128px;
+  min-width: 118px;
+  min-height: 128px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--fav-line);
+  border-radius: 15px;
+  background: #f1f1ee;
+  transform: none;
+  touch-action: manipulation;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview::before {
+  display: none;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview .favorite-folder-play {
+  width: 38px;
+  height: 38px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  position: static;
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  transform: none;
+  white-space: normal;
+}
 
 /* =========================================================
    Favoritos guardados desde el Bot
@@ -492,7 +548,70 @@
 }
 
 @media (max-width: 360px) {
-  
+  #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+    flex-basis: 108px;
+    width: 108px;
+    min-width: 108px;
+  }
+
+  #view-favoritos:not(.favorite-day-open)
+  .favorite-day-tile-preview.favorite-folder-preview {
+    flex-basis: 118px;
+    width: 108px;
+    min-width: 108px;
+    height: 118px;
+    min-height: 118px;
+  }
+
+  #view-favoritos .favorite-content-row {
+    grid-template-columns: 22px 52px minmax(0, 1fr) 38px;
+    gap: 8px;
+  }
+
+  #view-favoritos .favorite-content-thumb,
+  #view-favoritos .favorite-link-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  #view-favoritos .favorite-content-copy strong {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view-favoritos .favorite-day-screen {
+    animation: none !important;
+  }
+}
+
+#view-favoritos .app-page-header {
+  position: relative;
+  padding: 2px 0 15px;
+  margin: 0;
+  background: transparent;
+  padding-bottom: 20px;
+}
+
+#view-favoritos .favorite-native-routine-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fav-ink);
+  margin-bottom: 16px;
+}
+
+#view-favoritos .favorite-native-routine-icon {
+  display: grid;
+  place-items: center;
+  background: var(--fav-green-soft);
+  color: var(--fav-green);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
 #view-favoritos .favorite-native-bot .favorite-native-routine-heading {
   margin-top: 18px;
 }
@@ -600,6 +719,74 @@
   font-weight: 630;
 }
 
+#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  margin-inline: 0;
+  gap: 13px;
+  margin: 0;
+  padding: 0 2px 8px;
+  scroll-padding-inline: 2px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--fav-ink);
+  font: inherit;
+  text-align: left;
+  vertical-align: top;
+  scroll-snap-align: start;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 150ms ease, opacity 150ms ease;
+  gap: 8px;
+  flex-basis: 112px;
+  width: 112px;
+  min-width: 112px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
+  flex-basis: 150px;
+  width: 112px;
+  min-width: 112px;
+  height: 132px;
+  min-height: 132px;
+  border-radius: 18px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong {
+  margin: 0 0 3px;
+  color: var(--fav-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  margin: 0;
+  color: var(--fav-muted);
+  font-size: 9.8px;
+  font-weight: 480;
+}
 
 #view-favoritos .favorite-native-bot {
   padding-top: 0;
@@ -816,7 +1003,67 @@
 .favorite-routine-days .favorite-day-tile{width:100%;min-width:0}
 @media(max-width:430px){.favorite-routine-days{grid-template-columns:repeat(2,minmax(0,1fr))}.favorite-routine-tile{grid-template-columns:82px minmax(0,1fr) 20px}.favorite-routine-cover{width:82px;height:92px}}
 
-
+/* NU APP · DÍAS FAVORITOS COMPACTOS V93C */
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px 10px;
+  padding:2px 0 24px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile{
+  appearance:none;
+  -webkit-appearance:none;
+  display:flex;
+  flex:initial;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:8px;
+  border:1px solid rgba(24,39,69,.09);
+  border-radius:18px;
+  background:#fff;
+  text-align:left;
+  box-shadow:0 5px 16px rgba(24,39,69,.045);
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview.favorite-folder-preview{
+  flex:0 0 76px;
+  width:100%;
+  min-width:0;
+  height:76px;
+  min-height:76px;
+  border-radius:13px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview>img,
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview>video{
+  object-fit:cover;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy{
+  position:static;
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0 2px 2px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy strong{
+  display:block;
+  margin:0 0 2px;
+  color:var(--fav-ink);
+  font-size:14px;
+  font-weight:700;
+  line-height:1.2;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy small{
+  display:block;
+  margin:0;
+  color:var(--fav-muted);
+  font-size:11px;
+  font-weight:520;
+  line-height:1.25;
+}
 #view-favoritos .favorite-routine-screen-header .favorite-day-title h2{
   margin-top:4px;
   font-size:clamp(34px,10vw,44px);
