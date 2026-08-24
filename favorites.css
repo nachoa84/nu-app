@@ -87,45 +87,6 @@
   opacity: .92;
 }
 
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview.favorite-folder-preview {
-  position: relative;
-  flex: 0 0 128px;
-  width: 118px;
-  height: 128px;
-  min-width: 118px;
-  min-height: 128px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--fav-line);
-  border-radius: 15px;
-  background: #f1f1ee;
-  transform: none;
-  touch-action: manipulation;
-}
-
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview.favorite-folder-preview::before {
-  display: none;
-}
-
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview .favorite-folder-play {
-  width: 38px;
-  height: 38px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
-  position: static;
-  display: block;
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  transform: none;
-  white-space: normal;
-}
 
 /* =========================================================
    Favoritos guardados desde el Bot
