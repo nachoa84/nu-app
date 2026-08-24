@@ -458,3 +458,82 @@ body[data-active-view="bot"] .nav-btn .nav-icon svg {
     height: 62px;
   }
 }
+
+/* =========================================================
+   IRIS · HEADER / TYPE / BACKGROUND FINAL
+   Referencia aprobada: una sola etiqueta "TU ASISTENTE",
+   título limpio "Iris" y fondo lila muy claro.
+   ========================================================= */
+body[data-active-view="bot"],
+body[data-active-view="bot"] #app,
+body[data-active-view="bot"] main,
+body[data-active-view="bot"] #view-bot {
+  background: #f6f2fa !important;
+}
+
+#view-bot,
+#view-bot *,
+.bot-document-sheet,
+.bot-document-sheet * {
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif) !important;
+}
+
+#view-bot .bot-page-header > div:first-child::before {
+  content: "TU ASISTENTE" !important;
+  display: block !important;
+  margin: 0 0 5px !important;
+  color: #a08cb8 !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+}
+
+#view-bot .bot-page-header h1,
+#view-bot .app-page-header h1 {
+  margin: 0 !important;
+  color: #241b3b !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+  font-size: 25px !important;
+  font-weight: 700 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.035em !important;
+}
+
+#view-bot .bot-page-header h1::before,
+#view-bot .bot-page-header h1::after,
+#view-bot .app-page-header h1::before,
+#view-bot .app-page-header h1::after {
+  content: none !important;
+  display: none !important;
+}
+
+#view-bot .bot-page-header h1 > span,
+#view-bot .app-page-header h1 > span {
+  display: none !important;
+}
+
+#view-bot .bot-status {
+  margin-top: 6px !important;
+  color: #8f829f !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+}
+
+#view-bot .bot-card,
+#view-bot .bot-thread {
+  background: transparent !important;
+}
+
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  background: linear-gradient(to bottom, rgba(246,242,250,0), rgba(246,242,250,.98) 24%) !important;
+}
+
+body[data-active-view="bot"] .bottom-nav {
+  background: rgba(246,242,250,.96) !important;
+}
