@@ -883,11 +883,11 @@ function createBotFavoriteCard(saved) {
 function createFavoriteDayTile(day, items, allDayItems, favoritesView, routineId) {
   const tile = document.createElement("button");
   tile.type = "button";
-  tile.className = "favorite-day-tile";
+  tile.className = "favorite-day-tile favorite-day-tile-v2";
 
   const previewFavorite = preferredFavoriteFolderPreview(allDayItems) || items[0];
   const preview = favoritePreviewNode(previewFavorite);
-  preview.classList.add("favorite-day-tile-preview");
+  preview.classList.add("favorite-day-tile-preview", "favorite-day-tile-preview-v2");
 
   const copy = document.createElement("span");
   copy.className = "favorite-day-tile-copy";
