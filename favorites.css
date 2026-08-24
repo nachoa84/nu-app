@@ -1116,3 +1116,20 @@
   border-radius: inherit;
   object-fit: cover;
 }
+
+
+/* Fix 2 · preview must match the actual favorite tile width */
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
