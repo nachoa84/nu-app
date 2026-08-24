@@ -9,7 +9,8 @@
       { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" },
       { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" },
       { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
-      { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" }
+      { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" },
+      { href: "screens-reference-force-v1.css?v=20260823-2218", key: "screens-reference-force-v1.css", tag: "screens-ref-v1" }
     ];
 
     dailySheets.forEach(({ key }) => {
