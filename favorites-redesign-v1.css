@@ -567,3 +567,41 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
     height: 78px;
   }
 }
+
+
+/* Final tile sizing · the preview must follow the compact grid card */
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-routine-days .favorite-day-tile-preview.favorite-folder-preview {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 76px;
+  height: 76px;
+  min-height: 76px;
+  overflow: hidden;
+  isolation: isolate;
+  clip-path: inset(0 round 13px);
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-routine-days .favorite-day-tile-preview.favorite-folder-preview > img,
+#view-favoritos:not(.favorite-day-open)
+.favorite-routine-days .favorite-day-tile-preview.favorite-folder-preview > video {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
