@@ -8,7 +8,8 @@
       { href: "typography-reference-v1.css?v=20260823-1836", key: "typography-reference-v1.css", tag: "type-v1" },
       { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" },
       { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" },
-      { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" }
+      { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
+      { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" }
     ];
 
     dailySheets.forEach(({ key }) => {
@@ -27,6 +28,19 @@
   }
 
   ensureDailyReferenceStylesLast();
+
+  function setupIrisComposerV2() {
+    const form = document.getElementById("botForm");
+    const shortcuts = document.getElementById("botShortcutsBtn");
+    const send = form?.querySelector(".bot-send");
+
+    if (!form || !shortcuts || !send) return;
+    if (shortcuts.classList.contains("bot-composer-shortcuts")) return;
+
+    shortcuts.classList.add("bot-composer-shortcuts");
+    shortcuts.setAttribute("aria-label", "Abrir accesos rápidos");
+    form.insertBefore(shortcuts, send);
+  }
 
   function setupNotificationRedesignV2() {
     const modal = document.getElementById("notificationSettings");
@@ -88,9 +102,14 @@
     syncOpenState();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupNotificationRedesignV2, { once: true });
-  } else {
+  const setupAll = () => {
+    setupIrisComposerV2();
     setupNotificationRedesignV2();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupAll, { once: true });
+  } else {
+    setupAll();
   }
 })();
