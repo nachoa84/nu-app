@@ -79,7 +79,7 @@
   min-height: 0 !important;
   display: block !important;
   width: 100% !important;
-  margin: 18px 0 0 !important;
+  margin: 26px 0 0 !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -166,9 +166,9 @@
   min-width: 0 !important;
   color: #201936 !important;
   font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
-  font-size: 11.5px !important;
-  font-weight: 650 !important;
-  line-height: 1.2 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
   letter-spacing: -.01em !important;
 }
 
@@ -183,12 +183,14 @@
 }
 
 @media (max-width: 370px) {
+  /* Mantiene la pastilla "HECHO" — antes este breakpoint la volvía a
+     encoger a un cuadrado de 42x42 (el ícono suelto que se quería evitar). */
   #view-hoy.day-open .complete-card.done .complete-done-copy::after {
-    width: 42px !important;
-    height: 42px !important;
+    min-width: 140px !important;
+    max-width: 170px !important;
   }
 
   #view-hoy.day-open .native-day-progress-button strong {
-    font-size: 11px !important;
+    font-size: 14px !important;
   }
 }

@@ -44,7 +44,16 @@ main {
   color: var(--nu-ink);
 }
 
-body:not([data-active-view="guia"]) .view.active:not(#view-hoy.day-open) {
+/* #view-bot queda excluido: gestiona su propio padding-bottom (8px) como
+   parte de su layout flex-column con compositor en flujo. Antes esta regla
+   genérica ganaba igual por especificidad (":not(#view-hoy.day-open)" mete
+   un id en su propio cálculo de especificidad aunque sea una negación,
+   así que le gana a "body[data-active-view=bot] #view-bot" pese a tener
+   menos "peso" visual en el selector) y el padding-bottom real terminaba
+   siendo 88px en vez de 8px: la altura que .bot-card no lograba filtrar
+   como "espacio disponible" no era un bug de flex, era este padding
+   fantasma comiéndose 80px que no deberían estar ahí. */
+body:not([data-active-view="guia"]) .view.active:not(#view-hoy.day-open):not(#view-bot) {
   padding-bottom: calc(88px + var(--safe-bottom)) !important;
 }
 
@@ -214,7 +223,15 @@ body[data-active-view="bot"] #view-bot {
 }
 
 #view-bot .bot-card {
-  flex: 1 1 auto !important;
+  /* flex-basis:auto (el "auto" de 1 1 auto) usa la altura de contenido
+     como base y deja la resolución de la fila 1fr del grid interno
+     dependiendo de una altura que todavía no está resuelta: el resultado
+     es que el grid se queda con el alto de su propio contenido (mensajes +
+     compositor) en vez de estirarse, y el compositor termina pegado justo
+     debajo del último mensaje con un hueco vacío hasta el nav. flex-basis:0
+     fuerza a que TODA la altura salga del reparto por flex-grow, sin
+     ambigüedad. */
+  flex: 1 1 0 !important;
   min-height: 0 !important;
   display: grid !important;
   grid-template-rows: minmax(0, 1fr) auto !important;
@@ -912,10 +929,10 @@ body:has(#view-hoy.day-open) .bottom-nav {
 }
 
 #view-hoy.day-open .native-day-progress-button {
-  min-height: 50px !important;
-  margin-top: 14px !important;
-  padding: 0 14px !important;
-  border-radius: 15px !important;
+  min-height: 58px !important;
+  margin-top: 22px !important;
+  padding: 0 16px !important;
+  border-radius: 17px !important;
   background: #fff !important;
   font-size: 13px !important;
   font-weight: 650 !important;
@@ -926,14 +943,14 @@ body:has(#view-hoy.day-open) .bottom-nav {
    ========================================================= */
 
 #view-rutina {
-  padding: calc(14px + var(--safe-top)) 16px calc(88px + var(--safe-bottom)) !important;
+  padding: calc(24px + var(--safe-top)) 20px calc(88px + var(--safe-bottom)) !important;
 }
 
 #view-rutina .routine-page-header {
   min-height: 56px !important;
   grid-template-columns: 40px minmax(0, 1fr) !important;
   gap: 10px !important;
-  margin: 0 0 20px !important;
+  margin: 0 0 26px !important;
   padding: 0 !important;
 }
 
