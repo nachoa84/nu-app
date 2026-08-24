@@ -59,7 +59,7 @@ h2,
 .onboarding-shell h1,
 .onboarding-shell h2,
 .onboarding-shell h3 {
-  font-family: var(--nu-font-sans) !important;
+  font-family: "Plus Jakarta Sans", var(--nu-font-sans) !important;
   font-weight: 700 !important;
   letter-spacing: -0.03em !important;
 }

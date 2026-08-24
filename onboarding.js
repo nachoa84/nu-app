@@ -45,7 +45,21 @@
 
   const params = new URLSearchParams(window.location.search);
   const previewMode = params.get("preview") === "1";
+
+  // Modo de prueba del onboarding (?onboardingTest=1) — ver
+  // onboarding-test-mode.js para el detalle y cómo desactivarlo/quitarlo.
+  // window.OnboardingTestMode puede no existir si ese script no se cargó
+  // (p. ej. si se lo borra antes de producción): en ese caso el modo test
+  // queda simplemente inactivo, sin romper el onboarding real.
+  const isOnboardingTestMode = Boolean(
+    window.OnboardingTestMode?.detectOnboardingTestMode(window.location.search)
+  );
+  // Perfil "en memoria" usado únicamente en modo test: nunca se escribe en
+  // localStorage, así que se pierde al recargar (por diseño — ver caso D).
+  let testModeProfile = null;
+
   function getProfile() {
+    if (isOnboardingTestMode) return testModeProfile;
     try {
       return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
     } catch (error) {
@@ -54,7 +68,36 @@
   }
 
   function saveProfile(profile) {
+    const shouldPersist = window.OnboardingTestMode
+      ? window.OnboardingTestMode.shouldPersistProfile({ testMode: isOnboardingTestMode })
+      : true;
+    if (!shouldPersist) {
+      testModeProfile = profile;
+      return;
+    }
     localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  }
+
+  function renderTestModeBadge() {
+    if (!isOnboardingTestMode || document.getElementById("onboardingTestBadge")) return;
+    const badge = document.createElement("div");
+    badge.id = "onboardingTestBadge";
+    badge.textContent = "Modo prueba";
+    badge.setAttribute("aria-hidden", "true");
+    Object.assign(badge.style, {
+      position: "fixed",
+      top: "calc(6px + env(safe-area-inset-top, 0px))",
+      right: "6px",
+      zIndex: "99999",
+      padding: "3px 9px",
+      borderRadius: "999px",
+      background: "rgba(20, 16, 32, .82)",
+      color: "#fff",
+      font: "600 10px/1.4 system-ui, -apple-system, sans-serif",
+      letterSpacing: ".02em",
+      pointerEvents: "none"
+    });
+    document.body.appendChild(badge);
   }
 
   function detectedTimezone() {
@@ -1078,16 +1121,28 @@
         })
       );
 
-      if (firstProfile) {
+      const shouldReset = window.OnboardingTestMode
+        ? window.OnboardingTestMode.shouldResetRoutineForNewUser({
+            testMode: isOnboardingTestMode,
+            firstProfile
+          })
+        : firstProfile;
+      if (shouldReset) {
         resetRoutineForNewUser();
       }
 
-      const canRequestPush =
+      const canRequestPushBase =
         firstProfile &&
         "Notification" in window &&
         "PushManager" in window &&
         "serviceWorker" in navigator &&
         typeof window.PushClient?.subscribe === "function";
+      const canRequestPush = window.OnboardingTestMode
+        ? window.OnboardingTestMode.shouldRequestNotificationPermission({
+            testMode: isOnboardingTestMode,
+            canRequestPush: canRequestPushBase
+          })
+        : canRequestPushBase;
 
       if (canRequestPush) {
         if (finishButton) {
@@ -1117,12 +1172,24 @@
 
       showPreparing();
 
+      const shouldReload = window.OnboardingTestMode
+        ? window.OnboardingTestMode.shouldReloadOnFinish({
+            testMode: isOnboardingTestMode,
+            firstProfile
+          })
+        : firstProfile;
+
       setTimeout(() => {
-        if (firstProfile) {
+        if (shouldReload) {
           window.location.reload();
           return;
         }
 
+        // En modo test nunca recargamos: nada quedó persistido, así que un
+        // reload volvería a mostrar el onboarding en vez de pasar a Inicio
+        // (eso es justamente lo que se espera si el usuario recarga a
+        // propósito con ?onboardingTest=1 — ver caso D). Al terminar el
+        // flujo sin recargar, se entra normalmente a Inicio.
         removeOverlay();
         renderProfileUI();
       }, 760);
@@ -1229,8 +1296,15 @@
     const isForcedOnboarding = params.get("onboarding") === "1";
 
     handleNewUserTestParam();
+    renderTestModeBadge();
 
-    if (!previewMode && showInstallationGate()) {
+    const shouldRunInstallGate = window.OnboardingTestMode
+      ? window.OnboardingTestMode.shouldRunInstallationGate({
+          testMode: isOnboardingTestMode,
+          previewMode
+        })
+      : !previewMode;
+    if (shouldRunInstallGate && showInstallationGate()) {
       return;
     }
 
@@ -1248,12 +1322,16 @@
       return;
     }
 
-    if (profile) {
+    // isOnboardingTestMode se chequea acá también (no solo dentro de
+    // getProfile()) a propósito: aunque getProfile() ya devuelve null en
+    // modo test, esta doble comprobación evita que el onboarding de prueba
+    // dependa de un único punto de falla.
+    if (profile && !isOnboardingTestMode) {
       renderProfileUI();
       return;
     }
 
-    if (previewMode) {
+    if (previewMode && !isOnboardingTestMode) {
       return;
     }
 
