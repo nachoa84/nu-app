@@ -66,6 +66,63 @@ function resolveRoutineVideoPoster(src, explicitPoster = null) {
   return null;
 }
 
+// Reemplaza un <video> sin poster por una <img> con su primer frame
+// capturado a canvas, en cuanto haya un frame decodificado disponible.
+// Uso: miniaturas pequeñas recortadas con border-radius/overflow:hidden
+// (Favoritos, Materiales del día) donde no conviene dejar un <video> real
+// — en Android Chrome ese <video> puede componerse en una superficie de
+// decodificación de hardware que ignora el recorte CSS del contenedor y el
+// frame asoma por fuera del recuadro redondeado, algo que no se reproduce
+// en un navegador de escritorio (no usa esa vía de composición). Con una
+// <img> normal el recorte es consistente en todos los motores.
+function swapVideoForCapturedFrame(video, container) {
+  const capture = () => {
+    if (video.dataset.frameCaptured === "1") return;
+    if (!video.videoWidth || !video.videoHeight) return;
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+      const img = document.createElement("img");
+      img.className = video.className;
+      img.alt = video.getAttribute("alt") || "";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.setAttribute("draggable", "false");
+      img.addEventListener("dragstart", event => event.preventDefault());
+      img.src = dataUrl;
+
+      video.dataset.frameCaptured = "1";
+      if (video.isConnected && video.parentNode === container) {
+        container.replaceChild(img, video);
+      }
+      video.dispatchEvent(new CustomEvent("nu-frame-captured", { detail: { img } }));
+    } catch (error) {
+      // Frame no disponible todavía o canvas "tainted" por CORS: se deja el
+      // <video> como fallback, no es peor que el comportamiento previo.
+    }
+  };
+
+  video.addEventListener("loadeddata", capture, { once: true });
+  video.addEventListener("seeked", capture, { once: true });
+  // preload="metadata" no garantiza que el navegador decodifique un frame
+  // real (a veces solo conoce duración/dimensiones). Forzar un seek mínimo
+  // hace que decodifique el frame en esa posición de forma confiable.
+  video.addEventListener("loadedmetadata", () => {
+    try {
+      video.currentTime = Math.min(0.1, (video.duration || 1) / 2);
+    } catch (error) {
+      // Algunos navegadores no permiten seek hasta más adelante; el
+      // listener de loadeddata sigue siendo el intento principal.
+    }
+  }, { once: true });
+}
+
 function ensureToastHost() {
   let host = document.getElementById("appToastHost");
   if (host) return host;
