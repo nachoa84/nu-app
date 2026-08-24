@@ -621,8 +621,8 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
 .favorite-day-tile-preview-v2 > video {
   all: unset;
   box-sizing: border-box;
-  position: absolute;
-  inset: 0;
+  position: static;
+  inset: auto;
   display: block;
   width: 100%;
   min-width: 0;
