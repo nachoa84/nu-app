@@ -3,6 +3,61 @@
   // Los comandos visibles conservan los nombres conocidos, sin necesitar el punto inicial.
   window.BotContent = [
   {
+    "id": "galeria-oficial",
+    "title": "Galería oficial",
+    "command": "galeria oficial",
+    "aliases": [
+      "nuskin fotos oficial",
+      "smugmug"
+    ],
+    "phrases": [],
+    "keywords": [],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Acá tenés la galería oficial de Nu Skin para LATAM, con imágenes y materiales oficiales de productos."
+      },
+      {
+        "type": "link",
+        "title": "Galería oficial Nu Skin",
+        "url": "https://nuskinsocial.smugmug.com/Social/LATAM/Productos",
+        "actionLabel": "Abrir galería",
+        "description": "Material oficial de productos · LATAM",
+        "resourceKind": "link"
+      }
+    ],
+    "sourceFlow": "galeria oficial"
+  },
+  {
+    "id": "info-center",
+    "title": "Info Center",
+    "command": "info center",
+    "aliases": [],
+    "phrases": [],
+    "keywords": [],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "¿Sabes dónde consultar toda la información sobre incentivos, Viajes de Éxito, productos y mucho más?\n\nEn el Info Center podrás encontrar toda la información que necesitas, reunida en un solo lugar. 🙌"
+      },
+      {
+        "type": "document",
+        "title": "¿Cómo encontrarlo?",
+        "sections": [
+          {
+            "title": "🌐 Página web",
+            "body": "Dirígete a:\nPerfil → Volúmenes → Entrenamiento → Info Center"
+          },
+          {
+            "title": "📱 Stela",
+            "body": "Ingresa a:\nMás → Training → Info Center"
+          }
+        ]
+      }
+    ],
+    "sourceFlow": "info center"
+  },
+  {
     "id": "loi",
     "title": "LOI",
     "command": "loi",
