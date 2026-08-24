@@ -201,56 +201,6 @@
   height: 18px;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-routine-days,
-#view-favoritos:not(.favorite-day-open) .favorite-day-strip {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 2px 1px 8px;
-  scrollbar-width: none;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
-  flex: 0 0 122px;
-  width: 122px;
-  min-width: 122px;
-  display: block;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  text-align: left;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
-  width: 122px;
-  min-width: 122px;
-  height: 136px;
-  min-height: 136px;
-  border: 0;
-  border-radius: 20px;
-  background: #eee8f3;
-  box-shadow: 0 10px 26px rgba(55,43,77,.055);
-}
-
-#view-favoritos .favorite-day-tile-copy {
-  display: block;
-  padding: 10px 2px 0;
-}
-
-#view-favoritos .favorite-day-tile-copy strong {
-  color: var(--fav-ref-ink);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-#view-favoritos .favorite-day-tile-copy small {
-  margin-top: 2px;
-  color: var(--fav-ref-muted);
-  font-size: 11px;
-  line-height: 1.2;
-}
 
 #view-favoritos .bot-favorite-card {
   display: grid;
