@@ -10,7 +10,7 @@
       { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" },
       { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
       { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" },
-      { href: "screens-reference-force-v1.css?v=20260823-2218", key: "screens-reference-force-v1.css", tag: "screens-ref-v1" }
+      { href: "screens-reference-force-v1.css?v=20260823-2248", key: "screens-reference-force-v1.css", tag: "screens-ref-v2" }
     ];
 
     dailySheets.forEach(({ key }) => {
@@ -41,6 +41,38 @@
     shortcuts.classList.add("bot-composer-shortcuts");
     shortcuts.setAttribute("aria-label", "Abrir accesos rápidos");
     form.insertBefore(shortcuts, send);
+  }
+
+  function normalizeDynamicLabels() {
+    const guide = document.getElementById("view-guia");
+    const detail = guide?.querySelector(".guide-detail");
+    const kicker = document.getElementById("guideHeaderKicker");
+
+    if (detail && kicker && /^Paso\s+\d+/i.test(kicker.textContent || "")) {
+      kicker.textContent = "Guía de inicio";
+    }
+
+    guide?.querySelectorAll(".guide-complete-card.is-done .guide-complete-copy strong")
+      .forEach(label => {
+        if ((label.textContent || "").trim() !== "Hecho") {
+          label.textContent = "Hecho";
+        }
+      });
+
+    const toastNode = document.getElementById("toast");
+    if (toastNode && (toastNode.textContent || "").trim() === "Etapa completada") {
+      toastNode.textContent = "Hecho";
+    }
+  }
+
+  function setupDynamicLabelObserver() {
+    normalizeDynamicLabels();
+    const observer = new MutationObserver(() => normalizeDynamicLabels());
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
   }
 
   function setupNotificationRedesignV2() {
@@ -105,6 +137,7 @@
 
   const setupAll = () => {
     setupIrisComposerV2();
+    setupDynamicLabelObserver();
     setupNotificationRedesignV2();
   };
 
