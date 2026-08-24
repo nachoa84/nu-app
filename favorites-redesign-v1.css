@@ -602,9 +602,9 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
   position: relative;
   display: block;
   flex: 0 0 auto;
-  width: calc(100% - 16px) !important;
+  width: calc(100% - 28px) !important;
   min-width: 0;
-  max-width: calc(100% - 16px) !important;
+  max-width: calc(100% - 28px) !important;
   align-self: center;
   height: 76px;
   min-height: 76px;
