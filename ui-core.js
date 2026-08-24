@@ -364,9 +364,20 @@ function animateNativeViewEnter(target, direction = 0) {
     document.body.classList.remove("native-view-switching");
     target.style.opacity = "";
     target.style.transform = "";
+    // fill: "both" keeps applying the animation's end frame (a no-op
+    // translate3d(0,0,0), but still a real transform) after it finishes.
+    // That silently gives the view a new containing block, so any
+    // position:fixed element inside it (the Iris composer, "Hoy lo hice",
+    // toasts, etc.) ends up positioned against the view instead of the
+    // viewport. Cancel the animation so its effect is actually removed.
+    animation.cancel();
   };
   animation.onfinish = cleanup;
-  animation.oncancel = cleanup;
+  animation.oncancel = () => {
+    document.body.classList.remove("native-view-switching");
+    target.style.opacity = "";
+    target.style.transform = "";
+  };
 }
 
 function animateNativeNavSelection(button) {

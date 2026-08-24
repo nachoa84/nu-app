@@ -322,18 +322,19 @@ body:has(#view-hoy.day-open) #app {
 }
 
 #view-hoy.day-open .complete-card:not(.done) {
-  position: fixed !important;
-  z-index: 500 !important;
-  left: 50% !important;
-  bottom: calc(18px + var(--safe-bottom)) !important;
-  width: min(180px,calc(100vw - 64px)) !important;
+  position: static !important;
+  z-index: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  margin: 18px 0 0 !important;
   display: block !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 999px !important;
   background: transparent !important;
-  box-shadow: 0 14px 30px rgba(54,34,64,.18) !important;
-  transform: translateX(-50%) !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 #view-hoy.day-open .complete-card:not(.done) > h3,
@@ -405,6 +406,12 @@ body:has(#view-hoy.day-open) #app {
   aspect-ratio: 1 / 1 !important;
   display: block !important;
   overflow: hidden !important;
+  /* Fuerza a que el clip del borde redondeado se respete incluso con
+     <video>: sin esto, algunos motores (iOS/WebView) componen el video
+     en una capa aparte que ignora el overflow:hidden del padre y la
+     imagen/video termina asomando por fuera del recuadro. */
+  isolation: isolate !important;
+  corner-shape: round !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 14px !important;

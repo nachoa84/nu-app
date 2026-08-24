@@ -46,6 +46,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
+  isolation: isolate;
   background: #f1f1ee;
   color: var(--fav-brand);
 }

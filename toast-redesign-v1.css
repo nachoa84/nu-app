@@ -133,10 +133,19 @@ body:has(#mediaPreview:not([hidden])) .toast-text {
   font-size: 12px !important;
 }
 
-/* Detalle diario: abajo vive HOY LO HICE, por eso el aviso sube. */
-body:has(#view-hoy.day-open) .toast-host {
+/* Detalle diario: abajo vive HOY LO HICE, por eso el aviso sube.
+   Solo mientras esa vista está realmente activa: .day-open puede quedar
+   pegado en #view-hoy aunque el usuario haya navegado a otra pantalla
+   (p. ej. Progreso), y entonces este aviso tapaba el título de esa vista. */
+body[data-active-view="hoy"]:has(#view-hoy.day-open) .toast-host {
   top: calc(78px + var(--safe-top)) !important;
   bottom: auto !important;
+}
+
+/* Iris: el compositor vive pegado al menú, así que el aviso sube por
+   encima de él en vez de superponerse. */
+body[data-active-view="bot"] .toast-host {
+  bottom: calc(var(--nav-height, 72px) + 80px + var(--safe-bottom)) !important;
 }
 
 /* Teclado abierto (Iris/campos): no competir con el compositor. */
