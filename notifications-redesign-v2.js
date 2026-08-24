@@ -11,7 +11,8 @@
       { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
       { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" },
       { href: "screens-reference-force-v1.css?v=20260823-2248", key: "screens-reference-force-v1.css", tag: "screens-ref-v2" },
-      { href: "mobile-last-mile-v1.css?v=20260823-2251", key: "mobile-last-mile-v1.css", tag: "mobile-last-v1" }
+      { href: "mobile-last-mile-v1.css?v=20260823-2251", key: "mobile-last-mile-v1.css", tag: "mobile-last-v1" },
+      { href: "mobile-consistency-v2.css?v=20260823-2318", key: "mobile-consistency-v2.css", tag: "mobile-consistency-v2" }
     ];
 
     dailySheets.forEach(({ key }) => {
