@@ -1,0 +1,35 @@
+/* NU APP · MOBILE LAST MILE V1 */
+
+/* Detalle de rutina: contenido expandido sin sangría lateral heredada. */
+#view-hoy.day-open .action-step-body,
+#view-hoy.day-open .native-details-body {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+#view-hoy.day-open .action-step-body {
+  padding: 4px 0 15px !important;
+}
+
+#view-hoy.day-open .action-step-body > *,
+#view-hoy.day-open .native-details-body > * {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* En detalle de Guía nunca debe volver a verse PASO X. */
+#view-guia:has(.guide-detail) .guide-page-header .page-kicker {
+  display: block !important;
+}
+
+/* El estado completado se comporta como una píldora HECHO, no como una card. */
+#view-guia .guide-complete-card.is-done .guide-complete-copy > div {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Evita padding inferior extra en vistas que ocultan la navegación. */
+body[data-active-view="guia"] main,
+body:has(#view-hoy.day-open) main {
+  padding-bottom: 0 !important;
+}
