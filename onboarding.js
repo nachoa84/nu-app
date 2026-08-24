@@ -280,11 +280,11 @@
           apple
             ? `
               <button id="showIosInstallGuide" class="onboarding-primary" type="button">
-                Agregar a inicio
+                Ver cómo instalarla
               </button>
 
               <p class="install-gate-hint">
-                Solo te va a tomar unos segundos.
+                Te mostramos los pasos para agregarla desde Safari.
               </p>
 
               <div id="iosInstallGuide" class="ios-install-guide" hidden>
@@ -340,7 +340,7 @@
             `
             : `
               <button id="androidInstallBtn" class="onboarding-primary" type="button">
-                Instalar Nu App
+                Instalar app
               </button>
 
               <p id="androidInstallMessage" class="install-gate-hint">
