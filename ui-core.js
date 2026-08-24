@@ -76,15 +76,44 @@ function resolveRoutineVideoPoster(src, explicitPoster = null) {
 // en un navegador de escritorio (no usa esa vía de composición). Con una
 // <img> normal el recorte es consistente en todos los motores.
 function swapVideoForCapturedFrame(video, container) {
+  const MAX_ATTEMPTS = 8;
+  let attempts = 0;
+  let scheduled = false;
+
+  const isFrameBlack = ctx => {
+    // Muestreo disperso (no todos los píxeles, por costo) para detectar un
+    // frame realmente negro. En Android, drawImage() puede devolver negro
+    // aunque loadeddata/seeked/requestVideoFrameCallback ya dispararon: la
+    // superficie de decodificación de hardware todavía no sincronizó el
+    // buffer legible por el momento en que se llama a drawImage.
+    const { data, width, height } = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const stepPixels = Math.max(1, Math.floor((width * height) / 400));
+    for (let p = 0; p < width * height; p += stepPixels) {
+      const i = p * 4;
+      if (data[i] > 14 || data[i + 1] > 14 || data[i + 2] > 14) return false;
+    }
+    return true;
+  };
+
+  const retry = () => {
+    if (scheduled || attempts >= MAX_ATTEMPTS) return;
+    scheduled = true;
+    setTimeout(() => { scheduled = false; capture(); }, 150 * attempts);
+  };
+
   const capture = () => {
     if (video.dataset.frameCaptured === "1") return;
-    if (!video.videoWidth || !video.videoHeight) return;
+    attempts += 1;
+    if (!video.videoWidth || !video.videoHeight) return void retry();
     try {
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      if (isFrameBlack(ctx)) return void retry();
+
       const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
 
       const img = document.createElement("img");
@@ -103,10 +132,19 @@ function swapVideoForCapturedFrame(video, container) {
       }
       video.dispatchEvent(new CustomEvent("nu-frame-captured", { detail: { img } }));
     } catch (error) {
-      // Frame no disponible todavía o canvas "tainted" por CORS: se deja el
-      // <video> como fallback, no es peor que el comportamiento previo.
+      // Frame no disponible todavía o canvas "tainted": se deja el <video>
+      // como fallback, no es peor que el comportamiento previo.
     }
   };
+
+  // requestVideoFrameCallback (Chrome/Android Chrome) avisa exactamente
+  // cuando hay un frame presentado listo para leer — más confiable que
+  // loadeddata/seeked solos, que en Android pueden disparar antes de que
+  // el buffer esté sincronizado. Se usa si está disponible y además se
+  // deja el resto como red de contención (con reintento por frame negro).
+  if (typeof video.requestVideoFrameCallback === "function") {
+    video.requestVideoFrameCallback(() => capture());
+  }
 
   video.addEventListener("loadeddata", capture, { once: true });
   video.addEventListener("seeked", capture, { once: true });
