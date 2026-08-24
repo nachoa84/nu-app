@@ -50,7 +50,7 @@
       description: "Aplicaciones y funciones de la plataforma.",
       tone: "cyan",
       icon: "tools",
-      commands: ["stela", "vera", "navegar pagina"]
+      commands: ["stela", "vera", "navegar pagina", "info center"]
     }
   ];
 
