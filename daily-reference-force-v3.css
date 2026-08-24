@@ -412,6 +412,8 @@ body:has(#view-hoy.day-open) #app {
      imagen/video termina asomando por fuera del recuadro. */
   isolation: isolate !important;
   corner-shape: round !important;
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%) !important;
+  mask-image: radial-gradient(circle, #fff 100%, #fff 100%) !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 14px !important;
@@ -481,9 +483,11 @@ body:has(#view-hoy.day-open) #app {
   align-items: flex-start !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
-  padding: 0 0 6px !important;
+  /* El último item necesita el mismo aire que el resto contra el borde
+     derecho del carrusel, si no queda pegado/cortado al final del scroll. */
+  padding: 0 16px 6px 0 !important;
   scroll-snap-type: x proximity !important;
-  scroll-padding-inline: 0 !important;
+  scroll-padding-inline: 0 16px !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-x: contain !important;
   scrollbar-width: none !important;

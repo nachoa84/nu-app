@@ -89,7 +89,8 @@
 
 #view-hoy.day-open .complete-card.done .complete-done-copy {
   width: 100% !important;
-  display: block !important;
+  display: flex !important;
+  justify-content: center !important;
 }
 
 #view-hoy.day-open .complete-card.done .complete-done-copy h3,
@@ -97,9 +98,14 @@
   display: none !important;
 }
 
+/* Pastilla "HECHO" de ancho contenido, centrada — no un botón full-width
+   (ese era exactamente el bug: ::after heredaba width:100% del contenedor
+   flex de arriba en vez de tener su propio ancho acotado). */
 #view-hoy.day-open .complete-card.done .complete-done-copy::after {
   content: "HECHO" !important;
-  width: 100% !important;
+  width: auto !important;
+  min-width: 150px !important;
+  max-width: 190px !important;
   min-height: 48px !important;
   display: flex !important;
   align-items: center !important;

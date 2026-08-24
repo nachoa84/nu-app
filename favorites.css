@@ -47,6 +47,12 @@
   place-items: center;
   overflow: hidden;
   isolation: isolate;
+  /* Fuerza el clip en WebKit/Chrome móvil aunque el hijo termine en su
+     propia capa compuesta (GPU) por el <video>: overflow:hidden por sí
+     solo no siempre alcanza a recortarla ahí, la máscara sí. Es un no-op
+     visual en navegadores donde overflow:hidden ya recortaba bien. */
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
+  mask-image: radial-gradient(circle, #fff 100%, #fff 100%);
   background: #f1f1ee;
   color: var(--fav-brand);
 }

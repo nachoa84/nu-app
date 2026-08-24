@@ -103,7 +103,7 @@
 /* Preview de material: alineado con Guardar y con aire suficiente por encima. */
 body:has(#mediaPreview:not([hidden])) .toast-host {
   top: auto !important;
-  bottom: calc(82px + var(--safe-bottom)) !important;
+  bottom: calc(100px + var(--safe-bottom)) !important;
   left: calc(50% - min(215px, 50vw) + 22px) !important;
   width: min(286px, calc(100% - 44px)) !important;
   transform: none !important;
@@ -124,9 +124,9 @@ body:has(#mediaPreview:not([hidden])) .toast-host .toast.is-visible {
 }
 
 body:has(#mediaPreview:not([hidden])) .toast-status {
-  width: 27px !important;
-  height: 27px !important;
-  font-size: 12px !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 12.5px !important;
 }
 
 body:has(#mediaPreview:not([hidden])) .toast-text {
@@ -165,7 +165,7 @@ body:has(.onboarding-shell:not([hidden])) .toast-host {
 body:has(#mediaPreview:not([hidden])) .toast-host,
 body:has(#view-hoy.day-open):has(#mediaPreview:not([hidden])) .toast-host {
   top: auto !important;
-  bottom: calc(82px + var(--safe-bottom)) !important;
+  bottom: calc(100px + var(--safe-bottom)) !important;
   left: calc(50% - min(215px, 50vw) + 22px) !important;
   transform: none !important;
 }
