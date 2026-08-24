@@ -1,0 +1,186 @@
+/* NU APP · DAILY MATERIALS + COMPLETION REFERENCE V1
+   Ajuste visual del tramo inferior del detalle diario.
+   Mantiene la lógica existente: materiales, completado y acceso a progreso. */
+
+/* Materiales: misma composición compacta de la referencia. */
+#view-hoy.day-open .materials-section {
+  margin-top: 4px !important;
+  padding: 0 !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading {
+  min-height: 26px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 9px !important;
+  padding: 0 !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading > div {
+  display: block !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading h3 {
+  margin: 0 !important;
+  color: #17152f !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading .section-count {
+  min-width: 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8c72a9 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-align: right !important;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence {
+  gap: 10px !important;
+  padding-bottom: 4px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-row {
+  gap: 5px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-thumb {
+  border-radius: 14px !important;
+  box-shadow: 0 7px 16px rgba(48, 33, 67, .06) !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy strong {
+  font-size: 9.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.18 !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy span {
+  margin-top: 2px !important;
+  color: #a38ab9 !important;
+  font-size: 7.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em !important;
+}
+
+/* Estado completado: reemplaza por completo la vieja pastilla "Hecho hoy".
+   Queda solo el check circular coral-ciruela de la referencia. */
+#view-hoy.day-open .complete-card.done {
+  min-height: 72px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 12px 0 8px !important;
+  padding: 5px 0 7px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy {
+  width: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy h3,
+#view-hoy.day-open .complete-card.done .complete-done-copy p {
+  display: none !important;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy::after {
+  content: "✓" !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, #e65b38 0%, #ba4a4c 48%, #744064 100%) !important;
+  color: #fff !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  box-shadow: 0 12px 22px rgba(104, 57, 91, .22) !important;
+}
+
+/* Evita que estilos globales de completado vuelvan a pintar el estado en verde. */
+#view-hoy.day-open .complete-card.done,
+#view-hoy.day-open .complete-card.done *,
+#view-hoy.day-open .complete-card.done .complete-done-inline-check {
+  border-color: transparent !important;
+}
+
+/* Acceso a progreso: tarjeta blanca baja, como la referencia. */
+#view-hoy.day-open .native-day-progress-button {
+  width: 100% !important;
+  min-height: 54px !important;
+  display: grid !important;
+  grid-template-columns: 30px minmax(0,1fr) 18px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 6px 0 0 !important;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.96) !important;
+  color: #201936 !important;
+  box-shadow: 0 8px 22px rgba(44, 31, 62, .055) !important;
+  text-align: left !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:first-child {
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 9px !important;
+  background: #f1edf6 !important;
+  color: #715681 !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:first-child svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+#view-hoy.day-open .native-day-progress-button strong {
+  min-width: 0 !important;
+  color: #201936 !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 11.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.01em !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:last-child {
+  justify-self: end !important;
+  color: #5b4b70 !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:last-child svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .complete-card.done .complete-done-copy::after {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  #view-hoy.day-open .native-day-progress-button strong {
+    font-size: 11px !important;
+  }
+}
