@@ -146,7 +146,12 @@
   box-shadow: none !important;
 }
 
-#view-guia .guide-complete-card .guide-complete-copy {
+/* Especificidad igual a la regla de screens-reference-force-v1.css que
+   vuelve a mostrar este bloque en el estado completado (si no, gana esa
+   por tener selector más específico aunque cargue antes). */
+#view-guia .guide-complete-card .guide-complete-copy,
+#view-guia .guide-complete-card.is-done .guide-complete-copy,
+#view-guia .guide-complete-card:not(.is-done) .guide-complete-copy {
   display: none !important;
 }
 
@@ -503,6 +508,25 @@
   font-size: 13px !important;
 }
 
+/* Las miniaturas nunca deben salirse del recuadro redondeado. */
+#view-favoritos .favorite-folder-preview,
+#view-favoritos .favorite-day-tile-preview,
+#view-favoritos .favorite-content-thumb .favorite-folder-preview {
+  overflow: hidden !important;
+}
+
+#view-favoritos .favorite-folder-preview > img,
+#view-favoritos .favorite-folder-preview > video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: inherit !important;
+  object-fit: cover !important;
+}
+
 #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
   flex-basis: 136px !important;
   width: 136px !important;
@@ -641,6 +665,12 @@ body:has(#mediaPreview:not([hidden])) .toast-host .toast {
 
 body:has(#mediaPreview:not([hidden])) .toast-text {
   font-size: 13px !important;
+}
+
+/* El toast del preview debe quedar separado del botón Guardar/Compartir,
+   nunca casi pegado o superpuesto. */
+body:has(#mediaPreview:not([hidden])) .toast-host {
+  bottom: calc(18px + var(--safe-bottom) + 52px + 16px) !important;
 }
 
 /* ========================================================

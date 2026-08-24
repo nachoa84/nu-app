@@ -73,14 +73,14 @@
   letter-spacing: .08em !important;
 }
 
-/* Estado completado: reemplaza por completo la vieja pastilla "Hecho hoy".
-   Queda solo el check circular coral-ciruela de la referencia. */
+/* Estado completado: un único botón "HECHO", consistente con el CTA
+   "Hoy lo hice" que reemplaza (no un ícono de check suelto). */
 #view-hoy.day-open .complete-card.done {
-  min-height: 72px !important;
-  display: grid !important;
-  place-items: center !important;
-  margin: 12px 0 8px !important;
-  padding: 5px 0 7px !important;
+  min-height: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 18px 0 0 !important;
+  padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
@@ -89,8 +89,7 @@
 
 #view-hoy.day-open .complete-card.done .complete-done-copy {
   width: 100% !important;
-  display: grid !important;
-  place-items: center !important;
+  display: block !important;
 }
 
 #view-hoy.day-open .complete-card.done .complete-done-copy h3,
@@ -99,19 +98,22 @@
 }
 
 #view-hoy.day-open .complete-card.done .complete-done-copy::after {
-  content: "✓" !important;
-  width: 44px !important;
-  height: 44px !important;
-  display: grid !important;
-  place-items: center !important;
-  border-radius: 50% !important;
-  background: linear-gradient(145deg, #e65b38 0%, #ba4a4c 48%, #744064 100%) !important;
+  content: "HECHO" !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(115deg, #e85b39 0%, #c24b42 48%, #7a3f62 100%) !important;
   color: #fff !important;
   font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  letter-spacing: .08em !important;
   line-height: 1 !important;
-  box-shadow: 0 12px 22px rgba(104, 57, 91, .22) !important;
+  box-shadow: none !important;
 }
 
 /* Evita que estilos globales de completado vuelvan a pintar el estado en verde. */

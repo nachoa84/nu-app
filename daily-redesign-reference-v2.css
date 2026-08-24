@@ -12,12 +12,12 @@
   --ref-coral: #ef6a43;
   --ref-plum: #54345f;
   --ref-card: rgba(255,255,255,.93);
-  padding: calc(10px + var(--safe-top)) 16px 118px;
+  padding: calc(10px + var(--safe-top)) 16px calc(28px + var(--safe-bottom));
   background: var(--ref-bg);
 }
 
 #view-hoy.day-open .chat-wrap {
-  padding: 0 0 86px;
+  padding: 0 0 20px;
 }
 
 /* HEADER */
@@ -372,20 +372,20 @@
   background: var(--ref-card);
 }
 
-/* CTA: como la variante izquierda aprobada. */
+/* CTA en el flujo normal: nunca debe flotar sobre "Ver progreso" ni sobre
+   la capacitación. Ver mobile-last-mile-v1.css para el estado done. */
 #view-hoy.day-open .complete-card:not(.done) {
-  position: fixed;
-  z-index: 110;
-  left: 50%;
-  bottom: calc(18px + var(--safe-bottom));
-  width: min(180px, calc(100vw - 64px));
+  position: static;
+  z-index: auto;
+  width: 100%;
+  margin: 18px 0 0;
   display: block;
   padding: 0;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  box-shadow: 0 14px 30px rgba(54,34,64,.18);
-  transform: translateX(-50%);
+  box-shadow: none;
+  transform: none;
 }
 
 #view-hoy.day-open .complete-card:not(.done) > h3,
