@@ -1,0 +1,177 @@
+/* NU APP · TOAST REDESIGN V6
+   Toasts adaptativos por contexto: sin barra de tiempo, posicionados para no tapar CTAs. */
+
+.toast-host {
+  left: 50% !important;
+  top: auto !important;
+  bottom: calc(var(--nav-height) + 18px + var(--safe-bottom)) !important;
+  width: min(330px, calc(100% - 32px)) !important;
+  transform: translateX(-50%) !important;
+  pointer-events: none !important;
+}
+
+.toast-host .toast {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 300px !important;
+  min-height: 54px !important;
+  display: grid !important;
+  grid-template-columns: 30px minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 11px 13px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.97) !important;
+  color: #2a2440 !important;
+  box-shadow: 0 16px 32px -16px rgba(42,36,64,.34), 0 0 0 1px rgba(42,36,64,.045) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  opacity: 0 !important;
+  transform: translateY(12px) scale(.97) !important;
+  transition: opacity .24s cubic-bezier(.25,.9,.35,1), transform .24s cubic-bezier(.25,.9,.35,1) !important;
+  pointer-events: auto !important;
+}
+
+.toast-host .toast.is-visible {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.toast-host .toast.is-leaving {
+  opacity: 0 !important;
+  transform: translateY(8px) scale(.98) !important;
+}
+
+.toast-host .toast::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+}
+
+.toast-status {
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  color: #fff !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.toast-success .toast-status {
+  background: linear-gradient(115deg,#e2542e 0%,#8d4260 100%) !important;
+}
+
+.toast-error .toast-status {
+  background: #d95c58 !important;
+}
+
+.toast-info .toast-status {
+  background: #6a5578 !important;
+}
+
+.toast-text {
+  min-width: 0 !important;
+  color: #2a2440 !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.28 !important;
+  letter-spacing: -.008em !important;
+}
+
+.toast-action {
+  min-height: 28px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #f3eff8 !important;
+  color: #5a3e6b !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Preview de material: alineado con Guardar y con aire suficiente por encima. */
+body:has(#mediaPreview:not([hidden])) .toast-host {
+  top: auto !important;
+  bottom: calc(100px + var(--safe-bottom)) !important;
+  left: calc(50% - min(215px, 50vw) + 22px) !important;
+  width: min(286px, calc(100% - 44px)) !important;
+  transform: none !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-host .toast {
+  max-width: 270px !important;
+  min-height: 48px !important;
+  grid-template-columns: 27px minmax(0,1fr) auto !important;
+  gap: 8px !important;
+  padding: 9px 11px !important;
+  border-radius: 14px !important;
+  transform: translateY(8px) scale(.98) !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-host .toast.is-visible {
+  transform: translateY(0) scale(1) !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-status {
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 12.5px !important;
+}
+
+body:has(#mediaPreview:not([hidden])) .toast-text {
+  font-size: 12px !important;
+}
+
+/* Detalle diario: abajo vive HOY LO HICE, por eso el aviso sube.
+   Solo mientras esa vista está realmente activa: .day-open puede quedar
+   pegado en #view-hoy aunque el usuario haya navegado a otra pantalla
+   (p. ej. Progreso), y entonces este aviso tapaba el título de esa vista. */
+body[data-active-view="hoy"]:has(#view-hoy.day-open) .toast-host {
+  top: calc(78px + var(--safe-top)) !important;
+  bottom: auto !important;
+}
+
+/* Iris: el compositor vive pegado al menú, así que el aviso sube por
+   encima de él en vez de superponerse. */
+body[data-active-view="bot"] .toast-host {
+  bottom: calc(var(--nav-height, 72px) + 80px + var(--safe-bottom)) !important;
+}
+
+/* Teclado abierto (Iris/campos): no competir con el compositor. */
+body.keyboard-open .toast-host {
+  top: calc(14px + var(--safe-top)) !important;
+  bottom: auto !important;
+}
+
+/* Onboarding, si genera aviso, queda separado del CTA inferior. */
+body:has(.onboarding-shell:not([hidden])) .toast-host {
+  top: calc(18px + var(--safe-top)) !important;
+  bottom: auto !important;
+}
+
+/* PRIORIDAD FINAL: si el preview está abierto, siempre gana su posición inferior
+   y su alineación con el botón Guardar, incluso si detrás sigue activo el detalle diario. */
+body:has(#mediaPreview:not([hidden])) .toast-host,
+body:has(#view-hoy.day-open):has(#mediaPreview:not([hidden])) .toast-host {
+  top: auto !important;
+  bottom: calc(100px + var(--safe-bottom)) !important;
+  left: calc(50% - min(215px, 50vw) + 22px) !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-host .toast {
+    transition: none !important;
+  }
+}

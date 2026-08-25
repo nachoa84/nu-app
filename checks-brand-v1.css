@@ -1,0 +1,105 @@
+/* NU APP · CHECKS BRAND V1
+   Elimina el verde de estados de completado/éxito y los lleva a la identidad coral–ciruela. */
+
+:root {
+  --nu-check-accent: #8d4260;
+  --nu-check-accent-strong: #6d3b59;
+  --nu-check-accent-soft: #f2e7ee;
+  --nu-check-accent-soft-2: #eee7f3;
+}
+
+/* Variables de pantallas rediseñadas que todavía usaban verde. */
+#view-guia {
+  --guide-ref-green: var(--nu-check-accent) !important;
+}
+
+#view-rutina {
+  --progress-v2-green: var(--nu-check-accent) !important;
+  --progress-v2-green-soft: var(--nu-check-accent-soft) !important;
+}
+
+/* Guía de inicio */
+#view-guia .guide-step-card.is-done .guide-step-number,
+#view-guia .guide-complete-card.is-done .guide-complete-copy > span,
+#view-guia .guide-check-list li > span {
+  background: var(--nu-check-accent-soft) !important;
+  color: var(--nu-check-accent) !important;
+}
+
+#view-guia .guide-step-status.is-done {
+  color: var(--nu-check-accent) !important;
+}
+
+#view-guia .guide-complete-card.is-done {
+  background: rgba(248, 240, 245, .82) !important;
+}
+
+/* Progreso */
+#view-rutina .app-checkin-btn.is-done,
+#view-rutina .app-day-dot.is-complete {
+  background: var(--nu-check-accent-soft) !important;
+  color: var(--nu-check-accent) !important;
+}
+
+#view-rutina .app-day-dot.is-current.is-complete {
+  background: linear-gradient(135deg, #e2542e 0%, var(--nu-check-accent) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(141, 66, 96, .18) !important;
+}
+
+/* Detalle diario / estados compartidos */
+.complete-done-inline-check,
+.complete-action-check,
+.success-check,
+.check-success,
+.check-icon.is-done,
+.check-icon.is-complete,
+.status-check.is-done,
+.status-check.is-complete {
+  color: var(--nu-check-accent) !important;
+}
+
+.complete-done-inline-check,
+.success-check,
+.check-success,
+.status-check.is-done,
+.status-check.is-complete {
+  background: var(--nu-check-accent-soft) !important;
+  border-color: transparent !important;
+}
+
+.complete-done-inline-check svg,
+.complete-action-check svg,
+.success-check svg,
+.check-success svg,
+.check-icon.is-done svg,
+.check-icon.is-complete svg,
+.status-check.is-done svg,
+.status-check.is-complete svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Toast de éxito: sigue usando tilde, pero nunca verde. */
+.toast-success .toast-status {
+  background: linear-gradient(115deg, #e2542e 0%, var(--nu-check-accent) 100%) !important;
+  color: #fff !important;
+}
+
+/* Onboarding / estados de preparación: evita verdes heredados en checks de éxito. */
+.onboarding-shell [class*="check"],
+.onboarding-shell [class*="success"] {
+  --success: var(--nu-check-accent) !important;
+  --success-color: var(--nu-check-accent) !important;
+}
+
+.onboarding-shell [class*="check"] svg,
+.onboarding-shell [class*="success"] svg {
+  color: var(--nu-check-accent) !important;
+  stroke: currentColor !important;
+}
+
+/* Nunca convertir el estado online de Iris: ese punto verde comunica conexión, no completado. */
+#view-bot .bot-status i {
+  color: inherit;
+}

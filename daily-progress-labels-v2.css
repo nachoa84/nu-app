@@ -1,0 +1,33 @@
+/* Porcentaje visual del hero sin cambiar la lógica ni daily-view.js. */
+#view-hoy.day-open .native-day-progress-row small { font-size: 0; }
+#view-hoy.day-open .native-day-progress-row small::after { font-size: 9px; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 1 de 30"]) .native-day-progress-row small::after { content: "3%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 2 de 30"]) .native-day-progress-row small::after { content: "7%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 3 de 30"]) .native-day-progress-row small::after { content: "10%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 4 de 30"]) .native-day-progress-row small::after { content: "13%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 5 de 30"]) .native-day-progress-row small::after { content: "17%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 6 de 30"]) .native-day-progress-row small::after { content: "20%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 7 de 30"]) .native-day-progress-row small::after { content: "23%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 8 de 30"]) .native-day-progress-row small::after { content: "27%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 9 de 30"]) .native-day-progress-row small::after { content: "30%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 10 de 30"]) .native-day-progress-row small::after { content: "33%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 11 de 30"]) .native-day-progress-row small::after { content: "37%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 12 de 30"]) .native-day-progress-row small::after { content: "40%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 13 de 30"]) .native-day-progress-row small::after { content: "43%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 14 de 30"]) .native-day-progress-row small::after { content: "47%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 15 de 30"]) .native-day-progress-row small::after { content: "50%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 16 de 30"]) .native-day-progress-row small::after { content: "53%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 17 de 30"]) .native-day-progress-row small::after { content: "57%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 18 de 30"]) .native-day-progress-row small::after { content: "60%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 19 de 30"]) .native-day-progress-row small::after { content: "63%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 20 de 30"]) .native-day-progress-row small::after { content: "67%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 21 de 30"]) .native-day-progress-row small::after { content: "70%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 22 de 30"]) .native-day-progress-row small::after { content: "73%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 23 de 30"]) .native-day-progress-row small::after { content: "77%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 24 de 30"]) .native-day-progress-row small::after { content: "80%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 25 de 30"]) .native-day-progress-row small::after { content: "83%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 26 de 30"]) .native-day-progress-row small::after { content: "87%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 27 de 30"]) .native-day-progress-row small::after { content: "90%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 28 de 30"]) .native-day-progress-row small::after { content: "93%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 29 de 30"]) .native-day-progress-row small::after { content: "97%"; }
+#view-hoy.day-open .native-day-intro:has(.native-day-progress[aria-label="Progreso: 30 de 30"]) .native-day-progress-row small::after { content: "100%"; }
