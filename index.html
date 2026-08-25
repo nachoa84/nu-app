@@ -31,44 +31,25 @@
   <link rel="stylesheet" href="home.css?v=126-mobile-header-spacing" />
   <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="media-preview.css?v=85a-media-legibility" />
-  <link rel="stylesheet" href="bot.css?v=130-collagen-advising-guide" />
+  <link rel="stylesheet" href="bot.css?v=126-assistant-spacing" />
   <link rel="stylesheet" href="favorites.css?v=94-bot-folders" />
+  <link rel="stylesheet" href="favorites-redesign-v1.css" />
   <link rel="stylesheet" href="multiroutine-v92.css?v=106e-lumispa-interior-image">
   <link rel="stylesheet" href="onboarding.css?v=88-onboarding-legibility" />
   <link rel="stylesheet" href="guide.css?v=119a-completion-lock" />
   <link rel="stylesheet" href="native-visual-v117.css?v=117-native-visual-polish" />
   <link rel="stylesheet" href="home-redesign-v1.css" />
+  <link rel="stylesheet" href="daily-redesign-reference-v2.css?v=20260823-1313" />
 </head>
 
 <body data-active-view="hoy">
   <div id="appSplash" class="app-splash" role="status" aria-label="Cargando rutinas">
     <div class="splash-stage">
-      <video
-        id="nuSplashVideo"
-        class="nu-write-video"
-        autoplay
-        muted
-        playsinline
-        preload="auto"
-        aria-hidden="true"
-      >
+      <video id="nuSplashVideo" class="nu-write-video" autoplay muted playsinline preload="auto" aria-hidden="true">
         <source src="assets/custom/nu-write-v2.mp4" type="video/mp4" />
       </video>
-
-      <img
-        class="nu-final-poster"
-        src="assets/custom/nu-write-v2-poster.png"
-        alt=""
-        aria-hidden="true"
-      />
-
-      <img
-        class="nu-app-word"
-        src="assets/custom/nu-app-word-v51.png"
-        alt=""
-        aria-hidden="true"
-      />
-
+      <img class="nu-final-poster" src="assets/custom/nu-write-v2-poster.png" alt="" aria-hidden="true" />
+      <img class="nu-app-word" src="assets/custom/nu-app-word-v51.png" alt="" aria-hidden="true" />
       <div class="nu-loading">
         <span>Cargando rutinas</span>
         <span class="nu-loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
@@ -79,10 +60,7 @@
     <main>
       <section id="view-hoy" class="view active">
         <header class="app-page-header home-page-header">
-          <div>
-            <span id="homeGreeting" class="home-greeting">Hola</span>
-            <h1 id="homeDayTitle">Inicio</h1>
-          </div>
+          <div><span id="homeGreeting" class="home-greeting">Hola</span><h1 id="homeDayTitle">Inicio</h1></div>
           <button id="homeBellBtn" class="icon-button home-bell-btn" type="button" aria-label="Notificaciones"></button>
         </header>
 
@@ -91,76 +69,35 @@
             <div class="home-guide-feature-copy">
               <span id="homeGuideKicker" class="home-guide-kicker">Empezá por acá</span>
               <h2 id="homeGuideTitle">Guía de inicio</h2>
-              <p id="homeGuideDescription" class="home-guide-description">
-                Tus primeros pasos para comenzar con claridad y acompañamiento.
-              </p>
-
+              <p id="homeGuideDescription" class="home-guide-description">Tus primeros pasos para comenzar con claridad y acompañamiento.</p>
               <div class="home-guide-progress-row">
-                <div class="home-guide-progress-copy">
-                  <span id="homeGuideProgress">0 de 9 etapas</span>
-                  <strong id="homeGuidePercent">0%</strong>
-                </div>
-                <div class="home-guide-progress" aria-hidden="true">
-                  <span id="homeGuideProgressFill"></span>
-                </div>
+                <div class="home-guide-progress-copy"><span id="homeGuideProgress">0 de 9 etapas</span><strong id="homeGuidePercent">0%</strong></div>
+                <div class="home-guide-progress" aria-hidden="true"><span id="homeGuideProgressFill"></span></div>
               </div>
-
-              <button id="openGuideBtn" class="home-guide-action home-guide-open" type="button">
-                <span id="homeGuideButtonLabel">Comenzar</span>
-                <span class="home-guide-open-icon" aria-hidden="true"></span>
-              </button>
+              <button id="openGuideBtn" class="home-guide-action home-guide-open" type="button"><span id="homeGuideButtonLabel">Comenzar</span><span class="home-guide-open-icon" aria-hidden="true"></span></button>
             </div>
-
-            <div class="home-guide-brand" aria-hidden="true">
-              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" />
-            </div>
+            <div class="home-guide-brand" aria-hidden="true"><img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" /></div>
           </article>
         </section>
 
         <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
-          <div class="home-section-heading">
-            <div>
-              <span>Tu día a día</span>
-              <h2 id="homeRoutinesTitle">Mis rutinas</h2>
-            </div>
-          </div>
-
+          <div class="home-section-heading"><div><span>Tu día a día</span><h2 id="homeRoutinesTitle">Mis rutinas</h2></div></div>
           <div class="home-routines">
             <article class="home-routine-card home-routine-card-active">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
-              </div>
-
+              <div class="home-routine-cover" aria-hidden="true"><img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" /></div>
               <div class="home-routine-body">
-                <div class="home-routine-heading">
-                  <h2>Collagen+</h2>
-                </div>
-                <button id="startDayBtn" class="home-routine-continue" type="button">
-                  <span id="homeRoutineContinueLabel">Continuar Día 1</span>
-                  <span class="home-routine-continue-icon" aria-hidden="true"></span>
-                </button>
+                <div class="home-routine-heading"><h2>Collagen+</h2></div>
+                <button id="startDayBtn" class="home-routine-continue" type="button"><span id="homeRoutineContinueLabel">Continuar Día 1</span><span class="home-routine-continue-icon" aria-hidden="true"></span></button>
                 <button id="openRoutineBtn" class="home-routine-progress-link" type="button" hidden>Ver progreso de 30 días</button>
               </div>
             </article>
-
             <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>LumiSpa</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-              </div>
+              <div class="home-routine-cover" aria-hidden="true"><img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" /></div>
+              <div class="home-routine-body"><div class="home-routine-heading"><h2>LumiSpa</h2></div><p class="home-routine-day">Próximamente</p></div>
             </article>
-
             <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>Suplementos</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-              </div>
+              <div class="home-routine-cover" aria-hidden="true"><img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" /></div>
+              <div class="home-routine-body"><div class="home-routine-heading"><h2>Suplementos</h2></div><p class="home-routine-day">Próximamente</p></div>
             </article>
           </div>
         </section>
@@ -168,19 +105,10 @@
         <div id="chatWrap" class="chat-wrap">
           <header id="dailyNativeHeader" class="daily-native-header" hidden>
             <button id="dailyNativeBackBtn" class="icon-button daily-native-back" type="button" aria-label="Volver a Mis rutinas"></button>
-            <div class="daily-native-title">
-              <strong id="dailyNativeRoutineTitle">Collagen+</strong>
-              <span id="dailyNativeDayLabel">Día 1 de 30</span>
-            </div>
+            <div class="daily-native-title"><strong id="dailyNativeRoutineTitle">Collagen+</strong><span id="dailyNativeDayLabel">Día 1 de 30</span></div>
             <button id="dailyNativeProgressBtn" class="icon-button daily-native-progress" type="button" aria-label="Ver progreso de 30 días"></button>
           </header>
-          <div class="chat-header">
-            <div>
-              <strong>Día 1 · Rutina 30 Días</strong>
-              <span id="progressText">0/9 bloques</span>
-            </div>
-            <button id="restartBtn" class="ghost">Reiniciar</button>
-          </div>
+          <div class="chat-header"><div><strong>Día 1 · Rutina 30 Días</strong><span id="progressText">0/9 bloques</span></div><button id="restartBtn" class="ghost">Reiniciar</button></div>
           <div id="chat" class="chat"></div>
         </div>
       </section>
@@ -188,11 +116,7 @@
       <section id="view-guia" class="view">
         <header class="app-page-header guide-page-header">
           <button id="guideBackBtn" class="icon-button guide-back-btn" type="button" aria-label="Volver a Mis rutinas"></button>
-          <div>
-            <span id="guideHeaderKicker" class="page-kicker">Primeros pasos</span>
-            <h1 id="guideHeaderTitle">Guía de inicio</h1>
-          </div>
-
+          <div><span id="guideHeaderKicker" class="page-kicker">Primeros pasos</span><h1 id="guideHeaderTitle">Guía de inicio</h1></div>
         </header>
         <div id="guideRoot" class="guide-root"></div>
       </section>
@@ -200,57 +124,25 @@
       <section id="view-rutina" class="view">
         <header class="app-page-header routine-page-header">
           <button id="routineBackBtn" class="icon-button routine-back-btn" type="button" aria-label="Volver a Inicio"></button>
-          <div>
-            <span id="routineHeaderKicker" class="page-kicker">Collagen+</span>
-            <h1>Progreso</h1>
-          </div>
+          <div><span id="routineHeaderKicker" class="page-kicker">Collagen+</span><h1>Progreso</h1></div>
         </header>
         <div id="daysGrid" class="days-grid"></div>
       </section>
 
       <section id="view-favoritos" class="view">
-        <header class="app-page-header">
-          <div>
-            <h1>Favoritos</h1>
-          </div>
-          <button id="favoritesSearchBtn" class="icon-button" type="button" aria-label="Buscar favoritos"></button>
-        </header>
-
-        <div id="favoritesList" class="favorites-list empty-state">
-          Todavía no guardaste contenido.
-        </div>
+        <header class="app-page-header"><div><h1>Favoritos</h1></div><button id="favoritesSearchBtn" class="icon-button" type="button" aria-label="Buscar favoritos"></button></header>
+        <div id="favoritesList" class="favorites-list empty-state">Todavía no guardaste contenido.</div>
       </section>
 
       <section id="view-bot" class="view">
         <header class="app-page-header bot-page-header">
-          <div>
-            <h1>Iris</h1>
-            <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
-          </div>
-          <div class="bot-header-actions" aria-label="Acciones de Iris">
-            <button id="botShortcutsBtn" class="icon-button" type="button" aria-label="Abrir accesos rápidos"></button>
-            <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
-          </div>
+          <div><h1>Iris</h1><span class="bot-status"><i aria-hidden="true"></i>En línea</span></div>
+          <div class="bot-header-actions" aria-label="Acciones de Iris"><button id="botShortcutsBtn" class="icon-button" type="button" aria-label="Abrir accesos rápidos"></button><button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button></div>
         </header>
-
         <div class="bot-card">
           <div id="botThread" class="bot-thread" aria-live="polite"></div>
-
           <div id="botForm" class="bot-form">
-            <input
-              type="text"
-              inputmode="text"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-              enterkeyhint="send"
-              aria-autocomplete="none"
-              role="textbox"
-              name="botInput"
-              id="botInput"
-              placeholder="Preguntá o buscá un recurso..."
-            />
+            <input type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-autocomplete="none" role="textbox" name="botInput" id="botInput" placeholder="Preguntá o buscá un recurso..." />
             <button class="primary bot-send" type="button" aria-label="Enviar"></button>
           </div>
         </div>
@@ -258,102 +150,40 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal">
-      <button class="nav-btn active" data-view="hoy">
-        <span class="nav-icon"></span><span>Inicio</span>
-      </button>
-      <button class="nav-btn" data-view="favoritos">
-        <span class="nav-icon"></span><span>Favoritos</span>
-      </button>
-      <button class="nav-btn" data-view="bot">
-        <span class="nav-icon"></span><span>Iris</span>
-      </button>
+      <button class="nav-btn active" data-view="hoy"><span class="nav-icon"></span><span>Inicio</span></button>
+      <button class="nav-btn" data-view="favoritos"><span class="nav-icon"></span><span>Favoritos</span></button>
+      <button class="nav-btn" data-view="bot"><span class="nav-icon"></span><span>Iris</span></button>
     </nav>
   </div>
 
   <div id="mediaPreview" class="media-preview" hidden aria-hidden="true">
     <div id="mediaPreviewShell" class="media-preview-shell" role="dialog" aria-modal="true" aria-label="Vista previa del material">
-      <div class="media-preview-grabber" aria-hidden="true"></div>
-      <div id="previewSegments" class="preview-segments" aria-hidden="true"></div>
-      <header class="media-preview-header">
-        <button id="previewCloseBtn" class="preview-icon-btn" type="button" aria-label="Cerrar"></button>
-        <strong id="previewCounter">1 de 1</strong>
-        <button id="previewTopSaveBtn" class="preview-icon-btn" type="button" aria-label="Guardar"></button>
-      </header>
-
+      <div class="media-preview-grabber" aria-hidden="true"></div><div id="previewSegments" class="preview-segments" aria-hidden="true"></div>
+      <header class="media-preview-header"><button id="previewCloseBtn" class="preview-icon-btn" type="button" aria-label="Cerrar"></button><strong id="previewCounter">1 de 1</strong><button id="previewTopSaveBtn" class="preview-icon-btn" type="button" aria-label="Guardar"></button></header>
       <div id="previewStage" class="media-preview-stage"></div>
-
-      <div class="media-preview-meta">
-        <div>
-          <strong id="previewTitle">Material</strong>
-          <span id="previewType">Imagen</span>
-        </div>
-      </div>
-
-      <div class="media-preview-actions">
-        <button id="previewSaveBtn" type="button"></button>
-        <button id="previewShareBtn" type="button"></button>
-      </div>
-
-      <button id="previewPrevBtn" class="preview-nav preview-prev" type="button" aria-label="Anterior"></button>
-      <button id="previewNextBtn" class="preview-nav preview-next" type="button" aria-label="Siguiente"></button>
+      <div class="media-preview-meta"><div><strong id="previewTitle">Material</strong><span id="previewType">Imagen</span></div></div>
+      <div class="media-preview-actions"><button id="previewSaveBtn" type="button"></button><button id="previewShareBtn" type="button"></button></div>
+      <button id="previewPrevBtn" class="preview-nav preview-prev" type="button" aria-label="Anterior"></button><button id="previewNextBtn" class="preview-nav preview-next" type="button" aria-label="Siguiente"></button>
     </div>
   </div>
 
   <div id="notificationSettings" class="notification-settings" hidden aria-hidden="true">
     <button id="notificationSettingsBackdrop" class="notification-settings-backdrop" type="button" aria-label="Cerrar notificaciones"></button>
-
     <section class="notification-settings-sheet" role="dialog" aria-modal="true" aria-labelledby="notificationSettingsTitle">
       <div class="notification-settings-grabber" aria-hidden="true"></div>
-
-      <header class="notification-settings-header">
-        <h2 id="notificationSettingsTitle">Notificaciones</h2>
-        <button id="notificationSettingsClose" class="notification-settings-close" type="button" aria-label="Cerrar"></button>
-      </header>
-
+      <header class="notification-settings-header"><h2 id="notificationSettingsTitle">Notificaciones</h2><button id="notificationSettingsClose" class="notification-settings-close" type="button" aria-label="Cerrar"></button></header>
       <p class="notification-settings-intro">Elegí cuándo querés recibir tu recordatorio diario.</p>
-
       <div class="notification-settings-list">
-        <div class="notification-settings-row">
-          <div class="notification-settings-copy">
-            <strong>Recordatorio diario</strong>
-            <span>Recibí un aviso para continuar tu rutina.</span>
-          </div>
-          <button id="notificationEnableBtn" class="notification-enable-btn" type="button">Activar</button>
-        </div>
-
-        <div class="notification-settings-row">
-          <div class="notification-settings-copy">
-            <strong>Horario</strong>
-            <span>Hora local de tu dispositivo.</span>
-          </div>
-          <span id="notificationTimeValue" class="notification-time-value">09:00</span>
-        </div>
+        <div class="notification-settings-row"><div class="notification-settings-copy"><strong>Recordatorio diario</strong><span>Recibí un aviso para continuar tu rutina.</span></div><button id="notificationEnableBtn" class="notification-enable-btn" type="button">Activar</button></div>
+        <div class="notification-settings-row"><div class="notification-settings-copy"><strong>Horario</strong><span>Hora local de tu dispositivo.</span></div><span id="notificationTimeValue" class="notification-time-value">09:00</span></div>
       </div>
-
-      <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button">
-        <span>Cambiar horario</span>
-        <span class="notification-change-time-chevron" aria-hidden="true">›</span>
-      </button>
-
+      <button id="notificationChangeTimeBtn" class="notification-change-time-btn" type="button"><span>Cambiar horario</span><span class="notification-change-time-chevron" aria-hidden="true">›</span></button>
       <div id="notificationTimeEditor" class="notification-time-editor" hidden>
         <div class="notification-time-picker" role="group" aria-label="Elegir nuevo horario">
-          <div class="notification-time-picker-labels" aria-hidden="true">
-            <span>Hora</span>
-            <span>Minutos</span>
-          </div>
-
-          <div class="notification-time-wheel-shell">
-            <div class="notification-time-selection" aria-hidden="true"></div>
-            <div id="notificationHourWheel" class="notification-time-wheel" role="listbox" aria-label="Hora" tabindex="0"></div>
-            <span class="notification-time-separator" aria-hidden="true">:</span>
-            <div id="notificationMinuteWheel" class="notification-time-wheel" role="listbox" aria-label="Minutos" tabindex="0"></div>
-          </div>
+          <div class="notification-time-picker-labels" aria-hidden="true"><span>Hora</span><span>Minutos</span></div>
+          <div class="notification-time-wheel-shell"><div class="notification-time-selection" aria-hidden="true"></div><div id="notificationHourWheel" class="notification-time-wheel" role="listbox" aria-label="Hora" tabindex="0"></div><span class="notification-time-separator" aria-hidden="true">:</span><div id="notificationMinuteWheel" class="notification-time-wheel" role="listbox" aria-label="Minutos" tabindex="0"></div></div>
         </div>
-
-        <div class="notification-time-actions">
-          <button id="notificationTimeCancelBtn" type="button">Cancelar</button>
-          <button id="notificationTimeSaveBtn" type="button">Guardar</button>
-        </div>
+        <div class="notification-time-actions"><button id="notificationTimeCancelBtn" type="button">Cancelar</button><button id="notificationTimeSaveBtn" type="button">Guardar</button></div>
       </div>
     </section>
   </div>
@@ -366,14 +196,12 @@
         const state = JSON.parse(localStorage.getItem("routineState") || "null");
         const day = Number(state?.currentDay || localStorage.getItem("selectedDay") || 1);
         if (!Number.isFinite(day) || day < 1) return;
-
         const routineDay = document.getElementById("homeRoutineDay");
         const routinePercent = document.getElementById("homeRoutinePercent");
         const routineFill = document.getElementById("homeRoutineProgressFill");
         const routineContinue = document.getElementById("homeRoutineContinueLabel");
         const chatTitle = document.querySelector(".chat-header strong");
         const percent = Math.min(100, Math.round((day / 30) * 100));
-
         if (routineDay) routineDay.textContent = `Día ${day} de 30`;
         if (routinePercent) routinePercent.textContent = `${percent}%`;
         if (routineFill) routineFill.style.width = `${percent}%`;
@@ -386,7 +214,7 @@
   <script src="splash.js?v=122-session-resume"></script>
   <script src="backend-client.js?v=136-unified-daily-unlock"></script>
   <script src="push-client.js?v=61b-progress-canonical"></script>
-  <script src="bot-content.js?v=130-collagen-advising-guide"></script>
+  <script src="bot-content.js?v=79-loi-navegacion"></script>
   <script src="ui-core.js?v=126-iris-navigation"></script>
   <script src="routine-content.js?v=103a-unified-app-store"></script>
   <script src="routine-content-collagen-8-30.js?v=63-collagen-30"></script>
@@ -394,11 +222,12 @@
   <script src="routine-state.js?v=136-unified-daily-unlock"></script>
   <script src="routine-sync.js?v=136-unified-daily-unlock"></script>
   <script src="iris-ai-client-escalation-v1.js?v=1"></script>
-  <script src="bot.js?v=130-collagen-advising-guide"></script>
+  <script src="bot.js?v=124a-iris-layout"></script>
   <script src="bot-shortcuts-v95.js?v=125-nuskin-category-logo"></script>
   <script src="bot-sales-training-v102.js?v=102b-no-duplicate"></script>
   <script src="favorites.js?v=96-material-names"></script>
   <script src="notifications.js?v=61b-progress-canonical"></script>
+  <script src="notifications-redesign-v2.js"></script>
   <script src="home-view.js?v=61b-progress-canonical"></script>
   <script src="daily-view.js?v=102-sales-training"></script>
   <script src="progress-view.js?v=63-collagen-30"></script>

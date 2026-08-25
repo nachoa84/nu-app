@@ -1,0 +1,135 @@
+/* NU APP · MOBILE LAST MILE V1 */
+
+/* Detalle de rutina: contenido expandido sin sangría lateral heredada. */
+#view-hoy.day-open .action-step-body,
+#view-hoy.day-open .native-details-body {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+#view-hoy.day-open .action-step-body {
+  padding: 4px 0 15px !important;
+}
+
+#view-hoy.day-open .action-step-body > *,
+#view-hoy.day-open .native-details-body > * {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+#view-hoy.day-open .native-detail-paragraph,
+#view-hoy.day-open .native-detail-label {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  color: #554b64 !important;
+  font-size: 14px !important;
+  line-height: 1.58 !important;
+}
+
+#view-hoy.day-open .native-check-item {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 9px !important;
+  margin: 9px 0 !important;
+  padding: 0 !important;
+  color: #554b64 !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+#view-hoy.day-open .native-check-icon {
+  width: 20px !important;
+  height: 20px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 1px 0 0 !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #ef5737, #8a4267) !important;
+  color: #fff !important;
+}
+
+#view-hoy.day-open .native-check-icon svg {
+  width: 12px !important;
+  height: 12px !important;
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
+/* En detalle de Guía nunca debe volver a verse PASO X. */
+#view-guia:has(.guide-detail) .guide-page-header .page-kicker {
+  display: block !important;
+}
+
+/* El estado completado se comporta como una píldora HECHO, no como una card. */
+#view-guia .guide-complete-card.is-done .guide-complete-copy > div {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Progreso: todo debe quedar dentro del viewport real. */
+#view-rutina,
+#view-rutina .app-routine,
+#view-rutina .app-progress-card,
+#view-rutina .app-today-card,
+#view-rutina .app-week-card,
+#view-rutina .routine-page-header {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#view-rutina {
+  overflow-x: hidden !important;
+}
+
+#view-rutina .app-progress-row,
+#view-rutina .app-today-main,
+#view-rutina .app-week-days {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#view-rutina .app-progress-percent,
+#view-rutina .app-today-arrow {
+  justify-self: end !important;
+}
+
+#view-rutina .routine-back-btn {
+  margin-left: 0 !important;
+  transform: none !important;
+}
+
+/* El pseudo-elemento ya dibuja el check de marca: ocultamos el SVG duplicado. */
+#view-rutina .app-checkin-btn.is-done .app-checkin-icon {
+  display: none !important;
+}
+
+/* Toast: tipografía y tamaños del sistema visual actual, sin volver al estilo viejo. */
+.toast-host .toast,
+.toast-host .toast-text,
+.toast-host .toast-action,
+.toast-host .toast-status {
+  font-family: var(--nu-font, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif) !important;
+}
+
+.toast-host .toast-text {
+  color: #2a2440 !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+}
+
+.toast-host .toast-action {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 11.5px !important;
+  font-weight: 650 !important;
+}
+
+/* Evita padding inferior extra en vistas que ocultan la navegación. */
+body[data-active-view="guia"] main,
+body:has(#view-hoy.day-open) main {
+  padding-bottom: 0 !important;
+}

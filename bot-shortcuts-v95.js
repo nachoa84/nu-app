@@ -50,12 +50,12 @@
       description: "Aplicaciones y funciones de la plataforma.",
       tone: "cyan",
       icon: "tools",
-      commands: ["stela", "vera", "navegar pagina", "info center"]
+      commands: ["stela", "vera", "navegar pagina"]
     }
   ];
 
   const ICONS_V95 = {
-    sparkle: `<svg viewBox="0 0 24 24" aria-hidden="true"><path style="fill:#4285F4" d="M12 3l1.15 3.1L16 7.25l-2.85 1.15L12 11.5l-1.15-3.1L8 7.25l2.85-1.15L12 3Z"/><path style="fill:#FBBC05" d="M6.5 11l1.65 4.35L12.5 17l-4.35 1.65L6.5 23l-1.65-4.35L.5 17l4.35-1.65L6.5 11Z"/><path style="fill:#EA4335" d="M17.5 10l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1 1.1-2.9Z"/></svg>`,
+    sparkle: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>`,
     close: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`,
     back: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>`,
     arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`,

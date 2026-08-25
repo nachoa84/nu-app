@@ -519,6 +519,16 @@ function favoritePreviewNode(favorite) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", favoriteReady, { once: true });
+    // Sin poster, la miniatura quedaría como un <video> real recortado con
+    // overflow:hidden/border-radius. En Android Chrome el <video> se puede
+    // componer en una capa/superficie de decodificación de hardware que
+    // ignora ese recorte y el frame asoma por fuera del recuadro redondeado
+    // (no reproducible en Chromium de escritorio, que no usa esa vía de
+    // composición). En vez de forzar el clip con una máscara, se reemplaza
+    // el <video> por una <img> con el primer frame capturado a un canvas:
+    // una imagen normal si clippea de forma consistente en todos los
+    // motores, así que directamente no llega a haber un <video> que recortar.
+    swapVideoForCapturedFrame(media, wrap);
     media.src = favorite.src;
   } else {
     media.alt = favorite.label || "";
@@ -922,6 +932,7 @@ function createFavoriteRoutineTileV93b(routineId, visibleItems, allItems) {
   const tile = document.createElement("button");
   tile.type = "button";
   tile.className = "favorite-routine-tile";
+  tile.dataset.routineId = routineId;
   tile.innerHTML = `
     <span class="favorite-routine-cover">
       <img src="${config.cover || ""}" alt="" loading="lazy" />
