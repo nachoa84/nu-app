@@ -104,45 +104,6 @@
   opacity: .92;
 }
 
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview.favorite-folder-preview {
-  position: relative;
-  flex: 0 0 128px;
-  width: 118px;
-  height: 128px;
-  min-width: 118px;
-  min-height: 128px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--fav-line);
-  border-radius: 15px;
-  background: #f1f1ee;
-  transform: none;
-  touch-action: manipulation;
-}
-
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview.favorite-folder-preview::before {
-  display: none;
-}
-
-#view-favoritos:not(.favorite-day-open)
-.favorite-day-tile-preview .favorite-folder-play {
-  width: 38px;
-  height: 38px;
-}
-
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
-  position: static;
-  display: block;
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  transform: none;
-  white-space: normal;
-}
 
 /* =========================================================
    Favoritos guardados desde el Bot
@@ -548,70 +509,7 @@
 }
 
 @media (max-width: 360px) {
-  #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
-    flex-basis: 108px;
-    width: 108px;
-    min-width: 108px;
-  }
-
-  #view-favoritos:not(.favorite-day-open)
-  .favorite-day-tile-preview.favorite-folder-preview {
-    flex-basis: 118px;
-    width: 108px;
-    min-width: 108px;
-    height: 118px;
-    min-height: 118px;
-  }
-
-  #view-favoritos .favorite-content-row {
-    grid-template-columns: 22px 52px minmax(0, 1fr) 38px;
-    gap: 8px;
-  }
-
-  #view-favoritos .favorite-content-thumb,
-  #view-favoritos .favorite-link-icon {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-  }
-
-  #view-favoritos .favorite-content-copy strong {
-    font-size: 13px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #view-favoritos .favorite-day-screen {
-    animation: none !important;
-  }
-}
-
-#view-favoritos .app-page-header {
-  position: relative;
-  padding: 2px 0 15px;
-  margin: 0;
-  background: transparent;
-  padding-bottom: 20px;
-}
-
-#view-favoritos .favorite-native-routine-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--fav-ink);
-  margin-bottom: 16px;
-}
-
-#view-favoritos .favorite-native-routine-icon {
-  display: grid;
-  place-items: center;
-  background: var(--fav-green-soft);
-  color: var(--fav-green);
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-}
-
+  
 #view-favoritos .favorite-native-bot .favorite-native-routine-heading {
   margin-top: 18px;
 }
