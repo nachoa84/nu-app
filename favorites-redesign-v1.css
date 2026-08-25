@@ -608,3 +608,13 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
   gap: 18px;
   min-width: 0;
 }
+
+
+/* Favoritos · fondos unificados de las miniaturas de rutinas */
+#view-favoritos .favorite-native-routine .favorite-routine-cover {
+  background: linear-gradient(145deg, #f0ebf6, #e8e0f0);
+}
+
+#view-favoritos .favorite-native-routine .favorite-routine-cover img {
+  mix-blend-mode: multiply;
+}
