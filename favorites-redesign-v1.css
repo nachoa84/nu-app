@@ -599,3 +599,12 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
     padding: 7px;
   }
 }
+
+
+/* Favoritos · espaciado de la biblioteca de rutinas */
+#view-favoritos .favorite-native-routine .favorite-routine-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  min-width: 0;
+}
