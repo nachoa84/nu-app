@@ -570,9 +570,24 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
 
 #view-favoritos .favorite-routine-screen .favorite-routine-days .favorite-day-tile-copy {
   box-sizing: border-box;
+  position: static;
+  display: block;
   width: 100%;
   min-width: 0;
+  margin: 0;
   padding: 0 2px 2px;
+  transform: none;
+  opacity: 1;
+}
+
+#view-favoritos .favorite-routine-screen .favorite-routine-days .favorite-day-tile-copy strong,
+#view-favoritos .favorite-routine-screen .favorite-routine-days .favorite-day-tile-copy small {
+  position: static;
+  display: block;
+  width: 100%;
+  margin: 0;
+  transform: none;
+  white-space: normal;
 }
 
 @media (max-width: 360px) {
