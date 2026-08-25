@@ -886,7 +886,7 @@
 
 /* NU APP · JERARQUÍA DE FAVORITOS V93B */
 .favorite-routine-library{display:block}
-.favorite-routine-strip{display:flex;gap:14px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x proximity;scrollbar-width:none}
+.favorite-routine-strip{display:flex;gap:18px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x proximity;scrollbar-width:none}
 .favorite-routine-strip::-webkit-scrollbar{display:none}
 .favorite-routine-tile{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr) 22px;align-items:center;gap:14px;flex:0 0 min(330px,calc(100vw - 54px));min-height:128px;padding:14px;border:1px solid rgba(24,39,69,.09);border-radius:26px;background:#fff;color:#17233f;text-align:left;box-shadow:0 8px 24px rgba(24,39,69,.05);scroll-snap-align:start}
 .favorite-routine-cover{display:grid;place-items:center;width:92px;height:100px;overflow:hidden;border-radius:20px;background:#f6f7f8}
