@@ -540,27 +540,27 @@
   object-fit: cover !important;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+#view-favoritos:not(.favorite-day-open) .favorites-list:not(.favorite-routine-screen) .favorite-day-tile {
   flex-basis: 144px !important;
   width: 144px !important;
   min-width: 144px !important;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
+#view-favoritos:not(.favorite-day-open) .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-preview.favorite-folder-preview {
   width: 144px !important;
   min-width: 144px !important;
   height: 154px !important;
   min-height: 154px !important;
 }
 
-#view-favoritos .favorite-day-tile-copy strong,
+#view-favoritos .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-copy strong,
 #view-favoritos .bot-favorite-copy strong,
 #view-favoritos .favorite-content-copy strong {
   font-size: 14.5px !important;
   line-height: 1.3 !important;
 }
 
-#view-favoritos .favorite-day-tile-copy small,
+#view-favoritos .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-copy small,
 #view-favoritos .bot-favorite-copy small,
 #view-favoritos .favorite-content-copy span {
   font-size: 12px !important;
