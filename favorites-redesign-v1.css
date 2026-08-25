@@ -607,6 +607,11 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
   grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   min-width: 0;
+  /* padding explícito: favorites.css trae padding: 4px 4px 16px para este
+     mismo selector (pensado para el modo scroll horizontal), y como acá
+     no se pisa la propiedad, se cuela y angosta 8px el ancho disponible
+     de la tarjeta. Se anula para que el ancho quede igual al actual. */
+  padding: 0;
 }
 
 
