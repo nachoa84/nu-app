@@ -66,6 +66,101 @@ function resolveRoutineVideoPoster(src, explicitPoster = null) {
   return null;
 }
 
+// Reemplaza un <video> sin poster por una <img> con su primer frame
+// capturado a canvas, en cuanto haya un frame decodificado disponible.
+// Uso: miniaturas pequeñas recortadas con border-radius/overflow:hidden
+// (Favoritos, Materiales del día) donde no conviene dejar un <video> real
+// — en Android Chrome ese <video> puede componerse en una superficie de
+// decodificación de hardware que ignora el recorte CSS del contenedor y el
+// frame asoma por fuera del recuadro redondeado, algo que no se reproduce
+// en un navegador de escritorio (no usa esa vía de composición). Con una
+// <img> normal el recorte es consistente en todos los motores.
+function swapVideoForCapturedFrame(video, container) {
+  const MAX_ATTEMPTS = 8;
+  let attempts = 0;
+  let scheduled = false;
+
+  const isFrameBlack = ctx => {
+    // Muestreo disperso (no todos los píxeles, por costo) para detectar un
+    // frame realmente negro. En Android, drawImage() puede devolver negro
+    // aunque loadeddata/seeked/requestVideoFrameCallback ya dispararon: la
+    // superficie de decodificación de hardware todavía no sincronizó el
+    // buffer legible por el momento en que se llama a drawImage.
+    const { data, width, height } = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const stepPixels = Math.max(1, Math.floor((width * height) / 400));
+    for (let p = 0; p < width * height; p += stepPixels) {
+      const i = p * 4;
+      if (data[i] > 14 || data[i + 1] > 14 || data[i + 2] > 14) return false;
+    }
+    return true;
+  };
+
+  const retry = () => {
+    if (scheduled || attempts >= MAX_ATTEMPTS) return;
+    scheduled = true;
+    setTimeout(() => { scheduled = false; capture(); }, 150 * attempts);
+  };
+
+  const capture = () => {
+    if (video.dataset.frameCaptured === "1") return;
+    attempts += 1;
+    if (!video.videoWidth || !video.videoHeight) return void retry();
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      if (isFrameBlack(ctx)) return void retry();
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+      const img = document.createElement("img");
+      img.className = video.className;
+      img.alt = video.getAttribute("alt") || "";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.setAttribute("draggable", "false");
+      img.addEventListener("dragstart", event => event.preventDefault());
+      img.src = dataUrl;
+
+      video.dataset.frameCaptured = "1";
+      if (video.isConnected && video.parentNode === container) {
+        container.replaceChild(img, video);
+      }
+      video.dispatchEvent(new CustomEvent("nu-frame-captured", { detail: { img } }));
+    } catch (error) {
+      // Frame no disponible todavía o canvas "tainted": se deja el <video>
+      // como fallback, no es peor que el comportamiento previo.
+    }
+  };
+
+  // requestVideoFrameCallback (Chrome/Android Chrome) avisa exactamente
+  // cuando hay un frame presentado listo para leer — más confiable que
+  // loadeddata/seeked solos, que en Android pueden disparar antes de que
+  // el buffer esté sincronizado. Se usa si está disponible y además se
+  // deja el resto como red de contención (con reintento por frame negro).
+  if (typeof video.requestVideoFrameCallback === "function") {
+    video.requestVideoFrameCallback(() => capture());
+  }
+
+  video.addEventListener("loadeddata", capture, { once: true });
+  video.addEventListener("seeked", capture, { once: true });
+  // preload="metadata" no garantiza que el navegador decodifique un frame
+  // real (a veces solo conoce duración/dimensiones). Forzar un seek mínimo
+  // hace que decodifique el frame en esa posición de forma confiable.
+  video.addEventListener("loadedmetadata", () => {
+    try {
+      video.currentTime = Math.min(0.1, (video.duration || 1) / 2);
+    } catch (error) {
+      // Algunos navegadores no permiten seek hasta más adelante; el
+      // listener de loadeddata sigue siendo el intento principal.
+    }
+  }, { once: true });
+}
+
 function ensureToastHost() {
   let host = document.getElementById("appToastHost");
   if (host) return host;
@@ -364,9 +459,20 @@ function animateNativeViewEnter(target, direction = 0) {
     document.body.classList.remove("native-view-switching");
     target.style.opacity = "";
     target.style.transform = "";
+    // fill: "both" keeps applying the animation's end frame (a no-op
+    // translate3d(0,0,0), but still a real transform) after it finishes.
+    // That silently gives the view a new containing block, so any
+    // position:fixed element inside it (the Iris composer, "Hoy lo hice",
+    // toasts, etc.) ends up positioned against the view instead of the
+    // viewport. Cancel the animation so its effect is actually removed.
+    animation.cancel();
   };
   animation.onfinish = cleanup;
-  animation.oncancel = cleanup;
+  animation.oncancel = () => {
+    document.body.classList.remove("native-view-switching");
+    target.style.opacity = "";
+    target.style.transform = "";
+  };
 }
 
 function animateNativeNavSelection(button) {
