@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dbe8f4"/>
+      <stop offset="0.55" stop-color="#a9c3db"/>
+      <stop offset="1" stop-color="#7999b7"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8eabc3"/>
+      <stop offset="0.55" stop-color="#58758f"/>
+      <stop offset="1" stop-color="#33495e"/>
+    </linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f5b46b" stop-opacity="0.95"/>
+      <stop offset="0.42" stop-color="#df8a3d" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#df8a3d" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.16" stop-color="#bcc7ce"/>
+      <stop offset="0.34" stop-color="#f7fafb"/>
+      <stop offset="0.52" stop-color="#6e7d87"/>
+      <stop offset="0.72" stop-color="#eef3f5"/>
+      <stop offset="1" stop-color="#8a979f"/>
+    </linearGradient>
+    <linearGradient id="plaza" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7d6d2"/>
+      <stop offset="1" stop-color="#bcb9b1"/>
+    </linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#16222c" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="900" fill="url(#sky)"/>
+  <polygon points="0,40 470,0 470,530 0,620" fill="#b8c3cc"/>
+  <polygon points="485,15 900,50 900,610 485,530" fill="url(#glass)"/>
+  <rect x="0" y="230" width="455" height="300" fill="#7d8992" opacity="0.48"/>
+  <polygon points="0,520 900,500 900,900 0,900" fill="url(#plaza)"/>
+
+  <g opacity="0.24" stroke="#f5fbff" stroke-width="5">
+    <path d="M505 85H895M505 135H895M505 185H895M505 235H895M505 285H895M505 335H895M505 385H895M505 435H895"/>
+    <path d="M550 50V535M615 50V535M680 50V535M745 50V535M810 50V535M875 50V535"/>
+  </g>
+
+  <rect width="900" height="900" fill="url(#warm)"/>
+
+  <g transform="translate(218 240)" filter="url(#shadow)" fill="none" stroke="url(#steel)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M232 0c130 0 232 105 232 236v170" stroke-width="44"/>
+    <path d="M232 0C102 0 0 105 0 236v170" stroke-width="44"/>
+    <path d="M232 112c78 0 140 63 140 141v153" stroke-width="38"/>
+    <path d="M232 112c-78 0-140 63-140 141v153" stroke-width="38"/>
+    <path d="M232 205c42 0 76 34 76 77v124" stroke-width="34"/>
+    <path d="M232 205c-42 0-76 34-76 77v124" stroke-width="34"/>
+    <path d="M232 295v111" stroke-width="30"/>
+  </g>
+
+  <ellipse cx="450" cy="695" rx="235" ry="38" fill="#65737b" opacity="0.18"/>
+  <path d="M0 785C240 730 520 735 900 805V900H0Z" fill="#f4f1ea" opacity="0.46"/>
+</svg>
