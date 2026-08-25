@@ -508,8 +508,6 @@
   background: var(--fav-brand);
 }
 
-@media (max-width: 360px) {
-  
 #view-favoritos .favorite-native-bot .favorite-native-routine-heading {
   margin-top: 18px;
 }
