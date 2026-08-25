@@ -95,7 +95,7 @@ body[data-active-view="hoy"] #view-hoy {
   border-radius: 30px;
   background:
     linear-gradient(180deg, rgba(22,18,41,.02) 0%, rgba(22,18,41,.08) 38%, rgba(22,18,41,.54) 67%, rgba(22,18,41,.90) 100%),
-    url("assets/guide/nuskin-monument-home.svg") center 44% / cover no-repeat;
+    url("assets/guide/nuskin-monument-home-v2.svg") center 46% / cover no-repeat;
   box-shadow: none;
 }
 
