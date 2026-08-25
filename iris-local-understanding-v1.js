@@ -11,7 +11,7 @@ const PRODUCT_ALIASES_V1 = Object.freeze([
 ]);
 
 const MARKET_ALIASES_V1 = Object.freeze([
-  { country: "AR", market: "latam", aliases: ["argentina", "argentino", "argentina"] },
+  { country: "AR", market: "latam", aliases: ["argentina", "argentino"] },
   { country: "MX", market: "latam", aliases: ["mexico", "méxico", "mexicano"] },
   { country: "CL", market: "latam", aliases: ["chile"] },
   { country: "CO", market: "latam", aliases: ["colombia"] },
@@ -71,6 +71,13 @@ function detectIntentV1(text) {
   return "unknown";
 }
 
+function marketForCountryV1(country) {
+  const normalizedCountry = String(country || "").trim().toUpperCase();
+  if (!normalizedCountry) return null;
+  const match = MARKET_ALIASES_V1.find(entry => entry.country === normalizedCountry);
+  return match?.market || null;
+}
+
 function createIrisLocalUnderstandingV1({ enabled = false } = {}) {
   const isEnabled = enabled === true;
 
@@ -81,7 +88,7 @@ function createIrisLocalUnderstandingV1({ enabled = false } = {}) {
         intent: "unknown",
         productSlug: productSlug || null,
         country: country || null,
-        market: null,
+        market: country ? marketForCountryV1(country) : null,
         confidence: "none"
       });
     }
@@ -97,7 +104,7 @@ function createIrisLocalUnderstandingV1({ enabled = false } = {}) {
         intent: "unknown",
         productSlug: productSlug || null,
         country: country || null,
-        market: null,
+        market: country ? marketForCountryV1(country) : null,
         confidence: "low"
       });
     }
@@ -109,7 +116,9 @@ function createIrisLocalUnderstandingV1({ enabled = false } = {}) {
 
     const inferredProductSlug = productSlug || productMatch?.entry?.slug || null;
     const inferredCountry = country || marketMatch?.entry?.country || null;
-    const inferredMarket = marketMatch?.entry?.market || null;
+    const inferredMarket = country
+      ? marketForCountryV1(country)
+      : marketMatch?.entry?.market || null;
 
     let confidence = "low";
     if (intent !== "unknown" && inferredProductSlug) confidence = "high";
@@ -137,5 +146,6 @@ module.exports = {
   detectIntentV1,
   findAliasMatchV1,
   hasBoundedTermV1,
+  marketForCountryV1,
   normalizeLocalUnderstandingTextV1
 };
