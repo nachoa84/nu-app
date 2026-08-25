@@ -1643,12 +1643,10 @@
       "precios de colageno",
       "testimonios de colageno",
       "ficha tecnica colageno",
-      "ganancias colageno"
     ],
     "keywords": [
       "beauty focus collagen",
       "precios",
-      "ganancias",
       "testimonios",
       "papers",
       "ficha tecnica",
@@ -1657,7 +1655,7 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Encontrá en un solo lugar los principales materiales de Beauty Focus Collagen+: capacitación, asesoramiento, precios, testimonios, ganancias y documentación técnica."
+        "content": "Encontrá en un solo lugar los principales materiales de Beauty Focus Collagen+: capacitación, asesoramiento, precios, testimonios y documentación técnica."
       },
       {
         "type": "document",
@@ -1678,22 +1676,66 @@
           }
         ]
       },
-      {
+            {
         "type": "document",
         "kicker": "ASESORAMIENTO",
         "title": "Guía para asesorar",
-        "description": "Organizá tus respuestas y conversaciones con clientes.",
+        "description": "Secuencia propuesta de Asesoramiento Colágeno. Adaptala a tu forma de comunicarte.",
+            "collapsible": true,
         "sections": [
           {
-            "title": "WhatsApp Business",
-            "body": "Consultá esta guía para acompañar una conversación de asesoramiento y organizar respuestas en WhatsApp Business."
-          }
-        ],
-        "actions": [
+            "category": "GENERAL",
+            "title": "RC1 · Primer contacto",
+            "body": "Un placer saludarte y asesorarte aquí [Nombre] ☺️\nCuéntame si ya tomaste algún colágeno? ¿Qué te gustaría mejorar incorporando este suplemento?",
+            "note": "Reemplazá [Nombre] antes de enviar.",
+            "copyable": true
+          },
           {
-            "title": "Consultar guía para asesorar",
-            "description": "Documento de trabajo",
-            "url": "https://docs.google.com/document/d/1mznuJzMyEgFuHVSLfDE32-vxFWlSQdq8kuZ6RXB9gdc/edit?usp=sharing"
+            "category": "GENERAL",
+            "title": "RC2 · Enviar video",
+            "body": "Te dejo este video para que lo veas tranqui! ¡Es súper cortito! Y me dejo a disposición para asesorarte personalizado y enviarte más info ♡",
+            "note": "Adjuntar el video correspondiente desde tus respuestas guardadas.",
+            "copyable": true
+          },
+          {
+            "category": "GENERAL",
+            "title": "RC3 · ¿Para qué sirve Collagen Plus?",
+            "body": "🧐Para qué sirve Collagen Plus?\nCollagen + es el único del mercado que se absorbe hasta el 99% (versus 3-6% de absorción de los otros) logrando los siguientes beneficios:\n\n🍊 fortalecimiento y crecimiento de uñas, cabello y huesos\n🚀Aumento de elastina en la piel\n🙌🏻Disminución de las arrugas\n✅Incremento del ácido hialurónico\n➖ disminuye celulitis\n\n💆🏼‍♀️Es rejuvenecedor desde adentro hacia afuera!\n¿Te imaginas tus cambios? 😍",
+            "note": "Podés adjuntar imágenes según lo que la potencial clienta quiera mejorar, utilizando el stock de antes y después.",
+            "copyable": true
+          },
+          {
+            "category": "GENERAL",
+            "title": "RC4 · ¿Por qué este colágeno es diferente?",
+            "body": "PORQUE ESTE COLÁGENO ES DIFERENTE?\n\nPor sus ingredientes 😉\n\n🧡Uno de ellos es el Verisol: Este es un péptido bioactivo que estimula las células de la piel para que produzcan colágeno y elastina. Pudiendo así reducir las arrugas y aumentar la elasticidad y firmeza de la piel\n\n🧡Otro de sus componentes es la Luteína La cual es un potente carotenoide antioxidante, que protege la piel de diversos factores de estrés oxidativo, entre ellos la luz azul.\n\n🧡También contiene fitoceramidas las cuales actúan como barrera para mantener la humectación de la piel. Una Piel humectada es una piel mas saludable y joven.\n\n🧬 Algo que también lo hace único en el mercado es que los péptidos que lo componen son muy pequeños y eso hace que se absorba con mayor facilidad.",
+            "note": "Adjuntar el video de la explicación del Colágeno Hidrolizado.",
+            "copyable": true
+          },
+          {
+            "category": "LATAM",
+            "title": "RC5 · Presentar duración y packs",
+            "body": "Te cuento que el pote dura 30 tomas! ¡Ósea un mes!\nTe recomiendo comprometerte a tomarlos mínimo 3 meses para poder ver resultados extraordinarios. Te paso promo de Packs de 3 - 6 colágenos que tienen descuentos especiales y cuotas sin interés 👇dime cuál te interesa 😊",
+            "note": "Adjuntar la placa de precios correspondiente al país consultado.",
+            "copyable": true
+          },
+          {
+            "category": "LATAM",
+            "title": "RC6 · Quiere comprar",
+            "body": "🗣️ ¡Te cuento que la compra es súper fácil!\nTe pido tus datos para crear el código de cliente y te envío el paso a paso para suscribirte!\nY luego el producto te llega a tu domicilio a los 7 días hábiles aprox!",
+            "copyable": true
+          },
+          {
+            "category": "LATAM",
+            "title": "RC7 · Antes y después",
+            "body": "Fotos de Antes y después para enviarles si así lo requieren.",
+            "note": "Adjuntar las imágenes correspondientes desde las respuestas guardadas.",
+            "copyable": false
+          },
+          {
+            "category": "EUROPA",
+            "title": "RC5 · Presentar duración y packs — Europa",
+            "body": "Te cuento la caja de Colágeno trae 30 sticks, se consume 1 por día! Ósea te será un mes!\n\nSi bien por suscribirte al envío mensual tiene un 10% de Dto!\n\nTe recomiendo comprometerte a tomarlos mínimo 3 meses para poder ver resultados extraordinarios.\nTe paso promo de Packs de 3 cajas de colágenos para 3 meses de tratamiento que tienen descuentos especial del 15% y cuotas sin interés 👇dime cuál te interesa 😊",
+            "copyable": true
           }
         ]
       },
@@ -1736,25 +1778,6 @@
             "title": "Ver testimonios",
             "description": "Fotos, videos y antes/después",
             "url": "https://drive.google.com/drive/folders/1TnsiJtMO7R-yIkVvy9wIE7Qj0Zc-5hM7?usp=sharing"
-          }
-        ]
-      },
-      {
-        "type": "document",
-        "kicker": "GANANCIAS",
-        "title": "Ganancias por mercado",
-        "description": "Consultá la información correspondiente a cada país.",
-        "sections": [
-          {
-            "title": "Mercados disponibles",
-            "body": "Seleccioná el país en el que estás trabajando para consultar la información de ganancias de Collagen+."
-          }
-        ],
-        "actions": [
-          {
-            "title": "Ver ganancias por mercado",
-            "description": "Información organizada por país",
-            "url": "https://photos.app.goo.gl/UMpnxp2bqD5M5qSb9"
           }
         ]
       },

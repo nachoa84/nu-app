@@ -422,7 +422,85 @@ function openBotDocument(documentBlock) {
   const body = document.createElement("div");
   body.className = "bot-document-body";
 
-  (documentBlock.sections || []).forEach(section => {
+  const documentSections = Array.isArray(documentBlock.sections)
+    ? documentBlock.sections
+    : [];
+
+  documentSections.forEach(section => {
+    if (documentBlock.collapsible) {
+      const details = document.createElement("details");
+      details.className = "bot-document-answer";
+
+      const summary = document.createElement("summary");
+      summary.className = "bot-document-answer-summary";
+
+      const summaryCopy = document.createElement("span");
+      summaryCopy.className = "bot-document-answer-heading";
+
+      if (section.category) {
+        const category = document.createElement("small");
+        category.className = "bot-document-answer-category";
+        category.textContent = section.category;
+        summaryCopy.appendChild(category);
+      }
+
+      const answerTitle = document.createElement("strong");
+      answerTitle.textContent = section.title || "Respuesta";
+      summaryCopy.appendChild(answerTitle);
+
+      const chevron = document.createElement("span");
+      chevron.className = "bot-document-answer-chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "›";
+
+      summary.append(summaryCopy, chevron);
+      details.appendChild(summary);
+
+      const content = document.createElement("div");
+      content.className = "bot-document-answer-content";
+
+      if (section.body) {
+        const answerBody = document.createElement("p");
+        answerBody.className = "bot-document-answer-body";
+        answerBody.textContent = section.body;
+        content.appendChild(answerBody);
+      }
+
+      if (section.note) {
+        const note = document.createElement("div");
+        note.className = "bot-document-answer-note";
+
+        const noteLabel = document.createElement("strong");
+        noteLabel.textContent = "Recordatorio";
+
+        const noteText = document.createElement("span");
+        noteText.textContent = section.note;
+
+        note.append(noteLabel, noteText);
+        content.appendChild(note);
+      }
+
+      if (section.copyable && section.body) {
+        const copyButton = document.createElement("button");
+        copyButton.type = "button";
+        copyButton.className = "bot-document-copy-button";
+        copyButton.innerHTML = "<span>Copiar respuesta</span>";
+
+        copyButton.onclick = () => {
+          copyBotResponse(
+            section.copyText || section.body,
+            copyButton
+          );
+        };
+
+        content.appendChild(copyButton);
+      }
+
+      details.appendChild(content);
+      body.appendChild(details);
+      return;
+    }
+
     const sectionEl = document.createElement("article");
     sectionEl.className = "bot-document-section";
 

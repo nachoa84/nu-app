@@ -1414,3 +1414,136 @@ body.bot-quick-access-open {
 #view-bot .bot-native-welcome {
   padding-top: 56px;
 }
+
+
+/* NU APP · IRIS COLLAGEN ADVISING GUIDE V130 */
+
+
+
+
+.bot-document-answer {
+  margin: 0 0 10px;
+  border: 1px solid rgba(23, 34, 61, .09);
+  border-radius: 17px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.bot-document-answer[hidden] {
+  display: none;
+}
+
+.bot-document-answer-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 13px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.bot-document-answer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.bot-document-answer-heading {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 3px;
+}
+
+.bot-document-answer-category {
+  color: #777f8c;
+  font-size: 10.5px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: .08em;
+}
+
+.bot-document-answer-heading strong {
+  color: var(--app-text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.bot-document-answer-chevron {
+  flex: 0 0 auto;
+  color: #949ba7;
+  font-size: 23px;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform .18s ease;
+}
+
+.bot-document-answer[open] .bot-document-answer-chevron {
+  transform: rotate(-90deg);
+}
+
+.bot-document-answer-content {
+  display: grid;
+  gap: 12px;
+  padding: 2px 14px 14px;
+  border-top: 1px solid rgba(23, 34, 61, .06);
+}
+
+.bot-document-answer-body {
+  margin: 0;
+  padding-top: 12px;
+  color: var(--app-text);
+  font-size: 14px;
+  line-height: 1.58;
+  white-space: pre-line;
+}
+
+.bot-document-answer-note {
+  display: grid;
+  gap: 3px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  background: #f6f7f9;
+  color: #626b78;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.bot-document-answer-note strong {
+  color: #414957;
+  font-size: 11.5px;
+}
+
+.bot-document-copy-button {
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-radius: 13px;
+  background: var(--bot-brand-soft);
+  color: var(--bot-brand);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bot-document-copy-button:active {
+  transform: scale(.99);
+}
+
+.bot-document-copy-button.is-copied {
+  color: var(--bot-green);
+}
+
+
+@media (max-width: 380px) {
+  .bot-document-answer-summary {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .bot-document-answer-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
