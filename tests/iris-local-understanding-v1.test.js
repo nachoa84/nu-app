@@ -81,7 +81,7 @@ test("explicit product and country win over inferred values", () => {
   });
   assert.equal(result.productSlug, "lifepak");
   assert.equal(result.country, "AR");
-  assert.equal(result.market, "europe");
+  assert.equal(result.market, "latam");
   assert.equal(result.intent, "usage");
 });
 
