@@ -473,13 +473,13 @@ body[data-active-view="bot"] #view-bot {
   font-size: 12px !important;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+#view-favoritos:not(.favorite-day-open) .favorites-list:not(.favorite-routine-screen) .favorite-day-tile {
   flex-basis: 112px !important;
   width: 112px !important;
   min-width: 112px !important;
 }
 
-#view-favoritos:not(.favorite-day-open) .favorite-day-tile-preview.favorite-folder-preview {
+#view-favoritos:not(.favorite-day-open) .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-preview.favorite-folder-preview {
   width: 112px !important;
   min-width: 112px !important;
   height: 112px !important;
@@ -487,15 +487,15 @@ body[data-active-view="bot"] #view-bot {
   border-radius: 17px !important;
 }
 
-#view-favoritos .favorite-day-tile-copy {
+#view-favoritos .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-copy {
   padding-top: 8px !important;
 }
 
-#view-favoritos .favorite-day-tile-copy strong {
+#view-favoritos .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-copy strong {
   font-size: 12.5px !important;
 }
 
-#view-favoritos .favorite-day-tile-copy small {
+#view-favoritos .favorites-list:not(.favorite-routine-screen) .favorite-day-tile-copy small {
   font-size: 10.5px !important;
 }
 
