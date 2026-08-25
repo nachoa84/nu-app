@@ -932,6 +932,7 @@ function createFavoriteRoutineTileV93b(routineId, visibleItems, allItems) {
   const tile = document.createElement("button");
   tile.type = "button";
   tile.className = "favorite-routine-tile";
+  tile.dataset.routineId = routineId;
   tile.innerHTML = `
     <span class="favorite-routine-cover">
       <img src="${config.cover || ""}" alt="" loading="lazy" />
