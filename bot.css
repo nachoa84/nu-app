@@ -1333,6 +1333,8 @@ body.bot-quick-access-open {
   border-radius: 999px;
   background: #fff;
   color: #626b78;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 #view-bot .bot-message-action:active {
