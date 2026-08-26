@@ -1783,3 +1783,10 @@ body:has(#view-bot.active .bot-card:not(.has-conversation)) {
   box-shadow: none;
   background: transparent;
 }
+
+
+/* IRIS · superficie del botón limpiar */
+#view-bot #botClearBtn {
+  background: var(--bot-brand-soft);
+  box-shadow: 0 5px 14px rgba(32, 43, 66, .09);
+}
