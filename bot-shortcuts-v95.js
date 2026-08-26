@@ -375,7 +375,7 @@
         #view-bot .bot-status {
           margin-top: 5px;
           text-transform: uppercase;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 400;
         }
 
