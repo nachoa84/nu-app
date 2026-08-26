@@ -1649,3 +1649,21 @@ body.bot-quick-access-open {
   background: #EAF4F8;
   transform: scale(.96);
 }
+
+
+/* IRIS · estados del ícono de accesos rápidos */
+#view-bot #botShortcutsBtn svg rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+#view-bot #botShortcutsBtn.is-open {
+  color: #2D6C87;
+  background: #EAF4F8;
+}
+
+#view-bot #botShortcutsBtn.is-open svg rect {
+  fill: currentColor;
+  stroke: currentColor;
+}
