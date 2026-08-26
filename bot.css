@@ -1776,3 +1776,9 @@ body.bot-quick-access-open {
 body:has(#view-bot.active .bot-card:not(.has-conversation)) {
   overflow: hidden;
 }
+
+
+/* IRIS · contorno visible del campo */
+#view-bot .bot-form input {
+  border: 1px solid #AFCBD8;
+}
