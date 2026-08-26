@@ -1218,45 +1218,74 @@ function renderFavorites() {
   }
 
   list.innerHTML = "";
-  list.className = "favorites-list favorites-native-groups";
+  list.className = "favorites-list favorites-claude-layout";
 
-  if (filteredRoutine.length) {
-    // NU APP · JERARQUÍA DE FAVORITOS V93B
-    const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
-    const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
-      .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
-    const routineSection = document.createElement("section");
-    routineSection.className = "favorite-native-section favorite-native-routine favorite-routine-library";
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "De mis rutinas";
-    const strip = document.createElement("div");
-    strip.className = "favorite-routine-strip";
+  const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
+  const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
+    .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
+
+  if (visibleRoutineIds.length) {
+    const gallery = document.createElement("section");
+    gallery.className = "favorites-featured-gallery";
+    const galleryTrack = document.createElement("div");
+    galleryTrack.className = "favorites-featured-track";
+
     visibleRoutineIds.forEach(routineId => {
-      const visibleItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
-      const allItems = routineFavs.filter(favorite => favorite.routineId === routineId);
-      strip.appendChild(createFavoriteRoutineTileV93b(routineId, visibleItems, allItems));
+      const tile = createFavoriteRoutineTileV93b(
+        routineId,
+        filteredRoutine.filter(favorite => favorite.routineId === routineId),
+        routineFavs.filter(favorite => favorite.routineId === routineId)
+      );
+      tile.classList.add("favorites-featured-slide");
+      galleryTrack.appendChild(tile);
     });
-    routineSection.append(sectionLabel, strip);
-    list.appendChild(routineSection);
+
+    const dots = document.createElement("div");
+    dots.className = "favorites-featured-dots";
+    visibleRoutineIds.forEach((_, index) => {
+      const dot = document.createElement("span");
+      dot.className = index === 0 ? "is-active" : "";
+      dots.appendChild(dot);
+    });
+    gallery.append(galleryTrack, dots);
+    list.appendChild(gallery);
   }
+
+  const collectionsSection = document.createElement("section");
+  collectionsSection.className = "favorite-native-section favorite-collections-section";
+  const collectionsLabel = document.createElement("p");
+  collectionsLabel.className = "favorite-native-eyebrow";
+  collectionsLabel.textContent = "De mis rutinas";
+
+  const collectionsList = document.createElement("div");
+  collectionsList.className = "favorites-collection-list";
+
+  visibleRoutineIds.forEach(routineId => {
+    const tile = createFavoriteRoutineTileV93b(
+      routineId,
+      filteredRoutine.filter(favorite => favorite.routineId === routineId),
+      routineFavs.filter(favorite => favorite.routineId === routineId)
+    );
+    tile.classList.add("is-collection-row");
+    collectionsList.appendChild(tile);
+  });
+
+  filteredBot
+    .slice()
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+    .forEach(saved => {
+      const card = createBotFavoriteCard(saved);
+      card.classList.add("is-collection-row");
+      collectionsList.appendChild(card);
+    });
 
   if (filteredBot.length) {
-    const botSection = document.createElement("section");
-    botSection.className = "favorite-native-section favorite-native-bot";
-
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = "Del Bot";
-
-    const botList = document.createElement("div");
-    botList.className = "bot-favorites-list";
-    filteredBot
-      .slice()
-      .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
-      .forEach(saved => botList.appendChild(createBotFavoriteCard(saved)));
-
-    botSection.append(sectionLabel, botList);
-    list.appendChild(botSection);
+    const botLabel = document.createElement("p");
+    botLabel.className = "favorite-native-eyebrow favorite-bot-list-label";
+    botLabel.textContent = "Del Bot";
+    collectionsSection.append(collectionsLabel, collectionsList, botLabel);
+  } else {
+    collectionsSection.append(collectionsLabel, collectionsList);
   }
+  list.appendChild(collectionsSection);
 }
