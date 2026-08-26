@@ -153,3 +153,32 @@ body.is-scrolled #view-bot .app-page-header h1 {
     font-size: 22px;
   }
 }
+
+
+/* NU APP · Eje horizontal global de pantallas */
+:root {
+  --app-content-axis: 16px;
+}
+
+.view {
+  padding-inline: var(--app-content-axis);
+}
+
+.view > .app-page-header,
+.view > .bot-page-header {
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+#view-hoy .home-page-header > div,
+#view-hoy .home-routines-section > .home-section-heading,
+#view-favoritos:not(.favorite-day-open) .app-page-header,
+#view-favoritos:not(.favorite-day-open) .saved-filter-bar,
+#view-favoritos:not(.favorite-day-open) .favorites-native-groups {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#view-favoritos:not(.favorite-day-open) {
+  padding-inline: var(--app-content-axis);
+}
