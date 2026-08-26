@@ -255,3 +255,31 @@
 #view-hoy .home-page-header {
   margin-inline: 2px;
 }
+
+
+/* NU APP · Fondo fotográfico de la rutina activa · cambio visual aislado */
+.home-routine-card-active {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.home-routine-card-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, .91) 0%,
+      rgba(255, 255, 255, .80) 52%,
+      rgba(255, 255, 255, .87) 100%
+    ),
+    url("assets/custom/collagen-home-bg.jpg") center / cover no-repeat;
+}
+
+.home-routine-card-active .home-routine-cover {
+  background: rgba(255, 255, 255, .55);
+}

@@ -63,6 +63,7 @@ const CORE=[
   "./icons/nuapp-icon-512.png?v=61b-progress-canonical",
   "./icons/nuapp-maskable-512.png?v=61b-progress-canonical",
   "./assets/custom/routine-collagen-home.png",
+  "./assets/custom/collagen-home-bg.jpg",
   "./assets/custom/routine-lumispa-home.png",
   "./assets/custom/routine-lumispa-hero-v4.png",
   "./assets/custom/routine-wellspa-hero-v3.png",
