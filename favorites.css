@@ -1098,7 +1098,7 @@
   --fav-ink: #202B42;
   --fav-muted: #707681;
   --fav-line: #DCE9EE;
-  background: linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 60%, #FFF3E8 100%);
+  background: radial-gradient(circle at 88% 8%, rgba(226, 84, 46, .08) 0%, rgba(226, 84, 46, 0) 30%), linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 100%);
 }
 
 #view-favoritos .favorites-search-panel {
