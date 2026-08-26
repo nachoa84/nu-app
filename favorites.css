@@ -1097,3 +1097,10 @@
 #view-favoritos:not(.favorite-day-open) .favorites-native-groups {
   padding-inline: 13px;
 }
+
+
+/* NU APP · Ajuste fino del eje de títulos de Favoritos */
+#view-favoritos:not(.favorite-day-open) .app-page-header h1,
+#view-favoritos:not(.favorite-day-open) .favorite-native-eyebrow {
+  padding-left: 9px;
+}
