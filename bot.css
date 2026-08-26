@@ -1678,3 +1678,22 @@ body.bot-quick-access-open {
   fill: none;
   stroke: currentColor;
 }
+
+
+/* IRIS · campo de texto, contraste suave */
+#view-bot .bot-form input {
+  background: #fff;
+  border-color: #C9DCE4;
+  color: #202B42;
+}
+
+#view-bot .bot-form input::placeholder {
+  color: #71808B;
+  opacity: 1;
+}
+
+#view-bot .bot-form input:focus {
+  border-color: #9FC4D2;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(45, 108, 135, .10);
+}
