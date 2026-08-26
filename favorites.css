@@ -1166,3 +1166,39 @@
     height: 100px;
   }
 }
+
+
+/* NU APP · Corrección Propuesta 2: una sola rutina destacada */
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-strip {
+  display: grid;
+  gap: 10px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-featured {
+  grid-template-columns: 104px minmax(0, 1fr) 24px;
+  min-height: 148px;
+  padding: 14px;
+  border-radius: 22px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary {
+  grid-template-columns: 58px minmax(0, 1fr) 20px;
+  min-height: 72px;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary .favorite-routine-cover {
+  width: 58px;
+  height: 56px;
+  border-radius: 12px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary .favorite-routine-copy strong {
+  font-size: 15px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary .favorite-routine-copy small,
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary .favorite-routine-copy em {
+  font-size: 11px;
+}
