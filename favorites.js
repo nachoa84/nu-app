@@ -962,6 +962,7 @@ function renderFavorites() {
   if (searchPanel) searchPanel.hidden = !favoriteSearchOpen;
   favoritesView?.classList.toggle("favorites-searching", favoriteSearchOpen);
 
+  favoritesView?.querySelector(".favorites-reference-hero")?.remove();
   renderFavoriteFilterBar(list);
 
   const searchedRoutine = favoriteSearchQuery
@@ -1249,7 +1250,7 @@ function renderFavorites() {
     });
 
     hero.append(heroTrack, dots);
-    list.appendChild(hero);
+    favoritesView?.insertBefore(hero, document.getElementById("savedFilterBar") || list);
   }
 
   const collectionsSection = document.createElement("section");
