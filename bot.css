@@ -1783,3 +1783,4 @@ body:has(#view-bot.active .bot-card:not(.has-conversation)) {
   box-shadow: none;
   background: transparent;
 }
+
