@@ -761,8 +761,8 @@ body.bot-document-open {
 }
 
 #view-bot .bot-card.has-conversation .bot-form {
-  border-top: 1px solid var(--bot-line);
-  background: #fffdfa;
+  border-top: 0;
+  background: transparent;
 }
 
 #view-bot .bot-form input::placeholder {
@@ -1744,7 +1744,7 @@ body.bot-quick-access-open {
 
 /* IRIS · ajuste fino del compositor inferior */
 #view-bot .bot-form {
-  transform: translateY(6px);
+  transform: none;
 }
 
 #view-bot .bot-form input {
