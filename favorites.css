@@ -618,7 +618,9 @@
   --fav-ink: #17223d;
   --fav-muted: #717984;
   --fav-line: #e5e7e8;
-  background: #fafbfd;
+  background:
+    radial-gradient(circle at 88% 7%, rgba(226, 84, 46, .06) 0%, rgba(226, 84, 46, 0) 28%),
+    linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 100%);
   padding-top: calc(24px + var(--safe-top));
 }
 
