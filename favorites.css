@@ -1108,3 +1108,80 @@
 #view-favoritos:not(.favorite-day-open) .favorite-native-eyebrow {
   padding-left: 0;
 }
+
+
+/* NU APP · Favoritos como colecciones */
+#view-favoritos:not(.favorite-day-open) .favorites-collections-layout {
+  display: grid;
+  gap: 22px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-featured-section,
+#view-favoritos:not(.favorite-day-open) .favorite-collections-section {
+  min-width: 0;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-featured-section .favorite-native-eyebrow,
+#view-favoritos:not(.favorite-day-open) .favorite-collections-section .favorite-native-eyebrow {
+  margin: 0 0 10px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-featured-section .favorite-routine-tile {
+  grid-template-columns: 112px minmax(0, 1fr) 24px;
+  width: 100%;
+  min-height: 154px;
+  padding: 14px;
+  border-radius: 22px;
+  box-shadow: 0 10px 26px rgba(24,39,69,.08);
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-featured-section .favorite-routine-cover {
+  width: 112px;
+  height: 124px;
+  border-radius: 18px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list {
+  display: grid;
+  gap: 8px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .favorite-routine-tile,
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-card {
+  grid-template-columns: 58px minmax(0, 1fr) 22px;
+  min-height: 70px;
+  padding: 8px;
+  border: 1px solid rgba(24,39,69,.08);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(24,39,69,.035);
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .favorite-routine-cover,
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-thumb {
+  width: 58px;
+  height: 54px;
+  border-radius: 12px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-card {
+  display: grid;
+  margin: 0;
+  overflow: hidden;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-main {
+  min-height: 68px;
+  padding: 7px 4px;
+}
+
+@media (max-width: 360px) {
+  #view-favoritos:not(.favorite-day-open) .favorite-featured-section .favorite-routine-tile {
+    grid-template-columns: 86px minmax(0, 1fr) 20px;
+  }
+
+  #view-favoritos:not(.favorite-day-open) .favorite-featured-section .favorite-routine-cover {
+    width: 86px;
+    height: 108px;
+  }
+}
