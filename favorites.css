@@ -1108,3 +1108,61 @@
 #view-favoritos:not(.favorite-day-open) .favorite-native-eyebrow {
   padding-left: 0;
 }
+
+
+/* NU APP · Propuesta 2: rutina destacada + recursos compactos */
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine {
+  margin-bottom: 6px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-strip {
+  display: block;
+  padding: 0;
+  overflow: visible;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile {
+  grid-template-columns: 104px minmax(0, 1fr) 24px;
+  width: 100%;
+  min-height: 148px;
+  padding: 14px;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(24,39,69,.07);
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-cover {
+  width: 104px;
+  height: 118px;
+  border-radius: 17px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-bot {
+  padding-top: 0;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-bot .favorite-native-eyebrow {
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-bot .bot-favorite-card {
+  min-height: 62px;
+  margin-bottom: 8px;
+  border-radius: 16px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-bot .bot-favorite-main {
+  min-height: 62px;
+  padding: 9px 11px;
+}
+
+@media (max-width: 360px) {
+  #view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile {
+    grid-template-columns: 82px minmax(0, 1fr) 20px;
+  }
+
+  #view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-cover {
+    width: 82px;
+    height: 100px;
+  }
+}
