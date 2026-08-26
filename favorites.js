@@ -1240,7 +1240,18 @@ function renderFavorites() {
       tile.classList.toggle("is-secondary", index > 0);
       strip.appendChild(tile);
     });
+    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "Rutina destacada";
     routineSection.append(sectionLabel, strip);
+    if (visibleRoutineIds.length > 1) {
+      const otherLabel = document.createElement("p");
+      otherLabel.className = "favorite-native-subheading";
+      otherLabel.textContent = "Otras rutinas";
+      const otherTiles = [...strip.children].slice(1);
+      const otherList = document.createElement("div");
+      otherList.className = "favorite-routine-secondary-list";
+      otherTiles.forEach(tile => otherList.appendChild(tile));
+      strip.replaceChildren(strip.firstElementChild, otherLabel, otherList);
+    }
     list.appendChild(routineSection);
   }
 
