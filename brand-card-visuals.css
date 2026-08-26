@@ -75,19 +75,112 @@
   letter-spacing: .065em !important;
 }
 
-/* Guía · visual Nu Comunidad aprobado.
-   La imagen ya contiene únicamente el logo y su fondo neutro. */
+/* Guía · hero interno como una sola card continua.
+   El fondo Nu Comunidad ocupa toda la superficie y el contenido queda
+   integrado dentro de la misma pieza, sin franja inferior separada. */
 #view-guia .guide-hero-card {
+  min-height: 620px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  overflow: hidden !important;
+  padding: 330px 22px 24px !important;
+  border: 3px solid rgba(255,255,255,.94) !important;
+  border-radius: 30px !important;
   background:
-    url("assets/guide/guide-nu-comunidad.webp") center top / 100% auto no-repeat,
-    #f4eee7 !important;
-  padding-top: 205px !important;
+    url("assets/guide/guide-nu-comunidad.webp?v=20260825-2315") center center / cover no-repeat !important;
+  box-shadow: 0 16px 34px rgba(43,31,64,.06) !important;
 }
 
-/* Evita duplicar el logo antiguo del DOM: el branding ahora forma parte
-   exclusivamente del fondo visual aprobado. */
+/* El logo forma parte del fondo aprobado; no duplicarlo desde el DOM. */
 #view-guia .guide-hero-brand {
   display: none !important;
+}
+
+#view-guia .guide-hero-copy {
+  position: relative !important;
+  z-index: 1 !important;
+  margin: 0 !important;
+}
+
+#view-guia .guide-hero-copy > span {
+  color: #171329 !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+  line-height: 1.2 !important;
+  letter-spacing: .13em !important;
+}
+
+#view-guia .guide-hero-copy strong {
+  margin-top: 9px !important;
+  color: #171329 !important;
+  font-size: 34px !important;
+  font-weight: 790 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.045em !important;
+}
+
+#view-guia .guide-hero-copy p {
+  margin: 14px 0 0 !important;
+  color: #171329 !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1.42 !important;
+}
+
+#view-guia .guide-hero-progress-row {
+  position: relative !important;
+  z-index: 1 !important;
+  margin-top: 24px !important;
+  gap: 14px !important;
+}
+
+#view-guia .guide-hero-progress {
+  height: 8px !important;
+  background: rgba(255,255,255,.68) !important;
+}
+
+#view-guia .guide-hero-progress span {
+  background: linear-gradient(90deg, #ffad1f 0%, #f7c654 100%) !important;
+}
+
+#view-guia .guide-hero-progress-row b {
+  color: #f28a00 !important;
+  font-size: 17px !important;
+  font-weight: 780 !important;
+}
+
+#view-guia .guide-hero-count {
+  position: relative !important;
+  z-index: 1 !important;
+  margin-top: 11px !important;
+  color: #171329 !important;
+  font-size: 13px !important;
+  font-weight: 620 !important;
+}
+
+#view-guia .guide-hero-card > .guide-primary-button {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-height: 62px !important;
+  flex: 0 0 auto !important;
+  margin: 22px 0 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #f04a25 0%, #d84a42 52%, #9d365d 100%) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-size: 17px !important;
+  font-weight: 720 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+#view-guia .guide-hero-card > .guide-primary-button svg {
+  width: 18px !important;
+  height: 18px !important;
 }
 
 @media (max-width: 370px) {
@@ -109,6 +202,21 @@
   }
 
   #view-guia .guide-hero-card {
-    padding-top: 188px !important;
+    min-height: 588px !important;
+    padding: 308px 18px 20px !important;
+    border-radius: 27px !important;
+  }
+
+  #view-guia .guide-hero-copy strong {
+    font-size: 31px !important;
+  }
+
+  #view-guia .guide-hero-copy p {
+    font-size: 14px !important;
+  }
+
+  #view-guia .guide-hero-card > .guide-primary-button {
+    min-height: 58px !important;
+    font-size: 16px !important;
   }
 }
