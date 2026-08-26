@@ -76,20 +76,21 @@
 }
 
 /* Guía · hero interno como una sola card continua.
-   El fondo Nu Comunidad ocupa toda la superficie y el contenido queda
-   integrado dentro de la misma pieza, sin franja inferior separada. */
+   El fondo Nu Comunidad se muestra completo al ancho (sin crop de cover)
+   para reducir la escala visual del logo y conservar una sola superficie. */
 #view-guia .guide-hero-card {
-  min-height: 620px !important;
+  min-height: 575px !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-end !important;
   overflow: hidden !important;
-  padding: 330px 22px 24px !important;
+  padding: 286px 22px 22px !important;
   border: 3px solid rgba(255,255,255,.94) !important;
   border-radius: 30px !important;
   background:
-    url("assets/guide/guide-nu-comunidad.webp?v=20260825-2315") center center / cover no-repeat !important;
+    url("assets/guide/guide-nu-comunidad.webp?v=20260825-2355") center top / 100% auto no-repeat,
+    #f7efe7 !important;
   box-shadow: 0 16px 34px rgba(43,31,64,.06) !important;
 }
 
@@ -105,6 +106,8 @@
 }
 
 #view-guia .guide-hero-copy > span {
+  display: block !important;
+  margin: 0 0 10px !important;
   color: #171329 !important;
   font-size: 12px !important;
   font-weight: 760 !important;
@@ -113,7 +116,7 @@
 }
 
 #view-guia .guide-hero-copy strong {
-  margin-top: 9px !important;
+  margin-top: 0 !important;
   color: #171329 !important;
   font-size: 34px !important;
   font-weight: 790 !important;
@@ -132,7 +135,7 @@
 #view-guia .guide-hero-progress-row {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 24px !important;
+  margin-top: 20px !important;
   gap: 14px !important;
 }
 
@@ -154,7 +157,7 @@
 #view-guia .guide-hero-count {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 11px !important;
+  margin-top: 9px !important;
   color: #171329 !important;
   font-size: 13px !important;
   font-weight: 620 !important;
@@ -164,9 +167,9 @@
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
-  min-height: 62px !important;
+  min-height: 60px !important;
   flex: 0 0 auto !important;
-  margin: 22px 0 0 !important;
+  margin: 18px 0 0 !important;
   border: 0 !important;
   border-radius: 999px !important;
   background: linear-gradient(90deg, #f04a25 0%, #d84a42 52%, #9d365d 100%) !important;
@@ -202,9 +205,13 @@
   }
 
   #view-guia .guide-hero-card {
-    min-height: 588px !important;
-    padding: 308px 18px 20px !important;
+    min-height: 548px !important;
+    padding: 270px 18px 18px !important;
     border-radius: 27px !important;
+  }
+
+  #view-guia .guide-hero-copy > span {
+    margin-bottom: 9px !important;
   }
 
   #view-guia .guide-hero-copy strong {
@@ -216,7 +223,7 @@
   }
 
   #view-guia .guide-hero-card > .guide-primary-button {
-    min-height: 58px !important;
+    min-height: 56px !important;
     font-size: 16px !important;
   }
 }
