@@ -1766,3 +1766,13 @@ body.bot-quick-access-open {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+
+/* IRIS · contener scroll solo en estado vacío */
+#view-bot.active:has(.bot-card:not(.has-conversation)) {
+  overscroll-behavior-y: none;
+}
+
+body:has(#view-bot.active .bot-card:not(.has-conversation)) {
+  overflow: hidden;
+}
