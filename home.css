@@ -338,3 +338,41 @@
   background: #ffe7d8;
   color: #ad482d;
 }
+
+/* NU APP · Variante de paleta: Naranja solar + azul cielo */
+#view-hoy {
+  --home-ink: #17223D;
+  --home-muted: #66707D;
+  --home-line: #E3EBF0;
+  --home-progress: #F47A20;
+  --home-progress-soft: #FFF1E8;
+  background: radial-gradient(circle at 88% 7%, rgba(244, 122, 32, .16) 0%, rgba(244, 122, 32, 0) 28%), linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 48%, #FFF3E8 100%);
+}
+
+#view-hoy .home-guide-section {
+  border-color: #E3EBF0;
+}
+
+#view-hoy .home-guide-progress > span,
+#view-hoy .home-routine-progress > span {
+  background: linear-gradient(90deg, #F47A20 0%, #F26A4B 100%);
+}
+
+#view-hoy #homeGuideSection .home-guide-action {
+  background: linear-gradient(135deg, #F47A20 0%, #F26A4B 100%);
+  box-shadow: 0 6px 14px #F47A202E;
+}
+
+#view-hoy .home-routine-continue {
+  background: #FFF1E8;
+  color: #C65334;
+}
+
+#view-hoy .home-routine-continue:active {
+  background: #B8DDED;
+  color: #17223D;
+}
+
+#view-hoy .home-routine-card {
+  border-color: #E3EBF0;
+}
