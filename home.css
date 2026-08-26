@@ -338,3 +338,41 @@
   background: #ffe7d8;
   color: #ad482d;
 }
+
+/* NU APP · Variante de paleta: Mandarina + celeste tecnológico */
+#view-hoy {
+  --home-ink: #20334A;
+  --home-muted: #687783;
+  --home-line: #DCE9EE;
+  --home-progress: #F97316;
+  --home-progress-soft: #EAF4F8;
+  background: linear-gradient(180deg, #F3F8FA 0%, #EAF4F8 100%);
+}
+
+#view-hoy .home-guide-section {
+  border-color: #DCE9EE;
+}
+
+#view-hoy .home-guide-progress > span,
+#view-hoy .home-routine-progress > span {
+  background: linear-gradient(90deg, #F97316 0%, #FF9F43 100%);
+}
+
+#view-hoy #homeGuideSection .home-guide-action {
+  background: linear-gradient(135deg, #F97316 0%, #FF9F43 100%);
+  box-shadow: 0 6px 14px #F973162E;
+}
+
+#view-hoy .home-routine-continue {
+  background: #EAF4F8;
+  color: #27627A;
+}
+
+#view-hoy .home-routine-continue:active {
+  background: #8FC7DF;
+  color: #20334A;
+}
+
+#view-hoy .home-routine-card {
+  border-color: #DCE9EE;
+}
