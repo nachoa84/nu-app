@@ -360,7 +360,7 @@
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 3px;
+          gap: 7px;
           line-height: 1.05;
         }
 
@@ -373,9 +373,10 @@
         }
 
         #view-bot .bot-status {
-          margin-top: 2px;
+          margin-top: 5px;
           text-transform: uppercase;
-          font-weight: 520;
+          font-size: 12px;
+          font-weight: 500;
         }
 
         #view-bot .bot-header-actions {
