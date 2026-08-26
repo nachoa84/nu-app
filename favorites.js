@@ -1218,45 +1218,72 @@ function renderFavorites() {
   }
 
   list.innerHTML = "";
-  list.className = "favorites-list favorites-native-groups";
+  list.className = "favorites-list favorites-collections-layout";
 
   if (filteredRoutine.length) {
-    // NU APP · JERARQUÍA DE FAVORITOS V93B
     const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
     const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
       .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
-    const routineSection = document.createElement("section");
-    routineSection.className = "favorite-native-section favorite-native-routine favorite-routine-library";
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "De mis rutinas";
-    const strip = document.createElement("div");
-    strip.className = "favorite-routine-strip";
-    visibleRoutineIds.forEach(routineId => {
-      const visibleItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
-      const allItems = routineFavs.filter(favorite => favorite.routineId === routineId);
-      strip.appendChild(createFavoriteRoutineTileV93b(routineId, visibleItems, allItems));
+
+    const featuredSection = document.createElement("section");
+    featuredSection.className = "favorite-native-section favorite-featured-section";
+    const featuredLabel = document.createElement("p");
+    featuredLabel.className = "favorite-native-eyebrow";
+    featuredLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "Última rutina guardada";
+
+    const featuredRoutineId = visibleRoutineIds[0];
+    const featuredTile = createFavoriteRoutineTileV93b(
+      featuredRoutineId,
+      filteredRoutine.filter(favorite => favorite.routineId === featuredRoutineId),
+      routineFavs.filter(favorite => favorite.routineId === featuredRoutineId)
+    );
+    featuredTile.classList.add("is-featured");
+    featuredSection.append(featuredLabel, featuredTile);
+    list.appendChild(featuredSection);
+
+    const collectionsSection = document.createElement("section");
+    collectionsSection.className = "favorite-native-section favorite-collections-section";
+    const collectionsLabel = document.createElement("p");
+    collectionsLabel.className = "favorite-native-eyebrow";
+    collectionsLabel.textContent = "Favoritos guardados";
+
+    const collectionsList = document.createElement("div");
+    collectionsList.className = "favorites-collection-list";
+
+    visibleRoutineIds.slice(1).forEach(routineId => {
+      const tile = createFavoriteRoutineTileV93b(
+        routineId,
+        filteredRoutine.filter(favorite => favorite.routineId === routineId),
+        routineFavs.filter(favorite => favorite.routineId === routineId)
+      );
+      tile.classList.add("is-collection-row");
+      collectionsList.appendChild(tile);
     });
-    routineSection.append(sectionLabel, strip);
-    list.appendChild(routineSection);
-  }
 
-  if (filteredBot.length) {
-    const botSection = document.createElement("section");
-    botSection.className = "favorite-native-section favorite-native-bot";
-
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = "Del Bot";
-
-    const botList = document.createElement("div");
-    botList.className = "bot-favorites-list";
     filteredBot
       .slice()
       .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
-      .forEach(saved => botList.appendChild(createBotFavoriteCard(saved)));
+      .forEach(saved => {
+        const card = createBotFavoriteCard(saved);
+        card.classList.add("is-collection-row");
+        collectionsList.appendChild(card);
+      });
 
-    botSection.append(sectionLabel, botList);
-    list.appendChild(botSection);
+    collectionsSection.append(collectionsLabel, collectionsList);
+    list.appendChild(collectionsSection);
+  } else if (filteredBot.length) {
+    const collectionsSection = document.createElement("section");
+    collectionsSection.className = "favorite-native-section favorite-collections-section";
+    const collectionsLabel = document.createElement("p");
+    collectionsLabel.className = "favorite-native-eyebrow";
+    collectionsLabel.textContent = "Favoritos guardados";
+    const collectionsList = document.createElement("div");
+    collectionsList.className = "favorites-collection-list";
+    filteredBot
+      .slice()
+      .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+      .forEach(saved => collectionsList.appendChild(createBotFavoriteCard(saved)));
+    collectionsSection.append(collectionsLabel, collectionsList);
+    list.appendChild(collectionsSection);
   }
 }
