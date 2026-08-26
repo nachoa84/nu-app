@@ -1,64 +1,67 @@
 /* NU APP · APPROVED BRAND CARD VISUALS
    Ajustes visuales finales de las cards de Guía. */
 
-/* Inicio · visual Nu Skin aprobado */
+/* Inicio · card editorial basada en el render aprobado.
+   La foto se muestra completa al ancho, sin zoom/crop de cover. */
 #view-hoy #homeGuideSection.home-guide-section {
   background:
-    url("assets/guide/home-guide-nuskin-approved.png?v=20260825-1959") center center / cover no-repeat !important;
+    url("assets/guide/home-guide-nuskin-approved.png?v=20260825-2130") center top / 100% auto no-repeat,
+    #ffffff !important;
 }
 
-/* Inicio · composición más cercana al render aprobado */
 #view-hoy #homeGuideSection .home-guide-feature {
-  min-height: 452px !important;
-  padding: 268px 16px 18px !important;
+  min-height: 540px !important;
+  padding: 314px 18px 20px !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-feature-copy {
   width: 100% !important;
+  max-width: none !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-kicker {
-  margin-bottom: 8px !important;
+  margin: 0 0 8px !important;
   color: var(--ref-orange) !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: .12em !important;
+  font-size: 12px !important;
+  font-weight: 720 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .11em !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-feature h2 {
-  margin: 0 0 8px !important;
+  margin: 0 0 10px !important;
   color: #111111 !important;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
-  font-size: 34px !important;
+  font-size: 38px !important;
   font-weight: 760 !important;
-  line-height: 1.02 !important;
-  letter-spacing: -.045em !important;
+  line-height: .98 !important;
+  letter-spacing: -.05em !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-description {
-  max-width: 100% !important;
-  margin: 0 0 15px !important;
+  max-width: 290px !important;
+  margin: 0 0 20px !important;
   color: #111111 !important;
   font-size: 14px !important;
   font-weight: 450 !important;
-  line-height: 1.35 !important;
+  line-height: 1.42 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-row {
-  margin: 0 0 14px !important;
+  margin: 0 0 18px !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-copy {
-  margin-bottom: 8px !important;
+  margin-bottom: 9px !important;
   color: #111111 !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  font-size: 14px !important;
+  font-weight: 620 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-copy strong {
   color: var(--ref-orange) !important;
-  font-size: 15px !important;
-  font-weight: 760 !important;
+  font-size: 17px !important;
+  font-weight: 780 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress {
@@ -66,10 +69,10 @@
 }
 
 #view-hoy #homeGuideSection .home-guide-action {
-  min-height: 58px !important;
-  font-size: 16px !important;
+  min-height: 62px !important;
+  font-size: 17px !important;
   font-weight: 680 !important;
-  letter-spacing: .08em !important;
+  letter-spacing: .07em !important;
 }
 
 /* Guía · visual Nu Comunidad aprobado.
@@ -89,12 +92,12 @@
 
 @media (max-width: 370px) {
   #view-hoy #homeGuideSection .home-guide-feature {
-    min-height: 430px !important;
-    padding: 252px 15px 16px !important;
+    min-height: 510px !important;
+    padding: 296px 16px 18px !important;
   }
 
   #view-hoy #homeGuideSection .home-guide-feature h2 {
-    font-size: 31px !important;
+    font-size: 35px !important;
   }
 
   #view-guia .guide-hero-card {
