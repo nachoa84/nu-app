@@ -850,13 +850,12 @@ body.bot-document-open {
 .bot-form input {
   min-width: 0;
   padding: 0 16px;
-  border: 1px solid transparent;
+  border: 1px solid #AFCBD8;
   outline: 0;
   color: var(--app-text);
   min-height: 52px;
   border-radius: 20px;
   background: #fff;
-  border-color: #e5eaf0;
   font-size: 13px;
   font-weight: 520;
 }
@@ -975,7 +974,6 @@ body.bot-document-open {
 
 #view-bot .bot-form input {
   padding: 0 16px;
-  border: 1px solid #dde1e5;
   color: var(--bot-ink);
   box-shadow: none;
   width: 100%;
@@ -1594,7 +1592,6 @@ body.bot-quick-access-open {
 
 #view-bot .bot-form input {
   background: #fff;
-  border-color: #DCE3E8;
   color: #202B42;
 }
 
@@ -1683,7 +1680,6 @@ body.bot-quick-access-open {
 /* IRIS · campo de texto, contraste suave */
 #view-bot .bot-form input {
   background: #fff;
-  border-color: #C9DCE4;
   color: #202B42;
 }
 
@@ -1759,7 +1755,6 @@ body.bot-quick-access-open {
 
 /* IRIS · contorno y estado vacío del compositor */
 #view-bot .bot-form input {
-  border-color: #B8D2DD;
 }
 
 #view-bot .bot-card:not(.has-conversation) .bot-thread {
@@ -1777,8 +1772,3 @@ body:has(#view-bot.active .bot-card:not(.has-conversation)) {
   overflow: hidden;
 }
 
-
-/* IRIS · contorno visible del campo */
-#view-bot .bot-form input {
-  border: 1px solid #AFCBD8;
-}
