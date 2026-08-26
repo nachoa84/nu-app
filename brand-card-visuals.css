@@ -1,11 +1,28 @@
 /* NU APP · APPROVED BRAND CARD VISUALS
-   Solo reemplaza los fondos visuales de las dos cards de Guía.
-   No modifica botones, progreso, tipografía ni lógica. */
+   Ajustes visuales finales de las cards de Guía. */
 
 /* Inicio · visual Nu Skin aprobado */
 #view-hoy #homeGuideSection.home-guide-section {
   background:
     url("assets/guide/home-guide-nuskin-approved.png?v=20260825-1959") center 42% / cover no-repeat !important;
+}
+
+/* Inicio · tipografía sobre zona clara */
+#view-hoy #homeGuideSection .home-guide-feature h2,
+#view-hoy #homeGuideSection .home-guide-description,
+#view-hoy #homeGuideSection .home-guide-progress-copy {
+  color: #111111 !important;
+}
+
+/* Mantiene los acentos naranjas del diseño */
+#view-hoy #homeGuideSection .home-guide-kicker,
+#view-hoy #homeGuideSection .home-guide-progress-copy strong {
+  color: var(--ref-orange) !important;
+}
+
+/* Botón igual, solo texto CONTINUAR un poco más grande */
+#view-hoy #homeGuideSection .home-guide-action {
+  font-size: 16px !important;
 }
 
 /* Guía · visual Nu Comunidad aprobado.
