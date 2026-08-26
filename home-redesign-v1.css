@@ -498,3 +498,34 @@ body[data-active-view="hoy"] .nav-btn.active::after {
     min-height: 98px;
   }
 }
+
+
+/* NU APP · HOME GUIDE PHOTO V1
+   Cambio aislado: imagen de fondo y card ampliada. */
+#view-hoy #homeGuideSection.home-guide-section {
+  min-height: 504px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 18, 32, .10) 0%,
+      rgba(7, 18, 32, .20) 34%,
+      rgba(7, 18, 32, .82) 100%
+    ),
+    url("assets/custom/home-guide-background.jpg") center 58% / cover no-repeat;
+}
+
+#view-hoy #homeGuideSection .home-guide-feature {
+  min-height: 504px;
+  padding: 230px 29px 29px;
+}
+
+@media (max-width: 370px) {
+  #view-hoy #homeGuideSection.home-guide-section,
+  #view-hoy #homeGuideSection .home-guide-feature {
+    min-height: 468px;
+  }
+
+  #view-hoy #homeGuideSection .home-guide-feature {
+    padding: 204px 24px 24px;
+  }
+}
