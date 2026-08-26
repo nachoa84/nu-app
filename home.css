@@ -346,7 +346,7 @@
   --home-line: #E3EBF0;
   --home-progress: #F47A20;
   --home-progress-soft: #FFF1E8;
-  background: linear-gradient(180deg, #F7F9FC 0%, #EDF6FA 100%);
+  background: radial-gradient(circle at 88% 7%, rgba(244, 122, 32, .16) 0%, rgba(244, 122, 32, 0) 28%), linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 48%, #FFF3E8 100%);
 }
 
 #view-hoy .home-guide-section {
