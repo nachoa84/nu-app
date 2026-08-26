@@ -342,7 +342,7 @@
     const title = header.querySelector("h1");
     if (title && title.dataset.irisTitlePolish !== "1") {
       title.dataset.irisTitlePolish = "1";
-      title.innerHTML = `Iris <span class="bot-title-note">· Tu Asistente</span>`;
+      title.innerHTML = `<span class="bot-title-note">TU ASISTENTE</span>Iris`;
     }
 
     if (!document.getElementById("irisHeaderPolishV131")) {
@@ -358,21 +358,24 @@
         #view-bot .bot-page-header h1 {
           margin: 0;
           display: flex;
-          align-items: baseline;
-          flex-wrap: wrap;
-          gap: 6px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 3px;
           line-height: 1.05;
         }
 
         #view-bot .bot-title-note {
           color: #6f7b8c;
-          font-size: .62em;
-          font-weight: 650;
-          letter-spacing: -.02em;
+          font-size: .42em;
+          font-weight: 600;
+          letter-spacing: .12em;
+          line-height: 1.1;
         }
 
         #view-bot .bot-status {
           margin-top: 2px;
+          text-transform: uppercase;
+          font-weight: 520;
         }
 
         #view-bot .bot-header-actions {
