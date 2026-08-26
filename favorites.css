@@ -1089,3 +1089,11 @@
 #view-favoritos .bot-folder-resource-copy small{color:var(--fav-muted);font-size:12px;line-height:1.25}
 #view-favoritos .bot-folder-resource-copy em{color:var(--fav-muted);font-size:12px;line-height:1.35;font-style:normal}
 #view-favoritos .bot-folder-resource-arrow{color:var(--fav-muted)}
+
+
+/* NU APP · Eje lateral compartido de Favoritos */
+#view-favoritos:not(.favorite-day-open) .app-page-header,
+#view-favoritos:not(.favorite-day-open) .saved-filter-bar,
+#view-favoritos:not(.favorite-day-open) .favorites-native-groups {
+  padding-inline: 13px;
+}
