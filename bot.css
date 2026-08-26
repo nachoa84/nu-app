@@ -1547,3 +1547,68 @@ body.bot-quick-access-open {
     padding-right: 12px;
   }
 }
+
+
+/* NU APP · IRIS PALETA OPCIÓN A · SOLO COLOR V1 */
+#view-bot {
+  --bot-brand: #2D6C87;
+  --bot-brand-strong: #23586D;
+  --bot-brand-soft: #EAF4F8;
+  --bot-green: #2D6C87;
+  --bot-green-soft: #EAF4F8;
+  --bot-ink: #202B42;
+  --bot-muted: #707681;
+  --bot-line: #DCE9EE;
+  background:
+    radial-gradient(circle at 88% 7%, rgba(226, 84, 46, .06) 0%, rgba(226, 84, 46, 0) 28%),
+    linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 100%);
+}
+
+#view-bot .bot-native-welcome-mark,
+#view-bot .bot-resource-icon,
+#view-bot .bot-resource-thumb {
+  background: #EAF4F8;
+  color: #2D6C87;
+}
+
+#view-bot .bot-send {
+  background: linear-gradient(135deg, #E2542E 0%, #5A3E6B 100%);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(90, 62, 107, .16);
+}
+
+#view-bot .bot-send:active,
+#view-bot .bot-send:not(:disabled):active {
+  background: linear-gradient(135deg, #D94D2B 0%, #4F355F 100%);
+}
+
+#view-bot #botShortcutsBtn {
+  background: #fff;
+  color: #2D6C87;
+}
+
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  background: transparent;
+}
+
+#view-bot .bot-form input {
+  background: #fff;
+  border-color: #DCE3E8;
+  color: #202B42;
+}
+
+#view-bot .bot-form input::placeholder {
+  color: #8A929D;
+}
+
+#view-bot .bot-status {
+  border-color: rgba(45, 108, 135, .22);
+  background: rgba(45, 108, 135, .10);
+  color: #2D6C87;
+}
+
+#view-bot .bot-status i {
+  background: #2D6C87;
+  box-shadow: 0 0 0 3px #EAF4F8;
+}
