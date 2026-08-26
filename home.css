@@ -9,7 +9,7 @@
   --home-line: #e9ebef;
   --home-progress: #5149b8;
   --home-progress-soft: #eeeffb;
-  padding-top: calc(48px + var(--safe-top));
+  padding-top: calc(44px + var(--safe-top));
 }
 
 .home-page-header {
@@ -253,7 +253,7 @@
 
 /* NU APP · MARGEN SEGURO DE CABECERA MÓVIL V126 */
 #view-hoy .home-page-header {
-  margin: -4px 0 0;
+  margin: 0;
 }
 
 /* NU APP · Eje interno compartido de Inicio */
