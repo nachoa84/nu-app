@@ -1108,3 +1108,38 @@
 #view-favoritos:not(.favorite-day-open) .favorite-native-eyebrow {
   padding-left: 0;
 }
+
+
+/* NU APP · Favoritos V3 · hero y colecciones */
+#view-favoritos:not(.favorite-day-open) > .app-page-header { display:none; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3 { margin: -44px -16px 0; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-band {
+  position:relative; height:211px; padding:calc(18px + var(--safe-top)) 22px 0;
+  background:linear-gradient(135deg,#4563ad 0%,#5965d8 100%); color:#fff;
+}
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-top { display:flex; justify-content:space-between; align-items:center; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-avatar { display:grid; place-items:center; width:31px; height:31px; border:2px solid rgba(255,255,255,.85); border-radius:50%; background:#e8a05a; font-size:13px; font-weight:700; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-search { display:grid; place-items:center; width:36px; height:36px; padding:0; border:0; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-search svg { width:18px; height:18px; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-eyebrow { display:block; margin:25px 0 5px; color:rgba(255,255,255,.78); font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-band h1 { margin:0; color:#fff; font-size:25px; font-weight:760; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-gallery { position:relative; z-index:3; margin:-48px 20px 0; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-gallery { display:flex; gap:12px; overflow-x:auto; scrollbar-width:none; scroll-snap-type:x mandatory; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-gallery::-webkit-scrollbar {display:none;}
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide { position:relative; flex:0 0 calc(100% - 28px); height:141px; overflow:hidden; scroll-snap-align:start; border-radius:14px; background:#20243a; box-shadow:0 10px 24px rgba(29,30,62,.2); }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-cover { position:absolute; inset:0; width:100%; height:100%; border-radius:0; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-cover img { object-fit:cover; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-copy { position:absolute; left:13px; right:36px; bottom:9px; z-index:2; padding:22px 0 0; background:linear-gradient(transparent,rgba(15,20,40,.72)); }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-copy strong,
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-copy small { color:#fff; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-slide .favorite-routine-arrow { position:absolute; right:10px; bottom:10px; z-index:3; color:#fff; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-dots { display:flex; justify-content:center; gap:4px; margin:9px 0 14px; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-dots span { width:4px; height:4px; border-radius:50%; background:#c6ccd8; }
+#view-favoritos:not(.favorite-day-open) .favorites-hero-v3-dots span.is-active { background:var(--fav-brand); }
+#view-favoritos:not(.favorite-day-open) .favorites-collections-v3 { margin-top:0; }
+#view-favoritos:not(.favorite-day-open) .favorites-collections-list-v3 { display:grid; }
+#view-favoritos:not(.favorite-day-open) .favorites-collection-row-v3 { display:grid; grid-template-columns:72px minmax(0,1fr) 22px; align-items:center; min-height:78px; padding:8px 0; border-bottom:1px solid var(--fav-line); background:transparent; }
+#view-favoritos:not(.favorite-day-open) .favorites-collection-row-v3 .favorite-routine-cover { width:72px; height:62px; border-radius:11px; }
+#view-favoritos:not(.favorite-day-open) .favorites-bot-label-v3 { margin-top:18px; }
+#view-favoritos:not(.favorite-day-open) .favorites-bot-row-v3 { grid-template-columns:58px minmax(0,1fr) 22px; }
+#view-favoritos:not(.favorite-day-open) .favorites-bot-row-v3 .bot-favorite-thumb { width:58px; height:54px; border-radius:11px; }
