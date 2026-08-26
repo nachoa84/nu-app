@@ -1218,45 +1218,93 @@ function renderFavorites() {
   }
 
   list.innerHTML = "";
-  list.className = "favorites-list favorites-native-groups";
+  list.className = "favorites-list favorites-reference-layout-v3";
 
-  if (filteredRoutine.length) {
-    // NU APP · JERARQUÍA DE FAVORITOS V93B
-    const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
-    const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
-      .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
-    const routineSection = document.createElement("section");
-    routineSection.className = "favorite-native-section favorite-native-routine favorite-routine-library";
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "De mis rutinas";
-    const strip = document.createElement("div");
-    strip.className = "favorite-routine-strip";
+  favoritesView?.querySelector(".favorites-hero-v3")?.remove();
+
+  const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
+  const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
+    .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
+
+  if (visibleRoutineIds.length) {
+    const hero = document.createElement("section");
+    hero.className = "favorites-hero-v3";
+    const searchButton = document.getElementById("favoritesSearchBtn");
+    hero.innerHTML = `
+      <div class="favorites-hero-v3-band">
+        <div class="favorites-hero-v3-top">
+          <span class="favorites-hero-v3-avatar">C</span>
+          <button type="button" class="favorites-hero-v3-search" aria-label="Buscar favoritos">
+            ${searchButton?.innerHTML || ""}
+          </button>
+        </div>
+        <span class="favorites-hero-v3-eyebrow">Tu biblioteca</span>
+        <h1>Favoritos</h1>
+      </div>
+      <div class="favorites-hero-v3-gallery"></div>
+      <div class="favorites-hero-v3-dots"></div>
+    `;
+
+    hero.querySelector(".favorites-hero-v3-search")?.addEventListener("click", () => searchButton?.click());
+
+    const gallery = hero.querySelector(".favorites-hero-v3-gallery");
     visibleRoutineIds.forEach(routineId => {
-      const visibleItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
-      const allItems = routineFavs.filter(favorite => favorite.routineId === routineId);
-      strip.appendChild(createFavoriteRoutineTileV93b(routineId, visibleItems, allItems));
+      const tile = createFavoriteRoutineTileV93b(
+        routineId,
+        filteredRoutine.filter(favorite => favorite.routineId === routineId),
+        routineFavs.filter(favorite => favorite.routineId === routineId)
+      );
+      tile.className = "favorites-hero-v3-slide";
+      gallery.appendChild(tile);
     });
-    routineSection.append(sectionLabel, strip);
-    list.appendChild(routineSection);
+
+    const dots = hero.querySelector(".favorites-hero-v3-dots");
+    visibleRoutineIds.forEach((_, index) => {
+      const dot = document.createElement("span");
+      if (index === 0) dot.className = "is-active";
+      dots.appendChild(dot);
+    });
+
+    favoritesView?.insertBefore(hero, document.getElementById("savedFilterBar") || list);
   }
 
+  const collectionsSection = document.createElement("section");
+  collectionsSection.className = "favorite-native-section favorites-collections-v3";
+  const collectionsLabel = document.createElement("p");
+  collectionsLabel.className = "favorite-native-eyebrow";
+  collectionsLabel.textContent = "De mis rutinas";
+
+  const collectionsList = document.createElement("div");
+  collectionsList.className = "favorites-collections-list-v3";
+
+  visibleRoutineIds.forEach(routineId => {
+    const tile = createFavoriteRoutineTileV93b(
+      routineId,
+      filteredRoutine.filter(favorite => favorite.routineId === routineId),
+      routineFavs.filter(favorite => favorite.routineId === routineId)
+    );
+    tile.className = "favorites-collection-row-v3";
+    collectionsList.appendChild(tile);
+  });
+
+  collectionsSection.append(collectionsLabel, collectionsList);
+
   if (filteredBot.length) {
-    const botSection = document.createElement("section");
-    botSection.className = "favorite-native-section favorite-native-bot";
-
-    const sectionLabel = document.createElement("p");
-    sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = "Del Bot";
-
+    const botLabel = document.createElement("p");
+    botLabel.className = "favorite-native-eyebrow favorites-bot-label-v3";
+    botLabel.textContent = "Del Bot";
     const botList = document.createElement("div");
-    botList.className = "bot-favorites-list";
+    botList.className = "favorites-collections-list-v3";
     filteredBot
       .slice()
       .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
-      .forEach(saved => botList.appendChild(createBotFavoriteCard(saved)));
-
-    botSection.append(sectionLabel, botList);
-    list.appendChild(botSection);
+      .forEach(saved => {
+        const card = createBotFavoriteCard(saved);
+        card.className = "favorites-collection-row-v3 favorites-bot-row-v3";
+        botList.appendChild(card);
+      });
+    collectionsSection.append(botLabel, botList);
   }
+
+  list.appendChild(collectionsSection);
 }
