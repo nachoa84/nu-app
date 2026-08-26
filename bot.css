@@ -1715,3 +1715,9 @@ body.bot-quick-access-open {
 #view-bot .bot-page-header {
   margin-top: 18px;
 }
+
+
+/* IRIS · alinear encabezado con acción superior */
+#view-bot .bot-page-header {
+  align-items: flex-start;
+}
