@@ -1745,3 +1745,14 @@ body.bot-quick-access-open {
   width: 26px;
   height: 26px;
 }
+
+
+/* IRIS · ajuste fino del ícono de bienvenida */
+#view-bot .bot-native-welcome-mark {
+  transform: translateY(18px);
+}
+
+#view-bot .bot-native-welcome-mark svg {
+  width: 22px;
+  height: 22px;
+}
