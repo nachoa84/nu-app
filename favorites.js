@@ -1232,10 +1232,13 @@ function renderFavorites() {
     sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "Tu rutina guardada";
     const strip = document.createElement("div");
     strip.className = "favorite-routine-strip";
-    visibleRoutineIds.forEach(routineId => {
+    visibleRoutineIds.forEach((routineId, index) => {
       const visibleItems = filteredRoutine.filter(favorite => favorite.routineId === routineId);
       const allItems = routineFavs.filter(favorite => favorite.routineId === routineId);
-      strip.appendChild(createFavoriteRoutineTileV93b(routineId, visibleItems, allItems));
+      const tile = createFavoriteRoutineTileV93b(routineId, visibleItems, allItems);
+      tile.classList.toggle("is-featured", index === 0);
+      tile.classList.toggle("is-secondary", index > 0);
+      strip.appendChild(tile);
     });
     routineSection.append(sectionLabel, strip);
     list.appendChild(routineSection);
