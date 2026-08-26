@@ -9,7 +9,7 @@
   --home-line: #e9ebef;
   --home-progress: #5149b8;
   --home-progress-soft: #eeeffb;
-  padding-top: calc(68px + var(--safe-top));
+  padding-top: calc(48px + var(--safe-top));
 }
 
 .home-page-header {
@@ -233,7 +233,7 @@
 
 @media (max-width: 370px) {
   #view-hoy {
-    padding-top: calc(64px + var(--safe-top));
+    padding-top: calc(44px + var(--safe-top));
   }
 
   .home-routine-card {
