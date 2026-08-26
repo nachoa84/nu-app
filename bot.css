@@ -1625,3 +1625,27 @@ body.bot-quick-access-open {
   background: #34B56A;
   box-shadow: 0 0 0 4px rgba(52, 181, 106, .14);
 }
+
+
+/* IRIS · acceso rápido junto al campo de texto */
+#view-bot .bot-form {
+  grid-template-columns: minmax(0, 1fr) 46px 46px;
+}
+
+#view-bot #botShortcutsBtn {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  justify-self: end;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: #fff;
+  color: #2D6C87;
+  box-shadow: 0 4px 14px rgba(32, 43, 66, .06);
+}
+
+#view-bot #botShortcutsBtn:active {
+  background: #EAF4F8;
+  transform: scale(.96);
+}
