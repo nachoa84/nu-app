@@ -1729,3 +1729,19 @@ body.bot-quick-access-open {
   font-size: 30px;
   font-weight: 700;
 }
+
+
+/* IRIS · presencia visual del ícono de bienvenida */
+#view-bot .bot-native-welcome-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: #EAF4F8;
+  color: #2D6C87;
+  box-shadow: 0 8px 18px rgba(45, 108, 135, .10);
+}
+
+#view-bot .bot-native-welcome-mark svg {
+  width: 26px;
+  height: 26px;
+}
