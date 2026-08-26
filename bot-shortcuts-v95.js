@@ -351,7 +351,7 @@
       style.textContent = `
         #view-bot .bot-page-header > div:first-child {
           display: grid;
-          gap: 8px;
+          gap: 11px;
           min-width: 0;
         }
 
@@ -360,7 +360,7 @@
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 7px;
+          gap: 10px;
           line-height: 1.05;
         }
 
