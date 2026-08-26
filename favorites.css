@@ -1108,3 +1108,98 @@
 #view-favoritos:not(.favorite-day-open) .favorite-native-eyebrow {
   padding-left: 0;
 }
+
+
+/* NU APP · Favoritos inspirado en estructura de colecciones */
+#view-favoritos:not(.favorite-day-open) .favorites-claude-layout {
+  display: grid;
+  gap: 22px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-gallery {
+  position: relative;
+  margin-inline: -13px;
+  padding: 0 13px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 0 0 5px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-track::-webkit-scrollbar { display: none; }
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-slide {
+  flex: 0 0 calc(100% - 30px);
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 22px;
+  min-height: 146px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-slide .favorite-routine-cover {
+  width: 112px;
+  height: 146px;
+  border-radius: 0;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-slide .favorite-routine-copy {
+  align-self: end;
+  min-height: 70px;
+  padding: 12px 10px;
+  background: #fff;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c7ced8;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-featured-dots span.is-active { background: var(--fav-brand); }
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list {
+  display: grid;
+  gap: 8px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .favorite-routine-tile,
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-card {
+  grid-template-columns: 72px minmax(0, 1fr) 22px;
+  min-height: 84px;
+  padding: 8px;
+  border: 1px solid rgba(24,39,69,.08);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(24,39,69,.035);
+}
+
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .favorite-routine-cover,
+#view-favoritos:not(.favorite-day-open) .favorites-collection-list .bot-favorite-thumb {
+  width: 72px;
+  height: 68px;
+  border-radius: 13px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-bot-list-label {
+  margin-top: 14px;
+  margin-bottom: -2px;
+}
