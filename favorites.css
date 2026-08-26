@@ -1202,3 +1202,40 @@
 #view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-secondary .favorite-routine-copy em {
   font-size: 11px;
 }
+
+
+/* NU APP · Estructura final estilo colecciones */
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-strip {
+  display: block;
+  padding: 0;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-routine .favorite-routine-tile.is-featured {
+  display: grid;
+  margin-bottom: 16px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-routine-secondary-list {
+  display: grid;
+  gap: 8px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-native-subheading {
+  margin: 0 0 9px;
+  color: var(--fav-ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-routine-secondary-list .favorite-routine-tile {
+  grid-template-columns: 58px minmax(0, 1fr) 20px;
+  min-height: 72px;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-routine-secondary-list .favorite-routine-cover {
+  width: 58px;
+  height: 56px;
+  border-radius: 12px;
+}
