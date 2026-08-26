@@ -843,7 +843,7 @@ body.bot-document-open {
   flex-direction: column;
   min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
   background: #fafbfd;
-  padding-top: calc(24px + var(--safe-top));
+  padding-top: calc(44px + var(--safe-top));
 }
 
 .bot-form input {
@@ -1711,7 +1711,7 @@ body.bot-quick-access-open {
 
 /* IRIS · segundo ajuste de aire superior */
 #view-bot .bot-page-header {
-  margin-top: 18px;
+  margin-top: 0;
 }
 
 
