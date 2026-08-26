@@ -408,29 +408,3 @@
     font-size: 25px;
   }
 }
-
-/* NAV inferior — Progreso quedó sin el override que ya tienen Inicio,
-   Favoritos e Iris (ver home-redesign-v1.css / favorites-redesign-v1.css /
-   bot-redesign-v1.css), así que heredaba el estilo flotante de base
-   (native-visual-v117.css: cápsula redondeada, angosta y despegada del
-   borde). Se iguala acá para que la barra se vea igual en las 4 pantallas
-   que la muestran. No cambia colores ni el diseño: mismos valores que las
-   otras tres. */
-body[data-active-view="rutina"] .bottom-nav {
-  bottom: 0;
-  width: min(430px, 100%);
-  border: 0;
-  border-top: 1px solid rgba(52, 41, 77, .07);
-  border-radius: 0;
-  background: rgba(244, 240, 248, .96);
-  box-shadow: none;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
-
-body[data-active-view="rutina"] .nav-btn {
-  min-height: 54px;
-  gap: 0;
-  border-radius: 0;
-  color: #a7a0c0;
-}
