@@ -1745,3 +1745,13 @@ body.bot-quick-access-open {
   width: 26px;
   height: 26px;
 }
+
+
+/* IRIS · ajuste fino del compositor inferior */
+#view-bot .bot-form {
+  transform: translateY(6px);
+}
+
+#view-bot .bot-form input {
+  font-size: 14px;
+}
