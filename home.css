@@ -299,3 +299,42 @@
 #view-hoy .home-routine-continue {
   font-weight: 600;
 }
+
+/* NU APP · Botones controlados de Inicio */
+#view-hoy #homeGuideSection .home-guide-action {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f59a1b 0%, #ef623f 100%);
+  color: #ffffff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: 0 6px 14px rgba(224, 103, 57, .18);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active {
+  transform: scale(.98);
+  box-shadow: 0 3px 9px rgba(224, 103, 57, .14);
+}
+
+#view-hoy .home-routine-continue {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: #fff1e8;
+  color: #c65334;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+}
+
+#view-hoy .home-routine-continue:active {
+  transform: scale(.98);
+  background: #ffe7d8;
+  color: #ad482d;
+}
