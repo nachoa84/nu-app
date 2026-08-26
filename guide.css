@@ -7,7 +7,8 @@
   position: relative;
   overflow: hidden;
   margin: 0 0 28px;
-  min-height: 228px;
+  height: 275px;
+  min-height: 275px;
   padding: 17px;
   border: 1px solid #dce4ee;
   border-radius: 26px;
