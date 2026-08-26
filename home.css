@@ -261,3 +261,41 @@
 #view-hoy .home-routines-section > .home-section-heading {
   padding-left: 13px;
 }
+
+/* NU APP · Tipografía controlada de Inicio */
+#view-hoy,
+#view-hoy button {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-page-header h1,
+#view-hoy .home-section-heading h2,
+#view-hoy .home-guide-feature h2,
+#view-hoy .home-routine-heading h2 {
+  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-page-header h1,
+#view-hoy .home-section-heading h2,
+#view-hoy .home-guide-feature h2 {
+  font-weight: 700;
+}
+
+#view-hoy .home-routine-heading h2 {
+  font-weight: 650;
+}
+
+#view-hoy .home-greeting,
+#view-hoy .home-guide-kicker,
+#view-hoy .home-guide-description,
+#view-hoy .home-guide-progress-copy,
+#view-hoy .home-routine-day,
+#view-hoy .home-routine-percent,
+#view-hoy .home-routine-continue,
+#view-hoy .home-routine-placeholder-label {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-routine-continue {
+  font-weight: 600;
+}
