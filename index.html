@@ -37,7 +37,6 @@
   <link rel="stylesheet" href="onboarding.css?v=88-onboarding-legibility" />
   <link rel="stylesheet" href="guide.css?v=119a-completion-lock" />
   <link rel="stylesheet" href="native-visual-v117.css?v=117-native-visual-polish" />
-  <link rel="stylesheet" href="home-redesign-v1.css" />
 </head>
 
 <body data-active-view="hoy">
@@ -135,6 +134,13 @@
                 <div class="home-routine-heading">
                   <h2>Collagen+</h2>
                 </div>
+                <p id="homeRoutineDay" class="home-routine-day">Día 1 de 30</p>
+                <div class="home-routine-progress-row">
+                  <div class="home-routine-progress" aria-hidden="true">
+                    <span id="homeRoutineProgressFill"></span>
+                  </div>
+                  <span id="homeRoutinePercent" class="home-routine-percent">3%</span>
+                </div>
                 <button id="startDayBtn" class="home-routine-continue" type="button">
                   <span id="homeRoutineContinueLabel">Continuar Día 1</span>
                   <span class="home-routine-continue-icon" aria-hidden="true"></span>
@@ -150,6 +156,7 @@
               <div class="home-routine-body">
                 <div class="home-routine-heading"><h2>LumiSpa</h2></div>
                 <p class="home-routine-day">Próximamente</p>
+                <span class="home-routine-placeholder-label">Nueva rutina</span>
               </div>
             </article>
 
@@ -160,6 +167,7 @@
               <div class="home-routine-body">
                 <div class="home-routine-heading"><h2>Suplementos</h2></div>
                 <p class="home-routine-day">Próximamente</p>
+                <span class="home-routine-placeholder-label">Nueva rutina</span>
               </div>
             </article>
           </div>
