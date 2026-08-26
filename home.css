@@ -338,3 +338,35 @@
   background: #ffe7d8;
   color: #ad482d;
 }
+
+/* NU APP · Botones principales inspirados en referencia Claude */
+#view-hoy #homeGuideSection .home-guide-action {
+  min-height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #F47A20 0%, #D9573F 100%);
+  color: #FFFFFF;
+  font-weight: 650;
+  letter-spacing: .015em;
+  box-shadow: 0 8px 18px rgba(217, 87, 63, .22);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active {
+  transform: scale(.98);
+  box-shadow: 0 4px 10px rgba(217, 87, 63, .17);
+}
+
+#view-hoy .home-routine-continue {
+  min-height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #F47A20 0%, #D9573F 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 5px 12px rgba(217, 87, 63, .16);
+}
+
+#view-hoy .home-routine-continue:active {
+  transform: scale(.98);
+  background: linear-gradient(135deg, #E77A20 0%, #C94D3A 100%);
+  color: #FFFFFF;
+  box-shadow: 0 3px 8px rgba(217, 87, 63, .13);
+}
