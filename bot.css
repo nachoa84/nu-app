@@ -815,9 +815,8 @@ body.bot-document-open {
 }
 
 .bot-card.has-conversation .bot-form {
-  border-top: 1px solid rgba(91, 67, 56, .07);
-  border-top-color: rgba(23,34,61,.06);
-  background: linear-gradient(to bottom, rgba(250,251,253,.9), #fafbfd 34%);
+  border-top: 0;
+  background: transparent;
 }
 
 .bot-send {
