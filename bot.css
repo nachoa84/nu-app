@@ -1667,3 +1667,14 @@ body.bot-quick-access-open {
   fill: currentColor;
   stroke: currentColor;
 }
+
+
+/* IRIS · cuadrícula siempre en contorno */
+#view-bot #botShortcutsBtn.is-open {
+  background: #fff;
+}
+
+#view-bot #botShortcutsBtn.is-open svg rect {
+  fill: none;
+  stroke: currentColor;
+}
