@@ -1755,3 +1755,14 @@ body.bot-quick-access-open {
 #view-bot .bot-form input {
   font-size: 14px;
 }
+
+
+/* IRIS · contorno y estado vacío del compositor */
+#view-bot .bot-form input {
+  border-color: #B8D2DD;
+}
+
+#view-bot .bot-card:not(.has-conversation) .bot-thread {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
