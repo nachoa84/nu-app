@@ -414,7 +414,8 @@
         }
 
         #view-bot #botClearBtn {
-          background: #fff;
+          background: var(--bot-brand-soft);
+          box-shadow: 0 5px 14px rgba(32, 43, 66, .09);
         }
 
         @media (max-width: 380px) {
