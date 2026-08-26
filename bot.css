@@ -1703,3 +1703,9 @@ body.bot-quick-access-open {
 #view-bot .bot-form {
   grid-template-columns: 46px minmax(0, 1fr) 46px;
 }
+
+
+/* IRIS · aire superior del encabezado */
+#view-bot .bot-page-header {
+  margin-top: 10px;
+}
