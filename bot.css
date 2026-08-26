@@ -1772,3 +1772,12 @@ body:has(#view-bot.active .bot-card:not(.has-conversation)) {
   overflow: hidden;
 }
 
+
+
+/* IRIS · un solo contorno en estado vacío */
+#view-bot .bot-card:not(.has-conversation) .bot-form {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+}
