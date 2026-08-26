@@ -1,0 +1,1 @@
+- [Workflow port registration](workflow-port-registration.md) — a healthy imported app may register its preview port after the workflow restart timeout.

@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "@replit/object-storage": "^1.0.0",
-    "express": "^5.0.0",
-    "luxon": "^3.0.0",
-    "pdfjs-dist": "5.4.296",
-    "pg": "^8.0.0",
+    "express": "^5.2.1",
+    "luxon": "^3.7.2",
+    "pdfjs-dist": "^5.4.296",
+    "pg": "^8.23.0",
     "web-push": "^3.6.7"
   }
 }
