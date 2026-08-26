@@ -1612,3 +1612,16 @@ body.bot-quick-access-open {
   background: #2D6C87;
   box-shadow: 0 0 0 3px #EAF4F8;
 }
+
+
+/* IRIS · conservar indicador de disponibilidad original */
+#view-bot .bot-status {
+  border-color: rgba(52, 181, 106, .22);
+  background: rgba(52, 181, 106, .11);
+  color: #277A4C;
+}
+
+#view-bot .bot-status i {
+  background: #34B56A;
+  box-shadow: 0 0 0 4px rgba(52, 181, 106, .14);
+}
