@@ -1129,3 +1129,17 @@
 #view-favoritos .bot-favorites-list {
   border-color: #DCE9EE;
 }
+
+/* NU APP · Favoritos: íconos sin acento naranja */
+#view-favoritos .saved-empty-icon,
+#view-favoritos .favorite-native-routine-icon,
+#view-favoritos .favorite-content-thumb,
+#view-favoritos .favorite-link-icon,
+#view-favoritos .bot-favorite-thumb {
+  color: #2D6C87;
+}
+
+#view-favoritos .favorite-row-remove,
+#view-favoritos .bot-favorite-remove {
+  color: #66727D;
+}
