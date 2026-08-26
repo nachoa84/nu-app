@@ -901,3 +901,63 @@
 .home-guide-feature {
   z-index: 1;
 }
+
+/* NU APP · Opción A: paleta visual de Guía de inicio */
+#view-guia {
+  background: linear-gradient(180deg, #EAF4F8 0%, #F7F9FC 48%, #FFF3E8 100%);
+}
+
+#view-guia .guide-hero-card {
+  border-color: #DCE9EE;
+  background: linear-gradient(145deg, #FFFFFF 0%, #F3F8FA 64%, #FFF3E8 100%);
+}
+
+#view-guia .guide-hero-copy > span,
+#view-guia .guide-section-heading span,
+#view-guia .guide-detail-intro small {
+  color: #E2542E;
+}
+
+#view-guia .guide-primary-button,
+#view-guia .guide-complete-card button {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #E2542E 0%, #5A3E6B 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 18px rgba(90, 62, 107, .20);
+}
+
+#view-guia .guide-secondary-button {
+  border-color: #DCE3E8;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #596473;
+}
+
+#view-guia .guide-step-number,
+#view-guia .guide-detail-number {
+  background: #EAF4F8;
+  color: #2D6C87;
+}
+
+#view-guia .guide-step-card.is-done {
+  border-color: rgba(226, 84, 46, .24);
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F3 100%);
+}
+
+#view-guia .guide-step-card.is-done .guide-step-number,
+#view-guia .guide-complete-copy > span {
+  background: #FFE7D8;
+  color: #B84F35;
+}
+
+#view-guia .guide-complete-card.is-done {
+  border-color: rgba(226, 84, 46, .24);
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F3 100%);
+}
+
+#view-guia .guide-complete-card.is-done button {
+  background: #FFE7D8;
+  color: #B84F35;
+  box-shadow: none;
+}
