@@ -255,3 +255,9 @@
 #view-hoy .home-page-header {
   margin: -4px 0 0;
 }
+
+/* NU APP · Eje interno compartido de Inicio */
+#view-hoy .home-page-header > div,
+#view-hoy .home-routines-section > .home-section-heading {
+  padding-left: 13px;
+}
