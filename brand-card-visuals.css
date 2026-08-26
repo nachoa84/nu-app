@@ -1,17 +1,21 @@
-/* NU APP · APPROVED BRAND CARD VISUALS
-   Ajustes visuales finales de las cards de Guía. */
+/* NU APP · BLOCK 1 · COMPACT VISUALS
+   Compacta Inicio + Guía y unifica rutinas sin tocar otras pantallas. */
 
-/* Inicio · card editorial basada en el render aprobado.
-   Solo afecta a la card Guía de inicio. */
+/* =========================================================
+   INICIO · GUÍA DE INICIO MÁS COMPACTA
+   ========================================================= */
 #view-hoy #homeGuideSection.home-guide-section {
+  margin-bottom: 22px !important;
+  border-radius: 26px !important;
   background:
-    url("assets/guide/home-guide-nuskin-approved.png?v=20260825-2205") center -10px / 100% auto no-repeat,
+    url("assets/guide/home-guide-nuskin-approved.png?v=20260825-2205") center -8px / 100% auto no-repeat,
     #ffffff !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-feature {
-  min-height: 566px !important;
-  padding: 332px 20px 22px !important;
+  min-height: 468px !important;
+  padding: 250px 18px 18px !important;
+  border-radius: 26px !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-feature-copy {
@@ -20,81 +24,128 @@
 }
 
 #view-hoy #homeGuideSection .home-guide-kicker {
-  margin: 0 0 9px !important;
+  margin: 0 0 6px !important;
   color: var(--ref-orange) !important;
-  font-size: 12px !important;
+  font-size: 10.5px !important;
   font-weight: 720 !important;
   line-height: 1.15 !important;
-  letter-spacing: .11em !important;
+  letter-spacing: .10em !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-feature h2 {
-  margin: 0 0 12px !important;
+  margin: 0 0 8px !important;
   color: #111111 !important;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
-  font-size: 40px !important;
+  font-size: 34px !important;
   font-weight: 780 !important;
-  line-height: .98 !important;
-  letter-spacing: -.052em !important;
+  line-height: 1 !important;
+  letter-spacing: -.045em !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-description {
-  max-width: 310px !important;
-  margin: 0 0 22px !important;
+  max-width: 300px !important;
+  margin: 0 0 14px !important;
   color: #111111 !important;
-  font-size: 15px !important;
+  font-size: 13.5px !important;
   font-weight: 450 !important;
-  line-height: 1.48 !important;
+  line-height: 1.38 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-row {
-  margin: 0 0 20px !important;
+  margin: 0 0 13px !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-copy {
-  margin-bottom: 10px !important;
+  margin-bottom: 7px !important;
   color: #111111 !important;
-  font-size: 14px !important;
+  font-size: 12.5px !important;
   font-weight: 620 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress-copy strong {
   color: var(--ref-orange) !important;
-  font-size: 18px !important;
+  font-size: 15px !important;
   font-weight: 780 !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-progress {
-  height: 9px !important;
+  height: 7px !important;
 }
 
 #view-hoy #homeGuideSection .home-guide-action {
-  min-height: 64px !important;
-  font-size: 18px !important;
+  min-height: 52px !important;
+  padding: 0 18px !important;
+  font-size: 15px !important;
   font-weight: 680 !important;
-  letter-spacing: .065em !important;
+  letter-spacing: .07em !important;
 }
 
-/* Guía · hero interno como una sola card continua.
-   El fondo Nu Comunidad se muestra completo al ancho y el color de respaldo
-   coincide con la zona clara final para evitar una franja visual inferior. */
+/* =========================================================
+   INICIO · RUTINAS MÁS COMPACTAS Y TODAS DEL MISMO COLOR
+   ========================================================= */
+#view-hoy .home-routines {
+  gap: 10px !important;
+}
+
+#view-hoy .home-routine-card {
+  min-height: 142px !important;
+  border-radius: 20px !important;
+}
+
+#view-hoy .home-routine-cover,
+#view-hoy .home-routine-card:nth-child(2) .home-routine-cover,
+#view-hoy .home-routine-card:nth-child(3) .home-routine-cover,
+#view-hoy .home-routine-card:nth-child(4) .home-routine-cover,
+#view-hoy .home-routine-card:nth-child(5) .home-routine-cover,
+#view-hoy .home-routine-card:nth-child(6) .home-routine-cover {
+  height: 84px !important;
+  min-height: 84px !important;
+  border-radius: 20px 20px 0 0 !important;
+  background: linear-gradient(155deg, #eee9f6 0%, #ded5ee 100%) !important;
+}
+
+#view-hoy .home-routine-cover img {
+  padding: 10px !important;
+  object-fit: contain !important;
+}
+
+#view-hoy .home-routine-body {
+  padding: 9px 11px 11px !important;
+}
+
+#view-hoy .home-routine-heading {
+  margin-bottom: 4px !important;
+}
+
+#view-hoy .home-routine-heading h2,
+#view-hoy .home-routine-card-placeholder .home-routine-heading h2 {
+  font-size: 13px !important;
+}
+
+#view-hoy .home-routine-continue,
+#view-hoy .home-routine-day {
+  font-size: 11px !important;
+}
+
+/* =========================================================
+   GUÍA · HERO INTERNO MÁS COMPACTO
+   ========================================================= */
 #view-guia .guide-hero-card {
-  min-height: 575px !important;
+  min-height: 468px !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-end !important;
   overflow: hidden !important;
-  padding: 286px 22px 22px !important;
+  padding: 220px 18px 18px !important;
   border: 3px solid rgba(255,255,255,.94) !important;
-  border-radius: 30px !important;
+  border-radius: 27px !important;
   background:
     url("assets/guide/guide-nu-comunidad.webp?v=20260825-2355") center top / 100% auto no-repeat,
     #fff7f0 !important;
-  box-shadow: 0 16px 34px rgba(43,31,64,.06) !important;
+  box-shadow: 0 12px 28px rgba(43,31,64,.05) !important;
 }
 
-/* El logo forma parte del fondo aprobado; no duplicarlo desde el DOM. */
 #view-guia .guide-hero-brand {
   display: none !important;
 }
@@ -107,41 +158,40 @@
 
 #view-guia .guide-hero-copy > span {
   display: block !important;
-  margin: 0 0 10px !important;
+  margin: 0 0 7px !important;
   color: #171329 !important;
-  font-size: 12px !important;
+  font-size: 10.5px !important;
   font-weight: 760 !important;
   line-height: 1.2 !important;
-  letter-spacing: .13em !important;
+  letter-spacing: .12em !important;
 }
 
 #view-guia .guide-hero-copy strong {
   margin-top: 0 !important;
   color: #171329 !important;
-  font-size: 34px !important;
+  font-size: 29px !important;
   font-weight: 790 !important;
   line-height: 1.02 !important;
-  letter-spacing: -.045em !important;
+  letter-spacing: -.04em !important;
 }
 
 #view-guia .guide-hero-copy p {
-  margin: 14px 0 0 !important;
+  margin: 9px 0 0 !important;
   color: #171329 !important;
-  font-size: 15px !important;
+  font-size: 13.5px !important;
   font-weight: 500 !important;
-  line-height: 1.42 !important;
+  line-height: 1.38 !important;
 }
 
-/* Un poco más de aire entre la descripción y el progreso. */
 #view-guia .guide-hero-progress-row {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 26px !important;
-  gap: 14px !important;
+  margin-top: 16px !important;
+  gap: 10px !important;
 }
 
 #view-guia .guide-hero-progress {
-  height: 8px !important;
+  height: 7px !important;
   background: rgba(255,255,255,.68) !important;
 }
 
@@ -151,17 +201,16 @@
 
 #view-guia .guide-hero-progress-row b {
   color: #f28a00 !important;
-  font-size: 17px !important;
+  font-size: 15px !important;
   font-weight: 780 !important;
 }
 
-/* Etapas y botón ligeramente más arriba/compactos. */
 #view-guia .guide-hero-count {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 7px !important;
+  margin-top: 6px !important;
   color: #171329 !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 620 !important;
 }
 
@@ -169,68 +218,146 @@
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
-  min-height: 60px !important;
+  min-height: 52px !important;
   flex: 0 0 auto !important;
-  margin: 14px 0 0 !important;
+  margin: 12px 0 0 !important;
   border: 0 !important;
   border-radius: 999px !important;
   background: linear-gradient(90deg, #f04a25 0%, #d84a42 52%, #9d365d 100%) !important;
   color: #ffffff !important;
   box-shadow: none !important;
-  font-size: 17px !important;
+  font-size: 15px !important;
   font-weight: 720 !important;
-  letter-spacing: .08em !important;
+  letter-spacing: .07em !important;
   text-transform: uppercase !important;
 }
 
 #view-guia .guide-hero-card > .guide-primary-button svg {
-  width: 18px !important;
-  height: 18px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* =========================================================
+   GUÍA · "TUS PRIMEROS PASOS" COMO LISTA COMPACTA
+   ========================================================= */
+#view-guia .guide-section-block {
+  gap: 10px !important;
+}
+
+#view-guia .guide-section-heading {
+  padding: 0 2px !important;
+}
+
+#view-guia .guide-section-heading h2 {
+  font-size: 20px !important;
+}
+
+#view-guia .guide-step-list {
+  gap: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(39,31,66,.07) !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+#view-guia .guide-step-card,
+#view-guia .guide-step-card.is-done {
+  min-height: 64px !important;
+  grid-template-columns: 34px minmax(0, 1fr) 22px !important;
+  gap: 8px !important;
+  padding: 9px 11px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(39,31,66,.07) !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+#view-guia .guide-step-card:last-child {
+  border-bottom: 0 !important;
+}
+
+#view-guia .guide-step-number,
+#view-guia .guide-step-card.is-done .guide-step-number {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  background: #f7f3fb !important;
+  color: #9f78c7 !important;
+  font-size: 10.5px !important;
+}
+
+#view-guia .guide-step-copy {
+  gap: 2px !important;
+}
+
+#view-guia .guide-step-copy small {
+  display: none !important;
+}
+
+#view-guia .guide-step-copy strong {
+  font-size: 13px !important;
+  line-height: 1.18 !important;
+}
+
+#view-guia .guide-step-copy > span {
+  font-size: 11.5px !important;
+  line-height: 1.28 !important;
+  -webkit-line-clamp: 1 !important;
+}
+
+#view-guia .guide-step-status {
+  width: 21px !important;
+  height: 21px !important;
+}
+
+#view-guia .guide-step-status svg {
+  width: 20px !important;
+  height: 20px !important;
 }
 
 @media (max-width: 370px) {
-  #view-hoy #homeGuideSection.home-guide-section {
-    background-position: center -8px !important;
-  }
-
   #view-hoy #homeGuideSection .home-guide-feature {
-    min-height: 536px !important;
-    padding: 312px 18px 20px !important;
+    min-height: 442px !important;
+    padding: 234px 16px 16px !important;
   }
 
   #view-hoy #homeGuideSection .home-guide-feature h2 {
-    font-size: 37px !important;
+    font-size: 31px !important;
   }
 
   #view-hoy #homeGuideSection .home-guide-description {
+    font-size: 12.5px !important;
+  }
+
+  #view-hoy #homeGuideSection .home-guide-action {
+    min-height: 48px !important;
     font-size: 14px !important;
   }
 
   #view-guia .guide-hero-card {
-    min-height: 548px !important;
-    padding: 270px 18px 18px !important;
-    border-radius: 27px !important;
-  }
-
-  #view-guia .guide-hero-copy > span {
-    margin-bottom: 9px !important;
+    min-height: 444px !important;
+    padding: 206px 16px 16px !important;
+    border-radius: 25px !important;
   }
 
   #view-guia .guide-hero-copy strong {
-    font-size: 31px !important;
+    font-size: 27px !important;
   }
 
   #view-guia .guide-hero-copy p {
-    font-size: 14px !important;
-  }
-
-  #view-guia .guide-hero-progress-row {
-    margin-top: 23px !important;
+    font-size: 12.5px !important;
   }
 
   #view-guia .guide-hero-card > .guide-primary-button {
-    min-height: 56px !important;
-    margin-top: 12px !important;
-    font-size: 16px !important;
+    min-height: 49px !important;
+    font-size: 14px !important;
+  }
+
+  #view-guia .guide-step-card,
+  #view-guia .guide-step-card.is-done {
+    min-height: 60px !important;
+    padding: 8px 9px !important;
   }
 }
