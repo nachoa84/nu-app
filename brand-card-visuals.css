@@ -76,8 +76,8 @@
 }
 
 /* Guía · hero interno como una sola card continua.
-   El fondo Nu Comunidad se muestra completo al ancho (sin crop de cover)
-   para reducir la escala visual del logo y conservar una sola superficie. */
+   El fondo Nu Comunidad se muestra completo al ancho y el color de respaldo
+   coincide con la zona clara final para evitar una franja visual inferior. */
 #view-guia .guide-hero-card {
   min-height: 575px !important;
   box-sizing: border-box !important;
@@ -90,7 +90,7 @@
   border-radius: 30px !important;
   background:
     url("assets/guide/guide-nu-comunidad.webp?v=20260825-2355") center top / 100% auto no-repeat,
-    #f7efe7 !important;
+    #fff7f0 !important;
   box-shadow: 0 16px 34px rgba(43,31,64,.06) !important;
 }
 
@@ -132,10 +132,11 @@
   line-height: 1.42 !important;
 }
 
+/* Un poco más de aire entre la descripción y el progreso. */
 #view-guia .guide-hero-progress-row {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 20px !important;
+  margin-top: 26px !important;
   gap: 14px !important;
 }
 
@@ -154,10 +155,11 @@
   font-weight: 780 !important;
 }
 
+/* Etapas y botón ligeramente más arriba/compactos. */
 #view-guia .guide-hero-count {
   position: relative !important;
   z-index: 1 !important;
-  margin-top: 9px !important;
+  margin-top: 7px !important;
   color: #171329 !important;
   font-size: 13px !important;
   font-weight: 620 !important;
@@ -169,7 +171,7 @@
   width: 100% !important;
   min-height: 60px !important;
   flex: 0 0 auto !important;
-  margin: 18px 0 0 !important;
+  margin: 14px 0 0 !important;
   border: 0 !important;
   border-radius: 999px !important;
   background: linear-gradient(90deg, #f04a25 0%, #d84a42 52%, #9d365d 100%) !important;
@@ -222,8 +224,13 @@
     font-size: 14px !important;
   }
 
+  #view-guia .guide-hero-progress-row {
+    margin-top: 23px !important;
+  }
+
   #view-guia .guide-hero-card > .guide-primary-button {
     min-height: 56px !important;
+    margin-top: 12px !important;
     font-size: 16px !important;
   }
 }
