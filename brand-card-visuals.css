@@ -73,7 +73,7 @@
 }
 
 #view-hoy #homeGuideSection .home-guide-action {
-  min-height: 52px !important;
+  min-height: 54px !important;
   padding: 0 18px !important;
   font-size: 15px !important;
   font-weight: 680 !important;
@@ -81,15 +81,16 @@
 }
 
 /* =========================================================
-   INICIO · RUTINAS MÁS COMPACTAS Y TODAS DEL MISMO COLOR
+   INICIO · RUTINAS MÁS CUADRADAS Y TODAS DEL MISMO COLOR
    ========================================================= */
 #view-hoy .home-routines {
   gap: 10px !important;
 }
 
 #view-hoy .home-routine-card {
-  min-height: 142px !important;
-  border-radius: 20px !important;
+  min-height: 154px !important;
+  aspect-ratio: 1 / .96 !important;
+  border-radius: 18px !important;
 }
 
 #view-hoy .home-routine-cover,
@@ -98,10 +99,10 @@
 #view-hoy .home-routine-card:nth-child(4) .home-routine-cover,
 #view-hoy .home-routine-card:nth-child(5) .home-routine-cover,
 #view-hoy .home-routine-card:nth-child(6) .home-routine-cover {
-  height: 84px !important;
-  min-height: 84px !important;
-  border-radius: 20px 20px 0 0 !important;
-  background: linear-gradient(155deg, #eee9f6 0%, #ded5ee 100%) !important;
+  height: 92px !important;
+  min-height: 92px !important;
+  border-radius: 18px 18px 0 0 !important;
+  background: linear-gradient(155deg, #edf2f7 0%, #dce6ef 100%) !important;
 }
 
 #view-hoy .home-routine-cover img {
@@ -218,7 +219,7 @@
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
-  min-height: 52px !important;
+  min-height: 54px !important;
   flex: 0 0 auto !important;
   margin: 12px 0 0 !important;
   border: 0 !important;
@@ -238,7 +239,7 @@
 }
 
 /* =========================================================
-   GUÍA · "TUS PRIMEROS PASOS" COMO LISTA COMPACTA
+   GUÍA · "TUS PRIMEROS PASOS" COMO CARDS NATIVAS INDIVIDUALES
    ========================================================= */
 #view-guia .guide-section-block {
   gap: 10px !important;
@@ -253,11 +254,12 @@
 }
 
 #view-guia .guide-step-list {
-  gap: 0 !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(39,31,66,.07) !important;
-  border-radius: 18px !important;
-  background: #ffffff !important;
+  display: grid !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 
@@ -265,17 +267,16 @@
 #view-guia .guide-step-card.is-done {
   min-height: 64px !important;
   grid-template-columns: 34px minmax(0, 1fr) 22px !important;
-  gap: 8px !important;
+  gap: 9px !important;
   padding: 9px 11px !important;
-  border: 0 !important;
-  border-bottom: 1px solid rgba(39,31,66,.07) !important;
-  border-radius: 0 !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(39,31,66,.07) !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.96) !important;
+  box-shadow: 0 3px 10px rgba(42,31,62,.025) !important;
 }
 
 #view-guia .guide-step-card:last-child {
-  border-bottom: 0 !important;
+  border-bottom: 1px solid rgba(39,31,66,.07) !important;
 }
 
 #view-guia .guide-step-number,
@@ -283,8 +284,8 @@
   width: 34px !important;
   height: 34px !important;
   border-radius: 10px !important;
-  background: #f7f3fb !important;
-  color: #9f78c7 !important;
+  background: #f4f1f8 !important;
+  color: #9079ad !important;
   font-size: 10.5px !important;
 }
 
@@ -332,8 +333,22 @@
   }
 
   #view-hoy #homeGuideSection .home-guide-action {
-    min-height: 48px !important;
+    min-height: 51px !important;
     font-size: 14px !important;
+  }
+
+  #view-hoy .home-routine-card {
+    min-height: 148px !important;
+  }
+
+  #view-hoy .home-routine-cover,
+  #view-hoy .home-routine-card:nth-child(2) .home-routine-cover,
+  #view-hoy .home-routine-card:nth-child(3) .home-routine-cover,
+  #view-hoy .home-routine-card:nth-child(4) .home-routine-cover,
+  #view-hoy .home-routine-card:nth-child(5) .home-routine-cover,
+  #view-hoy .home-routine-card:nth-child(6) .home-routine-cover {
+    height: 88px !important;
+    min-height: 88px !important;
   }
 
   #view-guia .guide-hero-card {
@@ -351,7 +366,7 @@
   }
 
   #view-guia .guide-hero-card > .guide-primary-button {
-    min-height: 49px !important;
+    min-height: 51px !important;
     font-size: 14px !important;
   }
 
