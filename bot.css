@@ -1697,3 +1697,9 @@ body.bot-quick-access-open {
   background: #fff;
   box-shadow: 0 0 0 3px rgba(45, 108, 135, .10);
 }
+
+
+/* IRIS · acceso rápido antes del campo */
+#view-bot .bot-form {
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+}
