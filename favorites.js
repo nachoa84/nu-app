@@ -1229,7 +1229,7 @@ function renderFavorites() {
     routineSection.className = "favorite-native-section favorite-native-routine favorite-routine-library";
     const sectionLabel = document.createElement("p");
     sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "De mis rutinas";
+    sectionLabel.textContent = favoriteSearchQuery ? "En mis rutinas" : "Tu rutina guardada";
     const strip = document.createElement("div");
     strip.className = "favorite-routine-strip";
     visibleRoutineIds.forEach(routineId => {
@@ -1247,7 +1247,7 @@ function renderFavorites() {
 
     const sectionLabel = document.createElement("p");
     sectionLabel.className = "favorite-native-eyebrow";
-    sectionLabel.textContent = "Del Bot";
+    sectionLabel.textContent = "Recursos guardados";
 
     const botList = document.createElement("div");
     botList.className = "bot-favorites-list";
