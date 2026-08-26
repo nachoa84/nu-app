@@ -1327,8 +1327,8 @@ body.bot-quick-access-open {
 }
 
 #view-bot .bot-message-action {
-  min-height: 44px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 10px;
   border: 1px solid var(--bot-line);
   border-radius: 999px;
   background: #fff;
