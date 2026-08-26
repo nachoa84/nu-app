@@ -1,13 +1,3 @@
-// NU APP · DETALLE DIARIO REDESIGN V1
-// Carga visual aislada para el detalle diario sin tocar service worker/cache.
-if (!document.getElementById("dailyRedesignV1Stylesheet")) {
-  const dailyRedesignStylesheet = document.createElement("link");
-  dailyRedesignStylesheet.id = "dailyRedesignV1Stylesheet";
-  dailyRedesignStylesheet.rel = "stylesheet";
-  dailyRedesignStylesheet.href = "daily-redesign-v1.css";
-  document.head.appendChild(dailyRedesignStylesheet);
-}
-
 const chat = document.getElementById("chat");
 const chatWrap = document.getElementById("chatWrap");
 const progressText = document.getElementById("progressText");

@@ -366,7 +366,6 @@
   width: 46px;
   height: 46px;
   overflow: hidden;
-  isolation: isolate;
   padding: 0;
   border: 0;
   border-radius: 11px;
@@ -1486,18 +1485,13 @@
 }
 
 #view-hoy.day-open .resource-link-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
   width: 100%;
 }
 
 #view-hoy.day-open .resource-link-main {
-  flex: 0 1 auto;
-  width: auto;
-  max-width: calc(100% - 48px);
-  padding: 9px 14px;
+  width: 100%;
+  padding: 9px 12px;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;

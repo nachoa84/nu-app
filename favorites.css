@@ -46,13 +46,6 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  isolation: isolate;
-  /* Fuerza el clip en WebKit/Chrome móvil aunque el hijo termine en su
-     propia capa compuesta (GPU) por el <video>: overflow:hidden por sí
-     solo no siempre alcanza a recortarla ahí, la máscara sí. Es un no-op
-     visual en navegadores donde overflow:hidden ya recortaba bien. */
-  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%);
-  mask-image: radial-gradient(circle, #fff 100%, #fff 100%);
   background: #f1f1ee;
   color: var(--fav-brand);
 }
@@ -104,6 +97,45 @@
   opacity: .92;
 }
 
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview {
+  position: relative;
+  flex: 0 0 128px;
+  width: 118px;
+  height: 128px;
+  min-width: 118px;
+  min-height: 128px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--fav-line);
+  border-radius: 15px;
+  background: #f1f1ee;
+  transform: none;
+  touch-action: manipulation;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview.favorite-folder-preview::before {
+  display: none;
+}
+
+#view-favoritos:not(.favorite-day-open)
+.favorite-day-tile-preview .favorite-folder-play {
+  width: 38px;
+  height: 38px;
+}
+
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy strong,
+#view-favoritos:not(.favorite-day-open) .favorite-day-tile-copy small {
+  position: static;
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  transform: none;
+  white-space: normal;
+}
 
 /* =========================================================
    Favoritos guardados desde el Bot
@@ -508,6 +540,71 @@
   background: var(--fav-brand);
 }
 
+@media (max-width: 360px) {
+  #view-favoritos:not(.favorite-day-open) .favorite-day-tile {
+    flex-basis: 108px;
+    width: 108px;
+    min-width: 108px;
+  }
+
+  #view-favoritos:not(.favorite-day-open)
+  .favorite-day-tile-preview.favorite-folder-preview {
+    flex-basis: 118px;
+    width: 108px;
+    min-width: 108px;
+    height: 118px;
+    min-height: 118px;
+  }
+
+  #view-favoritos .favorite-content-row {
+    grid-template-columns: 22px 52px minmax(0, 1fr) 38px;
+    gap: 8px;
+  }
+
+  #view-favoritos .favorite-content-thumb,
+  #view-favoritos .favorite-link-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  #view-favoritos .favorite-content-copy strong {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view-favoritos .favorite-day-screen {
+    animation: none !important;
+  }
+}
+
+#view-favoritos .app-page-header {
+  position: relative;
+  padding: 2px 0 15px;
+  margin: 0;
+  background: transparent;
+  padding-bottom: 20px;
+}
+
+#view-favoritos .favorite-native-routine-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fav-ink);
+  margin-bottom: 16px;
+}
+
+#view-favoritos .favorite-native-routine-icon {
+  display: grid;
+  place-items: center;
+  background: var(--fav-green-soft);
+  color: var(--fav-green);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
 #view-favoritos .favorite-native-bot .favorite-native-routine-heading {
   margin-top: 18px;
 }
@@ -884,7 +981,7 @@
 
 /* NU APP · JERARQUÍA DE FAVORITOS V93B */
 .favorite-routine-library{display:block}
-.favorite-routine-strip{display:flex;gap:18px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x proximity;scrollbar-width:none}
+.favorite-routine-strip{display:flex;gap:14px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x proximity;scrollbar-width:none}
 .favorite-routine-strip::-webkit-scrollbar{display:none}
 .favorite-routine-tile{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr) 22px;align-items:center;gap:14px;flex:0 0 min(330px,calc(100vw - 54px));min-height:128px;padding:14px;border:1px solid rgba(24,39,69,.09);border-radius:26px;background:#fff;color:#17233f;text-align:left;box-shadow:0 8px 24px rgba(24,39,69,.05);scroll-snap-align:start}
 .favorite-routine-cover{display:grid;place-items:center;width:92px;height:100px;overflow:hidden;border-radius:20px;background:#f6f7f8}
@@ -899,7 +996,67 @@
 .favorite-routine-days .favorite-day-tile{width:100%;min-width:0}
 @media(max-width:430px){.favorite-routine-days{grid-template-columns:repeat(2,minmax(0,1fr))}.favorite-routine-tile{grid-template-columns:82px minmax(0,1fr) 20px}.favorite-routine-cover{width:82px;height:92px}}
 
-
+/* NU APP · DÍAS FAVORITOS COMPACTOS V93C */
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px 10px;
+  padding:2px 0 24px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile{
+  appearance:none;
+  -webkit-appearance:none;
+  display:flex;
+  flex:initial;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:8px;
+  border:1px solid rgba(24,39,69,.09);
+  border-radius:18px;
+  background:#fff;
+  text-align:left;
+  box-shadow:0 5px 16px rgba(24,39,69,.045);
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview.favorite-folder-preview{
+  flex:0 0 76px;
+  width:100%;
+  min-width:0;
+  height:76px;
+  min-height:76px;
+  border-radius:13px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview>img,
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-preview>video{
+  object-fit:cover;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy{
+  position:static;
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0 2px 2px;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy strong{
+  display:block;
+  margin:0 0 2px;
+  color:var(--fav-ink);
+  font-size:14px;
+  font-weight:700;
+  line-height:1.2;
+}
+#view-favoritos:not(.favorite-day-open) .favorite-routine-days .favorite-day-tile-copy small{
+  display:block;
+  margin:0;
+  color:var(--fav-muted);
+  font-size:11px;
+  font-weight:520;
+  line-height:1.25;
+}
 #view-favoritos .favorite-routine-screen-header .favorite-day-title h2{
   margin-top:4px;
   font-size:clamp(34px,10vw,44px);
