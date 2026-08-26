@@ -408,3 +408,29 @@
   color: #FFFFFF;
   box-shadow: 0 3px 8px rgba(217, 87, 63, .13);
 }
+
+/* NU APP · Degradé de marca reservado para CTA y estado Hecho */
+#view-hoy #homeGuideSection .home-guide-action,
+#view-hoy #homeGuideSection.home-guide-section.is-complete .home-guide-action {
+  background: linear-gradient(135deg, #E2542E 0%, #5A3E6B 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 18px rgba(90, 62, 107, .20);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active,
+#view-hoy #homeGuideSection.home-guide-section.is-complete .home-guide-action:active {
+  background: linear-gradient(135deg, #D94D2B 0%, #4F355F 100%);
+  box-shadow: 0 4px 10px rgba(90, 62, 107, .15);
+}
+
+#view-hoy .home-routine-continue {
+  background: #FFF1E8;
+  color: #C65334;
+  box-shadow: none;
+}
+
+#view-hoy .home-routine-continue:active {
+  background: #FFE7D8;
+  color: #AD482D;
+  box-shadow: none;
+}
