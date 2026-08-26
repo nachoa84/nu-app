@@ -338,3 +338,41 @@
   background: #ffe7d8;
   color: #ad482d;
 }
+
+/* NU APP · Variante de paleta: Coral cálido + azul hielo */
+#view-hoy {
+  --home-ink: #202B42;
+  --home-muted: #707681;
+  --home-line: #E8E6E2;
+  --home-progress: #E86645;
+  --home-progress-soft: #FCEBE3;
+  background: linear-gradient(180deg, #FAFAF8 0%, #F2F7F8 100%);
+}
+
+#view-hoy .home-guide-section {
+  border-color: #E8E6E2;
+}
+
+#view-hoy .home-guide-progress > span,
+#view-hoy .home-routine-progress > span {
+  background: linear-gradient(90deg, #E86645 0%, #FF9A62 100%);
+}
+
+#view-hoy #homeGuideSection .home-guide-action {
+  background: linear-gradient(135deg, #E86645 0%, #FF9A62 100%);
+  box-shadow: 0 6px 14px #E866452E;
+}
+
+#view-hoy .home-routine-continue {
+  background: #FCEBE3;
+  color: #B84F35;
+}
+
+#view-hoy .home-routine-continue:active {
+  background: #D8EDF4;
+  color: #202B42;
+}
+
+#view-hoy .home-routine-card {
+  border-color: #E8E6E2;
+}
