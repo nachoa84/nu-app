@@ -150,8 +150,20 @@
     return Boolean(normalizedAlias) && normalizedText.includes(` ${normalizedAlias} `);
   }
 
-  function detectExplicitProductV1(question) {
-    const strong = PRODUCT_REGISTRY_V1.filter(product =>
+  function normalizedProductRegistryV1(productRegistry) {
+    if (!Array.isArray(productRegistry)) return PRODUCT_REGISTRY_V1;
+    return productRegistry.filter(product =>
+      product &&
+      typeof product.productSlug === "string" &&
+      product.productSlug.trim() &&
+      Array.isArray(product.strongAliases) &&
+      Array.isArray(product.weakAliases)
+    );
+  }
+
+  function detectExplicitProductV1(question, productRegistry = PRODUCT_REGISTRY_V1) {
+    const registry = normalizedProductRegistryV1(productRegistry);
+    const strong = registry.filter(product =>
       product.strongAliases.some(alias => textHasAliasV1(question, alias))
     );
 
@@ -165,7 +177,7 @@
     }
     if (strong.length > 1) return Object.freeze({ status: "ambiguous" });
 
-    const weak = PRODUCT_REGISTRY_V1.filter(product =>
+    const weak = registry.filter(product =>
       product.weakAliases.some(alias => textHasAliasV1(question, alias))
     );
 
@@ -198,8 +210,8 @@
     return String(lastUser?.text || "").trim();
   }
 
-  function resolveProductContextV1(question, globalObject = root) {
-    const explicit = detectExplicitProductV1(question);
+  function resolveProductContextV1(question, globalObject = root, productRegistry = PRODUCT_REGISTRY_V1) {
+    const explicit = detectExplicitProductV1(question, productRegistry);
     if (explicit.status !== "missing") return explicit;
 
     const messages = readConversationV1(globalObject);
@@ -215,7 +227,7 @@
         continue;
       }
 
-      const candidate = detectExplicitProductV1(messageText);
+      const candidate = detectExplicitProductV1(messageText, productRegistry);
       if (candidate.status === "resolved") {
         return Object.freeze({
           status: "resolved",
@@ -260,7 +272,12 @@
     };
   }
 
-  function routingDecisionV1({ question, deterministicResponse, globalObject = root } = {}) {
+  function routingDecisionV1({
+    question,
+    deterministicResponse,
+    globalObject = root,
+    productRegistry = PRODUCT_REGISTRY_V1
+  } = {}) {
     const normalizedQuestion = String(question || currentConversationQuestionV1(globalObject) || "").trim();
     const baseMiss = isBaseDeterministicMissV1(deterministicResponse);
     const technical = isTechnicalProductQuestionV1(normalizedQuestion);
@@ -273,7 +290,7 @@
       });
     }
 
-    const product = resolveProductContextV1(normalizedQuestion, globalObject);
+    const product = resolveProductContextV1(normalizedQuestion, globalObject, productRegistry);
     if (product.status === "resolved") {
       return Object.freeze({
         shouldEscalate: true,
@@ -384,6 +401,7 @@
     isTechnicalProductQuestionV1,
     normalizeCountryKeyV1,
     normalizeRoutingTextV1,
+    normalizedProductRegistryV1,
     resolveProductContextV1,
     routingDecisionV1,
     toBotResponseV1,
