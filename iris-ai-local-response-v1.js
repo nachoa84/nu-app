@@ -89,9 +89,14 @@ function extractDirectRetrievalV1(context, assessment) {
 function createIrisAiLocalResponseEngineV1({
   deterministicResolver = null,
   verifiedCacheResolver = null,
-  retrievalAssessor = defaultRetrievalAssessmentV1
+  retrievalAssessor = defaultRetrievalAssessmentV1,
+  groundedRetrievalResolver = null
 } = {}) {
-  for (const [label, fn] of [["deterministicResolver", deterministicResolver], ["verifiedCacheResolver", verifiedCacheResolver]]) {
+  for (const [label, fn] of [
+    ["deterministicResolver", deterministicResolver],
+    ["verifiedCacheResolver", verifiedCacheResolver],
+    ["groundedRetrievalResolver", groundedRetrievalResolver]
+  ]) {
     if (fn != null && typeof fn !== "function") {
       throw new IrisAiLocalResponseErrorV1(`${label} inválido.`);
     }
@@ -115,7 +120,7 @@ function createIrisAiLocalResponseEngineV1({
 
   async function resolveAfterRetrieval(input = {}) {
     const assessment = await retrievalAssessor(input.context || [], input);
-    const retrieval = Object.freeze({
+    let retrieval = Object.freeze({
       authorized: assessment?.authorized === true,
       fragmentCount: Number(assessment?.fragmentCount) || 0,
       scopeMatch: assessment?.scopeMatch === true,
@@ -123,7 +128,38 @@ function createIrisAiLocalResponseEngineV1({
       directAnswer: assessment?.directAnswer === true,
       hasContradiction: assessment?.hasContradiction === true
     });
-    const directRetrieval = extractDirectRetrievalV1(input.context || [], retrieval);
+
+    let directRetrieval = null;
+
+    if (groundedRetrievalResolver) {
+      const groundedRaw = await groundedRetrievalResolver(input);
+      const grounded = validateCandidateV1(
+        groundedRaw,
+        "direct_retrieval"
+      );
+
+      if (grounded) {
+        retrieval = Object.freeze({
+          authorized: true,
+          fragmentCount: Array.isArray(input.context)
+            ? input.context.length
+            : 0,
+          scopeMatch: true,
+          termCoverage: "high",
+          directAnswer: true,
+          hasContradiction: false
+        });
+        directRetrieval = grounded;
+      }
+    }
+
+    if (!directRetrieval) {
+      directRetrieval = extractDirectRetrievalV1(
+        input.context || [],
+        retrieval
+      );
+    }
+
     return Object.freeze({ retrieval, directRetrieval });
   }
 
