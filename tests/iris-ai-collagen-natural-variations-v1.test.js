@@ -99,7 +99,11 @@ test("claims fuera del catálogo siguen cerrados", async () => {
     "¿Sirve para curar artritis?",
     "¿Me va a rejuvenecer?",
     "¿Es mejor que otro colágeno?",
-    "¿Me cura el dolor de rodilla?"
+    "¿Me cura el dolor de rodilla?",
+    "¿Qué beneficios tiene durante el embarazo?",
+    "¿Qué beneficios aporta en la lactancia?",
+    "¿El gluten es bueno o malo?",
+    "¿Qué ventajas tiene para los niños?"
   ];
 
   for (const question of unsupported) {
