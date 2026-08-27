@@ -1340,6 +1340,10 @@
   grid-column: 3;
 }
 
+#view-favoritos.favorites-reference-mode > .app-page-header #favoritesSearchBtn {
+  display: none;
+}
+
 #view-favoritos.favorites-reference-mode .saved-filter-bar,
 #view-favoritos.favorites-reference-mode #favoritesSearchPanel {
   display: none !important;
