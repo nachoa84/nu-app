@@ -42,10 +42,12 @@ const cases = [
   ["¿Qué cantidad de colágeno tiene?", "collagen_amount"],
   ["¿Cuántos miligramos de luteína trae?", "lutein_amount"],
   ["¿Lo pueden tomar las mujeres embarazadas?", "pregnancy_warning"],
+  ["¿El colágeno lo pueden tomar las embarazadas?", "pregnancy_warning"],
   ["¿Es apto durante el embarazo?", "pregnancy_warning"],
   ["¿Puedo tomarlo si estoy dando de mamar?", "lactation_warning"],
   ["¿Una mujer que amamanta puede consumirlo?", "lactation_warning"],
   ["¿Lo pueden tomar los niños?", "children_warning"],
+  ["¿El colágeno lo pueden tomar los niños?", "children_warning"],
   ["¿Es apto para niños?", "children_warning"],
   ["¿Tiene trigo?", "wheat_warning"],
   ["¿Es libre de gluten?", "wheat_warning"]
@@ -55,6 +57,17 @@ test("clasifica variaciones naturales en intents cerrados", () => {
   for (const [question, expectedIntent] of cases) {
     assert.equal(matchCollagenIntentV1(question), expectedIntent, question);
   }
+});
+
+test("prioriza advertencias de seguridad sobre el verbo tomar", () => {
+  assert.equal(
+    matchCollagenIntentV1("¿El colágeno lo pueden tomar las embarazadas?"),
+    "pregnancy_warning"
+  );
+  assert.equal(
+    matchCollagenIntentV1("¿El colágeno lo pueden tomar los niños?"),
+    "children_warning"
+  );
 });
 
 test("todas las variaciones reconocidas resuelven scope cuando el producto ya fue resuelto", async () => {
