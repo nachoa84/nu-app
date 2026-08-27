@@ -16,6 +16,9 @@ const {
   createIrisAiPolicyRuntimeV1
 } = require("./iris-ai-policy-runtime-v1");
 const {
+  createIrisAiSeparatedQuotaStoreV1
+} = require("./iris-ai-separated-quota-store-v1");
+const {
   createIrisDocumentRetrievalStoreV1
 } = require("./iris-document-retrieval-store-v1");
 const {
@@ -134,11 +137,17 @@ function createIrisAiRuntimeBootstrapV1({
     config
   });
 
+  const separatedQuotaStore = createIrisAiSeparatedQuotaStoreV1({
+    pool,
+    config
+  });
+
   const policyRuntime = createIrisAiPolicyRuntimeV1({
     config,
     usageQuotaStore: adapters.usageQuotaStore,
     providerBudgetStore: adapters.providerBudgetStore,
-    metricsStore: adapters.metricsStore
+    metricsStore: adapters.metricsStore,
+    separatedQuotaStore
   });
 
   const retrievalStore = createIrisDocumentRetrievalStoreV1({
