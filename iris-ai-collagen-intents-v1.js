@@ -9,6 +9,13 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
     phrases: Object.freeze([
       "como se toma",
       "como tomar",
+      "como tomarlo",
+      "como tengo que tomarlo",
+      "como debo tomarlo",
+      "como lo tengo que tomar",
+      "como lo debo tomar",
+      "de que manera lo tomo",
+      "de que manera se toma",
       "como se usa",
       "modo de uso",
       "forma de uso",
@@ -25,7 +32,7 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
       "cuantas veces al dia"
     ]),
     all: Object.freeze([
-      Object.freeze(["tomar", "tomo", "consumir", "consumo", "usar", "uso", "preparar", "preparo"]),
+      Object.freeze(["tomar", "tomarlo", "tomo", "consumir", "consumo", "usar", "uso", "preparar", "preparo"]),
       Object.freeze(["collagen", "colageno", "producto", "medida", "agua"])
     ])
   }),
