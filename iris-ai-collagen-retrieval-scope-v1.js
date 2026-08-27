@@ -1,41 +1,22 @@
 "use strict";
 
+const {
+  matchCollagenIntentV1
+} = require("./iris-ai-collagen-intents-v1");
+const {
+  normalizeNaturalTextV1
+} = require("./iris-ai-natural-intent-matcher-v1");
+
 const COLLAGEN_PRODUCT_SLUG_V1 = "beauty-focus-collagen-plus";
 const COLLAGEN_CATEGORY_V1 = "product-information";
 const COLLAGEN_COUNTRY_V1 = "AR";
 
 function normalizeScopeQuestionV1(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeNaturalTextV1(value);
 }
 
 function isCollagenGroundedIntentV1(question) {
-  const normalized = normalizeScopeQuestionV1(question);
-  if (!normalized) return false;
-
-  return [
-    "como se toma",
-    "como tomar",
-    "modo de uso",
-    "como se usa",
-    "cuanto collagen",
-    "cuanto colageno",
-    "cantidad de collagen",
-    "cantidad de colageno",
-    "cuanta luteina",
-    "cantidad de luteina",
-    "embarazada",
-    "embarazo",
-    "lactancia",
-    "ninos",
-    "trigo",
-    "gluten"
-  ].some(term => normalized.includes(term)) || normalized === "luteina";
+  return matchCollagenIntentV1(question) != null;
 }
 
 function createCollagenRetrievalScopeResolverV1() {
