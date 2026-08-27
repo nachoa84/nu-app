@@ -41,30 +41,209 @@ function validatePdfBytesV1(pdfBytes) {
   return pdfBytes;
 }
 
+function positionedTextItemV1(item, index) {
+  if (
+    !item ||
+    typeof item !== "object" ||
+    typeof item.str !== "string"
+  ) {
+    return null;
+  }
+
+  const value = item.str.normalize("NFC");
+  const transform = item.transform;
+
+  const hasPosition =
+    Array.isArray(transform) &&
+    transform.length >= 6 &&
+    Number.isFinite(transform[4]) &&
+    Number.isFinite(transform[5]);
+
+  return {
+    item,
+    index,
+    value,
+    hasPosition,
+    x: hasPosition ? transform[4] : null,
+    y: hasPosition ? transform[5] : null
+  };
+}
+
+function normalizeTableLineV1(tokens) {
+  const text = tokens
+    .sort((a, b) => a.x - b.x)
+    .map(token => token.value.trim())
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\bProteína s\b/gu, "Proteínas");
+
+  return text;
+}
+
+function groupTableRowsV1(tokens, tolerance = 3) {
+  const ordered = [...tokens].sort((a, b) => {
+    if (Math.abs(a.y - b.y) > tolerance) {
+      return b.y - a.y;
+    }
+    return a.x - b.x;
+  });
+
+  const rows = [];
+
+  for (const token of ordered) {
+    let row = rows.find(
+      candidate =>
+        Math.abs(candidate.y - token.y) <= tolerance
+    );
+
+    if (!row) {
+      row = {
+        y: token.y,
+        tokens: []
+      };
+      rows.push(row);
+    }
+
+    row.tokens.push(token);
+
+    row.y =
+      row.tokens.reduce((sum, item) => sum + item.y, 0) /
+      row.tokens.length;
+  }
+
+  return rows
+    .sort((a, b) => b.y - a.y)
+    .map(row => ({
+      ...row,
+      text: normalizeTableLineV1(row.tokens)
+    }))
+    .filter(row => row.text);
+}
+
+function nutritionTableBlockV1(tokens) {
+  const header = tokens.find(
+    token =>
+      token &&
+      token.hasPosition &&
+      /INFORMACIÓN NUTRICIONAL/iu.test(token.value)
+  );
+
+  if (!header) {
+    return null;
+  }
+
+  const terminator = tokens.find(
+    token =>
+      token &&
+      token.hasPosition &&
+      token.x >= header.x - 10 &&
+      token.y < header.y &&
+      /^INGREDIENTES\b/iu.test(token.value.trim())
+  );
+
+  const minimumY = terminator
+    ? terminator.y + 4
+    : header.y - 180;
+
+  const region = tokens.filter(
+    token =>
+      token &&
+      token.hasPosition &&
+      token.value.trim() &&
+      token.x >= header.x - 10 &&
+      token.y <= header.y + 3 &&
+      token.y >= minimumY
+  );
+
+  if (region.length < 4) {
+    return null;
+  }
+
+  return {
+    firstIndex: Math.min(...region.map(token => token.index)),
+    indices: new Set(region.map(token => token.index)),
+    text: groupTableRowsV1(region)
+      .map(row => row.text)
+      .join("\n")
+  };
+}
+
+function standaloneTableBlockV1(tokens) {
+  const usable = tokens.filter(
+    token => token && token.value.trim()
+  );
+
+  if (
+    usable.length < 6 ||
+    usable.some(token => !token.hasPosition)
+  ) {
+    return null;
+  }
+
+  const xs = usable.map(token => token.x);
+  const xSpan = Math.max(...xs) - Math.min(...xs);
+
+  if (xSpan > 250) {
+    return null;
+  }
+
+  const rows = groupTableRowsV1(usable);
+
+  if (
+    rows.length < 3 ||
+    rows.filter(row => row.tokens.length >= 2).length < 3
+  ) {
+    return null;
+  }
+
+  return {
+    firstIndex: Math.min(...usable.map(token => token.index)),
+    indices: new Set(usable.map(token => token.index)),
+    text: rows.map(row => row.text).join("\n")
+  };
+}
+
 function normalizePageItemsV1(items) {
   if (!Array.isArray(items)) {
     throw new IrisPdfTextExtractorOperationalErrorV1();
   }
 
+  const tokens = items.map(positionedTextItemV1);
+
+  const tableBlock =
+    nutritionTableBlockV1(tokens) ||
+    standaloneTableBlockV1(tokens);
+
   const parts = [];
 
-  for (const item of items) {
+  for (let index = 0; index < tokens.length; index += 1) {
     if (
-      !item ||
-      typeof item !== "object" ||
-      typeof item.str !== "string"
+      tableBlock &&
+      index === tableBlock.firstIndex
+    ) {
+      parts.push(tableBlock.text, "\n");
+    }
+
+    if (
+      tableBlock &&
+      tableBlock.indices.has(index)
     ) {
       continue;
     }
 
-    const value = item.str.normalize("NFC");
-    if (value) {
-      parts.push(value);
+    const token = tokens[index];
+
+    if (!token) {
+      continue;
     }
 
-    if (item.hasEOL === true) {
+    if (token.value) {
+      parts.push(token.value);
+    }
+
+    if (token.item.hasEOL === true) {
       parts.push("\n");
-    } else if (value) {
+    } else if (token.value) {
       parts.push(" ");
     }
   }
