@@ -78,17 +78,17 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
 
   pregnancy_warning: Object.freeze({
     phrases: Object.freeze([
-      "mujer embarazada",
-      "mujeres embarazadas",
       "estoy embarazada",
-      "durante el embarazo",
-      "en el embarazo",
       "si estoy embarazada",
       "si esta embarazada",
       "pueden tomarlo las embarazadas",
       "pueden tomar las embarazadas",
-      "apto para embarazadas",
-      "embarazo"
+      "lo pueden tomar las mujeres embarazadas",
+      "puedo tomarlo embarazada",
+      "puedo tomarlo durante el embarazo",
+      "se puede tomar durante el embarazo",
+      "es apto durante el embarazo",
+      "apto para embarazadas"
     ]),
     all: Object.freeze([
       Object.freeze(["embarazada", "embarazadas", "embarazo"]),
@@ -98,18 +98,20 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
 
   lactation_warning: Object.freeze({
     phrases: Object.freeze([
-      "lactancia",
       "dando de mamar",
       "dar de mamar",
       "estoy amamantando",
       "esta amamantando",
-      "mujer que amamanta",
-      "mujeres que amamantan",
-      "periodo de lactancia"
+      "puedo tomarlo si estoy dando de mamar",
+      "puedo tomarlo durante la lactancia",
+      "se puede tomar durante la lactancia",
+      "es apto durante la lactancia",
+      "mujer que amamanta puede consumirlo",
+      "mujeres que amamantan pueden consumirlo"
     ]),
     all: Object.freeze([
-      Object.freeze(["amamanta", "amamantando", "lactancia"]),
-      Object.freeze(["tomar", "tomarlo", "consumir", "usar", "puede", "pueden", "apto"])
+      Object.freeze(["amamanta", "amamantan", "amamantando", "lactancia"]),
+      Object.freeze(["tomar", "tomarlo", "consumir", "consumirlo", "usar", "puede", "pueden", "apto"])
     ])
   }),
 
@@ -119,13 +121,11 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
       "pueden tomarlo los ninos",
       "pueden tomar los ninos",
       "apto para ninos",
-      "para ninos",
-      "en ninos",
-      "menores de edad"
+      "menores de edad pueden tomarlo"
     ]),
     all: Object.freeze([
       Object.freeze(["nino", "ninos", "menor", "menores"]),
-      Object.freeze(["tomar", "tomarlo", "consumir", "usar", "puede", "pueden", "apto"])
+      Object.freeze(["tomar", "tomarlo", "consumir", "consumirlo", "usar", "puede", "pueden", "apto"])
     ])
   }),
 
@@ -137,6 +137,7 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
       "contiene gluten",
       "tiene gluten",
       "es libre de gluten",
+      "libre de gluten",
       "sin gluten"
     ]),
     all: Object.freeze([
