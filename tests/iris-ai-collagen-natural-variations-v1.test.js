@@ -13,6 +13,8 @@ const {
   createCollagenRetrievalScopeResolverV1
 } = require("../iris-ai-collagen-retrieval-scope-v1");
 
+const COLLAGEN_PRODUCT_SLUG = "beauty-focus-collagen-plus";
+
 const fragment = {
   documentKey: "doc_collagen_test_v1",
   versionLabel: "2021-04-27",
@@ -20,7 +22,7 @@ const fragment = {
   title: "Beauty Focus Collagen+",
   country: "AR",
   category: "product-information",
-  productSlug: "beauty-focus-collagen-plus",
+  productSlug: COLLAGEN_PRODUCT_SLUG,
   content: [
     "INFORMACIÓN NUTRICIONAL",
     "Colágeno 2500 mg -",
@@ -55,7 +57,7 @@ test("clasifica variaciones naturales en intents cerrados", () => {
   }
 });
 
-test("todas las variaciones reconocidas pueden resolver scope antes de retrieval", async () => {
+test("todas las variaciones reconocidas resuelven scope cuando el producto ya fue resuelto", async () => {
   const resolveScope = createCollagenRetrievalScopeResolverV1();
 
   for (const [question] of cases) {
@@ -64,14 +66,33 @@ test("todas las variaciones reconocidas pueden resolver scope antes de retrieval
       language: "es",
       country: "AR",
       category: null,
-      productSlug: null
+      productSlug: COLLAGEN_PRODUCT_SLUG
     });
 
     assert.deepEqual(scope, {
       country: "AR",
       category: "product-information",
-      productSlug: "beauty-focus-collagen-plus"
+      productSlug: COLLAGEN_PRODUCT_SLUG
     }, question);
+  }
+});
+
+test("preguntas con referencia explícita al producto pueden resolver scope sin contexto previo", async () => {
+  const resolveScope = createCollagenRetrievalScopeResolverV1();
+  const explicitCases = [
+    "¿Cuántos mg de colágeno aporta?",
+    "¿Cuánto collagen tiene?",
+    "¿Cómo se toma Collagen+?"
+  ];
+
+  for (const question of explicitCases) {
+    const scope = await resolveScope({
+      question,
+      language: "es",
+      country: "AR"
+    });
+
+    assert.equal(scope?.productSlug, COLLAGEN_PRODUCT_SLUG, question);
   }
 });
 
@@ -84,7 +105,7 @@ test("las variaciones responden solo si existe evidencia autorizada", async () =
       language: "es",
       country: "AR",
       category: "product-information",
-      productSlug: "beauty-focus-collagen-plus",
+      productSlug: COLLAGEN_PRODUCT_SLUG,
       context: [fragment]
     });
 
@@ -111,7 +132,8 @@ test("claims fuera del catálogo siguen cerrados", async () => {
     assert.equal(await resolveScope({
       question,
       language: "es",
-      country: "AR"
+      country: "AR",
+      productSlug: COLLAGEN_PRODUCT_SLUG
     }), null, question);
   }
 });
