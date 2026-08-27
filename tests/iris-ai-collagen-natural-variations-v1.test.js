@@ -90,22 +90,20 @@ test("todas las variaciones reconocidas resuelven scope cuando el producto ya fu
   }
 });
 
-test("preguntas con referencia explícita al producto pueden resolver scope sin contexto previo", async () => {
+test("referencias al colágeno sin productSlug no abren scope documental", async () => {
   const resolveScope = createCollagenRetrievalScopeResolverV1();
-  const explicitCases = [
+  const unresolvedCases = [
     "¿Cuántos mg de colágeno aporta?",
     "¿Cuánto collagen tiene?",
     "¿Cómo se toma Collagen+?"
   ];
 
-  for (const question of explicitCases) {
-    const scope = await resolveScope({
+  for (const question of unresolvedCases) {
+    assert.equal(await resolveScope({
       question,
       language: "es",
       country: "AR"
-    });
-
-    assert.equal(scope?.productSlug, COLLAGEN_PRODUCT_SLUG, question);
+    }), null, question);
   }
 });
 
