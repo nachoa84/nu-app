@@ -17,9 +17,17 @@ function normalizeTermsV1(values) {
     .filter(Boolean);
 }
 
+function includesTermV1(text, term) {
+  const normalizedText = normalizeNaturalTextV1(text);
+  const normalizedTerm = normalizeNaturalTextV1(term);
+  if (!normalizedText || !normalizedTerm) return false;
+
+  return (` ${normalizedText} `).includes(` ${normalizedTerm} `);
+}
+
 function includesAnyV1(text, values) {
   const terms = normalizeTermsV1(values);
-  return terms.length > 0 && terms.some(term => text.includes(term));
+  return terms.length > 0 && terms.some(term => includesTermV1(text, term));
 }
 
 function includesAllGroupsV1(text, groups) {
@@ -68,6 +76,7 @@ module.exports = {
   createNaturalIntentMatcherV1,
   includesAllGroupsV1,
   includesAnyV1,
+  includesTermV1,
   matchIntentRuleV1,
   normalizeNaturalTextV1
 };
