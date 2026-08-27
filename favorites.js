@@ -947,6 +947,118 @@ function createFavoriteRoutineTileV93b(routineId, visibleItems, allItems) {
   return tile;
 }
 
+function createFavoritesCollectionRow(routineId, items) {
+  const config = ROUTINE_CATALOG[routineId] || {};
+  const row = document.createElement("button");
+  row.type = "button";
+  row.className = "favorites-reference-collection";
+  const dayCount = new Set(items.map(item => Number(item.day) || 1)).size;
+  row.innerHTML = `
+    <span class="favorites-reference-collection-image">
+      <img src="${config.cover || ""}" alt="" loading="lazy" />
+    </span>
+    <span class="favorites-reference-collection-copy">
+      <strong>${config.title || items[0]?.routineTitle || "Rutina"}</strong>
+      <small>${items.length} material${items.length === 1 ? "" : "es"} · ${dayCount} día${dayCount === 1 ? "" : "s"} con favoritos</small>
+    </span>
+    <span class="favorites-reference-chevron" aria-hidden="true">${ICONS.arrow}</span>`;
+  row.setAttribute("aria-label", `Abrir favoritos de ${config.title || "rutina"}`);
+  row.onclick = () => {
+    favoriteOpenRoutine = routineId;
+    favoriteOpenDay = null;
+    favoriteOpenBot = null;
+    favoriteSearchOpen = false;
+    favoriteSearchQuery = "";
+    renderFavorites();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+  setupNativePressState(row);
+  return row;
+}
+
+function renderFavoritesReferenceHome(list, routineFavs, botFavs) {
+  const favoritesView = document.getElementById("view-favoritos");
+  favoritesView?.classList.add("favorites-reference-mode");
+  list.innerHTML = "";
+  list.className = "favorites-list favorites-reference-list";
+
+  const recent = routineFavs
+    .filter(item => item.mediaType === "image" && item.src)
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+    .slice(0, 4);
+
+  if (recent.length) {
+    const gallery = document.createElement("section");
+    gallery.className = "favorites-reference-gallery";
+    const galleryTrack = document.createElement("div");
+    galleryTrack.className = "favorites-reference-gallery-track";
+    recent.forEach((item, index) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = `favorites-reference-gallery-card${index === 0 ? " is-active" : ""}`;
+      card.innerHTML = `
+        <img src="${item.src}" alt="${item.label || ""}" loading="${index === 0 ? "eager" : "lazy"}" />
+        <span class="favorites-reference-gallery-caption">
+          <strong>${item.routineTitle || "Rutina"}</strong>
+          <small>Día ${Number(item.day) || 1}</small>
+        </span>`;
+      card.onclick = () => openMediaPreview(recent, index, Number(item.day) || 1);
+      galleryTrack.appendChild(card);
+    });
+    const dots = document.createElement("div");
+    dots.className = "favorites-reference-gallery-dots";
+    recent.forEach((_, index) => {
+      const dot = document.createElement("i");
+      dot.className = index === 0 ? "is-active" : "";
+      dots.appendChild(dot);
+    });
+    gallery.append(galleryTrack, dots);
+    list.appendChild(gallery);
+  }
+
+  const routineGroups = new Map();
+  routineFavs.forEach(item => {
+    const id = item.routineId || CURRENT_ROUTINE_ID;
+    if (!routineGroups.has(id)) routineGroups.set(id, []);
+    routineGroups.get(id).push(item);
+  });
+
+  if (routineGroups.size) {
+    const section = document.createElement("section");
+    section.className = "favorites-reference-section";
+    section.innerHTML = `<h2>Mis rutinas</h2>`;
+    const collectionList = document.createElement("div");
+    collectionList.className = "favorites-reference-collections";
+    const preferredOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
+    [...routineGroups.entries()]
+      .sort(([a], [b]) => {
+        const ai = preferredOrder.indexOf(a), bi = preferredOrder.indexOf(b);
+        return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+      })
+      .forEach(([id, items]) => collectionList.appendChild(createFavoritesCollectionRow(id, items)));
+    section.appendChild(collectionList);
+    list.appendChild(section);
+  }
+
+  if (botFavs.length) {
+    const section = document.createElement("section");
+    section.className = "favorites-reference-section favorites-reference-iris";
+    section.innerHTML = `<h2>Recursos de Iris</h2>`;
+    const resourceList = document.createElement("div");
+    resourceList.className = "favorites-reference-collections";
+    botFavs
+      .slice()
+      .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+      .forEach(saved => {
+        const card = createBotFavoriteCard(saved);
+        card.classList.add("favorites-reference-iris-row");
+        resourceList.appendChild(card);
+      });
+    section.appendChild(resourceList);
+    list.appendChild(section);
+  }
+}
+
 function renderFavorites() {
   const list = document.getElementById("favoritesList");
   const routineFavs = getFavorites().filter(favorite =>
@@ -962,7 +1074,7 @@ function renderFavorites() {
   if (searchPanel) searchPanel.hidden = !favoriteSearchOpen;
   favoritesView?.classList.toggle("favorites-searching", favoriteSearchOpen);
 
-  renderFavoriteFilterBar(list);
+  document.getElementById("savedFilterBar")?.remove();
 
   const searchedRoutine = favoriteSearchQuery
     ? routineFavs.filter(favorite => favoriteMatchesSearch(favorite, favoriteSearchQuery))
@@ -994,6 +1106,11 @@ function renderFavorites() {
 
 
 
+
+  if (!favoriteOpenBot && !favoriteOpenRoutine && !favoriteOpenDay) {
+    renderFavoritesReferenceHome(list, routineFavs, botFavs);
+    return;
+  }
 
   if (favoriteOpenBot) {
     const saved = botFavs.find(item => item.favoriteKey === favoriteOpenBot);
