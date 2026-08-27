@@ -3,6 +3,73 @@
   // Los comandos visibles conservan los nombres conocidos, sin necesitar el punto inicial.
   window.BotContent = [
   {
+    "id": "catalogos",
+    "title": "Catálogos",
+    "command": "catalogo",
+    "aliases": [
+      "catálogo",
+      "catalogos",
+      "catálogos"
+    ],
+    "phrases": [
+      "ver catalogo",
+      "ver catálogo",
+      "catalogo de productos",
+      "catálogo de productos"
+    ],
+    "keywords": [],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Elegí el país o mercado cuyo catálogo querés consultar:"
+      },
+      {
+        "type": "link",
+        "title": "Argentina",
+        "url": "https://catalogo.nuskin.com/argentina/catalogo-argentina/",
+        "actionLabel": "Abrir catálogo",
+        "resourceKind": "link"
+      },
+      {
+        "type": "link",
+        "title": "Chile",
+        "url": "https://catalogo.nuskin.com/chile/catalogo-chile-2026/",
+        "actionLabel": "Abrir catálogo",
+        "resourceKind": "link"
+      },
+      {
+        "type": "link",
+        "title": "Colombia",
+        "url": "https://catalogo.nuskin.com/colombia/catalogo-colombia/",
+        "actionLabel": "Abrir catálogo",
+        "resourceKind": "link"
+      },
+      {
+        "type": "link",
+        "title": "México",
+        "url": "https://catalogo.nuskin.com/mexico/catalogo-mexico/",
+        "actionLabel": "Abrir catálogo",
+        "resourceKind": "link"
+      },
+      {
+        "type": "link",
+        "title": "Perú",
+        "url": "https://catalogo.nuskin.com/peru/catalogo-peru/",
+        "actionLabel": "Abrir catálogo",
+        "resourceKind": "link"
+      },
+      {
+        "type": "link",
+        "title": "Europa · Feb 2026",
+        "url": "assets/catalogos/catalogo-europa-02-2026.pdf",
+        "actionLabel": "Abrir catálogo",
+        "description": "Catálogo de productos · Europa",
+        "resourceKind": "document"
+      }
+    ],
+    "sourceFlow": "catalogo"
+  },
+  {
     "id": "galeria-oficial",
     "title": "Galería oficial",
     "command": "galeria oficial",
@@ -2133,7 +2200,7 @@
       {
         "type": "link",
         "title": "Tutorial · Crear una oferta",
-        "url": "https://www.youtube.com/watch?v=rRPg_-xCEzo&feature=youtu.be",
+        "url": "https://youtube.com/shorts/3rwf04s2WHE?feature=share",
         "actionLabel": "Abrir",
         "description": "El ejemplo usa LumiSpa, pero el procedimiento puede aplicarse a otros productos.",
         "resourceKind": "video"
