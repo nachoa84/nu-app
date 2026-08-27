@@ -18,6 +18,8 @@ const {
   normalizeRequestV1
 } = require("../iris-ai-user-route-v1");
 
+const SYNTHETIC_PRODUCT_SLUG_V1 = "synthetic-collagen-product";
+
 function storageWithMessages(messages) {
   return {
     NU_IRIS_AI_ESCALATION_ENABLED: true,
@@ -38,6 +40,21 @@ function deterministicTopic(topicId = "generic-topic") {
   };
 }
 
+function syntheticMultiProductRegistryV1() {
+  return [
+    {
+      productSlug: COLLAGEN_PRODUCT_SLUG_V1,
+      strongAliases: ["beauty focus collagen+", "collagen+"],
+      weakAliases: ["colageno", "collagen"]
+    },
+    {
+      productSlug: SYNTHETIC_PRODUCT_SLUG_V1,
+      strongAliases: ["synthetic collagen"],
+      weakAliases: ["colageno", "collagen"]
+    }
+  ];
+}
+
 test("resuelve Collagen+ explícito y mantiene aliases débiles separados", () => {
   assert.equal(
     detectExplicitProductV1("¿Cuántos mg aporta Beauty Focus Collagen+?").productSlug,
@@ -48,6 +65,93 @@ test("resuelve Collagen+ explícito y mantiene aliases débiles separados", () =
     COLLAGEN_PRODUCT_SLUG_V1
   );
   assert.equal(detectExplicitProductV1("¿Lo puede usar?").status, "missing");
+});
+
+test("pregunta explícita sobre colágeno y embarazo resuelve Collagen+ mientras el alias es único", () => {
+  const decision = routingDecisionV1({
+    question: "¿El colágeno lo pueden tomar las embarazadas?",
+    deterministicResponse: deterministicTopic("boost-guide"),
+    globalObject: storageWithMessages([])
+  });
+
+  assert.equal(decision.shouldEscalate, true);
+  assert.equal(decision.needsClarification, false);
+  assert.equal(decision.productSlug, COLLAGEN_PRODUCT_SLUG_V1);
+  assert.equal(decision.productConfidence, "weak_explicit");
+});
+
+test("alias débil compartido entre productos queda ambiguo y nunca elige uno arbitrariamente", () => {
+  const registry = syntheticMultiProductRegistryV1();
+
+  assert.deepEqual(
+    detectExplicitProductV1("¿El colágeno lo pueden tomar las embarazadas?", registry),
+    { status: "ambiguous" }
+  );
+
+  const decision = routingDecisionV1({
+    question: "¿El colágeno lo pueden tomar las embarazadas?",
+    deterministicResponse: deterministicTopic("boost-guide"),
+    globalObject: storageWithMessages([]),
+    productRegistry: registry
+  });
+
+  assert.equal(decision.shouldEscalate, true);
+  assert.equal(decision.needsClarification, true);
+  assert.equal(decision.productSlug, null);
+});
+
+test("nombre comercial fuerte tiene prioridad aunque varios productos compartan alias débil", () => {
+  const registry = syntheticMultiProductRegistryV1();
+
+  assert.deepEqual(
+    detectExplicitProductV1("¿Beauty Focus Collagen+ lo pueden tomar embarazadas?", registry),
+    {
+      status: "resolved",
+      productSlug: COLLAGEN_PRODUCT_SLUG_V1,
+      confidence: "explicit",
+      source: "current_question"
+    }
+  );
+
+  assert.deepEqual(
+    detectExplicitProductV1("¿Synthetic Collagen lo pueden tomar embarazadas?", registry),
+    {
+      status: "resolved",
+      productSlug: SYNTHETIC_PRODUCT_SLUG_V1,
+      confidence: "explicit",
+      source: "current_question"
+    }
+  );
+});
+
+test("contexto conversacional multi-producto hereda solo un producto previamente resuelto", () => {
+  const registry = syntheticMultiProductRegistryV1();
+  const explicitContext = storageWithMessages([
+    { role: "user", text: "Quiero saber sobre Beauty Focus Collagen+" },
+    { role: "bot", text: "Decime qué querés consultar." },
+    { role: "user", text: "¿Lo pueden tomar embarazadas?" }
+  ]);
+
+  assert.deepEqual(
+    resolveProductContextV1("¿Lo pueden tomar embarazadas?", explicitContext, registry),
+    {
+      status: "resolved",
+      productSlug: COLLAGEN_PRODUCT_SLUG_V1,
+      confidence: "conversation_context",
+      source: "previous_turn"
+    }
+  );
+
+  const ambiguousContext = storageWithMessages([
+    { role: "user", text: "Quiero saber sobre colágeno" },
+    { role: "bot", text: "Decime qué querés consultar." },
+    { role: "user", text: "¿Lo pueden tomar embarazadas?" }
+  ]);
+
+  assert.deepEqual(
+    resolveProductContextV1("¿Lo pueden tomar embarazadas?", ambiguousContext, registry),
+    { status: "ambiguous" }
+  );
 });
 
 test("hereda el producto de la conversación para un pronombre", () => {
