@@ -1,17 +1,18 @@
 "use strict";
 
+const {
+  matchCollagenIntentV1
+} = require("./iris-ai-collagen-intents-v1");
+const {
+  normalizeNaturalTextV1
+} = require("./iris-ai-natural-intent-matcher-v1");
+
 const COLLAGEN_PRODUCT_SLUG_V1 = "beauty-focus-collagen-plus";
 const COLLAGEN_CATEGORY_V1 = "product-information";
 const COLLAGEN_COUNTRY_V1 = "AR";
 
 function normalizeQuestionV1(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeNaturalTextV1(value);
 }
 
 function normalizeSpaceV1(value) {
@@ -88,28 +89,18 @@ function createCollagenGroundedRetrievalResolverV1() {
     const fragments = scopedFragmentsV1(input.context || []);
     if (fragments.length === 0) return null;
 
-    const question = normalizeQuestionV1(input.question);
-    if (!question) return null;
+    const intent = matchCollagenIntentV1(input.question);
+    if (!intent) return null;
 
     for (const fragment of fragments) {
       const content = fragment.content;
 
-      if (
-        question.includes("como se toma") ||
-        question.includes("como tomar") ||
-        question.includes("modo de uso") ||
-        question.includes("como se usa")
-      ) {
+      if (intent === "usage") {
         const instruction = extractInstructionV1(content);
         if (instruction) return candidateV1(fragment, instruction);
       }
 
-      if (
-        question.includes("cuanto collagen") ||
-        question.includes("cuanto colageno") ||
-        question.includes("cantidad de collagen") ||
-        question.includes("cantidad de colageno")
-      ) {
+      if (intent === "collagen_amount") {
         if (/Col[aá]geno\s+2500\s+mg/i.test(content)) {
           return candidateV1(
             fragment,
@@ -118,11 +109,7 @@ function createCollagenGroundedRetrievalResolverV1() {
         }
       }
 
-      if (
-        question.includes("cuanta luteina") ||
-        question === "luteina" ||
-        question.includes("cantidad de luteina")
-      ) {
+      if (intent === "lutein_amount") {
         if (/Lute[ií]na\s+5\s+mg/i.test(content)) {
           return candidateV1(
             fragment,
@@ -132,20 +119,15 @@ function createCollagenGroundedRetrievalResolverV1() {
       }
 
       if (
-        question.includes("embarazada") ||
-        question.includes("embarazo") ||
-        question.includes("lactancia") ||
-        question.includes("ninos") ||
-        question.includes("niños")
+        intent === "pregnancy_warning" ||
+        intent === "lactation_warning" ||
+        intent === "children_warning"
       ) {
         const warning = extractWarningV1(content);
         if (warning) return candidateV1(fragment, warning);
       }
 
-      if (
-        question.includes("trigo") ||
-        question.includes("gluten")
-      ) {
+      if (intent === "wheat_warning") {
         if (/CONTIENE DERIVADOS DE\s+TRIGO/i.test(content)) {
           return candidateV1(
             fragment,
