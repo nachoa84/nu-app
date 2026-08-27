@@ -28,6 +28,9 @@ const {
   createCollagenGroundedRetrievalResolverV1
 } = require("./iris-ai-collagen-grounded-response-v1");
 const {
+  createCollagenRetrievalScopeResolverV1
+} = require("./iris-ai-collagen-retrieval-scope-v1");
+const {
   createIrisAiOrchestratorV1
 } = require("./iris-ai-orchestrator-v1");
 
@@ -165,7 +168,10 @@ function createIrisAiRuntimeBootstrapV1({
     env,
     timeoutMs: config.timeoutMs,
     policyRuntime,
-    localResponseEngine
+    localResponseEngine,
+    resolveRetrievalScope: collagenGroundedEnabled
+      ? createCollagenRetrievalScopeResolverV1()
+      : null
   });
 
   return Object.freeze({
