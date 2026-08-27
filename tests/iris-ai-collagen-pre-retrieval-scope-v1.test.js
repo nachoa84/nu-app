@@ -13,6 +13,8 @@ const {
   createNoopIrisAiProviderV1
 } = require("../iris-ai-provider-v1");
 
+const COLLAGEN_PRODUCT_SLUG = "beauty-focus-collagen-plus";
+
 function policyRuntimeV1() {
   return {
     providerName: "noop",
@@ -50,7 +52,7 @@ function createScopedOrchestrator(retrieveDocumentChunks) {
   });
 }
 
-test("resuelve scope Collagen antes de consultar documentos", async () => {
+test("resuelve scope Collagen con producto contextual antes de consultar documentos", async () => {
   const calls = [];
   const orchestrator = createScopedOrchestrator(async input => {
     calls.push(input);
@@ -61,6 +63,7 @@ test("resuelve scope Collagen antes de consultar documentos", async () => {
     question: "como se toma",
     language: "es",
     country: "AR",
+    productSlug: COLLAGEN_PRODUCT_SLUG,
     userScope: "test_user",
     deviceScope: "test_device"
   });
@@ -72,8 +75,28 @@ test("resuelve scope Collagen antes de consultar documentos", async () => {
   for (const call of calls) {
     assert.equal(call.country, "AR");
     assert.equal(call.category, "product-information");
-    assert.equal(call.productSlug, "beauty-focus-collagen-plus");
+    assert.equal(call.productSlug, COLLAGEN_PRODUCT_SLUG);
   }
+});
+
+test("intención genérica sin producto no se convierte silenciosamente en Collagen", async () => {
+  let retrievalCalls = 0;
+  const orchestrator = createScopedOrchestrator(async () => {
+    retrievalCalls += 1;
+    return [];
+  });
+
+  const result = await orchestrator.answerQuestion({
+    question: "lo puede tomar una embarazada",
+    language: "es",
+    country: "AR",
+    userScope: "test_user",
+    deviceScope: "test_device"
+  });
+
+  assert.equal(result.status, "fallback");
+  assert.equal(result.reason, "scope_unresolved");
+  assert.equal(retrievalCalls, 0);
 });
 
 test("pregunta fuera del scope permitido cae en fallback antes de retrieval", async () => {
@@ -87,6 +110,7 @@ test("pregunta fuera del scope permitido cae en fallback antes de retrieval", as
     question: "sirve para curar artritis",
     language: "es",
     country: "AR",
+    productSlug: COLLAGEN_PRODUCT_SLUG,
     userScope: "test_user",
     deviceScope: "test_device"
   });
@@ -107,6 +131,7 @@ test("mercado incorrecto no llega a retrieval", async () => {
     question: "cuanto collagen tiene",
     language: "es",
     country: "MX",
+    productSlug: COLLAGEN_PRODUCT_SLUG,
     userScope: "test_user",
     deviceScope: "test_device"
   });
