@@ -2133,7 +2133,7 @@
       {
         "type": "link",
         "title": "Tutorial · Crear una oferta",
-        "url": "https://www.youtube.com/watch?v=rRPg_-xCEzo&feature=youtu.be",
+        "url": "https://youtube.com/shorts/3rwf04s2WHE?feature=share",
         "actionLabel": "Abrir",
         "description": "El ejemplo usa LumiSpa, pero el procedimiento puede aplicarse a otros productos.",
         "resourceKind": "video"
