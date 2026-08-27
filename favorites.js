@@ -1069,6 +1069,7 @@ function renderFavorites() {
 
   const favoritesView = document.getElementById("view-favoritos");
   favoritesView?.classList.toggle("favorite-day-open", Boolean(favoriteOpenDay));
+  favoritesView?.classList.toggle("favorites-reference-mode", !favoriteOpenBot && !favoriteOpenRoutine && !favoriteOpenDay);
 
   const searchPanel = ensureFavoritesSearchPanel();
   if (searchPanel) searchPanel.hidden = !favoriteSearchOpen;
