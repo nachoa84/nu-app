@@ -79,6 +79,26 @@ test("resuelve scope Collagen con producto contextual antes de consultar documen
   }
 });
 
+test("referencia débil a colágeno sin productSlug falla cerrada antes de retrieval", async () => {
+  let retrievalCalls = 0;
+  const orchestrator = createScopedOrchestrator(async () => {
+    retrievalCalls += 1;
+    return [];
+  });
+
+  const result = await orchestrator.answerQuestion({
+    question: "¿Cuánto colágeno tiene?",
+    language: "es",
+    country: "AR",
+    userScope: "test_user",
+    deviceScope: "test_device"
+  });
+
+  assert.equal(result.status, "fallback");
+  assert.equal(result.reason, "scope_unresolved");
+  assert.equal(retrievalCalls, 0);
+});
+
 test("intención genérica sin producto no se convierte silenciosamente en Collagen", async () => {
   let retrievalCalls = 0;
   const orchestrator = createScopedOrchestrator(async () => {
