@@ -31,6 +31,12 @@ const {
   createCollagenRetrievalScopeResolverV1
 } = require("./iris-ai-collagen-retrieval-scope-v1");
 const {
+  getCollagenRetrievalHintsV1
+} = require("./iris-ai-collagen-intents-v1");
+const {
+  createIntentAwareRetrievalQueryPreparerV1
+} = require("./iris-ai-intent-aware-retrieval-query-prep-v1");
+const {
   createIrisAiOrchestratorV1
 } = require("./iris-ai-orchestrator-v1");
 
@@ -155,6 +161,12 @@ function createIrisAiRuntimeBootstrapV1({
         : null
     });
 
+  const prepareRetrievalQueries = collagenGroundedEnabled
+    ? createIntentAwareRetrievalQueryPreparerV1({
+        resolveHints: getCollagenRetrievalHintsV1
+      })
+    : undefined;
+
   const provider = createConfiguredIrisAiProviderV1({
     config,
     secrets,
@@ -166,6 +178,7 @@ function createIrisAiRuntimeBootstrapV1({
       retrievalStore.retrieveDocumentChunks,
     provider,
     env,
+    prepareRetrievalQueries,
     timeoutMs: config.timeoutMs,
     policyRuntime,
     localResponseEngine,
