@@ -51,9 +51,6 @@ function minimalFragmentV1(fragment) {
     versionLabel: fragment.versionLabel ?? null,
     chunkIndex: Number(fragment.chunkIndex),
     title: fragment.title ?? null,
-    country: fragment.country ?? null,
-    category: fragment.category ?? null,
-    productSlug: fragment.productSlug ?? null,
     content: sanitizeRetrievedContentV1(fragment.content).slice(0, MAX_FRAGMENT_CHARS_V1)
   };
 }
@@ -217,11 +214,21 @@ function createIrisAiOrchestratorV1({
     const context = buildMinimalContextV1(fragments);
     if (context.length === 0 || context.every(item => !item.content)) return fallback("no_authorized_context");
 
+    const localContext = context.map((item, index) => ({
+      ...item,
+      country: fragments[index]?.country ?? null,
+      category: fragments[index]?.category ?? null,
+      productSlug: fragments[index]?.productSlug ?? null
+    }));
+
     let retrievalAssessment = conservativeRetrievalAssessmentV1(context);
     if (localEngine) {
       try {
         const local = await withTimeoutV1(
-          () => localEngine.resolveAfterRetrieval({ ...localInput, context }),
+          () => localEngine.resolveAfterRetrieval({
+            ...localInput,
+            context: localContext
+          }),
           { timeoutMs }
         );
         retrievalAssessment = local.retrieval;
