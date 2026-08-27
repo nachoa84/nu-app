@@ -51,6 +51,9 @@ function minimalFragmentV1(fragment) {
     versionLabel: fragment.versionLabel ?? null,
     chunkIndex: Number(fragment.chunkIndex),
     title: fragment.title ?? null,
+    country: fragment.country ?? null,
+    category: fragment.category ?? null,
+    productSlug: fragment.productSlug ?? null,
     content: sanitizeRetrievedContentV1(fragment.content).slice(0, MAX_FRAGMENT_CHARS_V1)
   };
 }
@@ -301,6 +304,7 @@ module.exports = {
   createIrisAiOrchestratorV1,
   deterministicFallbackV1,
   localOkV1,
+  minimalFragmentV1,
   validateEphemeralProviderResultV1,
   validateProviderResultV1
 };
