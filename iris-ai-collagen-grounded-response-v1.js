@@ -131,7 +131,7 @@ function createCollagenGroundedRetrievalResolverV1() {
         if (/CONTIENE DERIVADOS DE\s+TRIGO/i.test(content)) {
           return candidateV1(
             fragment,
-            "Sí. El documento indica que contiene derivados de trigo."
+            "El documento indica que contiene derivados de trigo. No afirma que sea libre de gluten."
           );
         }
       }
