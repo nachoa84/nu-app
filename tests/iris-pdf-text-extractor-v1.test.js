@@ -280,3 +280,267 @@ test("un fallo de limpieza no reemplaza una extracción correcta", async () => {
     "Texto autorizado."
   );
 });
+
+test("reconstruye filas tabulares usando posición visual", () => {
+  const text = normalizePageItemsV1([
+    {
+      str: "Proteínas",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 312, 563]
+    },
+    {
+      str: "2500 mg",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 416, 548]
+    },
+    {
+      str: "1%",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 499, 578]
+    },
+    {
+      str: "Luteína",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 309, 537]
+    },
+    {
+      str: "2 g",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 422, 564]
+    },
+    {
+      str: "-",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 501, 550]
+    },
+    {
+      str: "Valor energético",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 578]
+    },
+    {
+      str: "Colágeno",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 549]
+    },
+    {
+      str: "5 mg",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 421, 536]
+    },
+    {
+      str: "11 kcal=46 KJ",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 409, 577]
+    },
+    {
+      str: "4%",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 499, 565]
+    },
+    {
+      str: "-",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 501, 535]
+    }
+  ]);
+
+  assert.equal(
+    text,
+    [
+      "Valor energético 11 kcal=46 KJ 1%",
+      "Proteínas 2 g 4%",
+      "Colágeno 2500 mg -",
+      "Luteína 5 mg -"
+    ].join("\n")
+  );
+});
+
+test("no mezcla columnas normales al reconstruir una tabla lateral", () => {
+  const text = normalizePageItemsV1([
+    {
+      str: "Texto izquierda línea 1",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 50, 650]
+    },
+    {
+      str: "Texto izquierda línea 2",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 50, 635]
+    },
+    {
+      str: "INFORMACIÓN NUTRICIONAL",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 310, 650]
+    },
+    {
+      str: "Valor energético",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 620]
+    },
+    {
+      str: "11 kcal=46 KJ",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 410, 620]
+    },
+    {
+      str: "1%",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 500, 620]
+    },
+    {
+      str: "Proteínas",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 605]
+    },
+    {
+      str: "2 g",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 420, 605]
+    },
+    {
+      str: "4%",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 500, 605]
+    }
+  ]);
+
+  assert.equal(
+    text,
+    [
+      "Texto izquierda línea 1",
+      "Texto izquierda línea 2",
+      "INFORMACIÓN NUTRICIONAL",
+      "Valor energético 11 kcal=46 KJ 1%",
+      "Proteínas 2 g 4%"
+    ].join("\n")
+  );
+});
+
+test("reordena una tabla descompuesta sin mezclar la columna vecina", () => {
+  const text = normalizePageItemsV1([
+    {
+      str: "Texto de la columna izquierda",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 50, 579]
+    },
+    {
+      str: "INFORMACIÓN NUTRICIONAL",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 309, 644]
+    },
+    {
+      str: "Cantidad por porción",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 387, 600]
+    },
+    {
+      str: "Proteína",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 312, 563]
+    },
+    {
+      str: "s",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 337, 563]
+    },
+    {
+      str: "%VD",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 494, 601]
+    },
+    {
+      str: "Valor energético",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 578]
+    },
+    {
+      str: "2500 mg",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 416, 548]
+    },
+    {
+      str: "1%",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 499, 578]
+    },
+    {
+      str: "Luteína",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 309, 537]
+    },
+    {
+      str: "2 g",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 422, 564]
+    },
+    {
+      str: "-",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 501, 550]
+    },
+    {
+      str: "Colágeno",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 310, 549]
+    },
+    {
+      str: "5",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 421, 536]
+    },
+    {
+      str: "mg",
+      hasEOL: true,
+      transform: [1, 0, 0, 1, 427, 536]
+    },
+
+    // PDF.js entrega estos valores después.
+    {
+      str: "11 kcal=46",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 409, 577]
+    },
+    {
+      str: "KJ",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 441, 577]
+    },
+    {
+      str: "4%",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 499, 565]
+    },
+    {
+      str: "-",
+      hasEOL: false,
+      transform: [1, 0, 0, 1, 501, 535]
+    }
+  ]);
+
+  assert.ok(
+    text.includes("Texto de la columna izquierda")
+  );
+
+  assert.ok(
+    text.includes("Valor energético 11 kcal=46 KJ 1%")
+  );
+
+  assert.ok(
+    text.includes("Proteínas 2 g 4%")
+  );
+
+  assert.ok(
+    text.includes("Colágeno 2500 mg -")
+  );
+
+  assert.ok(
+    text.includes("Luteína 5 mg -")
+  );
+
+  assert.ok(
+    !text.includes(
+      "Texto de la columna izquierda Valor energético"
+    )
+  );
+});
