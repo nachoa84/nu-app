@@ -1,7 +1,7 @@
 "use strict";
 
 const {
-  createNaturalIntentMatcherV1
+  matchIntentRuleV1
 } = require("./iris-ai-natural-intent-matcher-v1");
 
 const COLLAGEN_PRODUCT_SLUG_V1 = "beauty-focus-collagen-plus";
@@ -149,6 +149,16 @@ const COLLAGEN_INTENTS_V1 = Object.freeze({
   })
 });
 
+const COLLAGEN_INTENT_PRIORITY_V1 = Object.freeze([
+  "pregnancy_warning",
+  "lactation_warning",
+  "children_warning",
+  "wheat_warning",
+  "lutein_amount",
+  "collagen_amount",
+  "usage"
+]);
+
 const COLLAGEN_RETRIEVAL_HINTS_V1 = Object.freeze({
   usage: Object.freeze(["instrucciones de consumo"]),
   collagen_amount: Object.freeze(["colageno 2500 mg"]),
@@ -159,7 +169,14 @@ const COLLAGEN_RETRIEVAL_HINTS_V1 = Object.freeze({
   wheat_warning: Object.freeze(["derivados de trigo"])
 });
 
-const matchCollagenIntentV1 = createNaturalIntentMatcherV1(COLLAGEN_INTENTS_V1);
+function matchCollagenIntentV1(question) {
+  for (const intent of COLLAGEN_INTENT_PRIORITY_V1) {
+    if (matchIntentRuleV1(question, COLLAGEN_INTENTS_V1[intent])) {
+      return intent;
+    }
+  }
+  return null;
+}
 
 function getCollagenRetrievalHintsV1(input = {}) {
   const productSlug = String(input.productSlug || "").trim();
@@ -173,6 +190,7 @@ function getCollagenRetrievalHintsV1(input = {}) {
 
 module.exports = {
   COLLAGEN_INTENTS_V1,
+  COLLAGEN_INTENT_PRIORITY_V1,
   COLLAGEN_PRODUCT_SLUG_V1,
   COLLAGEN_RETRIEVAL_HINTS_V1,
   getCollagenRetrievalHintsV1,

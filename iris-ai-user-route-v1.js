@@ -7,9 +7,11 @@ const {
 
 const MAX_USER_ID_CHARS_V1 = 128;
 const MAX_QUESTION_CHARS_V1 = 500;
+const MAX_PRODUCT_SLUG_CHARS_V1 = 100;
 const USER_ID_PATTERN_V1 = /^[A-Za-z0-9_-]+$/;
 const COUNTRY_PATTERN_V1 = /^(GLOBAL|[A-Z]{2})$/;
 const LANGUAGE_PATTERN_V1 = /^[a-z]{2}(-[A-Z]{2})?$/;
+const PRODUCT_SLUG_PATTERN_V1 = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 class IrisAiUserRouteErrorV1 extends Error {
   constructor(message, status = 400) {
@@ -40,7 +42,8 @@ function normalizeRequestV1(body = {}) {
     "question",
     "userId",
     "country",
-    "language"
+    "language",
+    "productSlug"
   ]);
 
   if (Object.keys(body).some(key => !allowedKeys.has(key))) {
@@ -51,6 +54,9 @@ function normalizeRequestV1(body = {}) {
   const userId = String(body.userId || "").trim();
   const country = String(body.country || "").trim().toUpperCase();
   const language = String(body.language || "es").trim();
+  const productSlug = body.productSlug == null
+    ? null
+    : String(body.productSlug).trim().toLowerCase();
 
   if (!question || question.length > MAX_QUESTION_CHARS_V1) {
     throw new IrisAiUserRouteErrorV1("Pregunta inválida.");
@@ -72,7 +78,20 @@ function normalizeRequestV1(body = {}) {
     throw new IrisAiUserRouteErrorV1("Idioma inválido.");
   }
 
-  return Object.freeze({ question, userId, country, language });
+  if (
+    productSlug != null &&
+    (
+      !productSlug ||
+      productSlug.length > MAX_PRODUCT_SLUG_CHARS_V1 ||
+      !PRODUCT_SLUG_PATTERN_V1.test(productSlug)
+    )
+  ) {
+    throw new IrisAiUserRouteErrorV1("Producto inválido.");
+  }
+
+  const normalized = { question, userId, country, language };
+  if (productSlug) normalized.productSlug = productSlug;
+  return Object.freeze(normalized);
 }
 
 function hashScopeV1(prefix, value, hashImpl = crypto.createHash) {
@@ -197,6 +216,7 @@ function createIrisAiUserRouteV1({
         question: input.question,
         language: input.language,
         country: input.country,
+        productSlug: input.productSlug || null,
         userScope: hashScopeV1("iris_user", input.userId, hashImpl),
         deviceScope: hashScopeV1(
           "iris_device",
@@ -225,8 +245,10 @@ module.exports = {
   COUNTRY_PATTERN_V1,
   IrisAiUserRouteErrorV1,
   LANGUAGE_PATTERN_V1,
+  MAX_PRODUCT_SLUG_CHARS_V1,
   MAX_QUESTION_CHARS_V1,
   MAX_USER_ID_CHARS_V1,
+  PRODUCT_SLUG_PATTERN_V1,
   USER_ID_PATTERN_V1,
   controlledPilotBypassV1,
   createIrisAiUserRouteV1,

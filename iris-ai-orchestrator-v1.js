@@ -313,7 +313,13 @@ function createIrisAiOrchestratorV1({
       if (!provider.name || provider.name !== runtime.providerName) return fallback("provider_mismatch");
       let authorization;
       try {
-        authorization = await runtime.authorizeProviderCall({ retrieval: retrievalAssessment, totalQuestionsInPeriod, now });
+        authorization = await runtime.authorizeProviderCall({
+          retrieval: retrievalAssessment,
+          totalQuestionsInPeriod,
+          userScope,
+          deviceScope,
+          now
+        });
       } catch {
         return fallback("policy_runtime_error");
       }

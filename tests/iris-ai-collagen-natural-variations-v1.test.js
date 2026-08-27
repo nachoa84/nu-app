@@ -13,6 +13,8 @@ const {
   createCollagenRetrievalScopeResolverV1
 } = require("../iris-ai-collagen-retrieval-scope-v1");
 
+const COLLAGEN_PRODUCT_SLUG = "beauty-focus-collagen-plus";
+
 const fragment = {
   documentKey: "doc_collagen_test_v1",
   versionLabel: "2021-04-27",
@@ -20,7 +22,7 @@ const fragment = {
   title: "Beauty Focus Collagen+",
   country: "AR",
   category: "product-information",
-  productSlug: "beauty-focus-collagen-plus",
+  productSlug: COLLAGEN_PRODUCT_SLUG,
   content: [
     "INFORMACIÓN NUTRICIONAL",
     "Colágeno 2500 mg -",
@@ -40,10 +42,12 @@ const cases = [
   ["¿Qué cantidad de colágeno tiene?", "collagen_amount"],
   ["¿Cuántos miligramos de luteína trae?", "lutein_amount"],
   ["¿Lo pueden tomar las mujeres embarazadas?", "pregnancy_warning"],
+  ["¿El colágeno lo pueden tomar las embarazadas?", "pregnancy_warning"],
   ["¿Es apto durante el embarazo?", "pregnancy_warning"],
   ["¿Puedo tomarlo si estoy dando de mamar?", "lactation_warning"],
   ["¿Una mujer que amamanta puede consumirlo?", "lactation_warning"],
   ["¿Lo pueden tomar los niños?", "children_warning"],
+  ["¿El colágeno lo pueden tomar los niños?", "children_warning"],
   ["¿Es apto para niños?", "children_warning"],
   ["¿Tiene trigo?", "wheat_warning"],
   ["¿Es libre de gluten?", "wheat_warning"]
@@ -55,7 +59,18 @@ test("clasifica variaciones naturales en intents cerrados", () => {
   }
 });
 
-test("todas las variaciones reconocidas pueden resolver scope antes de retrieval", async () => {
+test("prioriza advertencias de seguridad sobre el verbo tomar", () => {
+  assert.equal(
+    matchCollagenIntentV1("¿El colágeno lo pueden tomar las embarazadas?"),
+    "pregnancy_warning"
+  );
+  assert.equal(
+    matchCollagenIntentV1("¿El colágeno lo pueden tomar los niños?"),
+    "children_warning"
+  );
+});
+
+test("todas las variaciones reconocidas resuelven scope cuando el producto ya fue resuelto", async () => {
   const resolveScope = createCollagenRetrievalScopeResolverV1();
 
   for (const [question] of cases) {
@@ -64,14 +79,31 @@ test("todas las variaciones reconocidas pueden resolver scope antes de retrieval
       language: "es",
       country: "AR",
       category: null,
-      productSlug: null
+      productSlug: COLLAGEN_PRODUCT_SLUG
     });
 
     assert.deepEqual(scope, {
       country: "AR",
       category: "product-information",
-      productSlug: "beauty-focus-collagen-plus"
+      productSlug: COLLAGEN_PRODUCT_SLUG
     }, question);
+  }
+});
+
+test("referencias al colágeno sin productSlug no abren scope documental", async () => {
+  const resolveScope = createCollagenRetrievalScopeResolverV1();
+  const unresolvedCases = [
+    "¿Cuántos mg de colágeno aporta?",
+    "¿Cuánto collagen tiene?",
+    "¿Cómo se toma Collagen+?"
+  ];
+
+  for (const question of unresolvedCases) {
+    assert.equal(await resolveScope({
+      question,
+      language: "es",
+      country: "AR"
+    }), null, question);
   }
 });
 
@@ -84,7 +116,7 @@ test("las variaciones responden solo si existe evidencia autorizada", async () =
       language: "es",
       country: "AR",
       category: "product-information",
-      productSlug: "beauty-focus-collagen-plus",
+      productSlug: COLLAGEN_PRODUCT_SLUG,
       context: [fragment]
     });
 
@@ -111,7 +143,8 @@ test("claims fuera del catálogo siguen cerrados", async () => {
     assert.equal(await resolveScope({
       question,
       language: "es",
-      country: "AR"
+      country: "AR",
+      productSlug: COLLAGEN_PRODUCT_SLUG
     }), null, question);
   }
 });

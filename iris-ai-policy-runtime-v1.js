@@ -23,12 +23,22 @@ function createIrisAiPolicyRuntimeV1({
   config,
   usageQuotaStore,
   providerBudgetStore,
-  metricsStore
+  metricsStore,
+  separatedQuotaStore = null
 } = {}) {
   if (!config || typeof config !== "object") {
     throw new IrisAiPolicyRuntimeErrorV1("config requerido.");
   }
-  assertMethodV1(usageQuotaStore, "consume", "usageQuotaStore");
+
+  const separatedQuotasEnabled = separatedQuotaStore != null;
+
+  if (separatedQuotasEnabled) {
+    assertMethodV1(separatedQuotaStore, "recordQuestion", "separatedQuotaStore");
+    assertMethodV1(separatedQuotaStore, "consumeProviderUsage", "separatedQuotaStore");
+  } else {
+    assertMethodV1(usageQuotaStore, "consume", "usageQuotaStore");
+  }
+
   assertMethodV1(providerBudgetStore, "reserve", "providerBudgetStore");
   assertMethodV1(providerBudgetStore, "finalize", "providerBudgetStore");
   assertMethodV1(providerBudgetStore, "release", "providerBudgetStore");
@@ -49,7 +59,14 @@ function createIrisAiPolicyRuntimeV1({
   }
 
   async function beginQuestion({ userScope, deviceScope = null, now = new Date() } = {}) {
-    const usage = await usageQuotaStore.consume({ userScope, deviceScope, now });
+    let usage;
+
+    if (separatedQuotasEnabled) {
+      usage = await separatedQuotaStore.recordQuestion({ now });
+    } else {
+      usage = await usageQuotaStore.consume({ userScope, deviceScope, now });
+    }
+
     if (!usage.allowed) {
       return Object.freeze({ allowed: false, reason: usage.reason, totalQuestionsInPeriod: 0 });
     }
@@ -94,7 +111,13 @@ function createIrisAiPolicyRuntimeV1({
     });
   }
 
-  async function authorizeProviderCall({ retrieval, totalQuestionsInPeriod, now = new Date() } = {}) {
+  async function authorizeProviderCall({
+    retrieval,
+    totalQuestionsInPeriod,
+    userScope = null,
+    deviceScope = null,
+    now = new Date()
+  } = {}) {
     const preflight = evaluateIrisAiPolicyV1({
       config,
       retrieval,
@@ -148,6 +171,33 @@ function createIrisAiPolicyRuntimeV1({
         decision: finalDecision.decision,
         reservationId: null
       });
+    }
+
+    if (separatedQuotasEnabled) {
+      let providerUsage;
+      try {
+        providerUsage = await separatedQuotaStore.consumeProviderUsage({
+          userScope,
+          deviceScope,
+          now
+        });
+      } catch (error) {
+        await providerBudgetStore.release(reservation.reservationId);
+        await metric("budget_reservations_released");
+        throw error;
+      }
+
+      if (!providerUsage?.allowed) {
+        await providerBudgetStore.release(reservation.reservationId);
+        await metric("budget_reservations_released");
+        await metric("provider_quota_blocked");
+        return Object.freeze({
+          allowed: false,
+          reason: providerUsage?.reason || "provider_usage_limit_exhausted",
+          decision: DECISIONS_V1.INSUFFICIENT,
+          reservationId: null
+        });
+      }
     }
 
     return Object.freeze({
