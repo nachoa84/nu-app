@@ -3,29 +3,10 @@ name: Iris AI core v1
 on:
   pull_request:
     paths:
-      - "iris-ai-provider-v1.js"
-      - "iris-ai-provider-factory-v1.js"
-      - "iris-ai-groq-provider-v1.js"
-      - "iris-ai-orchestrator-v1.js"
-      - "iris-ai-hardening-v1.js"
-      - "iris-retrieval-query-prep-v1.js"
-      - "iris-ai-policy-config-v1.js"
-      - "iris-ai-policy-engine-v1.js"
-      - "iris-ai-policy-runtime-v1.js"
-      - "iris-ai-local-response-v1.js"
-      - "iris-ai-quota-store-v1.js"
-      - "iris-ai-metrics-store-v1.js"
-      - "tests/iris-ai-orchestrator-v1.test.js"
-      - "tests/iris-ai-hardening-v1.test.js"
-      - "tests/iris-retrieval-query-prep-v1.test.js"
-      - "tests/iris-ai-policy-engine-v1.test.js"
-      - "tests/iris-ai-quota-metrics-v1.test.js"
-      - "tests/iris-ai-policy-runtime-integration-v1.test.js"
-      - "tests/iris-ai-policy-runtime-unsafe-input-v1.test.js"
-      - "tests/iris-ai-policy-runtime-metrics-failure-v1.test.js"
-      - "tests/iris-ai-local-responses-v1.test.js"
-      - "tests/iris-ai-groq-provider-v1.test.js"
-      - "tests/iris-ai-provider-factory-v1.test.js"
+      - "iris-ai-*.js"
+      - "iris-retrieval-*.js"
+      - "tests/iris-ai-*.test.js"
+      - "tests/iris-retrieval-*.test.js"
       - ".github/workflows/iris-ai-core-v1.yml"
   workflow_dispatch:
 
@@ -41,5 +22,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Run Iris AI core tests
-        run: node --test tests/iris-ai-orchestrator-v1.test.js tests/iris-ai-hardening-v1.test.js tests/iris-retrieval-query-prep-v1.test.js tests/iris-ai-policy-engine-v1.test.js tests/iris-ai-quota-metrics-v1.test.js tests/iris-ai-policy-runtime-integration-v1.test.js tests/iris-ai-policy-runtime-unsafe-input-v1.test.js tests/iris-ai-policy-runtime-metrics-failure-v1.test.js tests/iris-ai-local-responses-v1.test.js tests/iris-ai-groq-provider-v1.test.js tests/iris-ai-provider-factory-v1.test.js
+      - name: Run Iris AI core unit tests
+        shell: bash
+        run: |
+          mapfile -d '' test_files < <(
+            find tests -maxdepth 1 -type f \
+              \( -name 'iris-ai-*.test.js' -o -name 'iris-retrieval-*.test.js' \) \
+              ! -name '*.integration.test.js' \
+              -print0 | sort -z
+          )
+
+          if [ "${#test_files[@]}" -eq 0 ]; then
+            echo "No Iris AI/retrieval unit tests found."
+            exit 1
+          fi
+
+          printf 'Running %s unit test files:\n' "${#test_files[@]}"
+          printf ' - %s\n' "${test_files[@]}"
+          node --test "${test_files[@]}"
