@@ -83,13 +83,13 @@ test("responde advertencia y trigo desde evidencia explícita", async () => {
   const wheat = await resolve("contiene trigo");
   assert.equal(
     wheat.answer,
-    "El documento indica que contiene derivados de trigo. No afirma que sea libre de gluten."
+    "El documento indica que contiene derivados de trigo. Con este dato aprobado no puedo afirmar que sea libre de gluten."
   );
 
   const glutenFree = await resolve("es libre de gluten");
   assert.equal(
     glutenFree.answer,
-    "El documento indica que contiene derivados de trigo. No afirma que sea libre de gluten."
+    "El documento indica que contiene derivados de trigo. Con este dato aprobado no puedo afirmar que sea libre de gluten."
   );
 });
 
