@@ -163,7 +163,7 @@ const matchCollagenIntentV1 = createNaturalIntentMatcherV1(COLLAGEN_INTENTS_V1);
 
 function getCollagenRetrievalHintsV1(input = {}) {
   const productSlug = String(input.productSlug || "").trim();
-  if (productSlug && productSlug !== COLLAGEN_PRODUCT_SLUG_V1) return [];
+  if (productSlug !== COLLAGEN_PRODUCT_SLUG_V1) return [];
 
   const intent = matchCollagenIntentV1(input.question);
   if (!intent) return [];
