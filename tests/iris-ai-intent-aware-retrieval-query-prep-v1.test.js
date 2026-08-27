@@ -131,6 +131,7 @@ test("pregunta natural recupera evidencia por hint y responde localmente sin pro
     question: "¿Cómo tengo que tomarlo?",
     language: "es",
     country: "AR",
+    productSlug: PRODUCT_SLUG,
     userScope: "test_user",
     deviceScope: "test_device"
   });
