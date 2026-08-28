@@ -41,7 +41,7 @@
         <button class="foco-live-close" type="button" aria-label="Cerrar aviso">×</button>
         <span class="foco-live-eyebrow">Aviso de evento</span>
         <div class="foco-live-image-card">
-          <img src="assets/custom/foco-logo.jpg" alt="Foco en vivo" />
+          <img src="assets/custom/foco-live-card.png" alt="Foco en vivo" />
         </div>
         <div class="foco-live-copy">
           <h2 id="focoLiveTitle">Foco en vivo</h2>
