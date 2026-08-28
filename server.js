@@ -1533,8 +1533,8 @@ function getDueFocoEventsV1() {
     {
       kind: "midday",
       time: "13:00",
-      title: "📺 Foco en vivo este martes",
-      body: "Recordatorio: hoy a las 19:00 (Argentina) en Tu Vida en Foco.",
+      title: "Hoy en vivo",
+      body: "Te esperamos hoy a las 19hs Arg",
       url: FOCO_YOUTUBE_URL_V1,
       tag: `foco_midday_${dateKey}`
     },
@@ -4100,8 +4100,8 @@ app.post(
               test: true
             }
           : {
-              title: "📺 Foco en vivo — prueba",
-              body: "Recordatorio de prueba para el vivo de los martes.",
+              title: "Hoy en vivo",
+              body: "Te esperamos hoy a las 19hs Arg",
               url: FOCO_YOUTUBE_URL_V1,
               tag: "foco_test_midday",
               focoKind: "midday",
