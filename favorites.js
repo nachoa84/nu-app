@@ -519,6 +519,7 @@ function favoritePreviewNode(favorite) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", favoriteReady, { once: true });
+    swapVideoForCapturedFrame(media, wrap);
     media.src = favorite.src;
   } else {
     media.alt = favorite.label || "";

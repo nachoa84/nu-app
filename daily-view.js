@@ -201,6 +201,7 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
+    swapVideoForCapturedFrame(media, preview);
     media.src = block.src;
   } else {
     media.alt = "";
