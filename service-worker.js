@@ -30,7 +30,7 @@ const CORE=[
   "./bot.js?v=124a-iris-layout",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
-  "./assets/custom/foco-logo.jpg",
+  "./assets/custom/foco-live-card.png",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
