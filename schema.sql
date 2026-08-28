@@ -41,6 +41,26 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user
   ON push_subscriptions(user_id);
 
+-- NU APP · EVENTOS SEMANALES DE FOCO V1
+-- Cola idempotente para los dos avisos de cada martes.
+CREATE TABLE IF NOT EXISTS foco_notification_runs (
+  event_key TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  CHECK (kind IN ('midday', 'live')),
+  CHECK (status IN ('pending', 'processing', 'sent', 'failed'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_foco_notification_runs_due
+  ON foco_notification_runs(status, scheduled_for)
+  WHERE status IN ('pending', 'failed');
+
 CREATE TABLE IF NOT EXISTS notification_jobs (
   id BIGSERIAL PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

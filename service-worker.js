@@ -1,4 +1,4 @@
-const CACHE="nuapp-v136-unified-daily-unlock";
+const CACHE="nuapp-v137-foco-live-notification";
 
 const CORE=[
   "./",
@@ -14,6 +14,7 @@ const CORE=[
   "./shared.css?v=87-shared-ui-legibility",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
+  "./foco-live.css?v=1",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=126-assistant-spacing",
@@ -29,9 +30,11 @@ const CORE=[
   "./bot.js?v=124a-iris-layout",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
+  "./assets/custom/foco-live-card.png",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
+  "./foco-live.js?v=1",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
@@ -395,6 +398,9 @@ self.addEventListener(
           notificationId:
             data.notificationId ||
             data.tag ||
+            null,
+          focoKind:
+            data.focoKind ||
             null
         },
         tag:
@@ -404,6 +410,26 @@ self.addEventListener(
           }
         )
     ];
+
+    if (data.focoEvent && data.focoKind) {
+      tasks.push(
+        self.clients
+          .matchAll({
+            type: "window",
+            includeUncontrolled: true
+          })
+          .then(windowClients =>
+            Promise.all(
+              windowClients.map(client =>
+                client.postMessage({
+                  type: "NU_FOCO_EVENT",
+                  payload: data
+                })
+              )
+            )
+          )
+      );
+    }
 
     if (
       self.navigator &&
