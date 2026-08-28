@@ -1520,6 +1520,176 @@ function buildUnifiedRoutinePayloadV101A(batch) {
   };
 }
 
+// NU APP · AVISOS SEMANALES DE FOCO V1
+const FOCO_NOTIFICATION_TIMEZONE_V1 = "America/Argentina/Buenos_Aires";
+const FOCO_YOUTUBE_URL_V1 = "https://www.youtube.com/@TuvidaenFoco";
+
+function getDueFocoEventsV1() {
+  const now = DateTime.now().setZone(FOCO_NOTIFICATION_TIMEZONE_V1);
+  if (now.weekday !== 2) return [];
+
+  const dateKey = now.toFormat("yyyy-LL-dd");
+  return [
+    {
+      kind: "midday",
+      time: "13:00",
+      title: "📺 Foco en vivo este martes",
+      body: "Recordatorio: hoy a las 19:00 (Argentina) en Tu Vida en Foco.",
+      url: FOCO_YOUTUBE_URL_V1,
+      tag: `foco_midday_${dateKey}`
+    },
+    {
+      kind: "live",
+      time: "18:58",
+      title: "🔴 Foco en vivo comienza en 2 minutos",
+      body: "Entrá a Tu Vida en Foco y miralo en vivo.",
+      url: "/?focoEvent=live",
+      tag: `foco_live_${dateKey}`,
+      focoEvent: true,
+      focoKind: "live"
+    }
+  ].map(event => {
+    const [hour, minute] = event.time.split(":").map(Number);
+    return {
+      ...event,
+      eventKey: `foco:${dateKey}:${event.kind}`,
+      scheduledFor: now.startOf("day").set({
+        hour,
+        minute,
+        second: 0,
+        millisecond: 0
+      }).toUTC().toJSDate()
+    };
+  });
+}
+
+async function sendFocoPushV1(payload) {
+  assertDatabase();
+  assertPushConfigured();
+
+  const result = await pool.query(
+    `SELECT id, subscription
+     FROM push_subscriptions
+     ORDER BY updated_at DESC`
+  );
+
+  let sent = 0;
+  let removed = 0;
+
+  for (const row of result.rows) {
+    try {
+      await webpush.sendNotification(row.subscription, JSON.stringify(payload));
+      sent += 1;
+    } catch (error) {
+      const statusCode = Number(error.statusCode || 0);
+      if (statusCode === 404 || statusCode === 410) {
+        await pool.query("DELETE FROM push_subscriptions WHERE id = $1", [row.id]);
+        removed += 1;
+      }
+    }
+  }
+
+  return { sent, removed, subscriptions: result.rowCount };
+}
+
+async function processFocoNotificationsV1() {
+  const summary = { processed: 0, sent: 0, removed: 0 };
+  if (!pool || !pushConfigured) return summary;
+
+  const now = DateTime.now().toUTC();
+  const events = getDueFocoEventsV1();
+
+  for (const event of events) {
+    await pool.query(
+      `INSERT INTO foco_notification_runs (
+         event_key, kind, scheduled_for, status, updated_at
+       ) VALUES ($1, $2, $3, 'pending', NOW())
+       ON CONFLICT (event_key) DO NOTHING`,
+      [event.eventKey, event.kind, event.scheduledFor]
+    );
+  }
+
+  for (;;) {
+    const client = await pool.connect();
+    let claimed = null;
+
+    try {
+      await client.query("BEGIN");
+      const result = await client.query(
+        `SELECT event_key, kind, scheduled_for
+         FROM foco_notification_runs
+         WHERE status IN ('pending', 'failed')
+           AND scheduled_for <= $1
+           AND attempts < 3
+         ORDER BY scheduled_for ASC
+         FOR UPDATE SKIP LOCKED
+         LIMIT 1`,
+        [now.toJSDate()]
+      );
+
+      if (result.rowCount) {
+        claimed = result.rows[0];
+        await client.query(
+          `UPDATE foco_notification_runs
+           SET status = 'processing',
+               attempts = attempts + 1,
+               updated_at = NOW()
+           WHERE event_key = $1`,
+          [claimed.event_key]
+        );
+      }
+
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
+
+    if (!claimed) break;
+
+    const event = events.find(item => item.eventKey === claimed.event_key);
+    if (!event) {
+      await pool.query(
+        `UPDATE foco_notification_runs
+         SET status = 'failed', last_error = $2, updated_at = NOW()
+         WHERE event_key = $1`,
+        [claimed.event_key, "Evento de Foco fuera de la ventana semanal."]
+      );
+      continue;
+    }
+
+    try {
+      const delivery = await sendFocoPushV1(event);
+      await pool.query(
+        `UPDATE foco_notification_runs
+         SET status = 'sent',
+             sent_at = NOW(),
+             last_error = NULL,
+             updated_at = NOW()
+         WHERE event_key = $1`,
+        [claimed.event_key]
+      );
+      summary.processed += 1;
+      summary.sent += delivery.sent;
+      summary.removed += delivery.removed;
+    } catch (error) {
+      await pool.query(
+        `UPDATE foco_notification_runs
+         SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'failed' END,
+             last_error = $2,
+             updated_at = NOW()
+         WHERE event_key = $1`,
+        [claimed.event_key, error.message || String(error)]
+      );
+      summary.processed += 1;
+    }
+  }
+
+  return summary;
+}
+
 // NU APP · ENTREGA POR DISPOSITIVO V111
 async function prepareNotificationDeliveriesV111(batch, payload) {
   const logicalKey = logicalDeliveryKeyV111(batch);
@@ -2187,11 +2357,14 @@ async function runSchedulerCycle() {
 
     // Mantenimiento y entrega empiezan juntos. Así el worker líder no queda
     // rezagado mientras los demás reclaman todos los trabajos pendientes.
-    const [maintenance, notifications] = await Promise.all([
+    const [maintenance, notifications, foco] = await Promise.all([
       runLeaderMaintenanceV116(deadline),
       pushConfigured && Date.now() < deadline
         ? processUnifiedRoutineNotificationJobsV109(deadline)
-        : Promise.resolve(emptyNotifications)
+        : Promise.resolve(emptyNotifications),
+      pushConfigured && Date.now() < deadline
+        ? processFocoNotificationsV1()
+        : Promise.resolve({ processed: 0, sent: 0, removed: 0 })
     ]);
 
     if (
@@ -2199,7 +2372,8 @@ async function runSchedulerCycle() {
       maintenance.productAdvanced > 0 ||
       maintenance.recovered > 0 ||
       maintenance.recoveredDeliveries > 0 ||
-      notifications.processed > 0
+      notifications.processed > 0 ||
+      foco.processed > 0
     ) {
       console.log(
         `[scheduler-v116] worker=${process.pid} lider=${maintenance.leader ? 1 : 0} ` +
@@ -2214,6 +2388,7 @@ async function runSchedulerCycle() {
         `dispositivos_enviados=${notifications.deviceSent} ` +
         `dispositivos_reintentables=${notifications.deviceRetryable} ` +
         `dispositivos_permanentes=${notifications.devicePermanent} ` +
+        `foco_procesados=${foco.processed} foco_enviados=${foco.sent} ` +
         `suscripciones_eliminadas=${notifications.subscriptionsRemoved}`
       );
     }
