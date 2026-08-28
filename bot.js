@@ -913,6 +913,7 @@ const BOT_COUNTRY_ALIASES = {
   "Argentina": ["argentina", "arg"],
   "México": ["mexico", "mex"],
   "España": ["espana", "esp"],
+  "Europa": ["europa", "europeo", "europea"],
   "Chile": ["chile", "chi"],
   "Colombia": ["colombia", "col"],
   "Perú": ["peru", "per"],

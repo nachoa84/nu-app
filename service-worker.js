@@ -1,4 +1,4 @@
-const CACHE="nuapp-v137-foco-live-notification";
+const CACHE="nuapp-v138-country-catalogs";
 
 const CORE=[
   "./",
@@ -19,7 +19,7 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=126-assistant-spacing",
   "./favorites.css?v=94-bot-folders",
-  "./bot-content.js?v=79-loi-navegacion",
+  "./bot-content.js?v=131-country-catalogs",
   "./ui-core.js?v=126-iris-navigation",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
@@ -27,10 +27,11 @@ const CORE=[
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
-  "./bot.js?v=124a-iris-layout",
+  "./bot.js?v=131-country-catalogs",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
   "./assets/custom/foco-live-card.svg",
+  "./assets/catalogos/catalogo-europa-02-2026.pdf",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
