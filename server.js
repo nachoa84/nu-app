@@ -4056,6 +4056,77 @@ app.post(
 );
 
 app.post(
+  "/api/admin/foco-test-latest",
+  async (req, res, next) => {
+    try {
+      assertAdminTestRoutesEnabled();
+      assertDatabase();
+      assertPushConfigured();
+      assertAdminTestToken(req);
+
+      const kind =
+        req.body?.kind === "midday"
+          ? "midday"
+          : "live";
+
+      const result = await pool.query(
+        `SELECT
+           ps.id,
+           ps.user_id,
+           ps.subscription,
+           u.name
+         FROM push_subscriptions ps
+         JOIN users u ON u.id = ps.user_id
+         ORDER BY ps.updated_at DESC
+         LIMIT 1`
+      );
+
+      if (!result.rowCount) {
+        const error = new Error("No hay dispositivos suscriptos.");
+        error.status = 404;
+        throw error;
+      }
+
+      const row = result.rows[0];
+      const payload =
+        kind === "live"
+          ? {
+              title: "🔴 Foco en vivo — prueba",
+              body: "Tocá para abrir la tarjeta de Foco en Nu App.",
+              url: "/?focoEvent=live",
+              tag: "foco_test_live",
+              focoEvent: true,
+              focoKind: "live",
+              test: true
+            }
+          : {
+              title: "📺 Foco en vivo — prueba",
+              body: "Recordatorio de prueba para el vivo de los martes.",
+              url: FOCO_YOUTUBE_URL_V1,
+              tag: "foco_test_midday",
+              focoKind: "midday",
+              test: true
+            };
+
+      await webpush.sendNotification(
+        row.subscription,
+        JSON.stringify(payload)
+      );
+
+      res.json({
+        ok: true,
+        sent: 1,
+        kind,
+        userId: row.user_id,
+        name: row.name
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
   "/api/admin/push-test-latest",
   async (req, res, next) => {
     try {
