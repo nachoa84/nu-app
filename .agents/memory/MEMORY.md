@@ -1,0 +1,1 @@
+- [Ramas y límites de Nu App](nu-app-release-guardrails.md) — trabajar en development; preservar visual blanca y mantener Iris externo apagado salvo pruebas controladas.

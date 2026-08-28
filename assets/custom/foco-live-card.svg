@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 500" role="img" aria-labelledby="title desc">
+  <title id="title">Foco en vivo</title>
+  <desc id="desc">Tarjeta clara para el evento semanal de Foco</desc>
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef2fb"/>
+      <stop offset="1" stop-color="#fff4ed"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f08b68"/>
+      <stop offset="1" stop-color="#d85638"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="500" rx="32" fill="url(#wash)"/>
+  <circle cx="510" cy="112" r="76" fill="#f5c7a9" opacity=".78"/>
+  <circle cx="112" cy="410" r="120" fill="#dfe7f8" opacity=".9"/>
+  <path d="M0 366c115-80 190-24 280-82 96-62 151-31 233-82 52-32 91-39 127-27v325H0Z" fill="#fff" opacity=".78"/>
+  <circle cx="320" cy="242" r="84" fill="url(#sun)"/>
+  <path d="M286 250c21-42 48-63 83-64-8 20-21 40-40 59-17 18-31 34-43 54-8-17-8-33 0-49Z" fill="#fff7f1" opacity=".96"/>
+  <path d="M243 164c24-26 51-40 83-42M398 165c25 16 42 38 51 66" fill="none" stroke="#304f9a" stroke-linecap="round" stroke-width="12" opacity=".8"/>
+  <text x="320" y="390" text-anchor="middle" fill="#17223d" font-family="Arial, sans-serif" font-size="42" font-weight="700">FOCO EN VIVO</text>
+  <text x="320" y="430" text-anchor="middle" fill="#78808c" font-family="Arial, sans-serif" font-size="20" letter-spacing="3">MARTES · 19:00 ARG</text>
+</svg>
