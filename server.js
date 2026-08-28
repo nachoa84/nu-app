@@ -1560,6 +1560,10 @@ function getDueFocoEventsV1() {
         millisecond: 0
       }).toUTC().toJSDate()
     };
+  }).filter(event => {
+    const scheduledMs = event.scheduledFor.getTime();
+    const nowMs = now.toUTC().toJSDate().getTime();
+    return scheduledMs <= nowMs && nowMs < scheduledMs + 5 * 60 * 1000;
   });
 }
 
