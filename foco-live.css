@@ -29,10 +29,11 @@ body.foco-live-open {
 .foco-live-dialog {
   position: relative;
   z-index: 1;
-  width: min(360px, 100%);
+  width: min(330px, 100%);
   display: grid;
+  gap: 14px;
   justify-items: center;
-  padding: 18px 18px 16px;
+  padding: 14px 14px 14px;
   border: 1px solid rgba(48, 79, 154, .10);
   border-radius: 26px;
   background: var(--app-surface, #fff);
@@ -78,8 +79,9 @@ body.foco-live-open {
   object-fit: cover;
 }
 
-.foco-live-join {
-  width: min(280px, 100%);
+ .foco-live-join {
+  width: min(250px, 100%);
+  margin-top: 2px;
   min-height: 50px;
   display: grid;
   place-items: center;
