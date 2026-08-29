@@ -29,11 +29,11 @@ body.foco-live-open {
 .foco-live-dialog {
   position: relative;
   z-index: 1;
-  width: min(330px, 100%);
+  width: min(310px, 100%);
   display: grid;
-  gap: 14px;
+  gap: 18px;
   justify-items: center;
-  padding: 14px 14px 14px;
+  padding: 18px 14px 20px;
   border: 1px solid rgba(48, 79, 154, .10);
   border-radius: 26px;
   background: var(--app-surface, #fff);
@@ -46,17 +46,37 @@ body.foco-live-open {
   top: 12px;
   right: 12px;
   z-index: 2;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(48, 79, 154, .10);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .94);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .78);
   color: var(--app-text, #17223d);
-  font-size: 25px;
-  font-weight: 400;
-  line-height: 1;
+  box-shadow: 0 4px 12px rgba(35, 63, 130, .10);
+  line-height: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.foco-live-close svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.foco-live-close:focus {
+  outline: none;
+}
+
+.foco-live-close:focus-visible {
+  outline: 2px solid rgba(48, 79, 154, .35);
+  outline-offset: 3px;
 }
 
 .foco-live-image-card {
