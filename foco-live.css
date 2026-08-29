@@ -58,15 +58,6 @@ body.foco-live-open {
   line-height: 1;
 }
 
-.foco-live-eyebrow {
-  margin: 2px 0 14px;
-  color: var(--app-muted, #78808c);
-  font-size: 11px;
-  font-weight: 760;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-
 .foco-live-image-card {
   width: 100%;
   overflow: hidden;
@@ -85,26 +76,6 @@ body.foco-live-open {
 
 .foco-live-image-card img {
   object-fit: cover;
-}
-
-.foco-live-copy {
-  padding: 17px 8px 14px;
-  text-align: center;
-}
-
-.foco-live-copy h2 {
-  margin: 0;
-  color: var(--app-text, #17223d);
-  font-size: 26px;
-  font-weight: 780;
-  letter-spacing: -.04em;
-}
-
-.foco-live-copy p {
-  margin: 7px 0 0;
-  color: var(--app-muted, #78808c);
-  font-size: 14px;
-  line-height: 1.4;
 }
 
 .foco-live-join {
@@ -126,16 +97,6 @@ body.foco-live-open {
 
 .foco-live-join:active {
   transform: scale(.98);
-}
-
-.foco-live-dismiss {
-  margin-top: 13px;
-  padding: 4px 10px;
-  border: 0;
-  background: transparent;
-  color: var(--app-muted, #78808c);
-  font-size: 12.5px;
-  font-weight: 650;
 }
 
 @keyframes foco-live-in {

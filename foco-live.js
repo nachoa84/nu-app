@@ -60,25 +60,18 @@
     modal.setAttribute("aria-hidden", "true");
     modal.innerHTML = `
       <button class="foco-live-backdrop" type="button" aria-label="Cerrar aviso de Foco"></button>
-      <section class="foco-live-dialog" role="dialog" aria-modal="true" aria-labelledby="focoLiveTitle">
+      <section class="foco-live-dialog" role="dialog" aria-modal="true" aria-label="Foco en vivo">
         <button class="foco-live-close" type="button" aria-label="Cerrar aviso">×</button>
-        <span class="foco-live-eyebrow">Aviso de evento</span>
         <div class="foco-live-image-card">
-          <img src="assets/custom/foco-live-card.svg" alt="Foco en vivo" />
-        </div>
-        <div class="foco-live-copy">
-          <h2 id="focoLiveTitle">Foco en vivo</h2>
-          <p>Todos los martes · 19:00 Argentina</p>
+          <img src="assets/custom/foco-live-card.png" alt="Foco en vivo" />
         </div>
         <a class="foco-live-join" href="${YOUTUBE_URL}" target="_blank" rel="noopener noreferrer">Ver en vivo</a>
-        <button class="foco-live-dismiss" type="button">Ahora no</button>
       </section>
     `;
 
     document.body.appendChild(modal);
     modal.querySelector(".foco-live-backdrop")?.addEventListener("click", closeModal);
     modal.querySelector(".foco-live-close")?.addEventListener("click", closeModal);
-    modal.querySelector(".foco-live-dismiss")?.addEventListener("click", closeModal);
     modal.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         event.preventDefault();

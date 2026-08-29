@@ -30,7 +30,7 @@ const CORE=[
   "./bot.js?v=131-country-catalogs",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
-  "./assets/custom/foco-live-card.svg",
+  "./assets/custom/foco-live-card.png",
   "./assets/catalogos/catalogo-europa-02-2026.pdf",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
