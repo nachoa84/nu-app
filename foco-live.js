@@ -61,7 +61,9 @@
     modal.innerHTML = `
       <button class="foco-live-backdrop" type="button" aria-label="Cerrar aviso de Foco"></button>
       <section class="foco-live-dialog" role="dialog" aria-modal="true" aria-label="Foco en vivo">
-        <button class="foco-live-close" type="button" aria-label="Cerrar aviso">×</button>
+        <button class="foco-live-close" type="button" aria-label="Cerrar aviso">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
         <div class="foco-live-image-card">
           <img src="assets/custom/foco-live-card.png" alt="Foco en vivo" />
         </div>
