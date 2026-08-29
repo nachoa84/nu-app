@@ -29,11 +29,11 @@ body.foco-live-open {
 .foco-live-dialog {
   position: relative;
   z-index: 1;
-  width: min(310px, 100%);
+  width: min(290px, 100%);
   display: grid;
-  gap: 18px;
+  gap: 22px;
   justify-items: center;
-  padding: 18px 14px 20px;
+  padding: 20px 14px 24px;
   border: 1px solid rgba(48, 79, 154, .10);
   border-radius: 26px;
   background: var(--app-surface, #fff);
@@ -43,27 +43,28 @@ body.foco-live-open {
 
 .foco-live-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   z-index: 2;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   padding: 0;
   border: 0;
   border-radius: 10px;
-  background: rgba(255, 255, 255, .78);
+  background: rgba(31, 42, 68, .08);
   color: var(--app-text, #17223d);
-  box-shadow: 0 4px 12px rgba(35, 63, 130, .10);
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
   line-height: 0;
   appearance: none;
   -webkit-appearance: none;
 }
 
 .foco-live-close svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.2;
