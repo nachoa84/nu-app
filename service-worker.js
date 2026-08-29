@@ -1,4 +1,4 @@
-const CACHE="nuapp-v138-country-catalogs";
+const CACHE="nuapp-v139-foco-card-refinement";
 
 const CORE=[
   "./",
@@ -14,7 +14,7 @@ const CORE=[
   "./shared.css?v=87-shared-ui-legibility",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
-  "./foco-live.css?v=1",
+  "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=126-assistant-spacing",
@@ -35,7 +35,7 @@ const CORE=[
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
-  "./foco-live.js?v=1",
+  "./foco-live.js?v=2",
   "./home-view.js?v=61b-progress-canonical",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
