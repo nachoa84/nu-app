@@ -3915,6 +3915,77 @@ app.post(
   }
 );
 
+app.post(
+  "/api/admin/foco-test",
+  async (req, res, next) => {
+    try {
+      assertAdminTestRoutesEnabled();
+      assertDatabase();
+      assertPushConfigured();
+      assertAdminTestToken(req);
+
+      const userId = String(req.body.userId || "").trim();
+      if (!userId) {
+        const error = new Error("Falta userId.");
+        error.status = 400;
+        throw error;
+      }
+
+      const result = await pool.query(
+        `
+        SELECT id, subscription
+        FROM push_subscriptions
+        WHERE user_id = $1
+        ORDER BY updated_at DESC
+        `,
+        [userId]
+      );
+
+      if (!result.rowCount) {
+        const error = new Error(
+          "Este usuario no tiene dispositivos suscriptos."
+        );
+        error.status = 404;
+        throw error;
+      }
+
+      const payload = JSON.stringify({
+        title: "Foco en vivo",
+        body: "La ventana de Foco está lista para abrirse.",
+        url: "/?focoEvent=live",
+        tag: `foco_test_${Date.now()}`,
+        focoEvent: true,
+        focoKind: "live"
+      });
+
+      let sent = 0;
+      let removed = 0;
+
+      for (const row of result.rows) {
+        try {
+          await webpush.sendNotification(row.subscription, payload);
+          sent += 1;
+        } catch (error) {
+          if (error.statusCode === 404 || error.statusCode === 410) {
+            await pool.query(
+              "DELETE FROM push_subscriptions WHERE id = $1",
+              [row.id]
+            );
+            removed += 1;
+          } else {
+            throw error;
+          }
+        }
+      }
+
+      res.json({ ok: true, sent, removed });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+
 
 
 app.use(
