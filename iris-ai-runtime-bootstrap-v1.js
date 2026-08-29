@@ -25,6 +25,12 @@ const {
   createConservativeDirectRetrievalAssessorV1
 } = require("./iris-ai-direct-retrieval-assessor-v1");
 const {
+  createCollagenGroundedRetrievalResolverV1
+} = require("./iris-ai-collagen-grounded-response-v1");
+const {
+  createCollagenRetrievalScopeResolverV1
+} = require("./iris-ai-collagen-retrieval-scope-v1");
+const {
   createIrisAiOrchestratorV1
 } = require("./iris-ai-orchestrator-v1");
 
@@ -136,12 +142,17 @@ function createIrisAiRuntimeBootstrapV1({
 
   const directRetrievalEnabled =
     enabledFlagV1(env?.IRIS_AI_DIRECT_RETRIEVAL_ENABLED);
+  const collagenGroundedEnabled =
+    enabledFlagV1(env?.IRIS_AI_COLLAGEN_LOCAL_GROUNDED_ENABLED);
 
   const localResponseEngine =
     createIrisAiLocalResponseEngineV1({
       retrievalAssessor: directRetrievalEnabled
         ? createConservativeDirectRetrievalAssessorV1()
-        : undefined
+        : undefined,
+      groundedRetrievalResolver: collagenGroundedEnabled
+        ? createCollagenGroundedRetrievalResolverV1()
+        : null
     });
 
   const provider = createConfiguredIrisAiProviderV1({
@@ -157,7 +168,10 @@ function createIrisAiRuntimeBootstrapV1({
     env,
     timeoutMs: config.timeoutMs,
     policyRuntime,
-    localResponseEngine
+    localResponseEngine,
+    resolveRetrievalScope: collagenGroundedEnabled
+      ? createCollagenRetrievalScopeResolverV1()
+      : null
   });
 
   return Object.freeze({
