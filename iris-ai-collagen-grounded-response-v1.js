@@ -108,7 +108,13 @@ function createCollagenGroundedRetrievalResolverV1() {
         question.includes("cuanto collagen") ||
         question.includes("cuanto colageno") ||
         question.includes("cantidad de collagen") ||
-        question.includes("cantidad de colageno")
+        question.includes("cantidad de colageno") ||
+        question.includes("cuantos mg de collagen") ||
+        question.includes("cuantos mg de colageno") ||
+        question.includes("cuantos miligramos de collagen") ||
+        question.includes("cuantos miligramos de colageno") ||
+        question.includes("cuanto aporta de collagen") ||
+        question.includes("cuanto aporta de colageno")
       ) {
         if (/Col[aá]geno\s+2500\s+mg/i.test(content)) {
           return candidateV1(
@@ -121,7 +127,10 @@ function createCollagenGroundedRetrievalResolverV1() {
       if (
         question.includes("cuanta luteina") ||
         question === "luteina" ||
-        question.includes("cantidad de luteina")
+        question.includes("cantidad de luteina") ||
+        question.includes("cuantos mg de luteina") ||
+        question.includes("cuantos miligramos de luteina") ||
+        question.includes("cuanto aporta de luteina")
       ) {
         if (/Lute[ií]na\s+5\s+mg/i.test(content)) {
           return candidateV1(
