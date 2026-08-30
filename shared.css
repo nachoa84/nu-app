@@ -105,40 +105,6 @@
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* El teclado del Bot ajusta su layout sin alterar otros módulos. */
-body.keyboard-open #view-bot.active {
-  min-height: 0;
-  height: var(--bot-visual-height, 100dvh);
-  overflow: hidden;
-  padding-bottom: 4px;
-}
-
-body.keyboard-open .bot-card {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: auto;
-  overflow: hidden;
-}
-
-body.keyboard-open .bot-card.has-conversation .bot-thread {
-  min-height: 0;
-  max-height: none;
-  flex: 1 1 0;
-  overflow-y: auto;
-}
-
-body.keyboard-open .bot-form {
-  position: relative;
-  bottom: auto;
-  flex: 0 0 auto;
-  margin-top: auto;
-  padding-bottom: calc(4px + var(--safe-bottom));
-}
-
-body.keyboard-open .bot-page-header {
-  padding-bottom: 4px;
-}
-
 /* =========================================================
    V87 · Legibilidad de acciones compartidas
    Escala tipográfica sin cambios de comportamiento.

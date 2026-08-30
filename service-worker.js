@@ -1,4 +1,4 @@
-const CACHE="nuapp-v137-home-v3";
+const CACHE="nuapp-v139-iris-canonical";
 
 const CORE=[
   "./",
@@ -11,12 +11,12 @@ const CORE=[
   "./daily.css?v=98a-responsive-day2",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
-  "./shared.css?v=87-shared-ui-legibility",
+  "./shared.css?v=139-iris-canonical",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=137-home-v3",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=126-assistant-spacing",
+  "./bot.css?v=139-iris-canonical",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=126-iris-navigation",
@@ -27,7 +27,7 @@ const CORE=[
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
   "./bot.js?v=124a-iris-layout",
-  "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
+  "./bot-shortcuts-v95.js?v=139-iris-canonical",
   "./assets/custom/nuskin-logo-icon.svg",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
