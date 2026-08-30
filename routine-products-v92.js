@@ -310,10 +310,19 @@ function createFixedRoutineCardV92b(config) {
 function createUpcomingPharmanexCardV123() {
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-placeholder";
+  card.dataset.routineId = "pharmanex-upcoming";
   card.setAttribute("aria-disabled", "true");
   card.innerHTML = `
-    <div class="home-routine-cover" aria-hidden="true">
-      <img src="assets/custom/routine-pharmanex-home.png" alt="" loading="lazy" />
+    <div class="home-routine-cover home-routine-cover-pharmanex" aria-hidden="true">
+      <div class="home-pharmanex-mark">
+        <svg viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+          <path d="M31.5 51V29.5" />
+          <path d="M31.5 38C22 37.5 15.5 31.5 14 22c9.5.5 16 6.5 17.5 16Z" />
+          <path d="M32 31.5C33.5 21 40.5 14 51 13c-1 10.5-8 17.5-19 18.5Z" />
+          <path d="M31.5 46c-7.5 0-12.5-3.5-15-10.5 7.5-.5 12.5 3 15 10.5Z" />
+        </svg>
+        <span>PHARMANEX</span>
+      </div>
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>Suplementos</h2></div>
