@@ -77,101 +77,83 @@
   <div id="app">
     <main>
       <section id="view-hoy" class="view active">
-        <header class="app-page-header home-page-header">
-          <div>
-            <span id="homeGreeting" class="home-greeting">Hola</span>
-            <h1 id="homeDayTitle">Inicio</h1>
-          </div>
-          <button id="homeBellBtn" class="icon-button home-bell-btn" type="button" aria-label="Notificaciones"></button>
-        </header>
+        <div class="home-flow">
+          <header class="home-hero">
+            <button id="homeBellBtn" class="icon-button home-bell-btn" type="button" aria-label="Notificaciones"></button>
 
-        <section id="homeGuideSection" class="home-guide-section" aria-labelledby="homeGuideTitle">
-          <article class="home-guide-feature">
-            <div class="home-guide-feature-copy">
-              <span id="homeGuideKicker" class="home-guide-kicker">Empezá por acá</span>
-              <h2 id="homeGuideTitle">Guía de inicio</h2>
-              <p id="homeGuideDescription" class="home-guide-description">
-                Tus primeros pasos para comenzar con claridad y acompañamiento.
-              </p>
+            <div class="home-brand" aria-label="Nu Comunidad">
+              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="Nu Comunidad" />
+            </div>
 
-              <div class="home-guide-progress-row">
-                <div class="home-guide-progress-copy">
-                  <span id="homeGuideProgress">0 de 9 etapas</span>
-                  <strong id="homeGuidePercent">0%</strong>
+            <div class="home-orange-wave" aria-hidden="true"></div>
+
+            <div id="homeGreeting" class="home-greeting">Hola</div>
+
+            <article id="homeGuideSection" class="home-guide-section" aria-labelledby="homeGuideTitle">
+              <div class="home-guide-feature">
+                <div class="home-guide-brand" aria-hidden="true"></div>
+                <div class="home-guide-feature-copy">
+                  <span id="homeGuideKicker" class="home-guide-kicker">Empezá por acá</span>
+                  <h1 id="homeGuideTitle">Guía de inicio</h1>
+                  <button id="openGuideBtn" class="home-guide-action" type="button">
+                    <span id="homeGuideButtonLabel">Continuar</span>
+                  </button>
                 </div>
-                <div class="home-guide-progress" aria-hidden="true">
-                  <span id="homeGuideProgressFill"></span>
-                </div>
+                <button class="home-guide-round-action" type="button" aria-label="Abrir guía">
+                  <span aria-hidden="true">↗</span>
+                </button>
               </div>
+            </article>
+          </header>
 
-              <button id="openGuideBtn" class="home-guide-action home-guide-open" type="button">
-                <span id="homeGuideButtonLabel">Comenzar</span>
-                <span class="home-guide-open-icon" aria-hidden="true"></span>
-              </button>
-            </div>
-
-            <div class="home-guide-brand" aria-hidden="true">
-              <img src="assets/guide/logo-nu-comunidad-transparent.png" alt="" />
-            </div>
-          </article>
-        </section>
-
-        <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
-          <div class="home-section-heading">
-            <div>
+          <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
+            <div class="home-section-heading">
               <span>Tu día a día</span>
               <h2 id="homeRoutinesTitle">Mis rutinas</h2>
             </div>
-          </div>
 
-          <div class="home-routines">
-            <article class="home-routine-card home-routine-card-active">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img id="homeRoutineImage" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
-              </div>
+            <div class="home-routine-tabs" role="tablist" aria-label="Elegir rutina">
+              <button class="home-routine-tab is-active" type="button" role="tab" aria-selected="true">
+                <img src="assets/custom/routine-collagen-home.png" alt="" />
+                <span>Collagen+</span>
+              </button>
+              <button class="home-routine-tab" type="button" role="tab" aria-selected="false">
+                <img src="assets/custom/routine-lumispa-home.png" alt="" />
+                <span>LumiSpa</span>
+              </button>
+              <button class="home-routine-tab" type="button" role="tab" aria-selected="false">
+                <img src="assets/custom/routine-galvanicspa-home.webp" alt="" />
+                <span>Galvanic</span>
+              </button>
+              <button class="home-routine-tab" type="button" role="tab" aria-selected="false">
+                <img src="assets/custom/routine-wellspa-home.jpg" alt="" />
+                <span>WellSpa</span>
+              </button>
+              <button class="home-routine-tab" type="button" role="tab" aria-selected="false">
+                <img src="assets/custom/routine-pharmanex-home.png" alt="" />
+                <span>Pharmanex</span>
+              </button>
+            </div>
 
-              <div class="home-routine-body">
-                <div class="home-routine-heading">
-                  <h2>Collagen+</h2>
-                </div>
-                <p id="homeRoutineDay" class="home-routine-day">Día 1 de 30</p>
+            <article class="home-routine-feature" aria-live="polite">
+              <div class="home-routine-feature-copy">
+                <span class="home-routine-kicker">Hoy</span>
+                <h2>Collagen+</h2>
+                <p id="homeRoutineDay">Día 1 de 30</p>
                 <div class="home-routine-progress-row">
-                  <div class="home-routine-progress" aria-hidden="true">
-                    <span id="homeRoutineProgressFill"></span>
-                  </div>
-                  <span id="homeRoutinePercent" class="home-routine-percent">3%</span>
+                  <div class="home-routine-progress" aria-hidden="true"><span id="homeRoutineProgressFill"></span></div>
+                  <span id="homeRoutinePercent">3%</span>
                 </div>
                 <button id="startDayBtn" class="home-routine-continue" type="button">
-                  <span id="homeRoutineContinueLabel">Continuar Día 1</span>
-                  <span class="home-routine-continue-icon" aria-hidden="true"></span>
+                  <span id="homeRoutineContinueLabel">Continuar Día 1</span><span aria-hidden="true">›</span>
                 </button>
-                <button id="openRoutineBtn" class="home-routine-progress-link" type="button" hidden>Ver progreso de 30 días</button>
               </div>
+              <img id="homeRoutineImage" class="home-routine-feature-product" src="assets/custom/routine-collagen-home.png" alt="Collagen+" />
             </article>
 
-            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-lumispa-home.png" alt="LumiSpa" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>LumiSpa</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-                <span class="home-routine-placeholder-label">Nueva rutina</span>
-              </div>
-            </article>
-
-            <article class="home-routine-card home-routine-card-placeholder" aria-disabled="true">
-              <div class="home-routine-cover" aria-hidden="true">
-                <img src="assets/custom/routine-pharmanex-home.png" alt="Suplementos Pharmanex" />
-              </div>
-              <div class="home-routine-body">
-                <div class="home-routine-heading"><h2>Suplementos</h2></div>
-                <p class="home-routine-day">Próximamente</p>
-                <span class="home-routine-placeholder-label">Nueva rutina</span>
-              </div>
-            </article>
-          </div>
-        </section>
+            <p class="home-routine-swipe-hint">☝︎ &nbsp; Deslizá o elegí otra rutina</p>
+          </section>
+        </div>
 
         <div id="chatWrap" class="chat-wrap">
           <header id="dailyNativeHeader" class="daily-native-header" hidden>
