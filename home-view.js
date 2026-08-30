@@ -46,7 +46,12 @@ function setupHomeView() {
   const greeting = document.getElementById("homeGreeting");
 
   if (greeting) {
-    greeting.textContent = name ? `Hola, ${name}` : "Hola";
+    const nameNode = greeting.querySelector(".home-greeting-name");
+    if (nameNode) {
+      nameNode.textContent = name;
+    } else {
+      greeting.textContent = name ? `Hola, ${name}` : "Hola";
+    }
   }
 
   const bell = document.getElementById("homeBellBtn");
