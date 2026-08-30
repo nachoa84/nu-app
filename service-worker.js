@@ -1,4 +1,4 @@
-const CACHE="nuapp-v136-unified-daily-unlock";
+const CACHE="nuapp-v137-home-v3";
 
 const CORE=[
   "./",
@@ -14,7 +14,7 @@ const CORE=[
   "./shared.css?v=87-shared-ui-legibility",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
-  "./home.css?v=126-mobile-header-spacing",
+  "./home.css?v=137-home-v3",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=126-assistant-spacing",
   "./favorites.css?v=94-bot-folders",
@@ -32,7 +32,7 @@ const CORE=[
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
-  "./home-view.js?v=61b-progress-canonical",
+  "./home-view.js?v=137-home-v3",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
@@ -55,6 +55,13 @@ const CORE=[
   "./assets/custom/nu-write-v2.mp4",
   "./assets/custom/nu-write-v2-poster.png",
   "./assets/custom/nu-app-word-v51.png",
+  "./assets/nu-logo-home-v3.png",
+  "./assets/nu-guide-building-v3.jpg",
+  "./assets/nu-collagen-cutout-v3.png",
+  "./assets/nu-lumispa-cutout-v3.png",
+  "./assets/nu-galvanic-cutout-v3.png",
+  "./assets/nu-wellspa-cutout-v3.png",
+  "./assets/nu-pharmanex-cutout-v3.png",
 
   "./icons/nuapp-favicon-32.png?v=61b-progress-canonical",
   "./icons/nuapp-favicon-48.png?v=61b-progress-canonical",
