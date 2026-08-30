@@ -1,37 +1,6 @@
 /* Notifications redesign v2 · visual interaction only.
    Keeps existing push/time handlers intact and reshapes the current DOM. */
 (() => {
-  function ensureDailyReferenceStylesLast() {
-    const dailySheets = [
-      { href: "daily-redesign-reference-v2.css?v=20260823-1332", key: "daily-redesign-reference-v2.css", tag: "v2" },
-      { href: "daily-reference-force-v3.css?v=20260823-1836", key: "daily-reference-force-v3.css", tag: "v3" },
-      { href: "typography-reference-v1.css?v=20260823-1836", key: "typography-reference-v1.css", tag: "type-v1" },
-      { href: "toast-redesign-v1.css?v=20260823-1904", key: "toast-redesign-v1.css", tag: "toast-v2" },
-      { href: "checks-brand-v1.css?v=20260823-2014", key: "checks-brand-v1.css", tag: "checks-v1" },
-      { href: "daily-materials-completion-v1.css?v=20260823-2119", key: "daily-materials-completion-v1.css", tag: "daily-materials-v1" },
-      { href: "iris-refinement-v2.css?v=20260823-2129", key: "iris-refinement-v2.css", tag: "iris-v2" },
-      { href: "screens-reference-force-v1.css?v=20260823-2248", key: "screens-reference-force-v1.css", tag: "screens-ref-v2" },
-      { href: "mobile-last-mile-v1.css?v=20260823-2251", key: "mobile-last-mile-v1.css", tag: "mobile-last-v1" },
-      { href: "mobile-consistency-v2.css?v=20260823-2318", key: "mobile-consistency-v2.css", tag: "mobile-consistency-v2" }
-    ];
-
-    dailySheets.forEach(({ key }) => {
-      Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-        .filter(link => (link.getAttribute("href") || "").includes(key))
-        .forEach(link => link.remove());
-    });
-
-    dailySheets.forEach(({ href, tag }) => {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      link.dataset.dailyReference = tag;
-      document.head.appendChild(link);
-    });
-  }
-
-  ensureDailyReferenceStylesLast();
-
   function setupIrisComposerV2() {
     const form = document.getElementById("botForm");
     const shortcuts = document.getElementById("botShortcutsBtn");
