@@ -1,4 +1,4 @@
-const CACHE="nuapp-v139-foco-card-refinement";
+const CACHE="nuapp-v140-floating-navigation";
 
 const CORE=[
   "./",
@@ -8,6 +8,7 @@ const CORE=[
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
+  "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./daily.css?v=98a-responsive-day2",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
