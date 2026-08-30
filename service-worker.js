@@ -1,4 +1,4 @@
-const CACHE="nuapp-v139-iris-canonical";
+const CACHE="nuapp-v140-iris-header-composer";
 
 const CORE=[
   "./",
@@ -16,7 +16,7 @@ const CORE=[
   "./notifications.css?v=86-notifications-legibility",
   "./home.css?v=137-home-v3",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=139-iris-canonical",
+  "./bot.css?v=140-iris-header-composer",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=79-loi-navegacion",
   "./ui-core.js?v=126-iris-navigation",
@@ -27,7 +27,7 @@ const CORE=[
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
   "./bot.js?v=124a-iris-layout",
-  "./bot-shortcuts-v95.js?v=139-iris-canonical",
+  "./bot-shortcuts-v95.js?v=140-iris-header-composer",
   "./assets/custom/nuskin-logo-icon.svg",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
