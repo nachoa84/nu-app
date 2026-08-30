@@ -100,7 +100,7 @@ body[data-active-view="hoy"] #app {
 #view-hoy #homeGuideSection.home-guide-section {
   position: relative;
   z-index: 1;
-  min-height: calc(100svh - 126px - var(--safe-top));
+  min-height: calc(100svh - 208px - var(--safe-top));
   display: flex;
   flex-direction: column;
   margin: 0;
