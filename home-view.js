@@ -36,7 +36,15 @@ function renderHomeRoutineSummary(dayNumber, dayData) {
   }
 
   if (homeRoutineImage) {
-    homeRoutineImage.src = getActiveRoutineConfig().cover;
+    const activeRoutine = getActiveRoutineConfig();
+    const homeV3Assets = {
+      "collagen-30": "assets/nu-collagen-cutout-v3.png",
+      "lumispa-10": "assets/nu-lumispa-cutout-v3.png",
+      "galvanicspa-10": "assets/nu-galvanic-cutout-v3.png",
+      "wellspa-10": "assets/nu-wellspa-cutout-v3.png"
+    };
+    homeRoutineImage.src = homeV3Assets[activeRoutine.id] || activeRoutine.cover;
+    homeRoutineImage.alt = activeRoutine.title;
   }
 }
 
