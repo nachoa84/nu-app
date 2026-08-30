@@ -1,13 +1,3 @@
-// NU APP · DETALLE DIARIO REDESIGN V1
-// Carga visual aislada para el detalle diario sin tocar service worker/cache.
-if (!document.getElementById("dailyRedesignV1Stylesheet")) {
-  const dailyRedesignStylesheet = document.createElement("link");
-  dailyRedesignStylesheet.id = "dailyRedesignV1Stylesheet";
-  dailyRedesignStylesheet.rel = "stylesheet";
-  dailyRedesignStylesheet.href = "daily-redesign-v1.css";
-  document.head.appendChild(dailyRedesignStylesheet);
-}
-
 const chat = document.getElementById("chat");
 const chatWrap = document.getElementById("chatWrap");
 const progressText = document.getElementById("progressText");
@@ -79,27 +69,26 @@ if (installBtn) installBtn.onclick = async () => {
   installBtn?.classList.add("hidden");
 };
 
-// NU APP · ACTUALIZACIÓN AUTOMÁTICA CONTROLADA V128
-const APP_VERSION_V128 = "128-controlled-auto-update";
-localStorage.setItem("nuapp:active-version", APP_VERSION_V128);
-const APP_UPDATE_RELOAD_KEY_V128 = "nuapp:update-reload-v128";
-const APP_UPDATED_NOTICE_KEY_V128 = "nuapp:updated-notice-v128";
+// NU APP · ACTUALIZACIÓN ESTABLE V142
+// Las versiones nuevas quedan en espera y solo se activan cuando la persona
+// elige "Actualizar". Esto evita reinicios durante el arranque.
+const APP_VERSION_V142 = "142-stable-manual-update";
+localStorage.setItem("nuapp:active-version", APP_VERSION_V142);
+const APP_UPDATE_RELOAD_KEY_V142 = "nuapp:update-reload-v142";
+const APP_UPDATED_NOTICE_KEY_V142 = "nuapp:updated-notice-v142";
 
-function botDraftIsActiveV128() {
-  const input = document.getElementById("botInput");
-  return Boolean(input && String(input.value || "").trim());
-}
-
-function reloadForAppUpdateV128() {
-  if (sessionStorage.getItem(APP_UPDATE_RELOAD_KEY_V128) === "1") return;
-  sessionStorage.setItem(APP_UPDATE_RELOAD_KEY_V128, "1");
-  sessionStorage.setItem(APP_UPDATED_NOTICE_KEY_V128, "1");
+function reloadForAppUpdateV142() {
+  // La marca permanece durante toda la sesión. Aunque hubiera más de una
+  // versión esperando, nunca puede encadenar varias recargas.
+  if (sessionStorage.getItem(APP_UPDATE_RELOAD_KEY_V142) === "1") return;
+  sessionStorage.setItem(APP_UPDATE_RELOAD_KEY_V142, "1");
+  sessionStorage.setItem(APP_UPDATED_NOTICE_KEY_V142, "1");
   window.location.reload();
 }
 
-function activateWaitingWorkerV128(registration) {
+function activateWaitingWorkerV142(registration) {
   if (!registration?.waiting) return false;
-  registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V128" });
+  registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V142" });
   return true;
 }
 
@@ -109,24 +98,24 @@ async function registerAppServiceWorker() {
     { updateViaCache: "none" }
   );
 
-  let updating = false;
+  let updatePromptVisible = false;
 
   const handleReadyUpdate = () => {
-    if (!registration.waiting || updating) return;
-    updating = true;
+    if (!registration.waiting || updatePromptVisible) return;
+    if (typeof toast !== "function") return;
 
-    if (botDraftIsActiveV128() && typeof toast === "function") {
-      toast("Hay una actualización lista.", {
-        type: "info",
-        actionLabel: "Actualizar",
-        duration: 10000,
-        onAction: () => activateWaitingWorkerV128(registration)
-      });
-      updating = false;
-      return;
-    }
+    updatePromptVisible = true;
+    toast("Hay una actualización lista.", {
+      type: "info",
+      actionLabel: "Actualizar",
+      duration: 15000,
+      onAction: () => activateWaitingWorkerV142(registration)
+    });
 
-    activateWaitingWorkerV128(registration);
+    // Permite volver a ofrecerla más adelante si el aviso venció.
+    window.setTimeout(() => {
+      updatePromptVisible = false;
+    }, 15500);
   };
 
   if (registration.waiting && navigator.serviceWorker.controller) {
@@ -170,13 +159,12 @@ async function registerAppServiceWorker() {
 }
 
 navigator.serviceWorker?.addEventListener("controllerchange", () => {
-  reloadForAppUpdateV128();
+  reloadForAppUpdateV142();
 });
 
 window.addEventListener("pageshow", () => {
-  if (sessionStorage.getItem(APP_UPDATED_NOTICE_KEY_V128) !== "1") return;
-  sessionStorage.removeItem(APP_UPDATED_NOTICE_KEY_V128);
-  sessionStorage.removeItem(APP_UPDATE_RELOAD_KEY_V128);
+  if (sessionStorage.getItem(APP_UPDATED_NOTICE_KEY_V142) !== "1") return;
+  sessionStorage.removeItem(APP_UPDATED_NOTICE_KEY_V142);
   setTimeout(() => {
     if (typeof toast === "function") {
       toast("Nu App se actualizó", { type: "success", duration: 2600 });
