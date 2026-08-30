@@ -16,7 +16,7 @@
   isolation: isolate;
   overflow-x: clip;
   padding-top: calc(20px + var(--safe-top));
-  padding-bottom: 116px;
+  padding-bottom: calc(88px + var(--safe-bottom));
   color: var(--home-ink);
   background: var(--home-white);
 }
@@ -25,12 +25,13 @@
   content: "";
   position: absolute;
   z-index: -1;
-  inset: 0 0 auto;
-  height: max(760px, 100svh);
+  inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 72% 43% at 0% 0%, rgb(0 167 200 / 88%), transparent 75%),
-    radial-gradient(ellipse 68% 48% at 100% 83%, rgb(0 167 200 / 84%), transparent 76%),
+    radial-gradient(ellipse 72% 18% at 0% 0%, rgb(0 167 200 / 82%), transparent 76%),
+    radial-gradient(ellipse 72% 20% at 100% 34%, rgb(0 167 200 / 58%), transparent 78%),
+    radial-gradient(ellipse 90% 22% at 0% 67%, rgb(0 167 200 / 20%), transparent 78%),
+    radial-gradient(ellipse 82% 18% at 100% 100%, rgb(0 167 200 / 34%), transparent 80%),
     var(--home-white);
 }
 
@@ -45,9 +46,9 @@ body[data-active-view="hoy"] #app {
   position: relative;
   top: auto;
   z-index: 2;
-  min-height: 90px;
+  min-height: 98px;
   margin: 0;
-  padding: 8px 2px 12px;
+  padding: 16px 2px 8px;
   align-items: flex-start;
   border: 0 !important;
   background: transparent !important;
@@ -57,9 +58,9 @@ body[data-active-view="hoy"] #app {
 }
 
 body.is-scrolled #view-hoy .home-page-header {
-  min-height: 90px;
+  min-height: 98px;
   margin: 0;
-  padding: 8px 2px 12px;
+  padding: 16px 2px 8px;
   align-items: flex-start;
   background: transparent !important;
   box-shadow: none !important;
@@ -130,11 +131,11 @@ body.is-scrolled #view-hoy .home-bell-btn {
 #view-hoy #homeGuideSection.home-guide-section {
   position: relative;
   z-index: 1;
-  min-height: calc(100svh - 112px - var(--safe-top));
+  min-height: calc(100svh - 160px - var(--safe-top));
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0 2px calc(90px + var(--safe-bottom));
+  padding: 0 2px calc(24px + var(--safe-bottom));
   box-sizing: border-box;
   border: 0;
   border-radius: 0;
@@ -318,42 +319,18 @@ body.is-scrolled #view-hoy .home-bell-btn {
   line-height: 1;
 }
 
-#view-hoy .home-routines-cue {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  margin-top: 24px;
-  color: var(--home-ink);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-#view-hoy .home-routines-cue b {
-  display: block;
-  color: var(--home-orange);
-  font-size: 26px;
-  font-weight: 400;
-  line-height: 1;
-  transform: rotate(90deg);
-}
 
 /* Rutinas: una card por fila */
 #view-hoy .home-routines-section {
   position: relative;
   z-index: 2;
   margin: 0 -18px;
-  padding: 30px 18px 22px;
+  padding: 22px 18px 14px;
   overflow: hidden;
   border: 0 !important;
   border-radius: 0;
   box-shadow: none !important;
-  background:
-    radial-gradient(ellipse 86% 27% at 100% 0%, rgb(0 167 200 / 66%), transparent 78%),
-    radial-gradient(ellipse 96% 42% at 0% 52%, rgb(0 167 200 / 20%), transparent 76%),
-    radial-gradient(ellipse 88% 28% at 100% 100%, rgb(0 167 200 / 34%), transparent 80%),
-    var(--home-white);
+  background: transparent;
 }
 
 #view-hoy .home-routines-section::before,
@@ -434,15 +411,19 @@ body.is-scrolled #view-hoy .home-bell-btn {
 }
 
 #view-hoy .home-routine-card[data-routine-id="collagen-30"] .home-routine-cover img {
-  transform: scale(1.28);
+  transform: scale(1.08);
+}
+
+#view-hoy .home-routine-card[data-routine-id="lumispa-10"] .home-routine-cover img {
+  transform: scale(.78);
 }
 
 #view-hoy .home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img {
-  transform: scale(1.42);
+  transform: scale(1.92);
 }
 
 #view-hoy .home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
-  transform: scale(1.06);
+  transform: scale(1.18);
 }
 
 #view-hoy .home-routine-body {
@@ -544,60 +525,34 @@ body.is-scrolled #view-hoy .home-bell-btn {
   background: #fff;
 }
 
-#view-hoy .home-routine-card-placeholder .home-routine-cover img {
-  opacity: .92;
-  filter: saturate(.82);
+#view-hoy .home-routine-cover-pharmanex {
+  background: #fff;
 }
 
-#view-hoy .home-routine-cover img[src*="routine-pharmanex-home"] {
-  opacity: 1;
-  filter: brightness(1.08) contrast(.92) saturate(.78);
-}
-
-/* Novedades queda después de las rutinas sin competir con Home */
-#view-hoy .home-news-section {
-  margin: 0 -18px 6px;
-  padding: 24px 20px 36px;
-  background: var(--home-white);
-}
-
-#view-hoy .home-news-section h2 {
-  margin: 0 0 16px;
-  color: var(--home-ink);
-  font-size: 22px;
-  font-weight: 700;
-}
-
-#view-hoy .home-news-item {
+#view-hoy .home-pharmanex-mark {
+  width: 78%;
   display: grid;
-  grid-template-columns: 8px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
+  justify-items: center;
+  gap: 7px;
+  color: #8da43d;
 }
 
-#view-hoy .home-news-dot {
-  width: 8px;
-  height: 8px;
-  margin-top: 5px;
-  border-radius: 50%;
-  background: var(--home-orange);
+#view-hoy .home-pharmanex-mark svg {
+  width: 44px;
+  height: 44px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-#view-hoy .home-news-copy strong,
-#view-hoy .home-news-copy span {
-  display: block;
+#view-hoy .home-pharmanex-mark span {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .05em;
 }
 
-#view-hoy .home-news-copy strong {
-  color: var(--home-ink);
-  font-size: 15px;
-}
-
-#view-hoy .home-news-copy span {
-  margin-top: 2px;
-  color: var(--home-muted);
-  font-size: 12px;
-}
 
 /* Navegación inferior como el mockup aprobado */
 body[data-active-view="hoy"] .bottom-nav {
