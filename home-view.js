@@ -40,6 +40,30 @@ function renderHomeRoutineSummary(dayNumber, dayData) {
   }
 }
 
+function ensureHomeNewsSection() {
+  if (document.getElementById("homeNewsSection")) return;
+
+  const routinesSection = document.querySelector("#view-hoy .home-routines-section");
+  if (!routinesSection) return;
+
+  const section = document.createElement("section");
+  section.id = "homeNewsSection";
+  section.className = "home-news-section";
+  section.setAttribute("aria-labelledby", "homeNewsTitle");
+  section.innerHTML = `
+    <h2 id="homeNewsTitle">Novedades</h2>
+    <article class="home-news-item">
+      <span class="home-news-dot" aria-hidden="true"></span>
+      <div class="home-news-copy">
+        <strong>Nueva historia de Collagen+</strong>
+        <span>Contenido reciente</span>
+      </div>
+    </article>
+  `;
+
+  routinesSection.insertAdjacentElement("afterend", section);
+}
+
 function setupHomeView() {
   const profile = getRoutineProfile();
   const name = profile?.name || profile?.firstName || "";
@@ -48,6 +72,8 @@ function setupHomeView() {
   if (greeting) {
     greeting.textContent = name ? `Hola, ${name}` : "Hola";
   }
+
+  ensureHomeNewsSection();
 
   const bell = document.getElementById("homeBellBtn");
   if (!bell) return;

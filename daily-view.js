@@ -201,6 +201,11 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
+    // Ver comentario en favorites.js / swapVideoForCapturedFrame (ui-core.js):
+    // sin poster, esta miniatura recortada quedaría como un <video> real,
+    // y en Android Chrome ese <video> puede ignorar el overflow:hidden del
+    // contenedor y asomar por fuera del recuadro redondeado. Se reemplaza
+    // por una <img> con el primer frame capturado a canvas.
     swapVideoForCapturedFrame(media, preview);
     media.src = block.src;
   } else {

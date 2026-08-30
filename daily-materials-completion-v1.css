@@ -1,0 +1,196 @@
+/* NU APP · DAILY MATERIALS + COMPLETION REFERENCE V1
+   Ajuste visual del tramo inferior del detalle diario.
+   Mantiene la lógica existente: materiales, completado y acceso a progreso. */
+
+/* Materiales: misma composición compacta de la referencia. */
+#view-hoy.day-open .materials-section {
+  margin-top: 4px !important;
+  padding: 0 !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading {
+  min-height: 26px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 9px !important;
+  padding: 0 !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading > div {
+  display: block !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading h3 {
+  margin: 0 !important;
+  color: #17152f !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+}
+
+#view-hoy.day-open .materials-section > .native-section-heading .section-count {
+  min-width: 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8c72a9 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-align: right !important;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence {
+  gap: 10px !important;
+  padding-bottom: 4px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-row {
+  gap: 5px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-thumb {
+  border-radius: 14px !important;
+  box-shadow: 0 7px 16px rgba(48, 33, 67, .06) !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy strong {
+  font-size: 9.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.18 !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy span {
+  margin-top: 2px !important;
+  color: #a38ab9 !important;
+  font-size: 7.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em !important;
+}
+
+/* Estado completado: un único botón "HECHO", consistente con el CTA
+   "Hoy lo hice" que reemplaza (no un ícono de check suelto). */
+#view-hoy.day-open .complete-card.done {
+  min-height: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 26px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy h3,
+#view-hoy.day-open .complete-card.done .complete-done-copy p {
+  display: none !important;
+}
+
+/* Pastilla "HECHO" de ancho contenido, centrada — no un botón full-width
+   (ese era exactamente el bug: ::after heredaba width:100% del contenedor
+   flex de arriba en vez de tener su propio ancho acotado). */
+#view-hoy.day-open .complete-card.done .complete-done-copy::after {
+  content: "HECHO" !important;
+  width: auto !important;
+  min-width: 150px !important;
+  max-width: 190px !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(115deg, #e85b39 0%, #c24b42 48%, #7a3f62 100%) !important;
+  color: #fff !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  letter-spacing: .08em !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+/* Evita que estilos globales de completado vuelvan a pintar el estado en verde. */
+#view-hoy.day-open .complete-card.done,
+#view-hoy.day-open .complete-card.done *,
+#view-hoy.day-open .complete-card.done .complete-done-inline-check {
+  border-color: transparent !important;
+}
+
+/* Acceso a progreso: tarjeta blanca baja, como la referencia. */
+#view-hoy.day-open .native-day-progress-button {
+  width: 100% !important;
+  min-height: 54px !important;
+  display: grid !important;
+  grid-template-columns: 30px minmax(0,1fr) 18px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 6px 0 0 !important;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.96) !important;
+  color: #201936 !important;
+  box-shadow: 0 8px 22px rgba(44, 31, 62, .055) !important;
+  text-align: left !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:first-child {
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 9px !important;
+  background: #f1edf6 !important;
+  color: #715681 !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:first-child svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+#view-hoy.day-open .native-day-progress-button strong {
+  min-width: 0 !important;
+  color: #201936 !important;
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -.01em !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:last-child {
+  justify-self: end !important;
+  color: #5b4b70 !important;
+}
+
+#view-hoy.day-open .native-day-progress-button > span:last-child svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+@media (max-width: 370px) {
+  /* Mantiene la pastilla "HECHO" — antes este breakpoint la volvía a
+     encoger a un cuadrado de 42x42 (el ícono suelto que se quería evitar). */
+  #view-hoy.day-open .complete-card.done .complete-done-copy::after {
+    min-width: 140px !important;
+    max-width: 170px !important;
+  }
+
+  #view-hoy.day-open .native-day-progress-button strong {
+    font-size: 14px !important;
+  }
+}

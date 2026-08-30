@@ -161,7 +161,6 @@ function swapVideoForCapturedFrame(video, container) {
   }, { once: true });
 }
 
-
 function ensureToastHost() {
   let host = document.getElementById("appToastHost");
   if (host) return host;
