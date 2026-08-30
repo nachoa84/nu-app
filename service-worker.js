@@ -1,4 +1,4 @@
-const CACHE="nuapp-v141-poppins-typography";
+const CACHE="nuapp-v142-stable-update";
 
 const CORE=[
   "./",
@@ -25,7 +25,7 @@ const CORE=[
   "./ui-core.js?v=126-iris-navigation",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=123-pharmanex-card",
+  "./routine-products-v92.js?v=20260830-home-continuity-v4",
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
@@ -38,11 +38,11 @@ const CORE=[
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=61b-progress-canonical",
   "./foco-live.js?v=2",
-  "./home-view.js?v=61b-progress-canonical",
+  "./home-view.js?v=20260830-home-continuity-v4",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
-  "./app.js?v=128-controlled-auto-update",
+  "./app.js?v=142-stable-manual-update",
   "./backend-client.js?v=136-unified-daily-unlock",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
@@ -148,7 +148,7 @@ self.addEventListener("install",event=>{
 });
 
 self.addEventListener("message", event => {
-  if (event.data?.type === "NUAPP_SKIP_WAITING_V128") {
+  if (event.data?.type === "NUAPP_SKIP_WAITING_V142") {
     self.skipWaiting();
   }
 });
@@ -333,6 +333,26 @@ self.addEventListener("fetch",event=>{
   }
 
   const requestUrl = new URL(req.url);
+  const isCurrentCodeAsset =
+    requestUrl.origin === self.location.origin &&
+    /\.(css|js)$/i.test(requestUrl.pathname);
+
+  // CSS y JavaScript se consultan primero en red. Si no hay conexión,
+  // se usa la copia offline. Así una página nueva no queda mezclada con
+  // código o estilos de una versión anterior.
+  if (isCurrentCodeAsset) {
+    event.respondWith(
+      fetch(req, { cache: "no-store" })
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(cache => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
   const isVideoAsset = /\.(mp4|mov|m4v|webm)$/i.test(requestUrl.pathname);
 
   if (isVideoAsset) {
