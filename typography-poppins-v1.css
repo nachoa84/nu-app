@@ -1,0 +1,25 @@
+/*
+  NU APP · TIPOGRAFÍA CANÓNICA POPPINS V1
+  Fuente confirmada directamente desde el archivo original de Figma.
+*/
+
+:root {
+  --nu-font-sans: "Poppins", sans-serif;
+}
+
+html,
+body,
+body *,
+body *::before,
+body *::after,
+button,
+input,
+textarea,
+select {
+  font-family: "Poppins", sans-serif !important;
+}
+
+html,
+body {
+  font-synthesis: none;
+}
