@@ -1,4 +1,4 @@
-const CACHE="nuapp-v140-floating-navigation";
+const CACHE="nuapp-v141-poppins-typography";
 
 const CORE=[
   "./",
@@ -9,6 +9,7 @@ const CORE=[
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
+  "./typography-poppins-v1.css?v=20260830-poppins-v1",
   "./daily.css?v=98a-responsive-day2",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
