@@ -1,257 +1,53 @@
-/* =========================================================
-   V52C · Inicio canónico
-   Mis rutinas en una sola capa visual. Sin hero legado ni overrides históricos.
-   ========================================================= */
-
-#view-hoy {
-  --home-ink: #17223d;
-  --home-muted: #7f8794;
-  --home-line: #e9ebef;
-  --home-progress: #5149b8;
-  --home-progress-soft: #eeeffb;
-  padding-top: calc(34px + var(--safe-top));
-}
-
-.home-page-header {
-  align-items: flex-start;
-  padding: 6px 0 22px;
-}
-
-.home-page-header > div {
-  min-width: 0;
-}
-
-.home-greeting {
-  display: block;
-  margin-bottom: 12px;
-  color: #66707d;
-  font-size: 14px;
-  font-weight: 520;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-}
-
-.home-page-header h1,
-#view-hoy .home-page-header h1 {
-  margin: 0;
-  color: var(--home-ink);
-  font-size: 28px;
-  font-weight: 680;
-  line-height: 1.06;
-  letter-spacing: -0.04em;
-}
-
-.home-routines {
-  display: grid;
-  gap: 13px;
-  margin-bottom: 8px;
-}
-
-.home-routine-card {
-  display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 15px;
-  min-height: 150px;
-  align-items: center;
-  overflow: hidden;
-  padding: 12px 13px;
-  border: 1px solid var(--home-line);
-  border-radius: 22px;
-  background: #fff;
-  box-shadow: 0 9px 24px rgba(23, 34, 61, .045);
-}
-
-.home-routine-cover {
-  width: 104px;
-  min-width: 104px;
-  height: 126px;
-  min-height: 126px;
-  overflow: hidden;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #f8f9f9 0%, #f1f3f4 100%);
-}
-
-.home-routine-cover img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  object-position: center;
-  padding: 9px;
-}
-
-.home-routine-body {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.home-routine-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 0;
-}
-
-.home-routine-heading h2 {
-  min-width: 0;
-  margin: 0;
-  color: var(--home-ink);
-  font-size: 17px;
-  font-weight: 650;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-}
-
-.home-routine-day {
-  margin: 6px 0 11px;
-  color: #66707d;
-  font-size: 13.5px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.home-routine-progress-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 10px;
-}
-
-.home-routine-progress {
-  width: 100%;
-  height: 4px;
-  overflow: hidden;
-  margin: 0;
-  border-radius: 999px;
-  background: #e9ebf1;
-}
-
-.home-routine-progress > span {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--home-progress);
-  transition: width 260ms cubic-bezier(.2, 0, 0, 1);
-}
-
-.home-routine-percent {
-  position: static;
-  flex: 0 0 auto;
-  color: #66707d;
-  font-size: 12px;
-  font-weight: 620;
-  font-variant-numeric: tabular-nums;
-}
-
-.home-routine-continue {
-  width: fit-content;
-  min-width: 0;
-  min-height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--home-progress-soft);
-  color: #4845aa;
-  box-shadow: none;
-  font-size: 13px;
-  font-weight: 650;
-  white-space: nowrap;
-  transition: transform 150ms ease, background 150ms ease, color 150ms ease;
-}
-
-.home-routine-continue:active {
-  transform: scale(.98);
-  background: #e3e3f8;
-  color: #3f3c99;
-}
-
-.home-routine-continue-icon {
-  width: 14px;
-  height: 14px;
-  display: grid;
-  place-items: center;
-  margin-left: 0;
-}
-
-.home-routine-continue-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-.home-routine-progress-link {
-  display: none !important;
-}
-
-/* Próximamente: visible, pero claramente secundario frente a la rutina activa. */
-.home-routine-card-placeholder {
-  border-color: #eef0f3;
-  background: rgba(255, 255, 255, .72);
-  box-shadow: none;
-}
-
-.home-routine-card-placeholder .home-routine-cover {
-  background: linear-gradient(180deg, #fafbfc 0%, #f5f6f7 100%);
-}
-
-.home-routine-card-placeholder .home-routine-cover img {
-  opacity: .62;
-  filter: saturate(.58);
-}
-
-.home-routine-card-placeholder .home-routine-heading h2 {
-  color: #68717f;
-  font-weight: 600;
-}
-
-.home-routine-card-placeholder .home-routine-day {
-  color: #969da8;
-}
-
-.home-routine-placeholder-label {
-  width: fit-content;
-  min-height: 29px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 10px;
-  border: 1px solid #e1e5ea;
-  border-radius: 999px;
-  background: #fafbfc;
-  color: #6f7782;
-  font-size: 11.5px;
-  font-weight: 560;
-}
-
-
-@media (max-width: 370px) {
-  #view-hoy {
-    padding-top: calc(30px + var(--safe-top));
-  }
-
-  .home-routine-card {
-    grid-template-columns: 94px minmax(0, 1fr);
-    gap: 12px;
-    min-height: 140px;
-  }
-
-  .home-routine-cover {
-    width: 94px;
-    min-width: 94px;
-    height: 116px;
-    min-height: 116px;
-  }
-}
-
-
-/* NU APP · MARGEN SEGURO DE CABECERA MÓVIL V126 */
-#view-hoy .home-page-header {
-  margin-inline: 2px;
+/* NU APP · Home canónico · diseño final aprobado
+   Una sola definición visual para Home. La lógica existente conserva sus IDs.
+*/
+#view-hoy{padding:0;background:#fffdfc}
+.home-flow{min-height:100svh;background:#fffdfc}
+.home-hero{position:relative;min-height:735px;overflow:hidden;padding:0 24px}
+.home-bell-btn{position:absolute;z-index:5;top:64px;right:24px;width:48px;height:48px;border:0!important;border-radius:16px;background:#fff!important;color:#10163f;box-shadow:0 10px 28px rgba(16,22,63,.10)!important}
+.home-brand{position:absolute;z-index:3;top:154px;left:50%;width:190px;height:84px;transform:translateX(-50%)}
+.home-brand img{width:100%;height:100%;object-fit:contain}
+.home-orange-wave{position:absolute;z-index:0;top:276px;left:-116px;width:690px;height:480px;border-radius:51% 49% 45% 55% / 30% 47% 53% 70%;transform:rotate(12deg);background:#ff8a3d}
+.home-greeting{position:absolute;z-index:3;top:410px;left:32px;color:#10163f;font-size:25px;letter-spacing:-.025em}
+.home-greeting strong{font-size:32px;font-weight:780}
+#homeGuideSection{position:absolute;z-index:3;top:470px;left:24px;right:24px;height:238px;margin:0;padding:14px;border:1px solid rgba(16,22,63,.22);border-radius:28px;background:#fff;box-shadow:0 14px 30px rgba(16,22,63,.12)}
+.home-guide-feature{position:relative;display:grid;grid-template-columns:46% 54%;height:100%;overflow:visible}
+.home-guide-brand{border-radius:22px;background:url("assets/guide/community/community-01.jpg") center/cover no-repeat}
+.home-guide-feature-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:20px}
+.home-guide-kicker{margin:0 0 7px;color:#f05b14;font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+#homeGuideTitle{margin:0 0 16px;color:#10163f;font-size:25px;font-weight:720;line-height:1.05;letter-spacing:-.04em}
+.home-guide-action{padding:0;color:#10163f;background:transparent;font-size:17px}
+.home-guide-round-action{position:absolute;z-index:4;right:-2px;bottom:-39px;width:56px;height:56px;border:0;border-radius:50%;background:#10163f;color:#fff;box-shadow:0 10px 22px rgba(16,22,63,.24);font-size:30px;line-height:1}
+.home-routines-section{position:relative;min-height:748px;margin-top:-85px;padding:116px 18px 36px;overflow:hidden;background:#fffdfc}
+.home-routines-section::before{content:"";position:absolute;z-index:0;top:0;left:-55px;width:540px;height:130px;border-radius:50%;transform:rotate(7deg);background:#ff9a5b}
+.home-routines-section::after{content:"";position:absolute;z-index:0;top:54px;left:0;right:0;height:130px;border-radius:50% 50% 0 0;background:#fffdfc}
+.home-section-heading,.home-routine-tabs,.home-routine-feature,.home-routine-swipe-hint{position:relative;z-index:1}
+.home-section-heading{margin:20px 6px 16px}
+.home-section-heading span{display:block;margin-bottom:6px;color:#10163f;font-size:17px;font-weight:650;letter-spacing:.12em;text-transform:uppercase}
+.home-section-heading h2{margin:0;color:#10163f;font-size:30px;font-weight:760;letter-spacing:-.04em}
+.home-routine-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:14px}
+.home-routine-tab{min-width:0;padding:0 1px 8px;border:0;border-bottom:3px solid transparent;background:transparent;color:#10163f}
+.home-routine-tab img{display:block;width:100%;height:82px;margin-bottom:4px;object-fit:contain}
+.home-routine-tab span{display:block;font-size:13px;white-space:nowrap}
+.home-routine-tab.is-active{border-bottom-color:#10163f;font-weight:700}
+.home-routine-feature{position:relative;min-height:252px;overflow:hidden;padding:50px 18px 22px;border-radius:22px;color:#fff;background:#f5722c}
+.home-routine-feature-copy{position:relative;z-index:2;width:58%}
+.home-routine-kicker{font-size:16px;text-transform:uppercase}
+.home-routine-feature h2{margin:6px 0 8px;font-size:34px;line-height:.95;letter-spacing:-.045em}
+.home-routine-feature p{margin:0;font-size:16px}
+.home-routine-progress-row{display:flex;align-items:center;gap:9px;margin:16px 0 21px;font-weight:700}
+.home-routine-progress{flex:1;height:4px;overflow:hidden;border-radius:10px;background:rgba(255,255,255,.65)}
+.home-routine-progress span{display:block;width:0;height:100%;border-radius:inherit;background:#10163f}
+.home-routine-progress-row>span{font-size:16px}
+.home-routine-continue{padding:14px 17px;border:0;border-radius:999px;color:#fff;background:#10163f;font-weight:700}
+.home-routine-feature-product{position:absolute;z-index:1;right:-54px;top:12px;width:245px;height:238px;object-fit:contain;transform:scale(1.5)}
+.home-routine-swipe-hint{margin:12px 0 0;color:#777a83;text-align:center;font-size:13px;font-weight:600}
+#chatWrap{display:none}
+@media(max-width:370px){
+ .home-hero{min-height:700px}
+ #homeGuideSection{top:448px;height:222px}
+ .home-routine-tabs{gap:1px}
+ .home-routine-tab span{font-size:11px}
+ .home-routine-feature h2{font-size:29px}
+ .home-routine-feature-product{right:-72px;transform:scale(1.28)}
 }
