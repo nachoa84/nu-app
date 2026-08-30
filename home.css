@@ -18,7 +18,7 @@
 #view-hoy .home-greeting strong{font-size:30px;font-weight:800}
 #view-hoy #homeGuideSection{position:absolute;z-index:5;top:430px;left:18px;right:18px;height:258px;margin:0;padding:13px;border:1px solid rgba(16,22,64,.25);border-radius:28px;background:rgba(255,255,255,.975);box-shadow:var(--home-shadow)}
 #view-hoy #homeGuideSection .home-guide-feature{position:relative;display:grid;grid-template-columns:49% 51%;height:100%;overflow:visible}
-#view-hoy #homeGuideSection .home-guide-brand{width:auto;height:auto;border-radius:22px;background:url("assets/guide/community/community-01.jpg") center/cover no-repeat}
+#view-hoy #homeGuideSection .home-guide-brand{width:auto;height:auto;border-radius:22px;background:url("assets/nu-guide-building-v3.jpg") center/cover no-repeat}
 #view-hoy #homeGuideSection .home-guide-feature-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-width:0;padding:0 0 0 22px}
 #view-hoy #homeGuideSection .home-guide-kicker{margin:0 0 14px;color:var(--home-orange-dark);font-size:10px;font-weight:600;letter-spacing:.075em;text-transform:uppercase;white-space:nowrap}
 #view-hoy #homeGuideSection #homeGuideTitle{margin:0 0 18px;color:var(--home-navy);font-size:25px;font-weight:720;line-height:1;letter-spacing:-.045em;white-space:nowrap}
