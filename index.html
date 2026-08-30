@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="home.css?v=137-home-v3" />
   <link rel="stylesheet" href="shell.css?v=61b-progress-canonical" />
   <link rel="stylesheet" href="media-preview.css?v=85a-media-legibility" />
-  <link rel="stylesheet" href="bot.css?v=130-collagen-advising-guide" />
+  <link rel="stylesheet" href="bot.css?v=138-iris-final" />
   <link rel="stylesheet" href="favorites.css?v=94-bot-folders" />
   <link rel="stylesheet" href="multiroutine-v92.css?v=106e-lumispa-interior-image">
   <link rel="stylesheet" href="onboarding.css?v=88-onboarding-legibility" />
@@ -213,15 +213,25 @@
       </section>
 
       <section id="view-bot" class="view">
-        <header class="app-page-header bot-page-header">
-          <div>
-            <h1>Iris</h1>
-            <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
+        <header class="bot-page-header">
+          <button id="botBackBtn" class="bot-back-btn" type="button" aria-label="Volver a Inicio">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 4-8 8 8 8M7 12h14"/></svg>
+          </button>
+
+          <button id="botClearBtn" class="icon-button bot-clear-btn" type="button" aria-label="Limpiar conversación"></button>
+
+          <div class="bot-profile">
+            <div class="bot-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V3M8.5 12h.01M15.5 12h.01M9 16h6"/></svg>
+            </div>
+            <div class="bot-profile-copy">
+              <h1>Iris</h1>
+              <p>Tu asistente</p>
+              <span class="bot-status"><i aria-hidden="true"></i>En línea</span>
+            </div>
           </div>
-          <div class="bot-header-actions" aria-label="Acciones de Iris">
-            <button id="botShortcutsBtn" class="icon-button" type="button" aria-label="Abrir accesos rápidos"></button>
-            <button id="botClearBtn" class="icon-button" type="button" aria-label="Limpiar conversación"></button>
-          </div>
+
+          <div class="bot-orange-wave" aria-hidden="true"></div>
         </header>
 
         <div class="bot-card">
@@ -242,6 +252,9 @@
               id="botInput"
               placeholder="Preguntá o buscá un recurso..."
             />
+            <button id="botShortcutsBtn" class="bot-composer-grid" type="button" aria-label="Abrir accesos rápidos">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+            </button>
             <button class="primary bot-send" type="button" aria-label="Enviar"></button>
           </div>
         </div>
@@ -385,8 +398,8 @@
   <script src="routine-state.js?v=136-unified-daily-unlock"></script>
   <script src="routine-sync.js?v=136-unified-daily-unlock"></script>
   <script src="iris-ai-client-escalation-v1.js?v=1"></script>
-  <script src="bot.js?v=130-collagen-advising-guide"></script>
-  <script src="bot-shortcuts-v95.js?v=125-nuskin-category-logo"></script>
+  <script src="bot.js?v=138-iris-final"></script>
+  <script src="bot-shortcuts-v95.js?v=138-iris-final"></script>
   <script src="bot-sales-training-v102.js?v=102b-no-duplicate"></script>
   <script src="favorites.js?v=96-material-names"></script>
   <script src="notifications.js?v=61b-progress-canonical"></script>
