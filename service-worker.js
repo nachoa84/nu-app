@@ -1,4 +1,4 @@
-const CACHE="nuapp-v141-iris-yellow-header";
+const CACHE="nuapp-v142-home-updated";
 
 const CORE=[
   "./",
@@ -14,7 +14,7 @@ const CORE=[
   "./shared.css?v=139-iris-canonical",
   "./ui-core.css?v=87-shared-ui-legibility",
   "./notifications.css?v=86-notifications-legibility",
-  "./home.css?v=137-home-v3",
+  "./home.css?v=142-home-updated",
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=141-iris-yellow-header",
   "./favorites.css?v=94-bot-folders",
