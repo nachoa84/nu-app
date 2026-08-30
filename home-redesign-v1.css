@@ -12,7 +12,6 @@
   --home-orange-strong: #ed471f;
   --home-muted: #68728e;
   --home-line: rgba(11, 32, 88, .10);
-  --home-routines-bg: #f5f7fb;
   position: relative;
   isolation: isolate;
   overflow-x: clip;
@@ -100,11 +99,12 @@ body[data-active-view="hoy"] #app {
 #view-hoy #homeGuideSection.home-guide-section {
   position: relative;
   z-index: 1;
-  min-height: calc(100svh - 208px - var(--safe-top));
+  min-height: calc(100svh - 112px - var(--safe-top));
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0 2px 22px;
+  padding: 0 2px calc(90px + var(--safe-bottom));
+  box-sizing: border-box;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -121,7 +121,8 @@ body[data-active-view="hoy"] #app {
   min-height: 0;
   flex: 1;
   display: grid;
-  grid-template-rows: minmax(265px, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(190px, 1fr) auto;
   gap: 18px;
   padding: 0;
   border: 0;
@@ -131,6 +132,7 @@ body[data-active-view="hoy"] #app {
 }
 
 #view-hoy #homeGuideSection .home-guide-brand {
+  grid-column: 1;
   width: 100%;
   height: auto;
   display: grid !important;
@@ -152,6 +154,8 @@ body[data-active-view="hoy"] #app {
 }
 
 #view-hoy #homeGuideSection .home-guide-feature-copy {
+  grid-column: 1;
+  min-width: 0;
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 126px;
@@ -303,9 +307,12 @@ body[data-active-view="hoy"] #app {
 #view-hoy .home-routines-section {
   position: relative;
   z-index: 2;
-  margin: 0 -18px 28px;
-  padding: 32px 18px 20px;
-  background: var(--home-routines-bg);
+  margin: 0 -18px;
+  padding: 32px 18px 34px;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse 90% 34% at 100% 0%, rgb(0 167 200 / 76%), transparent 78%),
+    linear-gradient(180deg, rgb(0 167 200 / 28%) 0%, var(--home-white) 86%);
 }
 
 #view-hoy .home-section-heading {
@@ -377,6 +384,18 @@ body[data-active-view="hoy"] #app {
   transform: none;
   filter: none;
   opacity: 1;
+}
+
+#view-hoy .home-routine-card[data-routine-id="collagen-30"] .home-routine-cover img {
+  transform: scale(1.28);
+}
+
+#view-hoy .home-routine-card[data-routine-id="wellspa-10"] .home-routine-cover img {
+  transform: scale(1.18);
+}
+
+#view-hoy .home-routine-card[data-routine-id="galvanicspa-10"] .home-routine-cover img {
+  transform: scale(1.06);
 }
 
 #view-hoy .home-routine-body {
@@ -485,7 +504,9 @@ body[data-active-view="hoy"] #app {
 
 /* Novedades queda después de las rutinas sin competir con Home */
 #view-hoy .home-news-section {
-  margin: 28px 2px 6px;
+  margin: 0 -18px 6px;
+  padding: 28px 20px 36px;
+  background: var(--home-white);
 }
 
 #view-hoy .home-news-section h2 {
@@ -615,6 +636,6 @@ body[data-active-view="hoy"] .nav-btn.active::after {
   #view-hoy .home-routines-section {
     margin-left: 0;
     margin-right: 0;
-    border-radius: 28px 28px 0 0;
+    border-radius: 0;
   }
 }
