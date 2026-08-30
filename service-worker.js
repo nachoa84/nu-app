@@ -1,4 +1,4 @@
-const CACHE="nuapp-v142-stable-update";
+const CACHE="nuapp-v143-startup-stable";
 
 const CORE=[
   "./",
@@ -148,7 +148,7 @@ self.addEventListener("install",event=>{
 });
 
 self.addEventListener("message", event => {
-  if (event.data?.type === "NUAPP_SKIP_WAITING_V142") {
+  if (event.data?.type === "NUAPP_SKIP_WAITING_V142" || event.data?.type === "NUAPP_SKIP_WAITING_V143") {
     self.skipWaiting();
   }
 });
