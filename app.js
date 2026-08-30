@@ -74,18 +74,6 @@ if (installBtn) installBtn.onclick = async () => {
 // elige "Actualizar". Esto evita reinicios durante el arranque.
 const APP_VERSION_V142 = "142-stable-manual-update";
 localStorage.setItem("nuapp:active-version", APP_VERSION_V142);
-const APP_UPDATE_RELOAD_KEY_V142 = "nuapp:update-reload-v142";
-const APP_UPDATED_NOTICE_KEY_V142 = "nuapp:updated-notice-v142";
-
-function reloadForAppUpdateV142() {
-  // La marca permanece durante toda la sesión. Aunque hubiera más de una
-  // versión esperando, nunca puede encadenar varias recargas.
-  if (sessionStorage.getItem(APP_UPDATE_RELOAD_KEY_V142) === "1") return;
-  sessionStorage.setItem(APP_UPDATE_RELOAD_KEY_V142, "1");
-  sessionStorage.setItem(APP_UPDATED_NOTICE_KEY_V142, "1");
-  window.location.reload();
-}
-
 function activateWaitingWorkerV142(registration) {
   if (!registration?.waiting) return false;
   registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V142" });
@@ -157,20 +145,8 @@ async function registerAppServiceWorker() {
 
   return registration;
 }
+window.getAppServiceWorkerRegistration = registerAppServiceWorker;
 
-navigator.serviceWorker?.addEventListener("controllerchange", () => {
-  reloadForAppUpdateV142();
-});
-
-window.addEventListener("pageshow", () => {
-  if (sessionStorage.getItem(APP_UPDATED_NOTICE_KEY_V142) !== "1") return;
-  sessionStorage.removeItem(APP_UPDATED_NOTICE_KEY_V142);
-  setTimeout(() => {
-    if (typeof toast === "function") {
-      toast("Nu App se actualizó", { type: "success", duration: 2600 });
-    }
-  }, 500);
-});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
