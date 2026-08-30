@@ -7,6 +7,30 @@ const homeRoutineProgressFill = document.getElementById("homeRoutineProgressFill
 const homeRoutineContinueLabel = document.getElementById("homeRoutineContinueLabel");
 const homeRoutineContinueIcon = document.querySelector(".home-routine-continue-icon");
 const homeRoutineImage = document.getElementById("homeRoutineImage");
+const homeGuideProgress = document.getElementById("homeGuideProgress");
+const homeGuideCompletedCount = document.getElementById("homeGuideCompletedCount");
+
+function syncHomeGuideCompletedCount() {
+  if (!homeGuideProgress || !homeGuideCompletedCount) return;
+
+  const completed = Number.parseInt(homeGuideProgress.textContent || "0", 10);
+  homeGuideCompletedCount.textContent = Number.isFinite(completed)
+    ? String(Math.min(9, Math.max(0, completed)))
+    : "0";
+}
+
+function setupHomeGuideProgressSync() {
+  if (!homeGuideProgress || homeGuideProgress.dataset.stageSyncReady === "true") return;
+
+  homeGuideProgress.dataset.stageSyncReady = "true";
+  syncHomeGuideCompletedCount();
+
+  new MutationObserver(syncHomeGuideCompletedCount).observe(homeGuideProgress, {
+    childList: true,
+    characterData: true,
+    subtree: true
+  });
+}
 
 function renderHomeRoutineSummary(dayNumber, dayData) {
   const safeDayNumber = Number(dayNumber || 1);
@@ -73,6 +97,7 @@ function setupHomeView() {
     greeting.textContent = name ? `Hola, ${name}` : "Hola";
   }
 
+  setupHomeGuideProgressSync();
   ensureHomeNewsSection();
 
   const bell = document.getElementById("homeBellBtn");
