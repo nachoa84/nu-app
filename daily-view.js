@@ -689,7 +689,24 @@ function splitRoutineTextBlocks(blocks) {
     flush();
   });
 
-  return result;
+  const balanced = [];
+  result.forEach(block => {
+    const previous = balanced[balanced.length - 1];
+    const canJoin =
+      previous &&
+      !previous.links?.length &&
+      !block.links?.length &&
+      String(previous.content || "").length < 180 &&
+      String(previous.content || "").length + String(block.content || "").length < 360;
+
+    if (canJoin) {
+      previous.content = `${previous.content}\n\n${block.content}`;
+    } else {
+      balanced.push({ ...block });
+    }
+  });
+
+  return balanced;
 }
 
 function renderStructuredDayDetail() {
