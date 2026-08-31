@@ -317,6 +317,43 @@ body.is-scrolled #view-bot .app-page-header h1 {
   content: none !important;
 }
 
+/* Navegación explícita: flechas + puntos. */
+#view-hoy.day-open .routine-content-controls {
+  display: grid;
+  grid-template-columns: 38px minmax(0, auto) 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+#view-hoy.day-open .routine-content-controls .routine-content-dots {
+  margin: 0;
+}
+
+#view-hoy.day-open .routine-content-arrow {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #e1e6ee;
+  border-radius: 50%;
+  background: #fff;
+  color: #17203b;
+  font-family: Poppins, sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+  box-shadow: 0 3px 10px rgba(23, 32, 59, .05);
+  touch-action: manipulation;
+}
+
+#view-hoy.day-open .routine-content-arrow:disabled {
+  opacity: .28;
+  box-shadow: none;
+}
+
 #view-hoy.day-open .routine-content-dots {
   margin-top: 12px;
   margin-bottom: 14px;
@@ -324,6 +361,31 @@ body.is-scrolled #view-bot .app-page-header h1 {
 
 #view-hoy.day-open .routine-content-dot {
   touch-action: manipulation;
+}
+
+/* Materiales: sin contadores y con aire lateral real. */
+#view-hoy.day-open .materials-section .section-count,
+#view-hoy.day-open .materials-section .resource-order {
+  display: none !important;
+}
+
+#view-hoy.day-open .materials-section {
+  overflow: visible;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence {
+  box-sizing: border-box;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 12px !important;
+  padding-right: 18px !important;
+  scroll-padding-left: 12px;
+  scroll-padding-right: 18px;
+  gap: 12px;
+}
+
+#view-hoy.day-open .materials-section .resource-row:first-child {
+  margin-left: 0 !important;
 }
 
 @media (max-width: 370px) {
@@ -344,5 +406,21 @@ body.is-scrolled #view-bot .app-page-header h1 {
   #view-hoy.day-open .routine-content-card {
     padding-left: 17px;
     padding-right: 17px;
+  }
+
+  #view-hoy.day-open .routine-content-controls {
+    grid-template-columns: 34px minmax(0, auto) 34px;
+    gap: 8px;
+  }
+
+  #view-hoy.day-open .routine-content-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+  }
+
+  #view-hoy.day-open .materials-section .resource-sequence {
+    padding-left: 10px !important;
+    padding-right: 14px !important;
   }
 }
