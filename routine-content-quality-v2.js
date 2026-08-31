@@ -28,6 +28,7 @@
       .replace(/#10diasdelumispa(?:io)?/gi, "LumiSpa iO")
       .replace(/#10lumispa(?:io)?/gi, "LumiSpa iO")
       .replace(/#dia\s*(\d+)/gi, "Día $1")
+      .replace(/\bNuSkin\b/g, "Nu Skin")
       .replace(/\btestimonos\b/gi, "testimonios")
       .replace(/\bcon\s+las\s+cambios\b/gi, "con los cambios")
       .replace(/\bpersonailzada\b/gi, "personalizada")
@@ -35,6 +36,14 @@
       .replace(/\ba\s+traves\b/gi, "a través")
       .replace(/\blV\b/g, "IV")
       .replace(/\bestas\s+interesado\?/gi, "¿Estás interesado?")
+      .replace(/\bEs apto para cel[ií]acos\?/gi, "¿Es apto para celíacos?")
+      .replace(/\bEs apto para diab[eé]ticos\?/gi, "¿Es apto para diabéticos?")
+      .replace(/\bTiene colorantes artificiales\?/gi, "¿Tiene colorantes artificiales?")
+      .replace(/\bHay que beberlo en ayunas\?/gi, "¿Hay que beberlo en ayunas?")
+      .replace(/\bEn alg[uú]n momento especifico del d[ií]a\?/gi, "¿En algún momento específico del día?")
+      .replace(/\bPueden consumirlo embarazadas o mujeres que est[aá]n amamantando\?/gi, "¿Pueden consumirlo embarazadas o mujeres que están amamantando?")
+      .replace(/\bSI!\b/g, "Sí")
+      .replace(/\besta dado\b/gi, "está dado")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
   }
