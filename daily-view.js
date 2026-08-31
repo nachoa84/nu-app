@@ -647,27 +647,36 @@ function createActionStep(block, index) {
   return details;
 }
 
+function isMaterialTransitionBlock(block) {
+  if (!block || block.type !== "text" || block.links?.length) return false;
+  const text = stripDecorativeSymbols(block.content).replace(/\\s+/g, " ").trim();
+  if (!text || text.length > 180) return false;
+  return /(?:aquí|aqui|a continuación|ahora)\\s+(?:está|esta|el|la|los|las|te dejo|te dejamos|comparto|encontrarás|encontraras)|material(?:es)?\\s+(?:de|para)|public(?:a|ar)\\s+(?:en|el|este)|contenido\\s+(?:para|de)\\s+(?:publicar|mercadeo)/i.test(text);
+}
+
 function splitRoutineTextBlocks(blocks) {
   const result = [];
 
   blocks.forEach(block => {
-    const raw = String(block.content || "").replace(/\r\n?/g, "\n").trim();
+    const raw = String(block.content || "").replace(/\\r\\n?/g, "\\n").trim();
     const paragraphs = raw
-      .split(/\n\s*\n/)
+      .split(/\\n\\s*\\n/)
       .map(value => value.trim())
       .filter(Boolean);
 
     if (!paragraphs.length) return;
 
+    // Un enlace siempre viaja junto al párrafo que lo presenta.
+    if (block.links?.length) {
+      result.push({ ...block, content: paragraphs.join("\\n\\n") });
+      return;
+    }
+
     let current = [];
     let currentLength = 0;
-
     const flush = () => {
       if (!current.length) return;
-      result.push({
-        ...block,
-        content: current.join("\n\n")
-      });
+      result.push({ ...block, content: current.join("\\n\\n") });
       current = [];
       currentLength = 0;
     };
@@ -677,41 +686,65 @@ function splitRoutineTextBlocks(blocks) {
         ? currentLength + paragraph.length + 2
         : paragraph.length;
 
-      // Mantiene una card equilibrada sin separar ideas a mitad de párrafo.
-      if (current.length && nextLength > 360) {
-        flush();
-      }
-
+      // Cortamos sólo entre párrafos para no romper una idea.
+      if (current.length && nextLength > 330) flush();
       current.push(paragraph);
-      currentLength += paragraph.length + (current.length > 1 ? 2 : 0);
+      currentLength = current.length === 1
+        ? paragraph.length
+        : currentLength + paragraph.length + 2;
     });
-
     flush();
   });
 
+  // Une títulos o remates cortos con el texto siguiente para evitar cards
+  // desbalanceadas y mantener una lectura continua.
   const balanced = [];
-  result.forEach(block => {
+  for (let index = 0; index < result.length; index += 1) {
+    const block = result[index];
+    const next = result[index + 1];
+    const blockLength = String(block.content || "").length;
+    const nextLength = String(next?.content || "").length;
+    const canJoinNext =
+      next &&
+      !block.links?.length &&
+      !next.links?.length &&
+      blockLength < 150 &&
+      blockLength + nextLength + 2 <= 360;
+
+    if (canJoinNext) {
+      balanced.push({
+        ...block,
+        content: `${block.content}\\n\\n${next.content}`
+      });
+      index += 1;
+      continue;
+    }
+
     const previous = balanced[balanced.length - 1];
-    const canJoin =
+    const canJoinPrevious =
       previous &&
       !previous.links?.length &&
       !block.links?.length &&
-      String(previous.content || "").length < 180 &&
-      String(previous.content || "").length + String(block.content || "").length < 360;
+      String(previous.content || "").length < 150 &&
+      String(previous.content || "").length + blockLength + 2 <= 360;
 
-    if (canJoin) {
-      previous.content = `${previous.content}\n\n${block.content}`;
+    if (canJoinPrevious) {
+      previous.content = `${previous.content}\\n\\n${block.content}`;
     } else {
       balanced.push({ ...block });
     }
-  });
+  }
 
   return balanced;
 }
 
 function renderStructuredDayDetail() {
   const blocks = currentBlocks();
-  const textBlocks = splitRoutineTextBlocks(blocks.filter(block => block.type === "text"));
+  const rawTextBlocks = blocks.filter(block => block.type === "text");
+  const materialIntroBlocks = rawTextBlocks.filter(isMaterialTransitionBlock);
+  const textBlocks = splitRoutineTextBlocks(
+    rawTextBlocks.filter(block => !isMaterialTransitionBlock(block))
+  );
   const mediaBlocks = blocks.filter(block => block.type === "media");
   const actionBlocks = blocks.filter(block => block.type === "action");
   const completeBlock = blocks.find(block => block.type === "complete");
@@ -826,6 +859,15 @@ function renderStructuredDayDetail() {
         <small class="section-count">${mediaBlocks.length}</small>
       </div>
     `;
+
+    if (materialIntroBlocks.length) {
+      const introText = document.createElement("p");
+      introText.className = "materials-intro";
+      introText.textContent = materialIntroBlocks
+        .map(block => stripDecorativeSymbols(block.content))
+        .join(" ");
+      materials.querySelector(".native-section-heading > div").appendChild(introText);
+    }
 
     const list = document.createElement("div");
     list.className = "resource-sequence";
