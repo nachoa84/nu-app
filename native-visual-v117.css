@@ -163,9 +163,9 @@ body.is-scrolled #view-bot .app-page-header h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 18px 20px;
+  padding: 18px 22px;
   border: 1px solid #e1e6ee;
-  border-radius: 24px;
+  border-radius: 20px;
   background: #fff;
   box-shadow: 0 8px 20px rgba(23, 32, 59, .065) !important;
   overflow: hidden;
@@ -176,7 +176,8 @@ body.is-scrolled #view-bot .app-page-header h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 7px;
+  gap: 9px;
+  margin-block: auto;
 }
 
 #view-hoy.day-open .routine-card-heading,
@@ -195,7 +196,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   color: #17203b;
   font-size: 15px;
   font-weight: 400 !important;
-  line-height: 1.48;
+  line-height: 1.58;
   letter-spacing: 0;
   text-transform: none;
   white-space: normal;
@@ -215,7 +216,8 @@ body.is-scrolled #view-bot .app-page-header h1 {
 
 #view-hoy.day-open .routine-content-card.is-qa .routine-flat-copy {
   justify-content: flex-start;
-  gap: 5px;
+  gap: 6px;
+  margin-block: 0;
 }
 
 #view-hoy.day-open .routine-content-card.is-qa .routine-card-heading,
@@ -223,7 +225,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .routine-content-card.is-qa .native-detail-label,
 #view-hoy.day-open .routine-content-card.is-qa .native-check-item {
   font-size: 13.2px;
-  line-height: 1.4;
+  line-height: 1.42;
 }
 
 #view-hoy.day-open .native-check-item {
@@ -245,13 +247,27 @@ body.is-scrolled #view-bot .app-page-header h1 {
   flex: 0 0 17px;
 }
 
+/* Links dentro de cards: una fila compacta y legible, nunca texto crudo dominante. */
 #view-hoy.day-open .resource-links {
-  margin-top: 4px;
+  display: grid;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+#view-hoy.day-open .resource-link-row {
+  gap: 8px;
 }
 
 #view-hoy.day-open .resource-link-main {
-  min-height: 34px;
-  font-size: 11px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #view-hoy.day-open .training-card-open,
@@ -377,15 +393,22 @@ body.is-scrolled #view-bot .app-page-header h1 {
   box-sizing: border-box;
   margin-left: 0 !important;
   margin-right: 0 !important;
-  padding-left: 12px !important;
-  padding-right: 18px !important;
-  scroll-padding-left: 12px;
-  scroll-padding-right: 18px;
-  gap: 12px;
+  padding-left: 16px !important;
+  padding-right: 20px !important;
+  scroll-padding-left: 16px;
+  scroll-padding-right: 20px;
+  gap: 14px;
 }
 
 #view-hoy.day-open .materials-section .resource-row:first-child {
   margin-left: 0 !important;
+}
+
+@media (min-width: 600px) {
+  #view-hoy.day-open .routine-flat-copy {
+    width: min(100%, 520px);
+    margin-inline: auto;
+  }
 }
 
 @media (max-width: 370px) {
@@ -420,7 +443,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   }
 
   #view-hoy.day-open .materials-section .resource-sequence {
-    padding-left: 10px !important;
-    padding-right: 14px !important;
+    padding-left: 14px !important;
+    padding-right: 16px !important;
   }
 }
