@@ -570,26 +570,18 @@ function appendFormattedContent(container, content, options = {}) {
 }
 
 function createObjectiveCard(block) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedObjectiveCard(block);
-  }
-
+  const { heading, body: detailText } = importedTextParts(block.content);
   const card = document.createElement("section");
   card.className = "objective-card";
 
   const header = document.createElement("div");
   header.className = "objective-card-header";
-  header.innerHTML = `
-    <div>
-      <span>Objetivo</span>
-      <h3>${getRoutineDayObjectiveV92a(selectedDay, DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content))}</h3>
-    </div>
-  `;
-
+  const title = document.createElement("h3");
+  title.textContent = heading;
+  header.appendChild(title);
   card.appendChild(header);
 
-  const fullText = String(block.content || "").trim();
-  if (fullText && !block.hideObjectiveDetailsV97a) {
+  if ((detailText || block.links?.length) && !block.hideObjectiveDetailsV97a) {
     const details = document.createElement("details");
     details.className = "native-details";
 
@@ -598,11 +590,12 @@ function createObjectiveCard(block) {
 
     const body = document.createElement("div");
     body.className = "native-details-body";
-    appendFormattedContent(body, fullText, { dropFirstParagraph: true });
+    appendFormattedContent(body, detailText);
     addLinks(body, block.links);
 
     details.addEventListener("toggle", () => {
-      summary.querySelector(".details-label").textContent = details.open ? "Ocultar detalles" : "Ver detalles";
+      const label = summary.querySelector(".details-label");
+      if (label) label.textContent = details.open ? "Ocultar detalles" : "Ver detalles";
     });
 
     details.append(summary, body);
@@ -677,17 +670,17 @@ function renderStructuredDayDetail() {
     <div class="native-day-hero">
       <div class="native-day-hero-copy">
         <h2>Día ${selectedDay}</h2>
-        <p>Tu acción de hoy</p>
+        <p>TU ACCIÓN DE HOY</p>
       </div>
       <div class="native-day-hero-media" aria-hidden="true">
         <img src="${getRoutineHeroV92a()}" alt="" />
       </div>
-    </div>
-    <div class="native-day-progress-row">
-      <div class="native-day-progress" aria-label="Progreso: ${selectedDay} de ${TOTAL_PROGRAM_DAYS}">
-        <span style="width:${Math.min(100, Math.round((selectedDay / TOTAL_PROGRAM_DAYS) * 100))}%"></span>
+      <div class="native-day-progress-row">
+        <div class="native-day-progress" aria-label="Progreso: ${selectedDay} de ${TOTAL_PROGRAM_DAYS}">
+          <span style="width:${Math.min(100, Math.round((selectedDay / TOTAL_PROGRAM_DAYS) * 100))}%"></span>
+        </div>
+        <small>${selectedDay} de ${TOTAL_PROGRAM_DAYS}</small>
       </div>
-      <small>${selectedDay} de ${TOTAL_PROGRAM_DAYS}</small>
     </div>
   `;
   chat.appendChild(intro);
@@ -696,6 +689,10 @@ function renderStructuredDayDetail() {
     const carousel = document.createElement("section");
     carousel.className = "routine-content-carousel";
     carousel.setAttribute("aria-label", "Contenido de la rutina");
+
+    const heading = document.createElement("h3");
+    heading.className = "routine-content-heading";
+    heading.textContent = "Contenido del día";
 
     const track = document.createElement("div");
     track.className = "routine-content-track";
@@ -712,7 +709,34 @@ function renderStructuredDayDetail() {
       track.appendChild(slide);
     });
 
-    carousel.appendChild(track);
+    const dots = document.createElement("div");
+    dots.className = "routine-content-dots";
+    dots.setAttribute("aria-label", "Navegación del contenido");
+    textBlocks.forEach((_, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "routine-content-dot";
+      dot.setAttribute("aria-label", `Ver contenido ${index + 1}`);
+      dot.addEventListener("click", () => {
+        track.scrollTo({ left: track.clientWidth * index, behavior: "smooth" });
+      });
+      dots.appendChild(dot);
+    });
+
+    const setActiveDot = () => {
+      const index = Math.max(0, Math.min(
+        textBlocks.length - 1,
+        Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
+      ));
+      dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
+        dot.classList.toggle("is-active", dotIndex === index);
+        dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
+      });
+    };
+    track.addEventListener("scroll", setActiveDot, { passive: true });
+    requestAnimationFrame(setActiveDot);
+
+    carousel.append(heading, track, dots);
     chat.appendChild(carousel);
   }
 
