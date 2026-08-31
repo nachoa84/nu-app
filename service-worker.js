@@ -1,4 +1,4 @@
-const CACHE="nuapp-v157-routine-carousel";
+const CACHE="nuapp-v158-routine-carousel-fix";
 
 const CORE=[
   "./",
@@ -10,7 +10,7 @@ const CORE=[
   "./navigation.css?v=81-home-navigation-legibility",
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./typography-poppins-v1.css?v=20260830-poppins-v1",
-  "./daily.css?v=102-routine-carousel",
+  "./daily.css?v=103-routine-carousel-fix",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
