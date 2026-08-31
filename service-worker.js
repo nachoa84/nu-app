@@ -1,4 +1,4 @@
-const CACHE="nuapp-v160-unified-routine-detail";
+const CACHE="nuapp-v161-unified-routine-detail";
 
 const CORE=[
   "./",
@@ -11,7 +11,7 @@ const CORE=[
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./typography-poppins-v1.css?v=20260830-poppins-v1",
   "./home-redesign-v1.css?v=20260831-routine-state-scope",
-  "./daily.css?v=104-routine-unified-detail",
+  "./daily.css?v=105-routine-unified-detail",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
