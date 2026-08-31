@@ -164,10 +164,10 @@ body.is-scrolled #view-bot .app-page-header h1 {
   flex-direction: column;
   justify-content: center;
   padding: 18px 22px;
-  border: 1px solid #e1e6ee;
-  border-radius: 20px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 8px 20px rgba(23, 32, 59, .065) !important;
+  box-shadow: 0 5px 16px rgba(23, 32, 59, .055) !important;
   overflow: hidden;
 }
 
@@ -176,7 +176,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 9px;
+  gap: 10px;
   margin-block: auto;
 }
 
@@ -196,7 +196,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   color: #17203b;
   font-size: 15px;
   font-weight: 400 !important;
-  line-height: 1.58;
+  line-height: 1.62;
   letter-spacing: 0;
   text-transform: none;
   white-space: normal;
@@ -225,7 +225,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .routine-content-card.is-qa .native-detail-label,
 #view-hoy.day-open .routine-content-card.is-qa .native-check-item {
   font-size: 13.2px;
-  line-height: 1.42;
+  line-height: 1.46;
 }
 
 #view-hoy.day-open .native-check-item {
@@ -261,7 +261,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .resource-link-main {
   min-height: 36px;
   padding: 7px 11px;
-  border-radius: 11px;
+  border-radius: 9px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.25;
@@ -406,7 +406,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 
 @media (min-width: 600px) {
   #view-hoy.day-open .routine-flat-copy {
-    width: min(100%, 520px);
+    width: min(100%, 480px);
     margin-inline: auto;
   }
 }
