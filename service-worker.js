@@ -1,4 +1,4 @@
-const CACHE="nuapp-v139-foco-card-refinement";
+const CACHE="nuapp-v140-routine-card-navigation";
 
 const CORE=[
   "./",
@@ -8,7 +8,7 @@ const CORE=[
   "./splash.css?v=61b-progress-canonical",
   "./splash.js?v=61b-progress-canonical",
   "./navigation.css?v=81-home-navigation-legibility",
-  "./daily.css?v=98a-responsive-day2",
+  "./daily.css?v=140-routine-card-navigation",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
@@ -37,7 +37,7 @@ const CORE=[
   "./notifications.js?v=61b-progress-canonical",
   "./foco-live.js?v=2",
   "./home-view.js?v=61b-progress-canonical",
-  "./daily-view.js?v=102-sales-training",
+  "./daily-view.js?v=140-routine-card-navigation",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=128-controlled-auto-update",

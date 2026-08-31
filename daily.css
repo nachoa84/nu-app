@@ -1507,3 +1507,209 @@
     margin-left: 34px;
   }
 }
+
+/* =========================================================
+   V140 · Cards de contenido y navegación accesible
+   Ajuste acotado a la vista interna de rutinas.
+   ========================================================= */
+
+#view-hoy.day-open .routine-content-carousel {
+  width: 100%;
+  margin-top: 20px;
+}
+
+#view-hoy.day-open .routine-content-heading {
+  margin: 0 0 13px;
+  color: var(--app-text);
+  font-size: 17px;
+  font-weight: 660;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+#view-hoy.day-open .routine-content-track {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  gap: 0;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+#view-hoy.day-open .routine-content-track::-webkit-scrollbar {
+  display: none;
+}
+
+#view-hoy.day-open .routine-content-track:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 3px;
+  border-radius: 21px;
+}
+
+#view-hoy.day-open .routine-content-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  height: clamp(330px, 46dvh, 400px);
+  padding: 1px 2px 3px;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+}
+
+#view-hoy.day-open .routine-content-card {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 24px 22px;
+  border: 1px solid var(--app-line);
+  border-radius: 21px;
+  background: var(--app-surface);
+  box-shadow: 0 8px 24px rgba(23, 34, 61, 0.08);
+  color: var(--app-text);
+}
+
+#view-hoy.day-open .routine-content-card-body {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(81, 73, 184, 0.25) transparent;
+  color: #4f565c;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+#view-hoy.day-open .routine-content-card.is-qa .routine-content-card-body {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+#view-hoy.day-open .routine-content-card .native-detail-paragraph {
+  margin: 0 0 12px;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+#view-hoy.day-open .routine-content-card .native-detail-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+#view-hoy.day-open .routine-content-card .native-detail-label {
+  margin: 10px 0 7px;
+}
+
+#view-hoy.day-open .routine-content-card .native-check-item {
+  margin: 9px 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+#view-hoy.day-open .routine-content-card .resource-links {
+  margin-top: 14px;
+}
+
+#view-hoy.day-open .routine-content-navigation {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 22px;
+}
+
+#view-hoy.day-open .routine-content-dots {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#view-hoy.day-open .routine-content-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #d4d7dc;
+  box-shadow: none;
+}
+
+#view-hoy.day-open .routine-content-dot.is-active {
+  background: var(--day-brand);
+  transform: scale(1.16);
+}
+
+#view-hoy.day-open .routine-content-arrow {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--app-line);
+  border-radius: 50%;
+  background: var(--app-surface);
+  color: var(--day-brand);
+  box-shadow: 0 3px 10px rgba(23, 34, 61, 0.06);
+  touch-action: manipulation;
+}
+
+#view-hoy.day-open .routine-content-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+#view-hoy.day-open .routine-content-arrow:not(:disabled):active {
+  transform: scale(0.94);
+  background: var(--day-brand-soft);
+}
+
+#view-hoy.day-open .routine-content-arrow:disabled {
+  opacity: 0.35;
+}
+
+#view-hoy.day-open .materials-intro {
+  margin: 5px 0 0;
+  color: var(--app-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+#view-hoy.day-open .materials-section .section-count,
+#view-hoy.day-open .resource-order {
+  display: none;
+}
+
+#view-hoy.day-open .resource-sequence {
+  width: 100%;
+  margin: 0;
+  padding: 0 8px 8px;
+  box-sizing: border-box;
+  gap: 12px;
+  scroll-padding-inline: 8px;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .routine-content-slide {
+    height: clamp(320px, 45dvh, 370px);
+  }
+
+  #view-hoy.day-open .routine-content-card {
+    padding: 21px 18px;
+  }
+
+  #view-hoy.day-open .routine-content-card-body {
+    font-size: 14px;
+  }
+
+  #view-hoy.day-open .routine-content-card.is-qa .routine-content-card-body {
+    font-size: 13px;
+  }
+}

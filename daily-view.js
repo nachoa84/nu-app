@@ -169,10 +169,6 @@ function createCompactMediaItem(block, order, mediaBlocks) {
 
   const openPreview = () => openMediaPreview(mediaBlocks, order - 1, selectedDay);
 
-  const orderBadge = document.createElement("span");
-  orderBadge.className = "resource-order";
-  orderBadge.textContent = String(order);
-
   const preview = document.createElement("div");
   preview.className = "resource-thumb";
   preview.setAttribute("aria-hidden", "true");
@@ -282,9 +278,34 @@ function createCompactMediaItem(block, order, mediaBlocks) {
 
   setupNativePressState(item, ".resource-action-btn");
   main.append(copy, actions);
-  item.append(orderBadge, preview, main, disclosure);
+  item.append(preview, main, disclosure);
   updateFavoriteButtons();
   return item;
+}
+
+function normalizeRoutineText(value) {
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/[ \t]*\n[ \t]*/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function naturalRoutineParagraphs(value) {
+  return normalizeRoutineText(value)
+    .split(/\n\s*\n/)
+    .map(paragraph =>
+      paragraph
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .join(" ")
+        .replace(/[*_`~]+/g, "")
+        .replace(/\s+([,.;:!?])/g, "$1")
+        .trim()
+    )
+    .filter(paragraph => paragraph && !/^-{2,}$/.test(paragraph));
 }
 
 function cleanLeadingSymbols(value) {
@@ -294,7 +315,7 @@ function cleanLeadingSymbols(value) {
 }
 
 function firstMeaningfulLine(content) {
-  const line = String(content || "")
+  const line = normalizeRoutineText(content)
     .split(/\n+/)
     .map(value => cleanLeadingSymbols(value))
     .find(Boolean) || "Tu acción de hoy";
@@ -307,7 +328,7 @@ function isImportedCollagenContentDay() {
 }
 
 function importedTextParts(content, { stripStepNumber = false } = {}) {
-  const normalized = String(content || "").replace(/\r\n?/g, "\n");
+  const normalized = normalizeRoutineText(content);
   const lines = normalized.split("\n");
   const firstIndex = lines.findIndex(line => cleanLeadingSymbols(line));
 
@@ -475,40 +496,382 @@ function createImportedActionStep(block, index) {
 
 function appendFormattedContent(container, content, options = {}) {
   const { dropFirstParagraph = false } = options;
-  let paragraphs = String(content || "")
-    .split(/\n\s*\n/)
-    .map(value => value.trim())
-    .filter(Boolean);
+  let paragraphs = naturalRoutineParagraphs(content);
 
   if (dropFirstParagraph) {
     paragraphs = paragraphs.slice(1);
   }
 
   paragraphs.forEach(paragraph => {
-    const lines = paragraph
-      .split(/\n+/)
-      .map(value => value.trim())
+    if (/^(✅|☑️|✔️)/u.test(paragraph)) {
+      const check = document.createElement("div");
+      check.className = "native-check-item";
+      check.innerHTML = `
+        <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
+        <span>${paragraph.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
+      `;
+      container.appendChild(check);
+      return;
+    }
+
+    const isLabel =
+      paragraph.length < 34 &&
+      /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(paragraph);
+    const element = document.createElement(isLabel ? "div" : "p");
+    element.className = isLabel
+      ? "native-detail-label"
+      : "native-detail-paragraph";
+    element.textContent = paragraph;
+    container.appendChild(element);
+  });
+}
+
+function isQuestionAnswerContent(value) {
+  const text = normalizeRoutineText(value).toLowerCase();
+  if (!text) return false;
+
+  const explicitQa =
+    /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|pregunta\s*[:\-]|respuesta\s*[:\-]/i.test(text);
+  const questionCount = (text.match(/[¿?]/g) || []).length;
+  const answerSignals = (
+    text.match(
+      /\b(?:sí|si|no|porque|puede|puedes|debe|debes|recomendamos|respuesta)\b/gi
+    ) || []
+  ).length;
+
+  return (
+    explicitQa ||
+    questionCount >= 3 ||
+    (questionCount >= 2 && answerSignals >= 2)
+  );
+}
+
+function estimateRoutineVisualLines(value, qa = false) {
+  const text = naturalRoutineParagraphs(value).join("\n\n");
+  if (!text) return 0;
+
+  const charsPerLine = qa ? 45 : 40;
+  return text
+    .split(/\n\s*\n/)
+    .reduce(
+      (sum, paragraph) =>
+        sum + Math.max(1, Math.ceil(paragraph.length / charsPerLine)) + 0.35,
+      0
+    );
+}
+
+function splitRoutineVisualUnit(value, qa, lineBudget) {
+  const text = naturalRoutineParagraphs(value).join(" ");
+  if (!text) return [];
+  if (estimateRoutineVisualLines(text, qa) <= lineBudget) return [text];
+
+  const words = text.split(/\s+/).filter(Boolean);
+  const units = [];
+  let current = "";
+
+  words.forEach(word => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (
+      current &&
+      estimateRoutineVisualLines(candidate, qa) > lineBudget
+    ) {
+      units.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  });
+
+  if (current) units.push(current);
+  return units;
+}
+
+function routineTextUnits(value, qa) {
+  const paragraphs = naturalRoutineParagraphs(value);
+  if (!paragraphs.length) return [];
+
+  if (qa) {
+    const units = [];
+    for (let index = 0; index < paragraphs.length; index += 1) {
+      const paragraph = paragraphs[index];
+      if (
+        paragraph.includes("?") &&
+        paragraphs[index + 1] &&
+        !paragraphs[index + 1].includes("?")
+      ) {
+        units.push(`${paragraph}\n\n${paragraphs[index + 1]}`);
+        index += 1;
+      } else {
+        units.push(paragraph);
+      }
+    }
+    return units.flatMap(unit =>
+      splitRoutineVisualUnit(unit, true, 5.2)
+    );
+  }
+
+  return paragraphs.flatMap(paragraph => {
+    const sentences = paragraph
+      .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÜÑ¿¡0-9])/u)
+      .map(sentence => sentence.trim())
       .filter(Boolean);
 
-    lines.forEach(line => {
-      if (/^(✅|☑️|✔️)/u.test(line)) {
-        const check = document.createElement("div");
-        check.className = "native-check-item";
-        check.innerHTML = `
-          <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
-          <span>${line.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
-        `;
-        container.appendChild(check);
-        return;
-      }
+    return (sentences.length ? sentences : [paragraph]).flatMap(sentence =>
+      splitRoutineVisualUnit(sentence, false, 4.8)
+    );
+  });
+}
 
-      const isLabel = line.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
-      const element = document.createElement(isLabel ? "div" : "p");
-      element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
-      element.textContent = line;
-      container.appendChild(element);
+function balanceRoutineTextPool(pool, qa) {
+  if (!pool.length) return [];
+
+  const targetLines = qa ? 10.2 : 8.2;
+  const units = [];
+
+  pool.forEach(block => {
+    routineTextUnits(block.content, qa).forEach(content => {
+      units.push({
+        content,
+        cost: estimateRoutineVisualLines(content, qa),
+        block
+      });
     });
   });
+
+  if (!units.length) return [];
+
+  const totalCost = units.reduce((sum, unit) => sum + unit.cost, 0);
+  const groupCount = Math.max(1, Math.ceil(totalCost / targetLines));
+  const groups = [];
+  let current = [];
+  let currentCost = 0;
+  let consumedCost = 0;
+
+  const flush = () => {
+    if (!current.length) return;
+    const first = current[0].block;
+    groups.push({
+      ...first,
+      content: current.map(unit => unit.content).join("\n\n")
+    });
+    consumedCost += currentCost;
+    current = [];
+    currentCost = 0;
+  };
+
+  units.forEach((unit, index) => {
+    const groupsLeft = groupCount - groups.length;
+    const remainingCost = totalCost - consumedCost;
+    const dynamicTarget = remainingCost / Math.max(groupsLeft, 1);
+    const candidateCost = currentCost + unit.cost;
+    const canStillCut = groups.length < groupCount - 1;
+    const unitsLeft = units.length - index;
+    const groupsNeeded = groupCount - groups.length;
+
+    if (
+      current.length &&
+      canStillCut &&
+      unitsLeft >= groupsNeeded
+    ) {
+      const beforeDifference = Math.abs(dynamicTarget - currentCost);
+      const afterDifference = Math.abs(dynamicTarget - candidateCost);
+      if (
+        beforeDifference <= afterDifference &&
+        currentCost >= dynamicTarget * 0.58
+      ) {
+        flush();
+      }
+    }
+
+    current.push(unit);
+    currentCost += unit.cost;
+  });
+
+  flush();
+  return groups;
+}
+
+function splitRoutineTextBlocks(blocks) {
+  const output = [];
+  let pool = [];
+  let poolQa = null;
+
+  const flushPool = () => {
+    if (!pool.length) return;
+    output.push(...balanceRoutineTextPool(pool, Boolean(poolQa)));
+    pool = [];
+    poolQa = null;
+  };
+
+  blocks.forEach(block => {
+    const normalized = normalizeRoutineText(block.content);
+    if (!normalized) return;
+
+    if (block.links?.length) {
+      flushPool();
+      const qa = isQuestionAnswerContent(normalized);
+      const linkedCards = balanceRoutineTextPool(
+        [{ ...block, content: normalized, links: [] }],
+        qa
+      );
+      linkedCards.forEach((linkedCard, index) => {
+        output.push({
+          ...linkedCard,
+          links: index === linkedCards.length - 1 ? block.links : []
+        });
+      });
+      return;
+    }
+
+    const qa = isQuestionAnswerContent(normalized);
+    if (pool.length && qa !== poolQa) flushPool();
+    if (!pool.length) poolQa = qa;
+    pool.push({ ...block, content: normalized });
+  });
+
+  flushPool();
+  return output;
+}
+
+function isMaterialTransitionBlock(block) {
+  if (!block || block.type !== "text" || block.links?.length) return false;
+
+  const text = naturalRoutineParagraphs(block.content).join(" ");
+  if (!text || text.length > 180) return false;
+
+  return (
+    /^(?:ahora\s+s[ií][,:\s-]*)?(?:el\s+)?contenido(?:\s*\.{2,})?$/i.test(
+      text
+    ) ||
+    /(?:material(?:es)?|contenido).{0,80}(?:hoy|publicar|mercadeo|redes|stories|estados)|(?:publica|publicar|subas?).{0,80}(?:redes|estados|stories|contenido|material)/i.test(
+      text
+    )
+  );
+}
+
+function createRoutineContentCard(block) {
+  const card = document.createElement("section");
+  card.className = "routine-content-card";
+
+  const qa = isQuestionAnswerContent(block.content);
+  card.classList.toggle("is-qa", qa);
+
+  const body = document.createElement("div");
+  body.className = "routine-content-card-body";
+  appendFormattedContent(body, block.content);
+  addLinks(body, block.links);
+  card.appendChild(body);
+
+  return card;
+}
+
+function createRoutineContentCarousel(textBlocks) {
+  const carousel = document.createElement("section");
+  carousel.className = "routine-content-carousel";
+  carousel.setAttribute("aria-label", "Contenido de la rutina");
+
+  const heading = document.createElement("h3");
+  heading.className = "routine-content-heading";
+  heading.textContent = "Contenido del día";
+
+  const track = document.createElement("div");
+  track.className = "routine-content-track";
+  track.tabIndex = 0;
+  track.setAttribute("aria-label", "Cards de contenido");
+
+  textBlocks.forEach((block, index) => {
+    const slide = document.createElement("article");
+    slide.className = "routine-content-slide";
+    slide.dataset.slideIndex = String(index);
+    slide.setAttribute(
+      "aria-label",
+      `Contenido ${index + 1} de ${textBlocks.length}`
+    );
+    slide.appendChild(createRoutineContentCard(block));
+    track.appendChild(slide);
+  });
+
+  const navigation = document.createElement("div");
+  navigation.className = "routine-content-navigation";
+
+  const previous = document.createElement("button");
+  previous.type = "button";
+  previous.className = "routine-content-arrow routine-content-previous";
+  previous.setAttribute("aria-label", "Ver contenido anterior");
+  previous.innerHTML = ICONS.back;
+
+  const dots = document.createElement("div");
+  dots.className = "routine-content-dots";
+  dots.setAttribute("aria-label", "Navegación del contenido");
+
+  const next = document.createElement("button");
+  next.type = "button";
+  next.className = "routine-content-arrow routine-content-next";
+  next.setAttribute("aria-label", "Ver contenido siguiente");
+  next.innerHTML = ICONS.arrow;
+
+  const dotButtons = textBlocks.map((_, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "routine-content-dot";
+    dot.setAttribute("aria-label", `Ver contenido ${index + 1}`);
+    dots.appendChild(dot);
+    return dot;
+  });
+
+  let activeIndex = 0;
+
+  const renderNavigationState = index => {
+    activeIndex = Math.max(0, Math.min(textBlocks.length - 1, index));
+    dotButtons.forEach((dot, dotIndex) => {
+      const active = dotIndex === activeIndex;
+      dot.classList.toggle("is-active", active);
+      dot.setAttribute("aria-current", active ? "true" : "false");
+    });
+    previous.disabled = activeIndex === 0;
+    next.disabled = activeIndex === textBlocks.length - 1;
+  };
+
+  const goTo = index => {
+    const target = Math.max(0, Math.min(textBlocks.length - 1, index));
+    track.scrollTo({
+      left: track.clientWidth * target,
+      behavior: prefersReducedMotion() ? "auto" : "smooth"
+    });
+    renderNavigationState(target);
+  };
+
+  dotButtons.forEach((dot, index) => {
+    dot.addEventListener("click", () => goTo(index));
+  });
+  previous.addEventListener("click", () => goTo(activeIndex - 1));
+  next.addEventListener("click", () => goTo(activeIndex + 1));
+
+  track.addEventListener(
+    "scroll",
+    () => {
+      const index = Math.round(
+        track.scrollLeft / Math.max(track.clientWidth, 1)
+      );
+      renderNavigationState(index);
+    },
+    { passive: true }
+  );
+  track.addEventListener("keydown", event => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goTo(activeIndex - 1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goTo(activeIndex + 1);
+    }
+  });
+
+  navigation.append(previous, dots, next);
+  carousel.append(heading, track, navigation);
+  renderNavigationState(0);
+  return carousel;
 }
 
 function createObjectiveCard(block) {
@@ -600,7 +963,13 @@ function createActionStep(block, index) {
 
 function renderStructuredDayDetail() {
   const blocks = currentBlocks();
-  const textBlocks = blocks.filter(block => block.type === "text");
+  const rawTextBlocks = blocks.filter(block => block.type === "text");
+  const materialIntroBlocks = rawTextBlocks.filter(
+    isMaterialTransitionBlock
+  );
+  const textBlocks = splitRoutineTextBlocks(
+    rawTextBlocks.filter(block => !isMaterialTransitionBlock(block))
+  );
   const mediaBlocks = blocks.filter(block => block.type === "media");
   const actionBlocks = blocks.filter(block => block.type === "action");
   const completeBlock = blocks.find(block => block.type === "complete");
@@ -631,35 +1000,7 @@ function renderStructuredDayDetail() {
   chat.appendChild(intro);
 
   if (textBlocks.length) {
-    const planGroup = document.createElement("section");
-    planGroup.className = "day-plan-group";
-
-    const objective = createObjectiveCard(textBlocks[0]);
-    objective.classList.add("day-plan-objective");
-    planGroup.appendChild(objective);
-
-    if (textBlocks.length > 1) {
-      const steps = document.createElement("section");
-      steps.className = "native-section steps-section day-plan-steps";
-      steps.innerHTML = `
-        <div class="native-section-heading">
-          <div>
-            <h3>Pasos de hoy</h3>
-          </div>
-          <small class="section-count">${textBlocks.length - 1}</small>
-        </div>
-      `;
-
-      const list = document.createElement("div");
-      list.className = "action-step-list";
-      textBlocks.slice(1).forEach((block, index) => {
-        list.appendChild(createActionStep(block, index + 1));
-      });
-      steps.appendChild(list);
-      planGroup.appendChild(steps);
-    }
-
-    chat.appendChild(planGroup);
+    chat.appendChild(createRoutineContentCarousel(textBlocks));
   }
 
   if (mediaBlocks.length) {
@@ -670,9 +1011,19 @@ function renderStructuredDayDetail() {
         <div>
           <h3>Materiales para hoy</h3>
         </div>
-        <small class="section-count">${mediaBlocks.length}</small>
       </div>
     `;
+
+    if (materialIntroBlocks.length) {
+      const intro = document.createElement("p");
+      intro.className = "materials-intro";
+      intro.textContent = materialIntroBlocks
+        .flatMap(block => naturalRoutineParagraphs(block.content))
+        .join(" ");
+      materials
+        .querySelector(".native-section-heading > div")
+        .appendChild(intro);
+    }
 
     const list = document.createElement("div");
     list.className = "resource-sequence";
