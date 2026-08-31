@@ -609,3 +609,22 @@ body[data-active-view="bot"] .bottom-nav {
   height: 50px;
   min-height: 50px;
 }
+
+
+/* Confirmación breve de limpieza: conserva la acción, sin hoja antigua. */
+body[data-active-view="bot"] .toast-host .toast {
+  border: 1px solid rgba(16,22,63,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.96);
+  color: #10163f;
+  box-shadow: 0 12px 30px rgba(16,22,63,.12);
+  font-family: Poppins, sans-serif;
+}
+body[data-active-view="bot"] .toast-host .toast-status {
+  background: rgba(255,122,50,.14);
+  color: #f05b14;
+}
+body[data-active-view="bot"] .toast-host .toast-text {
+  color: #10163f;
+  font-weight: 600;
+}
