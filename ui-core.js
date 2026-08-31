@@ -795,7 +795,7 @@ function setupInterfaceChrome() {
       showActionSheet({
         title: "¿Limpiar conversación?",
         message: "Se eliminarán los mensajes de esta conversación en este dispositivo.",
-        actionLabel: "Limpiar conversación",
+        actionLabel: "Limpiar",
         onConfirm: () => resetBotConversation()
       });
     };
