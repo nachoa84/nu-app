@@ -52,22 +52,44 @@ function looksLikeAllCapsLine(line) {
 }
 
 function explicitQa(text) {
-  return /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|pregunta\s*[:\-]|respuesta\s*[:\-]/i.test(text);
+  return /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|(?:^|\n)\s*pregunta\s*[:\-]|(?:^|\n)\s*respuesta\s*[:\-]/i.test(text);
+}
+
+function cleanQaLine(value) {
+  return String(value || "")
+    .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️\-–—]+/u, "")
+    .trim();
+}
+
+function isQuestionLine(value) {
+  const line = cleanQaLine(value);
+  return Boolean(line) && /[?]/.test(line);
+}
+
+function isLikelyDirectAnswer(value) {
+  const line = cleanQaLine(value).toLocaleLowerCase("es");
+  if (!line || isQuestionLine(line) || line.length < 3) return false;
+
+  return /^(?:sí\b|si\b|no\b|depende\b|desde\b|cuando\b|por\b|porque\b|puede\b|puedes\b|se\b|el\b|la\b|los\b|las\b|beauty\b|nu\s*skin\b|wellspa\b|galvanic\b|lumispa\b|recomendamos\b|aproximadamente\b|hasta\b|entre\b)/i.test(line);
 }
 
 function structuralQa(text) {
   const lines = String(text || "")
     .split(/\n+/)
-    .map(line => line.trim())
+    .map(cleanQaLine)
     .filter(Boolean);
+
   let pairs = 0;
-  for (let i = 0; i < lines.length - 1; i += 1) {
-    if (/\?$/.test(lines[i]) && !/\?$/.test(lines[i + 1]) && lines[i + 1].length >= 18) {
-      pairs += 1;
-      i += 1;
-    }
+  let firstPairIndex = Number.POSITIVE_INFINITY;
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    if (!isQuestionLine(lines[index])) continue;
+    if (!isLikelyDirectAnswer(lines[index + 1])) continue;
+    pairs += 1;
+    firstPairIndex = Math.min(firstPairIndex, index);
   }
-  return pairs >= 2;
+
+  return pairs >= 2 || (pairs === 1 && firstPairIndex <= 1);
 }
 
 const typoPatterns = [
@@ -76,9 +98,12 @@ const typoPatterns = [
   ["Instragram", /\binstragram\b/i],
   ["Whatapp", /\bwhatapp\b/i],
   ["A demás", /\ba\s+demás\b/i],
+  ["típs", /\btíps\b/i],
   ["practicas", /\bpracticas\b/i],
   ["a traves", /\ba\s+traves\b/i],
   ["con las cambios", /\bcon\s+las\s+cambios\b/i],
+  ["runing", /\bruning\b/i],
+  ["lV/IV", /\blV\b/],
   ["wellnes&Skincare", /\bwellnes\s*&\s*skincare\b/i],
   ["perdida de brillo", /\bperdida\s+de\s+brillo\b/i],
   ["Ahora si", /\bahora\s+si\b/i],
