@@ -80,16 +80,15 @@
   };
 
   function routineCharsPerLine(qa = false) {
-    const width = Math.max(
+    const viewportWidth = Math.max(
       320,
       Number(window.innerWidth || document.documentElement?.clientWidth || 390)
     );
+    const visualWidth = Math.min(480, viewportWidth);
 
-    if (width <= 360) return qa ? 39 : 34;
-    if (width <= 430) return qa ? 43 : 38;
-    if (width <= 600) return qa ? 47 : 42;
-    if (width <= 900) return qa ? 52 : 47;
-    return qa ? 56 : 51;
+    if (visualWidth <= 360) return qa ? 39 : 34;
+    if (visualWidth <= 430) return qa ? 43 : 38;
+    return qa ? 49 : 44;
   }
 
   estimateRoutineVisualLines = function routineQualityVisualLines(value, qa = false) {
