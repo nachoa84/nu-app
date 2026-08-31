@@ -1606,10 +1606,10 @@
 #view-hoy.day-open .routine-content-heading {
   margin: 0 0 14px;
   color: #17203b;
-  font-size: 24px;
-  font-weight: 720;
-  line-height: 1.12;
-  letter-spacing: -.04em;
+  font-size: 20px;
+  font-weight: 680;
+  line-height: 1.15;
+  letter-spacing: -.03em;
 }
 
 #view-hoy.day-open .routine-content-track {
@@ -1623,6 +1623,7 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  transition: height .2s ease;
 }
 
 #view-hoy.day-open .routine-content-track::-webkit-scrollbar {
@@ -1686,6 +1687,18 @@
 
 #view-hoy.day-open .native-details > summary {
   display: none;
+}
+
+#view-hoy.day-open .routine-content-card.is-long-copy .native-details-body,
+#view-hoy.day-open .routine-content-card.is-long-copy .action-step-body {
+  font-size: 15px;
+  line-height: 1.48;
+}
+
+#view-hoy.day-open .routine-content-card.is-long-copy .action-step-title,
+#view-hoy.day-open .routine-content-card.is-long-copy .objective-card-header h3 {
+  font-size: 20px;
+  line-height: 1.24;
 }
 
 #view-hoy.day-open .native-details-body,
