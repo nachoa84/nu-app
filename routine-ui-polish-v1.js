@@ -67,10 +67,8 @@
 
   function ensureRoutineCarouselControls() {
     document
-      .querySelectorAll("#view-hoy.day-open .routine-content-carousel")
+      .querySelectorAll("#view-hoy .routine-content-carousel")
       .forEach(carousel => {
-        if (carousel.dataset.controlsReady === "true") return;
-
         const track = carousel.querySelector(".routine-content-track");
         const dots = carousel.querySelector(".routine-content-dots");
         const slides = Array.from(carousel.querySelectorAll(".routine-content-slide"));
@@ -78,7 +76,20 @@
 
         if (!track || !dots || slides.length <= 1 || dotButtons.length !== slides.length) return;
 
-        carousel.dataset.controlsReady = "true";
+        const existingControls = carousel.querySelector(".routine-content-controls");
+        const existingArrows = carousel.querySelectorAll(".routine-content-arrow");
+
+        if (existingControls && existingArrows.length === 2) {
+          carousel.dataset.controlsReady = "true";
+          return;
+        }
+
+        // Auto-repara un montaje incompleto: conserva los puntos y reconstruye
+        // el contenedor de navegación si faltan las flechas.
+        if (existingControls && existingControls.contains(dots)) {
+          existingControls.replaceWith(dots);
+        }
+        carousel.dataset.controlsReady = "false";
 
         const controls = document.createElement("div");
         controls.className = "routine-content-controls";
@@ -97,6 +108,7 @@
 
         dots.replaceWith(controls);
         controls.append(previous, dots, next);
+        carousel.dataset.controlsReady = "true";
 
         const activeIndex = () => {
           const current = dotButtons.findIndex(dot => dot.classList.contains("is-active"));
@@ -133,7 +145,7 @@
   }
 
   function polishRoutineMaterials() {
-    const dayView = document.querySelector("#view-hoy.day-open");
+    const dayView = document.querySelector("#view-hoy");
     if (!dayView) return;
 
     dayView.querySelectorAll(".materials-section .section-count").forEach(node => node.remove());
@@ -178,7 +190,9 @@
 
   routineUiObserver.observe(routineUiRoot, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"]
   });
 
   document.addEventListener("DOMContentLoaded", () => {
