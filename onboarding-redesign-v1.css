@@ -386,3 +386,9 @@
 .onboarding-welcome-step .onboarding-heading h1 {
   max-width: 340px !important;
 }
+
+
+/* Onboarding · separación superior del contenido */
+.onboarding-body {
+  padding-top: 24px !important;
+}
