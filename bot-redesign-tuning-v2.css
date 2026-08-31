@@ -18,7 +18,7 @@
   content: "Iris";
   display: inline-block;
   color: var(--iris-ref-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 36px;
   font-weight: 400;
   line-height: .98;
@@ -55,3 +55,12 @@
     max-height: calc(100dvh - 286px - var(--safe-bottom));
   }
 }
+
+
+/* Overrides finales de Iris: el HTML conserva el nombre real y el composer queda en una sola fila. */
+#view-bot .bot-page-header h1 { font-size: 34px !important; }
+#view-bot .bot-page-header h1::before { content: none !important; display: none !important; }
+#view-bot .bot-form { grid-template-columns: 48px minmax(0,1fr) 50px !important; }
+#view-bot .bot-form #botShortcutsBtn { grid-column: 1; }
+#view-bot .bot-form #botInput { grid-column: 2; }
+#view-bot .bot-form .bot-send { grid-column: 3; }
