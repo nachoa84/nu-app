@@ -1,4 +1,4 @@
-const CACHE="nuapp-v149-wellspa-scale";
+const CACHE="nuapp-v150-onboarding-clean";
 
 const CORE=[
   "./",
@@ -19,7 +19,7 @@ const CORE=[
   "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=143-iris-layout-5",
+  "./bot.css?v=143-iris-layout-6",
   "./favorites.css?v=94-bot-folders",
   "./favorites-redesign-v1.css?v=146-wellspa-scale",
   "./bot-content.js?v=131-country-catalogs",
