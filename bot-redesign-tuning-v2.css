@@ -1,66 +1,181 @@
-/* =========================================================
-   NU APP · IRIS TUNING V2
-   Ajustes posteriores a validación visual.
-   - Título visible solo como "Iris"
-   - Menos vacío vertical entre conversación y composer
-   ========================================================= */
-
-/* El texto real puede ser reescrito por chrome compartido; forzamos
-   visualmente el título aprobado sin tocar la lógica de navegación. */
-#view-bot .bot-page-header h1,
-#view-bot .app-page-header h1 {
-  font-size: 0 !important;
-  line-height: 1 !important;
+/* Iris · layout final
+   Una sola capa de composición para encabezado, conversación y composer.
+   La lógica de Iris permanece en bot.js. */
+#view-bot.active {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
+  overflow: hidden;
 }
-
+#view-bot .bot-page-header {
+  flex: 0 0 auto;
+  min-height: 0;
+  margin: 0 2px 12px;
+  padding: calc(20px + var(--safe-top)) 0 0;
+}
+#view-bot .bot-page-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 0;
+  gap: 0;
+}
+#view-bot .bot-page-header > div:first-child::before,
 #view-bot .bot-page-header h1::before,
-#view-bot .app-page-header h1::before {
-  content: "Iris";
-  display: inline-block;
-  color: var(--iris-ref-ink);
-  font-family: Poppins, sans-serif;
-  font-size: 36px;
-  font-weight: 400;
-  line-height: .98;
-  letter-spacing: -.045em;
-}
-
-#view-bot .bot-page-header h1::after,
-#view-bot .app-page-header h1::after {
+#view-bot .bot-page-header h1::after {
   content: none !important;
   display: none !important;
 }
-
-/* En conversaciones cortas, no estiramos el thread hasta llenar toda
-   la pantalla: el composer acompaña al contenido y el resultado respira mejor. */
-#view-bot .bot-card.has-conversation .bot-thread {
-  flex: 0 1 auto;
-  max-height: calc(100dvh - 300px - var(--safe-bottom));
+#view-bot .bot-eyebrow {
+  display: block;
+  margin: 0 0 6px;
+  color: #8f86a5;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+#view-bot .bot-page-header h1 {
+  margin: 0;
+  color: #332947;
+  font-family: Poppins, sans-serif !important;
+  font-size: 34px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.04em !important;
+}
+#view-bot .bot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #4f8f62;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+#view-bot .bot-status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6f9e73;
+  box-shadow: 0 0 0 3px rgba(111,158,115,.14);
+}
+#view-bot .bot-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 0 !important;
+  background: transparent;
+}
+#view-bot .bot-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
   overflow-y: auto;
-  padding-bottom: 10px;
+  padding: 8px 0 12px;
+  scroll-padding-bottom: 16px;
 }
-
-#view-bot .bot-card.has-conversation .bot-form,
-#view-bot .bot-form {
-  margin-top: 18px;
+#view-bot .bot-native-welcome {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 8px 48px;
+  text-align: center;
 }
-
-@media (max-width: 370px) {
-  #view-bot .bot-page-header h1::before,
-  #view-bot .app-page-header h1::before {
-    font-size: 33px;
+#view-bot .bot-native-welcome-mark { display: none !important; }
+#view-bot .bot-native-welcome h2 {
+  max-width: 330px;
+  margin: 0 auto;
+  color: #332947;
+  font-family: Poppins, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+#view-bot .bot-native-welcome p {
+  max-width: 350px;
+  margin: 12px auto 0;
+  color: #857d91;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr) 50px !important;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 16px 0 8px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+#view-bot .bot-form::before,
+#view-bot .bot-form::after { content: none !important; display: none !important; }
+#view-bot .bot-form #botShortcutsBtn { grid-column: 1; grid-row: 1; }
+#view-bot .bot-form #botInput { grid-column: 2; grid-row: 1; min-width: 0; }
+#view-bot .bot-form .bot-send { grid-column: 3; grid-row: 1; }
+body[data-active-view="bot"] .app-action-sheet {
+  font-family: Poppins, sans-serif;
+  background: rgba(16,22,63,.26);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+body[data-active-view="bot"] .app-action-sheet-panel,
+body[data-active-view="bot"] .app-action-sheet-cancel {
+  border-radius: 24px;
+  box-shadow: 0 18px 48px rgba(16,22,63,.16);
+}
+body[data-active-view="bot"] .app-action-sheet-copy strong,
+body[data-active-view="bot"] .app-action-sheet-copy span,
+body[data-active-view="bot"] .app-action-sheet-action,
+body[data-active-view="bot"] .app-action-sheet-cancel {
+  font-family: Poppins, sans-serif;
+}
+body[data-active-view="bot"] .app-action-sheet-action {
+  background: linear-gradient(115deg, #ff7a32, #f05b14);
+  color: #fff;
+}
+@media (max-width: 360px) {
+  #view-bot .bot-form,
+  #view-bot .bot-card.has-conversation .bot-form {
+    grid-template-columns: 44px minmax(0,1fr) 46px !important;
   }
-
-  #view-bot .bot-card.has-conversation .bot-thread {
-    max-height: calc(100dvh - 286px - var(--safe-bottom));
-  }
+  #view-bot .bot-form #botShortcutsBtn { width: 44px; min-width: 44px; }
+  #view-bot .bot-form .bot-send { width: 46px; min-width: 46px; }
 }
-
-
-/* Overrides finales de Iris: el HTML conserva el nombre real y el composer queda en una sola fila. */
-#view-bot .bot-page-header h1 { font-size: 34px !important; }
-#view-bot .bot-page-header h1::before { content: none !important; display: none !important; }
-#view-bot .bot-form { grid-template-columns: 48px minmax(0,1fr) 50px !important; }
-#view-bot .bot-form #botShortcutsBtn { grid-column: 1; }
-#view-bot .bot-form #botInput { grid-column: 2; }
-#view-bot .bot-form .bot-send { grid-column: 3; }
+body.keyboard-open #view-bot.active {
+  height: var(--bot-visual-height);
+  min-height: 0;
+  max-height: var(--bot-visual-height);
+  padding-bottom: 0;
+}
+body.keyboard-open #view-bot .bot-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+body.keyboard-open #view-bot .bot-form,
+body.keyboard-open #view-bot .bot-card.has-conversation .bot-form {
+  position: relative;
+  margin: 0;
+  padding: 10px 0 8px;
+  transform: none !important;
+}
