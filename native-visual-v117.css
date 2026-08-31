@@ -13,7 +13,6 @@
   --native-nav-gap-v117: 10px;
 }
 
-/* Tipografía con roles claros. */
 body,
 button,
 input,
@@ -37,7 +36,6 @@ h6,
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 }
 
-/* Navegación principal como superficie flotante y segura. */
 #app {
   padding-bottom:
     calc(var(--nav-height) + var(--native-nav-gap-v117) + var(--safe-bottom));
@@ -71,7 +69,6 @@ body.keyboard-open .bottom-nav {
     translate(-50%, calc(100% + var(--native-nav-gap-v117) + 18px));
 }
 
-/* Encabezados más compactos sin perder áreas táctiles. */
 .app-page-header {
   min-height: 50px;
   gap: 12px;
@@ -119,7 +116,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   font-weight: 700;
 }
 
-/* Etiquetas editoriales: menos mayúsculas y tracking más natural. */
 .page-kicker,
 .home-guide-kicker,
 .home-section-heading span,
@@ -129,7 +125,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   letter-spacing: .015em;
 }
 
-/* Mantener aire suficiente sobre la navegación flotante. */
 .view {
   padding-bottom: 34px;
 }
@@ -140,8 +135,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 /* =========================================================
-   Rutinas · normalización tipográfica segura
-   Solo afecta el día abierto. No modifica Home, Iris ni Favoritos.
+   Rutinas · cards canónicas
    ========================================================= */
 
 #view-hoy.day-open .native-day-content {
@@ -149,32 +143,26 @@ body.is-scrolled #view-bot .app-page-header h1 {
     calc(var(--nav-height) + var(--native-nav-gap-v117) + var(--safe-bottom) + 112px);
 }
 
+#view-hoy.day-open .routine-content-slide {
+  display: flex;
+  align-items: stretch;
+}
+
 #view-hoy.day-open .routine-content-card {
+  width: 100%;
+  min-height: 300px;
   box-sizing: border-box;
 }
 
 #view-hoy.day-open .routine-content-card.action-step,
 #view-hoy.day-open .routine-content-card.action-step-static,
 #view-hoy.day-open .routine-content-card.objective-card {
-  padding: 18px 18px 17px;
+  padding: 20px;
 }
 
-/* Título y cuerpo comparten escala: el contenido se lee como una sola pieza. */
+/* Escala normal: igual para título y cuerpo. */
 #view-hoy.day-open .objective-card-header h3,
-#view-hoy.day-open .action-step-title {
-  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.52;
-  letter-spacing: 0;
-  color: #17203b;
-  overflow-wrap: anywhere;
-}
-
-#view-hoy.day-open .action-step > summary {
-  margin-bottom: 8px;
-}
-
+#view-hoy.day-open .action-step-title,
 #view-hoy.day-open .native-details-body,
 #view-hoy.day-open .action-step-body,
 #view-hoy.day-open .native-detail-paragraph,
@@ -191,19 +179,48 @@ body.is-scrolled #view-bot .app-page-header h1 {
   word-break: normal;
 }
 
-/* Las líneas cortas/importadas dejan de verse como subtítulos arbitrarios. */
+#view-hoy.day-open .objective-card-header h3,
+#view-hoy.day-open .action-step-title {
+  color: #17203b;
+}
+
+#view-hoy.day-open .action-step > summary {
+  margin-bottom: 8px;
+}
+
 #view-hoy.day-open .native-detail-label {
   margin: 5px 0;
   color: #535d70;
-  opacity: 1;
 }
 
 #view-hoy.day-open .native-detail-paragraph {
-  margin-bottom: 8px;
+  margin: 0 0 9px;
 }
 
 #view-hoy.day-open .native-detail-paragraph:last-child {
   margin-bottom: 0;
+}
+
+/* Solo contenido algo más largo: reducción leve. */
+#view-hoy.day-open .routine-content-card.is-compact-copy .objective-card-header h3,
+#view-hoy.day-open .routine-content-card.is-compact-copy .action-step-title,
+#view-hoy.day-open .routine-content-card.is-compact-copy .native-details-body,
+#view-hoy.day-open .routine-content-card.is-compact-copy .action-step-body,
+#view-hoy.day-open .routine-content-card.is-compact-copy .native-detail-paragraph,
+#view-hoy.day-open .routine-content-card.is-compact-copy .native-check-item {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Q&A: única variante claramente más pequeña. */
+#view-hoy.day-open .routine-content-card.is-qa .objective-card-header h3,
+#view-hoy.day-open .routine-content-card.is-qa .action-step-title,
+#view-hoy.day-open .routine-content-card.is-qa .native-details-body,
+#view-hoy.day-open .routine-content-card.is-qa .action-step-body,
+#view-hoy.day-open .routine-content-card.is-qa .native-detail-paragraph,
+#view-hoy.day-open .routine-content-card.is-qa .native-check-item {
+  font-size: 13.5px;
+  line-height: 1.47;
 }
 
 #view-hoy.day-open .native-check-item {
@@ -226,7 +243,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   flex: 0 0 17px;
 }
 
-/* Reduce el alto inicial de los días con mucho texto sin esconder contenido. */
 #view-hoy.day-open .five-line-body.is-collapsed {
   max-height: calc(1.52em * 4);
 }
@@ -243,34 +259,20 @@ body.is-scrolled #view-bot .app-page-header h1 {
   font-size: 23px;
 }
 
-/* Cards particularmente densas: menor tamaño solo cuando hay mucho contenido
-   estructurado dentro de la misma card (caso típico de preguntas/respuestas). */
-#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-details-body,
-#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .action-step-body,
-#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-detail-paragraph,
-#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-detail-label,
-#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-check-item {
-  font-size: 13.5px;
-  line-height: 1.48;
-}
-
-/* Botones de rutina: misma escala y jerarquía táctil. */
+/* Botones de rutina: misma altura, radio, tipografía y peso. */
 #view-hoy.day-open .training-card-open,
 #view-hoy.day-open .complete-day-btn,
 #view-hoy.day-open .native-day-progress-button {
-  min-height: 46px;
+  min-height: 52px;
+  border-radius: 18px;
+  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
 }
 
-#view-hoy.day-open .complete-day-btn,
-#view-hoy.day-open .native-day-progress-button {
-  border-radius: 15px;
-}
-
 #view-hoy.day-open .training-card {
-  min-height: 64px;
+  min-height: 72px;
   gap: 10px;
 }
 
@@ -300,10 +302,13 @@ body.is-scrolled #view-bot .app-page-header h1 {
     font-size: 22px;
   }
 
+  #view-hoy.day-open .routine-content-card {
+    min-height: 286px;
+  }
+
   #view-hoy.day-open .routine-content-card.action-step,
   #view-hoy.day-open .routine-content-card.action-step-static,
   #view-hoy.day-open .routine-content-card.objective-card {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 17px;
   }
 }
