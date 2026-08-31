@@ -80,16 +80,16 @@ function structuralQa(text) {
     .filter(Boolean);
 
   let pairs = 0;
-  let firstPairIndex = Number.POSITIVE_INFINITY;
 
   for (let index = 0; index < lines.length - 1; index += 1) {
     if (!isQuestionLine(lines[index])) continue;
     if (!isLikelyDirectAnswer(lines[index + 1])) continue;
     pairs += 1;
-    firstPairIndex = Math.min(firstPairIndex, index);
   }
 
-  return pairs >= 2 || (pairs === 1 && firstPairIndex <= 1);
+  // La app exige dos pares reales cuando no hay una etiqueta Q&A explícita.
+  // Esto evita clasificar como Q&A listas de preguntas comerciales o de cierre.
+  return pairs >= 2;
 }
 
 const typoPatterns = [
@@ -104,13 +104,16 @@ const typoPatterns = [
   ["con las cambios", /\bcon\s+las\s+cambios\b/i],
   ["runing", /\bruning\b/i],
   ["lV/IV", /\blV\b/],
+  ["NuSkin", /\bNuSkin\b/],
   ["wellnes&Skincare", /\bwellnes\s*&\s*skincare\b/i],
   ["perdida de brillo", /\bperdida\s+de\s+brillo\b/i],
   ["Ahora si", /\bahora\s+si\b/i],
   ["Si, no tiene", /\bsi,\s+no\s+tiene\b/i],
   ["Si, de 2 años", /\bsi,\s+de\s+2\s+años\b/i],
   ["tu lo comercializas", /\btu\s+lo\s+comercializas\b/i],
-  ["por esta nuevo comienzo", /\bpor\s+esta\s+nuevo\s+comienzo\b/i]
+  ["por esta nuevo comienzo", /\bpor\s+esta\s+nuevo\s+comienzo\b/i],
+  ["especifico", /\bespecifico\b/i],
+  ["esta dado", /\besta\s+dado\b/i]
 ];
 
 const punctuationPatterns = [
@@ -118,7 +121,12 @@ const punctuationPatterns = [
   ["question_without_opening:Estas interesado", /(^|[\s“\"])(Estas interesado\?)/i],
   ["question_without_opening:Vas a aprovechar", /(^|[\s“\"])(Vas a aprovechar esta oferta\?)/i],
   ["question_without_opening:Como quieres", /(^|[\s“\"])(Como quieres abonarlo\?)/i],
-  ["question_without_opening:Cual es la dolencia", /(^|[\s“\"])(Cuál es la dolencia\?)/i]
+  ["question_without_opening:Cual es la dolencia", /(^|[\s“\"])(Cuál es la dolencia\?)/i],
+  ["question_without_opening:Es apto celíacos", /(^|\n)\s*Es apto para cel[ií]acos\?/i],
+  ["question_without_opening:Es apto diabéticos", /(^|\n)\s*Es apto para diab[eé]ticos\?/i],
+  ["question_without_opening:Colorantes", /(^|\n)\s*Tiene colorantes artificiales\?/i],
+  ["question_without_opening:Ayunas", /(^|\n)\s*Hay que beberlo en ayunas\?/i],
+  ["question_without_opening:Embarazo", /(^|\n)\s*Pueden consumirlo embarazadas/i]
 ];
 
 function auditBlock(routine, row) {
