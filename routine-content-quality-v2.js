@@ -22,10 +22,17 @@
   function normalizeVerifiedRoutineDefects(value) {
     return String(value || "")
       .replace(/<<inline-button-anchor:[^>]+>>/gi, "")
+      .replace(/#30d[ií]ascollagen\+?/gi, "Collagen+")
+      .replace(/#wellspa(?:io)?10/gi, "WellSpa iO")
+      .replace(/#galvanicspa10/gi, "Galvanic Spa")
+      .replace(/#10diasdelumispa(?:io)?/gi, "LumiSpa iO")
+      .replace(/#10lumispa(?:io)?/gi, "LumiSpa iO")
+      .replace(/#dia\s*(\d+)/gi, "Día $1")
       .replace(/\btestimonos\b/gi, "testimonios")
       .replace(/\bcon\s+las\s+cambios\b/gi, "con los cambios")
       .replace(/\bpersonailzada\b/gi, "personalizada")
       .replace(/\bruning\b/gi, "running")
+      .replace(/\ba\s+traves\b/gi, "a través")
       .replace(/\blV\b/g, "IV")
       .replace(/\bestas\s+interesado\?/gi, "¿Estás interesado?")
       .replace(/\n{3,}/g, "\n\n")
@@ -195,6 +202,7 @@
 
     content = content
       .replace(/<<inline-button-anchor:[^>]+>>/gi, "")
+      .replace(/(^|\n)\s*links?\s+de\s+descarga\s*:?\s*(?=\n|$)/gi, "$1")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
 
