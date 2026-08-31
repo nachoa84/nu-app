@@ -428,7 +428,7 @@
     const button = document.getElementById("botShortcutsBtn");
     if (!button || button.dataset.quickAccessReady === "1") return;
     button.dataset.quickAccessReady = "1";
-    button.innerHTML = ICONS_V95.sparkle;
+    button.innerHTML = ICONS_V95.grid;
     button.onclick = openBotQuickAccess;
   }
 
