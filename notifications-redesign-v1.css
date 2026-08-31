@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400&display=swap');
 
 /* =========================================================
    Notifications redesign · approved reference
@@ -20,7 +19,7 @@
   border-radius: 26px 26px 0 0;
   background: #fbfafd;
   box-shadow: 0 -20px 50px -20px rgba(20, 16, 34, .40);
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
 }
 
 .notification-settings-grabber {
@@ -40,7 +39,7 @@
 .notification-settings-header h2 {
   margin: 0;
   color: #2a2440;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 20px;
   font-weight: 800;
   line-height: 1.2;
@@ -70,7 +69,7 @@
   margin: 0;
   padding: 0 22px 4px;
   color: #8a82a3;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 12.5px;
   font-weight: 500;
   line-height: 1.45;
@@ -98,7 +97,7 @@
 
 .notification-settings-row strong {
   color: #2a2440;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.25;
@@ -108,7 +107,7 @@
 .notification-settings-copy span {
   max-width: 190px;
   color: #8a82a3;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 11.5px;
   font-weight: 500;
   line-height: 1.4;
@@ -163,7 +162,7 @@
 .notification-time-value {
   min-width: auto;
   color: #5a3e6b;
-  font-family: Jost, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 15px;
   font-weight: 400;
   line-height: 1;
@@ -178,7 +177,7 @@
   border-top: 1px solid rgba(42, 36, 64, .07);
   border-radius: 0;
   color: #2a2440;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 12.5px;
   font-weight: 700;
 }
@@ -208,7 +207,7 @@
 .notification-time-picker-labels {
   padding: 0 0 6px;
   color: #a79ec2;
-  font-family: Jost, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 10.5px;
   font-weight: 400;
   line-height: 1.2;
@@ -233,7 +232,7 @@
 
 .notification-time-option {
   color: #c7c0da;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 15px;
   font-weight: 600;
   opacity: 1;
@@ -242,7 +241,7 @@
 
 .notification-time-option.is-selected {
   color: #2a2440;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 22px;
   font-weight: 800;
   opacity: 1;
@@ -251,7 +250,7 @@
 
 .notification-time-separator {
   color: #2a2440;
-  font-family: Inter, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 22px;
   font-weight: 800;
 }
@@ -268,7 +267,7 @@
   border-radius: 999px;
   background: transparent;
   color: #6b6480;
-  font-family: Jost, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 12.5px;
   font-weight: 400;
   letter-spacing: .14em;
@@ -279,7 +278,7 @@
   border-color: transparent;
   background: linear-gradient(115deg, #e2542e 0%, #c4432a 45%, #5a3e6b 130%);
   color: #fff;
-  font-family: Jost, sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 13px;
   font-weight: 300;
   letter-spacing: .20em;
