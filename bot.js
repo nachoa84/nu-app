@@ -1503,7 +1503,6 @@ function updateBotKeyboardState() {
 
   if (keyboardOpen) {
     requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: "auto" });
       scrollBotToEnd("auto");
     });
   }
