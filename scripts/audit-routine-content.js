@@ -78,7 +78,22 @@ const typoPatterns = [
   ["A demás", /\ba\s+demás\b/i],
   ["practicas", /\bpracticas\b/i],
   ["a traves", /\ba\s+traves\b/i],
-  ["con las cambios", /\bcon\s+las\s+cambios\b/i]
+  ["con las cambios", /\bcon\s+las\s+cambios\b/i],
+  ["wellnes&Skincare", /\bwellnes\s*&\s*skincare\b/i],
+  ["perdida de brillo", /\bperdida\s+de\s+brillo\b/i],
+  ["Ahora si", /\bahora\s+si\b/i],
+  ["Si, no tiene", /\bsi,\s+no\s+tiene\b/i],
+  ["Si, de 2 años", /\bsi,\s+de\s+2\s+años\b/i],
+  ["tu lo comercializas", /\btu\s+lo\s+comercializas\b/i],
+  ["por esta nuevo comienzo", /\bpor\s+esta\s+nuevo\s+comienzo\b/i]
+];
+
+const punctuationPatterns = [
+  ["question_without_opening:Qué te parece", /(^|[\s“\"])(Qué te parece\?)/i],
+  ["question_without_opening:Estas interesado", /(^|[\s“\"])(Estas interesado\?)/i],
+  ["question_without_opening:Vas a aprovechar", /(^|[\s“\"])(Vas a aprovechar esta oferta\?)/i],
+  ["question_without_opening:Como quieres", /(^|[\s“\"])(Como quieres abonarlo\?)/i],
+  ["question_without_opening:Cual es la dolencia", /(^|[\s“\"])(Cuál es la dolencia\?)/i]
 ];
 
 function auditBlock(routine, row) {
@@ -89,17 +104,21 @@ function auditBlock(routine, row) {
 
   const rawUrls = countMatches(text, /https?:\/\/\S+/g);
   const inlineLinks = countMatches(text, /\[[^\]]+\]\s*https?:\/\/\S+/g);
+  const inlineAnchors = countMatches(text, /<<inline-button-anchor:[^>]+>>/g);
   const hashtags = countMatches(text, /(^|\s)#[\wÁÉÍÓÚÜÑáéíóúüñ+]+/g);
   const allCapsLines = lines.filter(looksLikeAllCapsLine).length;
   const blankRuns = countMatches(text, /\n\s*\n\s*\n/g);
   const questionMarks = countMatches(text, /\?/g);
+  const campaignNoise = countMatches(text, /\b(?:CHALLENGE|IMPORTANTE|COMENZAMOS)\b/g);
 
   if (rawUrls) issues.push(`raw_urls:${rawUrls}`);
   if (inlineLinks) issues.push(`inline_links:${inlineLinks}`);
+  if (inlineAnchors) issues.push(`inline_anchors:${inlineAnchors}`);
   if (links.length) issues.push(`link_buttons:${links.length}`);
   if (hashtags) issues.push(`hashtags:${hashtags}`);
   if (allCapsLines) issues.push(`all_caps_lines:${allCapsLines}`);
   if (blankRuns) issues.push(`excess_blank_runs:${blankRuns}`);
+  if (campaignNoise) issues.push(`campaign_caps:${campaignNoise}`);
   if (text.length > 700) issues.push(`very_long:${text.length}`);
   else if (text.length > 420) issues.push(`long:${text.length}`);
 
@@ -109,6 +128,10 @@ function auditBlock(routine, row) {
 
   typoPatterns.forEach(([name, regex]) => {
     if (regex.test(text)) issues.push(`typo:${name}`);
+  });
+
+  punctuationPatterns.forEach(([name, regex]) => {
+    if (regex.test(text)) issues.push(name);
   });
 
   return {
@@ -141,8 +164,8 @@ function main() {
 
   const flagged = rows.filter(row => row.issues.length);
   const qa = flagged.filter(row => row.issues.includes("qa_candidate"));
-  const links = flagged.filter(row => row.issues.some(issue => /^(?:raw_urls|inline_links|link_buttons):/.test(issue)));
-  const textDefects = flagged.filter(row => row.issues.some(issue => /^(?:all_caps_lines|excess_blank_runs|typo|hashtags):?/.test(issue)));
+  const links = flagged.filter(row => row.issues.some(issue => /^(?:raw_urls|inline_links|inline_anchors|link_buttons):/.test(issue)));
+  const textDefects = flagged.filter(row => row.issues.some(issue => /^(?:all_caps_lines|excess_blank_runs|campaign_caps|typo|hashtags|question_without_opening):?/.test(issue)));
   const density = flagged.filter(row => row.issues.some(issue => /^(?:long|very_long):/.test(issue)));
 
   const dayCount = routines.reduce((sum, [, days]) => sum + Object.keys(days || {}).length, 0);
