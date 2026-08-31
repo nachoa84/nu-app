@@ -29,7 +29,7 @@ const CORE=[
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
-  "./bot.js?v=131-country-catalogs",
+  "./bot.js?v=143-keyboard-layout",
   "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
   "./assets/custom/nuskin-logo-icon.svg",
   "./assets/custom/foco-live-card.png",
