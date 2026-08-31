@@ -120,14 +120,19 @@ function auditBlock(routine, row) {
   };
 }
 
+function productRoutineDays(product, routineId) {
+  const entry = product.days?.[routineId];
+  return entry?.days || entry || {};
+}
+
 function main() {
   const collagen = loadCollagenDays();
   const product = loadProductDays();
   const routines = [
     ["Collagen+", collagen],
-    ["WellSpa", product.days?.wellspa],
-    ["Galvanic Spa", product.days?.galvanicspa],
-    ["LumiSpa", product.days?.lumispa]
+    ["WellSpa", productRoutineDays(product, "wellspa-10")],
+    ["Galvanic Spa", productRoutineDays(product, "galvanicspa-10")],
+    ["LumiSpa", productRoutineDays(product, "lumispa-10")]
   ];
 
   const rows = routines.flatMap(([name, days]) =>
@@ -140,14 +145,21 @@ function main() {
   const textDefects = flagged.filter(row => row.issues.some(issue => /^(?:all_caps_lines|excess_blank_runs|typo|hashtags):?/.test(issue)));
   const density = flagged.filter(row => row.issues.some(issue => /^(?:long|very_long):/.test(issue)));
 
+  const dayCount = routines.reduce((sum, [, days]) => sum + Object.keys(days || {}).length, 0);
+
   console.log(`Rutinas auditadas: ${routines.length}`);
-  console.log(`Días esperados: 60`);
+  console.log(`Días encontrados: ${dayCount} / 60`);
   console.log(`Bloques de texto auditados: ${rows.length}`);
   console.log(`Bloques con observaciones: ${flagged.length}`);
   console.log(`Q&A candidatos: ${qa.length}`);
   console.log(`Bloques con links: ${links.length}`);
   console.log(`Bloques con defectos de texto/formato: ${textDefects.length}`);
   console.log(`Bloques largos: ${density.length}`);
+
+  if (dayCount !== 60) {
+    process.exitCode = 2;
+    console.error(`ADVERTENCIA: se esperaban 60 días y se encontraron ${dayCount}.`);
+  }
 
   const print = (title, list) => {
     console.log(`\n=== ${title} ===`);
@@ -163,7 +175,7 @@ function main() {
 
   if (process.argv.includes("--json")) {
     console.log("\n=== JSON ===");
-    console.log(JSON.stringify({ rows, flagged, qa, links, textDefects, density }, null, 2));
+    console.log(JSON.stringify({ dayCount, rows, flagged, qa, links, textDefects, density }, null, 2));
   }
 }
 
