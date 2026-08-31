@@ -1894,6 +1894,16 @@
   letter-spacing: -.03em;
 }
 
+
+#view-hoy.day-open .materials-intro {
+  margin: 4px 0 0;
+  max-width: 34rem;
+  color: #69738a;
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 1.45;
+}
+
 #view-hoy.day-open .materials-section .section-count {
   display: none;
 }
