@@ -196,3 +196,124 @@ function renderDays() {
 
   ensureDemoControls();
 }
+
+// =========================================================
+// Rutinas · pulido final de lectura y navegación
+// Se ejecuta después de daily-view.js y antes de app.js.
+// =========================================================
+
+function compactRoutineParagraphBreaks(value, preserveQa = false) {
+  const text = normalizeRoutineText(value);
+  if (!text) return "";
+
+  if (preserveQa) {
+    return text
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/\n\s*[-–—]\s*/g, "\n")
+      .trim();
+  }
+
+  return text
+    .replace(/\n+/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+}
+
+const createBalancedTextCardBase = createBalancedTextCard;
+createBalancedTextCard = function patchedBalancedTextCard(block, options = {}) {
+  const qa = isQuestionAnswerContent(block?.content || "");
+  const normalizedBlock = {
+    ...block,
+    content: compactRoutineParagraphBreaks(block?.content || "", qa)
+  };
+
+  return createBalancedTextCardBase(normalizedBlock, options);
+};
+
+function ensureRoutineCarouselControls() {
+  const carousel = document.querySelector("#view-hoy.day-open .routine-content-carousel");
+  if (!carousel || carousel.dataset.controlsReady === "true") return;
+
+  const track = carousel.querySelector(".routine-content-track");
+  const dots = carousel.querySelector(".routine-content-dots");
+  const slides = Array.from(carousel.querySelectorAll(".routine-content-slide"));
+  const dotButtons = dots ? Array.from(dots.querySelectorAll(".routine-content-dot")) : [];
+
+  if (!track || !dots || slides.length <= 1 || !dotButtons.length) return;
+
+  carousel.dataset.controlsReady = "true";
+
+  const nav = document.createElement("div");
+  nav.className = "routine-content-controls";
+
+  const previous = document.createElement("button");
+  previous.type = "button";
+  previous.className = "routine-content-arrow routine-content-prev";
+  previous.setAttribute("aria-label", "Contenido anterior");
+  previous.textContent = "‹";
+
+  const next = document.createElement("button");
+  next.type = "button";
+  next.className = "routine-content-arrow routine-content-next";
+  next.setAttribute("aria-label", "Contenido siguiente");
+  next.textContent = "›";
+
+  dots.before(nav);
+  nav.append(previous, dots, next);
+
+  const activeIndex = () => {
+    const current = dotButtons.findIndex(dot => dot.classList.contains("is-active"));
+    if (current >= 0) return current;
+    return Math.max(0, Math.min(
+      slides.length - 1,
+      Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
+    ));
+  };
+
+  const updateButtons = () => {
+    const index = activeIndex();
+    previous.disabled = index <= 0;
+    next.disabled = index >= slides.length - 1;
+  };
+
+  previous.addEventListener("click", () => {
+    const index = Math.max(0, activeIndex() - 1);
+    dotButtons[index]?.click();
+    requestAnimationFrame(updateButtons);
+  });
+
+  next.addEventListener("click", () => {
+    const index = Math.min(slides.length - 1, activeIndex() + 1);
+    dotButtons[index]?.click();
+    requestAnimationFrame(updateButtons);
+  });
+
+  track.addEventListener("scroll", updateButtons, { passive: true });
+  dotButtons.forEach(dot => dot.addEventListener("click", () => requestAnimationFrame(updateButtons)));
+  requestAnimationFrame(updateButtons);
+}
+
+function polishRoutineMaterials() {
+  const dayView = document.querySelector("#view-hoy.day-open");
+  if (!dayView) return;
+
+  dayView.querySelectorAll(".materials-section .section-count").forEach(node => node.remove());
+  dayView.querySelectorAll(".materials-section .resource-order").forEach(node => node.remove());
+
+  dayView.querySelectorAll(".materials-section .resource-copy strong").forEach(node => {
+    node.textContent = String(node.textContent || "")
+      .replace(/^Historia\s+\d+\s+de\s+\d+$/i, "Material")
+      .replace(/^Material\s+\d+\s+de\s+\d+$/i, "Material");
+  });
+}
+
+const renderStructuredDayDetailBase = renderStructuredDayDetail;
+renderStructuredDayDetail = function patchedRenderStructuredDayDetail() {
+  const result = renderStructuredDayDetailBase.apply(this, arguments);
+  requestAnimationFrame(() => {
+    ensureRoutineCarouselControls();
+    polishRoutineMaterials();
+  });
+  return result;
+};
