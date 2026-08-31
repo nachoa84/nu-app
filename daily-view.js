@@ -524,7 +524,9 @@ function createImportedActionStep(block, index) {
   addLinks(body, block.links);
 
   details.append(summary, body);
+  details.open = true;
   setupAnimatedDetails(details);
+  setupFiveLineExpansion(details, body);
 
   return details;
 }
