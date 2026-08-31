@@ -1713,3 +1713,62 @@
 #view-hoy.day-open .native-day-progress-row {
   margin-top: 12px;
 }
+
+
+/* V102 · Carrusel de contenido: una tarjeta visible por vez */
+#view-hoy.day-open .routine-content-carousel {
+  width: 100%;
+  margin: 16px 0 0;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .routine-content-track {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+#view-hoy.day-open .routine-content-track::-webkit-scrollbar {
+  display: none;
+}
+
+#view-hoy.day-open .routine-content-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  padding: 0 1px 6px;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+}
+
+#view-hoy.day-open .routine-content-card {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+#view-hoy.day-open .routine-content-card .daily-card-expand {
+  right: 16px;
+}
+
+#view-hoy.day-open .routine-content-card .native-details-body {
+  max-width: 100%;
+}
+
+#view-hoy.day-open .routine-content-slide .action-step,
+#view-hoy.day-open .routine-content-slide .action-step-static {
+  min-height: 0;
+}
+
+#view-hoy.day-open .routine-content-slide .action-step-body {
+  padding-bottom: 14px;
+}
+
+#view-hoy.day-open .routine-content-slide .action-step-arrow {
+  display: none !important;
+}
