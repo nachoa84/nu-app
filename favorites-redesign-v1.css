@@ -697,3 +697,21 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
 #view-favoritos .favorite-day-title small {
   font-family: Poppins, sans-serif;
 }
+
+
+/* Ajuste específico WellSpa: escala óptica y fondo limpio */
+#view-favoritos .favorite-native-routine .favorite-routine-cover {
+  background: #fff;
+}
+#view-favoritos .favorite-native-routine .favorite-routine-cover img {
+  background: transparent;
+  mix-blend-mode: normal;
+}
+#view-favoritos .favorite-native-routine .favorite-routine-tile[data-routine-id="wellspa-10"] .favorite-routine-cover {
+  background: #fff;
+}
+#view-favoritos .favorite-native-routine .favorite-routine-tile[data-routine-id="wellspa-10"] .favorite-routine-cover img {
+  transform: scale(1.8);
+  background: transparent;
+  mix-blend-mode: normal;
+}
