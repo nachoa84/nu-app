@@ -466,7 +466,6 @@ function createImportedObjectiveCard(block) {
     details.append(summary, body);
     details.open = true;
     setupAnimatedDetails(details);
-    setupFiveLineExpansion(card, body);
     card.appendChild(details);
   }
 
@@ -651,9 +650,54 @@ function createActionStep(block, index) {
   return details;
 }
 
+function splitRoutineTextBlocks(blocks) {
+  const result = [];
+
+  blocks.forEach(block => {
+    const raw = String(block.content || "").replace(/\r\n?/g, "\n").trim();
+    const paragraphs = raw
+      .split(/\n\s*\n/)
+      .map(value => value.trim())
+      .filter(Boolean);
+
+    if (!paragraphs.length) return;
+
+    let current = [];
+    let currentLength = 0;
+
+    const flush = () => {
+      if (!current.length) return;
+      result.push({
+        ...block,
+        content: current.join("\n\n")
+      });
+      current = [];
+      currentLength = 0;
+    };
+
+    paragraphs.forEach(paragraph => {
+      const nextLength = currentLength
+        ? currentLength + paragraph.length + 2
+        : paragraph.length;
+
+      // Mantiene una card equilibrada sin separar ideas a mitad de párrafo.
+      if (current.length && nextLength > 360) {
+        flush();
+      }
+
+      current.push(paragraph);
+      currentLength += paragraph.length + (current.length > 1 ? 2 : 0);
+    });
+
+    flush();
+  });
+
+  return result;
+}
+
 function renderStructuredDayDetail() {
   const blocks = currentBlocks();
-  const textBlocks = blocks.filter(block => block.type === "text");
+  const textBlocks = splitRoutineTextBlocks(blocks.filter(block => block.type === "text"));
   const mediaBlocks = blocks.filter(block => block.type === "media");
   const actionBlocks = blocks.filter(block => block.type === "action");
   const completeBlock = blocks.find(block => block.type === "complete");
@@ -703,6 +747,9 @@ function renderStructuredDayDetail() {
         ? createObjectiveCard(block)
         : createActionStep(block, index);
       card.classList.add("routine-content-card");
+      if (String(block.content || "").length > 480) {
+        card.classList.add("is-long-copy");
+      }
       slide.appendChild(card);
       track.appendChild(slide);
     });
@@ -728,7 +775,11 @@ function renderStructuredDayDetail() {
       ));
       const activeSlide = track.children[index];
       if (activeSlide) {
-        track.style.height = `${activeSlide.offsetHeight}px`;
+        track.style.height = "auto";
+        const measuredHeight = activeSlide.offsetHeight;
+        if (measuredHeight > 0) {
+          track.style.height = `${measuredHeight}px`;
+        }
       }
       dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
         dot.classList.toggle("is-active", dotIndex === index);
@@ -737,7 +788,14 @@ function renderStructuredDayDetail() {
     };
     track.addEventListener("scroll", setActiveDot, { passive: true });
     window.addEventListener("resize", setActiveDot, { passive: true });
-    requestAnimationFrame(() => requestAnimationFrame(setActiveDot));
+    requestAnimationFrame(() => {
+      track.style.height = "auto";
+      requestAnimationFrame(() => requestAnimationFrame(setActiveDot));
+    });
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(setActiveDot);
+      Array.from(track.children).forEach(slide => observer.observe(slide));
+    }
 
     carousel.append(heading, track, dots);
     chat.appendChild(carousel);
