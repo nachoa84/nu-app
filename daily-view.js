@@ -621,7 +621,7 @@ function createActionStep(block, index) {
     row.innerHTML = `
       <div class="action-step-static-row">
         <span class="action-step-number">${index}</span>
-        <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
+        <span class="action-step-title">${heading}</span>
       </div>
     `;
     return row;
