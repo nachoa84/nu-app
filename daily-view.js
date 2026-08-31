@@ -288,16 +288,62 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   return item;
 }
 
-function normalizeRoutineText(value) {
+function restoreRoutineNames(value) {
   return String(value || "")
+    .replace(/collagen\+/gi, "Collagen+")
+    .replace(/wellspa\s*io/gi, "WellSpa iO")
+    .replace(/wellspa/gi, "WellSpa")
+    .replace(/galvanic\s+spa/gi, "Galvanic Spa")
+    .replace(/lumispa/gi, "LumiSpa")
+    .replace(/nu\s+skin/gi, "Nu Skin")
+    .replace(/instagram/gi, "Instagram")
+    .replace(/facebook/gi, "Facebook")
+    .replace(/whatsapp/gi, "WhatsApp")
+    .replace(/\bstela\b/gi, "Stela")
+    .replace(/\bq\s*&\s*a\b/gi, "Q&A");
+}
+
+function sentenceCaseImportedLine(value) {
+  let line = String(value || "").trim();
+  if (!line) return "";
+  if (/https?:\/\//i.test(line)) return restoreRoutineNames(line);
+
+  const letters = line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "");
+  const allCaps = letters.length >= 5 && letters === letters.toUpperCase();
+
+  if (allCaps && !/^Q&A$/i.test(line)) {
+    const lowered = line.toLocaleLowerCase("es");
+    line = lowered.charAt(0).toLocaleUpperCase("es") + lowered.slice(1);
+  }
+
+  return restoreRoutineNames(line);
+}
+
+function normalizeRoutineText(value) {
+  const cleaned = String(value || "")
     .replace(/\r\n?/g, "\n")
     .replace(/\d\uFE0F?\u20E3/gu, "")
     .replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D\u20E3]/gu, "")
     .replace(/[*_`~]+/g, "")
+    .replace(/\bpreguntes\b/gi, "preguntas")
+    .replace(/\binstragram\b/gi, "Instagram")
+    .replace(/\bwhatapp\b/gi, "WhatsApp")
+    .replace(/\bwhatsapp\b/gi, "WhatsApp")
+    .replace(/\ba\s+demás\b/gi, "Además")
+    .replace(/\btíps\b/gi, "tips")
+    .replace(/\baquí\s+esta\b/gi, "Aquí está")
+    .replace(/\baqui\s+esta\b/gi, "Aquí está")
+    .replace(/\bpracticas\b/gi, "prácticas")
+    .replace(/\s+([,.;:!?])/g, "$1")
     .replace(/[ \t]+/g, " ")
     .replace(/ *\n */g, "\n")
     .replace(/\n{3,}/g, "\n\n")
-    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+
+  return cleaned
+    .split("\n")
+    .map(sentenceCaseImportedLine)
+    .join("\n")
     .trim();
 }
 
@@ -440,120 +486,68 @@ function appendFormattedContent(container, content, options = {}) {
   });
 }
 
-function applyRoutineCardDensity(card, block) {
-  const text = normalizeRoutineText(block?.content || "");
-  card.classList.toggle("is-qa", isQuestionAnswerContent(text));
-  card.classList.toggle("is-compact-copy", !isQuestionAnswerContent(text) && text.length > 285);
-  card.classList.toggle("is-standard-copy", !isQuestionAnswerContent(text) && text.length <= 285);
+function estimateRoutineVisualLines(value, qa = false) {
+  const text = normalizeRoutineText(value);
+  if (!text) return 0;
+  const charsPerLine = qa ? 43 : 38;
+  const paragraphs = text.split(/\n\s*\n/).filter(Boolean);
+  return paragraphs.reduce((sum, paragraph) => {
+    const explicitLines = paragraph.split(/\n+/).filter(Boolean);
+    const paragraphLines = explicitLines.reduce(
+      (lineSum, line) => lineSum + Math.max(1, Math.ceil(line.length / charsPerLine)),
+      0
+    );
+    return sum + paragraphLines + 0.35;
+  }, 0);
 }
 
-function createObjectiveCard(block) {
-  const { heading, body: detailText } = importedTextParts(block.content);
+function applyRoutineCardDensity(card, block) {
+  const text = normalizeRoutineText(block?.content || "");
+  const qa = isQuestionAnswerContent(text);
+  card.classList.toggle("is-qa", qa);
+  card.classList.toggle("is-standard-copy", !qa);
+  card.classList.remove("is-compact-copy");
+}
+
+function createBalancedTextCard(block, { stripStepNumber = false } = {}) {
+  const { heading, body } = importedTextParts(block.content, { stripStepNumber });
   const card = document.createElement("section");
-  card.className = "objective-card";
+  card.className = "objective-card routine-flat-card";
 
-  const header = document.createElement("div");
-  header.className = "objective-card-header";
-  const title = document.createElement("h3");
-  title.textContent = heading;
-  header.appendChild(title);
-  card.appendChild(header);
+  const copy = document.createElement("div");
+  copy.className = "routine-flat-copy";
 
-  if ((detailText || block.links?.length) && !block.hideObjectiveDetailsV97a) {
-    const details = document.createElement("details");
-    details.className = "native-details";
-
-    const summary = document.createElement("summary");
-    summary.innerHTML = `<span class="details-label">Ver detalles</span><span class="details-arrow">${ICONS.down}</span>`;
-
-    const body = document.createElement("div");
-    body.className = "native-details-body";
-    appendFormattedContent(body, detailText);
-    addLinks(body, block.links);
-
-    details.addEventListener("toggle", () => {
-      const label = summary.querySelector(".details-label");
-      if (label) label.textContent = details.open ? "Ocultar detalles" : "Ver detalles";
-    });
-
-    details.append(summary, body);
-    details.open = true;
-    setupAnimatedDetails(details);
-    card.appendChild(details);
+  if (heading) {
+    const first = document.createElement("p");
+    first.className = "routine-card-heading";
+    first.textContent = heading;
+    copy.appendChild(first);
   }
 
+  if (body) {
+    appendFormattedContent(copy, body);
+  }
+
+  addLinks(copy, block.links);
+  card.appendChild(copy);
   applyRoutineCardDensity(card, block);
   return card;
 }
 
+function createObjectiveCard(block) {
+  return createBalancedTextCard(block);
+}
+
 function createImportedObjectiveCard(block) {
-  return createObjectiveCard(block);
+  return createBalancedTextCard(block);
 }
 
-function createImportedActionStep(block, index) {
-  const { heading, body: detailText } = importedTextParts(
-    block.content,
-    { stripStepNumber: true }
-  );
-
-  const hasDetails = Boolean(detailText) || Boolean(block.links?.length);
-
-  if (!hasDetails) {
-    const row = document.createElement("div");
-    row.className = "action-step action-step-static";
-
-    const inner = document.createElement("div");
-    inner.className = "action-step-static-row";
-
-    const number = document.createElement("span");
-    number.className = "action-step-number";
-    number.textContent = String(index);
-
-    const title = document.createElement("span");
-    title.className = "action-step-title";
-    title.textContent = heading;
-
-    inner.append(number, title);
-    row.appendChild(inner);
-    applyRoutineCardDensity(row, block);
-    return row;
-  }
-
-  const details = document.createElement("details");
-  details.className = "action-step";
-
-  const summary = document.createElement("summary");
-
-  const number = document.createElement("span");
-  number.className = "action-step-number";
-  number.textContent = String(index);
-
-  const title = document.createElement("span");
-  title.className = "action-step-title";
-  title.textContent = heading;
-
-  const arrow = document.createElement("span");
-  arrow.className = "action-step-arrow";
-  arrow.innerHTML = ICONS.down;
-
-  summary.append(number, title, arrow);
-
-  const body = document.createElement("div");
-  body.className = "action-step-body";
-
-  appendFormattedContent(body, detailText);
-  addLinks(body, block.links);
-
-  details.append(summary, body);
-  details.open = true;
-  setupAnimatedDetails(details);
-  applyRoutineCardDensity(details, block);
-
-  return details;
+function createImportedActionStep(block) {
+  return createBalancedTextCard(block, { stripStepNumber: true });
 }
 
-function createActionStep(block, index) {
-  return createImportedActionStep(block, index);
+function createActionStep(block) {
+  return createImportedActionStep(block);
 }
 
 function isMaterialTransitionBlock(block) {
@@ -563,127 +557,158 @@ function isMaterialTransitionBlock(block) {
   return /(?:aquí|aqui|a continuación|ahora)\s+(?:está|esta|el|la|los|las|te dejo|te dejamos|comparto|encontrarás|encontraras)|material(?:es)?\s+(?:de|para)|public(?:a|ar)\s+(?:en|el|este)|contenido\s+(?:para|de)\s+(?:publicar|mercadeo)/i.test(text);
 }
 
-function splitLongTextUnit(value, maxChars) {
+function splitVisualUnit(value, qa, lineBudget) {
   const text = normalizeRoutineText(value);
-  if (text.length <= maxChars) return [text];
+  if (!text) return [];
+  if (estimateRoutineVisualLines(text, qa) <= lineBudget) return [text];
 
-  const sentences = text
-    .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÜÑ¿¡0-9])/u)
-    .map(item => item.trim())
-    .filter(Boolean);
-
-  if (sentences.length <= 1) {
-    const words = text.split(/\s+/);
-    const chunks = [];
-    let current = "";
-    words.forEach(word => {
-      const candidate = current ? `${current} ${word}` : word;
-      if (current && candidate.length > maxChars) {
-        chunks.push(current);
-        current = word;
-      } else {
-        current = candidate;
-      }
-    });
-    if (current) chunks.push(current);
-    return chunks;
-  }
-
-  const chunks = [];
+  const words = text.split(/\s+/).filter(Boolean);
+  const result = [];
   let current = "";
-  sentences.forEach(sentence => {
-    const candidate = current ? `${current} ${sentence}` : sentence;
-    if (current && candidate.length > maxChars) {
-      chunks.push(current);
-      current = sentence;
+
+  words.forEach(word => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (current && estimateRoutineVisualLines(candidate, qa) > lineBudget) {
+      result.push(current);
+      current = word;
     } else {
       current = candidate;
     }
   });
-  if (current) chunks.push(current);
-  return chunks;
+
+  if (current) result.push(current);
+  return result;
 }
 
-function splitBlockEvenly(block) {
-  const raw = normalizeRoutineText(block.content);
-  if (!raw) return [];
+function textUnitsForBalance(value, qa) {
+  const text = normalizeRoutineText(value);
+  if (!text) return [];
 
-  if (block.links?.length) {
-    return [{ ...block, content: raw }];
+  if (qa) {
+    const lines = text.split(/\n+/).map(item => item.trim()).filter(Boolean);
+    const units = [];
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      if (line.includes("?") && lines[index + 1] && !lines[index + 1].includes("?")) {
+        units.push(`${line}\n${lines[index + 1]}`);
+        index += 1;
+      } else {
+        units.push(line);
+      }
+    }
+    return units.flatMap(unit => splitVisualUnit(unit, true, 4.7));
   }
 
-  const qa = isQuestionAnswerContent(raw);
-  const maxChars = qa ? 430 : 340;
-  const paragraphs = raw
-    .split(/\n\s*\n/)
-    .map(value => value.trim())
-    .filter(Boolean);
+  const paragraphs = text.split(/\n\s*\n/).map(item => item.trim()).filter(Boolean);
+  const units = [];
 
-  const units = paragraphs.flatMap(paragraph => splitLongTextUnit(paragraph, maxChars));
-  const totalLength = units.reduce((sum, unit) => sum + unit.length, 0);
-  const partCount = Math.max(1, Math.ceil(totalLength / maxChars));
-  const targetLength = Math.max(1, Math.ceil(totalLength / partCount));
+  paragraphs.forEach(paragraph => {
+    const sentences = paragraph
+      .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÜÑ¿¡0-9])/u)
+      .map(item => item.trim())
+      .filter(Boolean);
+
+    const source = sentences.length ? sentences : [paragraph];
+    source.forEach(sentence => {
+      units.push(...splitVisualUnit(sentence, false, 4.2));
+    });
+  });
+
+  return units;
+}
+
+function balanceRoutinePool(pool, qa) {
+  if (!pool.length) return [];
+
+  const targetLines = qa ? 8.8 : 6.8;
+  const units = [];
+
+  pool.forEach(block => {
+    textUnitsForBalance(block.content, qa).forEach(content => {
+      units.push({
+        content,
+        cost: estimateRoutineVisualLines(content, qa),
+        block
+      });
+    });
+  });
+
+  if (!units.length) return [];
+
+  const totalCost = units.reduce((sum, unit) => sum + unit.cost, 0);
+  const partCount = Math.max(1, Math.ceil(totalCost / targetLines));
   const groups = [];
   let current = [];
-  let currentLength = 0;
+  let currentCost = 0;
+  let consumedCost = 0;
 
   const flush = () => {
     if (!current.length) return;
-    groups.push(current.join("\n\n"));
+    const first = current[0].block;
+    groups.push({
+      ...first,
+      content: current.map(unit => unit.content).join("\n\n")
+    });
+    consumedCost += currentCost;
     current = [];
-    currentLength = 0;
+    currentCost = 0;
   };
 
   units.forEach((unit, index) => {
-    const remainingUnits = units.length - index;
-    const remainingGroups = partCount - groups.length;
-    const candidateLength = currentLength
-      ? currentLength + unit.length + 2
-      : unit.length;
-    const shouldFlush =
-      current.length &&
-      groups.length < partCount - 1 &&
-      candidateLength > targetLength * 1.14 &&
-      remainingUnits >= remainingGroups;
+    const groupsLeft = partCount - groups.length;
+    const remainingCost = totalCost - consumedCost;
+    const dynamicTarget = remainingCost / Math.max(groupsLeft, 1);
+    const candidateCost = currentCost + unit.cost;
+    const canStillCut = groups.length < partCount - 1;
+    const unitsLeft = units.length - index;
+    const groupsNeeded = partCount - groups.length;
 
-    if (shouldFlush) flush();
+    if (current.length && canStillCut && unitsLeft >= groupsNeeded) {
+      const beforeDiff = Math.abs(dynamicTarget - currentCost);
+      const afterDiff = Math.abs(dynamicTarget - candidateCost);
+      if (beforeDiff <= afterDiff && currentCost >= dynamicTarget * 0.58) {
+        flush();
+      }
+    }
 
     current.push(unit);
-    currentLength = current.length === 1
-      ? unit.length
-      : currentLength + unit.length + 2;
+    currentCost += unit.cost;
   });
-  flush();
 
-  return groups.map(content => ({ ...block, content }));
+  flush();
+  return groups;
 }
 
 function splitRoutineTextBlocks(blocks) {
-  const result = blocks.flatMap(splitBlockEvenly);
-  const balanced = [];
+  const output = [];
+  let pool = [];
+  let poolQa = null;
 
-  result.forEach(block => {
-    const previous = balanced[balanced.length - 1];
-    const blockText = normalizeRoutineText(block.content);
-    const previousText = normalizeRoutineText(previous?.content || "");
-    const sameDensity = previous &&
-      isQuestionAnswerContent(previousText) === isQuestionAnswerContent(blockText);
-    const canMerge =
-      previous &&
-      sameDensity &&
-      !previous.links?.length &&
-      !block.links?.length &&
-      blockText.length < 95 &&
-      previousText.length + blockText.length + 2 <= 320;
+  const flushPool = () => {
+    if (!pool.length) return;
+    output.push(...balanceRoutinePool(pool, Boolean(poolQa)));
+    pool = [];
+    poolQa = null;
+  };
 
-    if (canMerge) {
-      previous.content = `${previous.content}\n\n${block.content}`;
-    } else {
-      balanced.push({ ...block });
+  blocks.forEach(block => {
+    const normalized = normalizeRoutineText(block.content);
+    if (!normalized) return;
+
+    if (block.links?.length) {
+      flushPool();
+      output.push({ ...block, content: normalized });
+      return;
     }
+
+    const qa = isQuestionAnswerContent(normalized);
+    if (pool.length && qa !== poolQa) flushPool();
+    if (!pool.length) poolQa = qa;
+    pool.push({ ...block, content: normalized });
   });
 
-  return balanced;
+  flushPool();
+  return output;
 }
 
 function renderStructuredDayDetail() {
@@ -766,29 +791,14 @@ function renderStructuredDayDetail() {
         textBlocks.length - 1,
         Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
       ));
-      const activeSlide = track.children[index];
-      if (activeSlide) {
-        track.style.height = "auto";
-        const measuredHeight = activeSlide.offsetHeight;
-        if (measuredHeight > 0) {
-          track.style.height = `${measuredHeight}px`;
-        }
-      }
       dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
         dot.classList.toggle("is-active", dotIndex === index);
         dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
       });
     };
+
     track.addEventListener("scroll", setActiveDot, { passive: true });
-    window.addEventListener("resize", setActiveDot, { passive: true });
-    requestAnimationFrame(() => {
-      track.style.height = "auto";
-      requestAnimationFrame(() => requestAnimationFrame(setActiveDot));
-    });
-    if ("ResizeObserver" in window) {
-      const observer = new ResizeObserver(setActiveDot);
-      Array.from(track.children).forEach(slide => observer.observe(slide));
-    }
+    requestAnimationFrame(setActiveDot);
 
     carousel.append(heading, track, dots);
     chat.appendChild(carousel);
