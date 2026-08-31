@@ -788,17 +788,7 @@ function setupInterfaceChrome() {
   const botClear = document.getElementById("botClearBtn");
   if (botClear) {
     botClear.innerHTML = ICONS.trash;
-    botClear.onclick = () => {
-      showActionSheet({
-        title: "¿Limpiar conversación?",
-        message: "Se eliminarán los mensajes de esta conversación en este dispositivo.",
-        actionLabel: "Limpiar conversación",
-        onConfirm: () => {
-          resetBotConversation();
-          toast("Conversación limpiada", { type: "success" });
-        }
-      });
-    };
+    botClear.onclick = () => { resetBotConversation(); toast("Conversación limpiada", { type: "success" }); };
   }
 
   const activeNav = document.querySelector(".nav-btn.active");
