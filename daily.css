@@ -1684,8 +1684,7 @@
   padding: 0;
 }
 
-#view-hoy.day-open .native-details > summary,
-#view-hoy.day-open .action-step > summary {
+#view-hoy.day-open .native-details > summary {
   display: none;
 }
 
@@ -1749,6 +1748,29 @@
 
 #view-hoy.day-open .action-step-number,
 #view-hoy.day-open .action-step-arrow {
+  display: none;
+}
+
+#view-hoy.day-open .routine-content-card.action-step,
+#view-hoy.day-open .routine-content-card.action-step-static {
+  min-height: 0;
+  padding: 28px 28px 26px;
+  border: 1px solid #e1e6ee;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(23, 32, 59, .14), 0 2px 7px rgba(23, 32, 59, .06);
+}
+
+#view-hoy.day-open .action-step > summary {
+  display: block;
+  min-height: 0;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  cursor: default;
+}
+
+#view-hoy.day-open .action-step > summary::-webkit-details-marker {
   display: none;
 }
 
