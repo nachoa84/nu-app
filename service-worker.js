@@ -1,4 +1,4 @@
-const CACHE="nuapp-v143-iris-stable";
+const CACHE="nuapp-v144-iris-final";
 
 const CORE=[
   "./",
@@ -19,7 +19,7 @@ const CORE=[
   "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=143-iris-layout-3",
+  "./bot.css?v=143-iris-layout-4",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=131-country-catalogs",
   "./ui-core.js?v=143-iris-clean-2",
@@ -30,7 +30,7 @@ const CORE=[
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
   "./bot.js?v=143-keyboard-layout",
-  "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
+  "./bot-shortcuts-v95.js?v=126-grid-access-icon",
   "./assets/custom/nuskin-logo-icon.svg",
   "./assets/custom/foco-live-card.png",
   "./assets/catalogos/catalogo-europa-02-2026.pdf",
