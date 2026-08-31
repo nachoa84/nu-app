@@ -1,4 +1,4 @@
-const CACHE="nuapp-v162-routine-text-normalized";
+const CACHE="nuapp-v163-routine-card-density";
 
 const CORE=[
   "./",
@@ -11,7 +11,7 @@ const CORE=[
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./typography-poppins-v1.css?v=20260830-poppins-v1",
   "./home-redesign-v1.css?v=20260831-routine-state-scope",
-  "./daily.css?v=106-routine-text-normalized",
+  "./daily.css?v=107-routine-card-density",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
@@ -41,7 +41,7 @@ const CORE=[
   "./notifications.js?v=143-single-sw",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
-  "./daily-view.js?v=106-routine-text-normalized",
+  "./daily-view.js?v=107-routine-card-density",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
