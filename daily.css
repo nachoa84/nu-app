@@ -1638,3 +1638,35 @@
 #view-hoy.day-open .is-expandable .native-details-body {
   padding-right: 46px;
 }
+
+
+/* V100 · Rutinas: superficies blancas y jerarquía sin numeración */
+#view-hoy.day-open .day-plan-objective,
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #dfe3e9 !important;
+  box-shadow: 0 8px 22px rgba(24, 35, 52, .09) !important;
+}
+
+#view-hoy.day-open .day-plan-steps .section-count,
+#view-hoy.day-open .day-plan-steps .native-section-heading > small,
+#view-hoy.day-open .action-step-number {
+  display: none !important;
+}
+
+#view-hoy.day-open .action-step summary {
+  grid-template-columns: minmax(0, 1fr) 24px;
+  gap: 10px;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#view-hoy.day-open .action-step-body {
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-bottom: 14px;
+}
