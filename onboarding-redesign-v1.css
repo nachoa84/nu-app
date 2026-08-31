@@ -361,3 +361,28 @@
   .onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1::after { font-size: 24px !important; }
   .onboarding-welcome-step .onboarding-heading h1 { font-size: 32px !important; }
 }
+
+
+/* Onboarding · márgenes consistentes */
+.onboarding-body {
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-fields,
+.onboarding-step:not(.onboarding-welcome-step) .objective-options,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-time-section,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-error,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-bottom-action,
+.onboarding-welcome-step .onboarding-heading,
+.onboarding-welcome-step .onboarding-welcome-copy,
+.onboarding-welcome-step .onboarding-primary {
+  width: 100% !important;
+  max-width: 340px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1,
+.onboarding-welcome-step .onboarding-heading h1 {
+  max-width: 340px !important;
+}
