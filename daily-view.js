@@ -559,7 +559,7 @@ function appendFormattedContent(container, content, options = {}) {
       const normalizedLine = stripDecorativeSymbols(line);
       if (!normalizedLine) return;
 
-      const isLabel = normalizedLine.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
+      const isLabel = normalizedLine.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(normalizedLine);
       const element = document.createElement(isLabel ? "div" : "p");
       element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
       element.textContent = normalizedLine;
