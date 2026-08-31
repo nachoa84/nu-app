@@ -355,6 +355,55 @@ function importedTextParts(content, { stripStepNumber = false } = {}) {
   };
 }
 
+function setupFiveLineExpansion(card, body) {
+  if (!card || !body || body.dataset.fiveLineReady === "true") return;
+  body.dataset.fiveLineReady = "true";
+  body.classList.add("five-line-body");
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "daily-card-expand";
+  toggle.hidden = true;
+  toggle.setAttribute("aria-label", "Mostrar más");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = '<span aria-hidden="true">+</span>';
+
+  let expanded = false;
+  const setExpanded = value => {
+    expanded = value;
+    body.classList.toggle("is-collapsed", !expanded);
+    body.classList.toggle("is-expanded", expanded);
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", expanded ? "Mostrar menos" : "Mostrar más");
+    toggle.querySelector("span").textContent = expanded ? "−" : "+";
+  };
+
+  toggle.addEventListener("click", () => setExpanded(!expanded));
+  card.classList.add("has-five-line-content");
+  card.appendChild(toggle);
+
+  const evaluate = () => {
+    if (!body.isConnected) {
+      requestAnimationFrame(evaluate);
+      return;
+    }
+    setExpanded(false);
+    requestAnimationFrame(() => {
+      if (body.scrollHeight > body.clientHeight + 2) {
+        toggle.hidden = false;
+        card.classList.add("is-expandable");
+      } else {
+        toggle.hidden = true;
+        card.classList.remove("is-expandable");
+        body.classList.remove("is-collapsed");
+      }
+    });
+  };
+
+  requestAnimationFrame(evaluate);
+  window.addEventListener("resize", evaluate, { passive: true });
+}
+
 function createImportedObjectiveCard(block) {
   const {
     heading,
@@ -406,7 +455,9 @@ function createImportedObjectiveCard(block) {
     });
 
     details.append(summary, body);
+    details.open = true;
     setupAnimatedDetails(details);
+    setupFiveLineExpansion(card, body);
     card.appendChild(details);
   }
 
@@ -553,7 +604,9 @@ function createObjectiveCard(block) {
     });
 
     details.append(summary, body);
+    details.open = true;
     setupAnimatedDetails(details);
+    setupFiveLineExpansion(card, body);
     card.appendChild(details);
   }
 
