@@ -74,16 +74,16 @@
       .filter(Boolean);
 
     let pairCount = 0;
-    let firstPairIndex = Number.POSITIVE_INFINITY;
 
     for (let index = 0; index < lines.length - 1; index += 1) {
       if (!isQuestionLine(lines[index])) continue;
       if (!isLikelyDirectAnswer(lines[index + 1])) continue;
       pairCount += 1;
-      firstPairIndex = Math.min(firstPairIndex, index);
     }
 
-    return pairCount >= 2 || (pairCount === 1 && firstPairIndex <= 1);
+    // Una lista de preguntas de cierre no es Q&A. Sin una etiqueta explícita,
+    // exigimos al menos dos pares pregunta/respuesta consecutivos reales.
+    return pairCount >= 2;
   };
 
   function routineCharsPerLine(qa = false) {
@@ -115,7 +115,9 @@
   };
 
   function targetRoutineLines(qa = false) {
-    return qa ? 8.2 : 6.3;
+    // Reserva aire dentro de la card y evita que el último renglón quede pegado
+    // a los bordes en pantallas angostas.
+    return qa ? 8.0 : 6.0;
   }
 
   if (typeof textUnitsForBalance === "function") {
@@ -301,11 +303,11 @@
     if (!groups.length) groups = [withoutLinks];
 
     const last = groups[groups.length - 1];
-    const linkCost = block.links.length * 1.55;
+    const linkCost = block.links.length * 1.75;
     const target = targetRoutineLines(qa);
     const lastCost = estimateRoutineVisualLines(last.content, qa);
 
-    if (lastCost + linkCost <= target * 1.08) {
+    if (lastCost + linkCost <= target * 1.06) {
       groups[groups.length - 1] = { ...last, links: block.links };
       return groups;
     }
