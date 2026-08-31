@@ -1,4 +1,4 @@
-const CACHE="nuapp-v145-iris-dialog";
+const CACHE="nuapp-v146-iris-dialog-refined";
 
 const CORE=[
   "./",
@@ -19,10 +19,10 @@ const CORE=[
   "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=143-iris-layout-4",
+  "./bot.css?v=143-iris-layout-5",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=131-country-catalogs",
-  "./ui-core.js?v=143-iris-clean-3",
+  "./ui-core.js?v=143-iris-clean-4",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=143-single-render",
