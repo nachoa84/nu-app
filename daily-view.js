@@ -292,10 +292,17 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   return item;
 }
 
-function cleanLeadingSymbols(value) {
+function stripDecorativeSymbols(value) {
   return String(value || "")
-    .replace(/^[\s✅☑️✔️✨🔥🚀🙌🏻🧡💛]+/u, "")
+    .replace(/[\\p{Extended_Pictographic}\\uFE0F\\u200D]/gu, "")
+    .replace(/^[\\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
+    .replace(/([!?¡¿])\\1{1,}/gu, "$1")
+    .replace(/\\s{2,}/g, " ")
     .trim();
+}
+
+function cleanLeadingSymbols(value) {
+  return stripDecorativeSymbols(value);
 }
 
 function firstMeaningfulLine(content) {
@@ -549,21 +556,13 @@ function appendFormattedContent(container, content, options = {}) {
       .filter(Boolean);
 
     lines.forEach(line => {
-      if (/^(✅|☑️|✔️)/u.test(line)) {
-        const check = document.createElement("div");
-        check.className = "native-check-item";
-        check.innerHTML = `
-          <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
-          <span>${line.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
-        `;
-        container.appendChild(check);
-        return;
-      }
+      const normalizedLine = stripDecorativeSymbols(line);
+      if (!normalizedLine) return;
 
-      const isLabel = line.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
+      const isLabel = normalizedLine.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
       const element = document.createElement(isLabel ? "div" : "p");
       element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
-      element.textContent = line;
+      element.textContent = normalizedLine;
       container.appendChild(element);
     });
   });
@@ -728,13 +727,18 @@ function renderStructuredDayDetail() {
         textBlocks.length - 1,
         Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
       ));
+      const activeSlide = track.children[index];
+      if (activeSlide) {
+        track.style.height = `${activeSlide.offsetHeight}px`;
+      }
       dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
         dot.classList.toggle("is-active", dotIndex === index);
         dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
       });
     };
     track.addEventListener("scroll", setActiveDot, { passive: true });
-    requestAnimationFrame(setActiveDot);
+    window.addEventListener("resize", setActiveDot, { passive: true });
+    requestAnimationFrame(() => requestAnimationFrame(setActiveDot));
 
     carousel.append(heading, track, dots);
     chat.appendChild(carousel);
