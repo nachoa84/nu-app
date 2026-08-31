@@ -1747,9 +1747,19 @@
 }
 
 #view-hoy.day-open .action-step-number,
-#view-hoy.day-open .action-step-arrow,
-#view-hoy.day-open .action-step-static-row {
+#view-hoy.day-open .action-step-arrow {
   display: none;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  display: block;
+  min-height: 136px;
+  margin: 0;
+  padding: 0;
+}
+
+#view-hoy.day-open .action-step-static-row .action-step-title {
+  display: block;
 }
 
 #view-hoy.day-open .action-step-body {
