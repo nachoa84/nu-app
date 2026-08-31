@@ -1,4 +1,4 @@
-const CACHE="nuapp-v148-wellspa-cover";
+const CACHE="nuapp-v149-wellspa-scale";
 
 const CORE=[
   "./",
@@ -21,7 +21,7 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=143-iris-layout-5",
   "./favorites.css?v=94-bot-folders",
-  "./favorites-redesign-v1.css?v=145-wellspa-cover",
+  "./favorites-redesign-v1.css?v=146-wellspa-scale",
   "./bot-content.js?v=131-country-catalogs",
   "./ui-core.js?v=143-iris-clean-4",
   "./routine-content.js?v=103a-unified-app-store",
