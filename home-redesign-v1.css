@@ -21,7 +21,7 @@
   background: var(--home-white);
 }
 
-#view-hoy::before {
+#view-hoy:not(.day-open)::before {
   content: "";
   position: absolute;
   z-index: -1;
