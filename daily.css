@@ -1513,3 +1513,128 @@
     margin-left: 34px;
   }
 }
+
+
+/* V99 · Tarjetas de rutina: lectura y expansión en cinco líneas */
+#view-hoy.day-open .day-plan-objective,
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e7e9ee;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(24, 35, 52, .06);
+  color: #17203b;
+  font-family: Poppins, sans-serif;
+}
+
+#view-hoy.day-open .day-plan-objective {
+  margin-bottom: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid #e7e9ee;
+}
+
+#view-hoy.day-open .day-plan-steps {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .action-step-list {
+  gap: 10px;
+}
+
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  border-bottom: 1px solid #e7e9ee;
+}
+
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-static-row {
+  padding: 13px 14px;
+}
+
+#view-hoy.day-open .objective-card-header h3,
+#view-hoy.day-open .action-step-title {
+  font-family: Poppins, sans-serif;
+  color: #17203b;
+}
+
+#view-hoy.day-open .objective-card-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#view-hoy.day-open .native-details > summary {
+  display: none;
+}
+
+#view-hoy.day-open .native-details {
+  margin-top: 12px;
+}
+
+#view-hoy.day-open .native-details-body,
+#view-hoy.day-open .action-step-body {
+  border-top: 0;
+  margin-top: 0;
+  padding: 0;
+  color: #27324a;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  line-height: 1.52;
+}
+
+#view-hoy.day-open .native-detail-paragraph,
+#view-hoy.day-open .native-detail-label,
+#view-hoy.day-open .native-check-item {
+  font-family: Poppins, sans-serif;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+#view-hoy.day-open .five-line-body.is-collapsed {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+#view-hoy.day-open .has-five-line-content {
+  padding-bottom: 20px;
+}
+
+#view-hoy.day-open .daily-card-expand {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e0e3e8;
+  border-radius: 50%;
+  background: #fff;
+  color: #f05b14;
+  box-shadow: 0 3px 10px rgba(24, 35, 52, .12);
+  font-family: Poppins, sans-serif;
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#view-hoy.day-open .daily-card-expand:active {
+  transform: scale(.96);
+}
+
+#view-hoy.day-open .daily-card-expand[hidden] {
+  display: none;
+}
+
+#view-hoy.day-open .is-expandable .native-details-body {
+  padding-right: 46px;
+}
