@@ -612,11 +612,8 @@ function createActionStep(block, index) {
     return createImportedActionStep(block, index);
   }
 
-  const paragraphs = String(block.content || "")
-    .split(/\n\s*\n/)
-    .map(value => value.trim())
-    .filter(Boolean);
-  const hasDetails = paragraphs.length > 1 || Boolean(block.links?.length);
+  const { heading, body: detailText } = importedTextParts(block.content);
+  const hasDetails = Boolean(detailText) || Boolean(block.links?.length);
 
   if (!hasDetails) {
     const row = document.createElement("div");
@@ -642,7 +639,7 @@ function createActionStep(block, index) {
 
   const body = document.createElement("div");
   body.className = "action-step-body";
-  appendFormattedContent(body, block.content, { dropFirstParagraph: true });
+  appendFormattedContent(body, detailText);
   addLinks(body, block.links);
 
   details.append(summary, body);
