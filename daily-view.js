@@ -693,35 +693,27 @@ function renderStructuredDayDetail() {
   chat.appendChild(intro);
 
   if (textBlocks.length) {
-    const planGroup = document.createElement("section");
-    planGroup.className = "day-plan-group";
+    const carousel = document.createElement("section");
+    carousel.className = "routine-content-carousel";
+    carousel.setAttribute("aria-label", "Contenido de la rutina");
 
-    const objective = createObjectiveCard(textBlocks[0]);
-    objective.classList.add("day-plan-objective");
-    planGroup.appendChild(objective);
+    const track = document.createElement("div");
+    track.className = "routine-content-track";
 
-    if (textBlocks.length > 1) {
-      const steps = document.createElement("section");
-      steps.className = "native-section steps-section day-plan-steps";
-      steps.innerHTML = `
-        <div class="native-section-heading">
-          <div>
-            <h3>Pasos de hoy</h3>
-          </div>
-          <small class="section-count">${textBlocks.length - 1}</small>
-        </div>
-      `;
+    textBlocks.forEach((block, index) => {
+      const slide = document.createElement("article");
+      slide.className = "routine-content-slide";
+      slide.dataset.slideIndex = String(index);
+      const card = index === 0
+        ? createObjectiveCard(block)
+        : createActionStep(block, index);
+      card.classList.add("routine-content-card");
+      slide.appendChild(card);
+      track.appendChild(slide);
+    });
 
-      const list = document.createElement("div");
-      list.className = "action-step-list";
-      textBlocks.slice(1).forEach((block, index) => {
-        list.appendChild(createActionStep(block, index + 1));
-      });
-      steps.appendChild(list);
-      planGroup.appendChild(steps);
-    }
-
-    chat.appendChild(planGroup);
+    carousel.appendChild(track);
+    chat.appendChild(carousel);
   }
 
   if (mediaBlocks.length) {
