@@ -141,6 +141,25 @@
     });
   }
 
+  function isRoutinePreviewMode() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("preview") === "1" || params.get("routinePreview") === "1";
+  }
+
+  document.addEventListener("click", event => {
+    if (!isRoutinePreviewMode()) return;
+    const progressAction = event.target.closest(".complete-day-btn, .app-checkin-btn");
+    if (!progressAction) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    if (typeof toast === "function") {
+      toast("Vista previa: el progreso no se modifica.", { type: "info" });
+    }
+  }, true);
+
   const baseRenderStructuredDayDetail = renderStructuredDayDetail;
   renderStructuredDayDetail = function routineUiRenderDay() {
     const result = baseRenderStructuredDayDetail.apply(this, arguments);
