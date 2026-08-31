@@ -42,7 +42,7 @@
   display: block;
   margin: 0 0 6px;
   color: #9d94af;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 11px;
   font-weight: 600;
   line-height: 1;
@@ -53,7 +53,7 @@
 #view-bot .app-page-header h1 {
   margin: 0;
   color: var(--iris-ref-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 36px;
   font-weight: 400;
   line-height: .98;
@@ -152,7 +152,7 @@
   max-width: 330px;
   margin: 0;
   color: var(--iris-ref-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 30px;
   font-weight: 400;
   line-height: 1.02;
@@ -252,7 +252,7 @@
 
 #view-bot .bot-resource-copy small {
   color: #968ca3;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 9px;
   font-weight: 600;
   letter-spacing: .12em;
@@ -352,7 +352,7 @@
 
 .bot-document-header small {
   color: #9c91aa;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: .13em;
@@ -360,7 +360,7 @@
 
 .bot-document-header h2 {
   color: var(--iris-ref-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Poppins, sans-serif;
   font-size: 26px;
   font-weight: 400;
   letter-spacing: -.04em;
@@ -536,4 +536,76 @@ body[data-active-view="bot"] #view-bot {
 
 body[data-active-view="bot"] .bottom-nav {
   background: rgba(246,242,250,.96) !important;
+}
+
+
+/* Iris · composición estable y tipografía aprobada */
+#view-bot .bot-page-header > div:first-child::before { content: none; display: none; }
+#view-bot .bot-eyebrow {
+  display: block;
+  margin: 0 0 7px;
+  color: #8f86a5;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+#view-bot .bot-page-header h1,
+#view-bot .bot-page-header h1::before {
+  font-family: Poppins, sans-serif !important;
+  font-size: 34px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+}
+#view-bot .bot-page-header h1::before { content: none !important; display: none !important; }
+#view-bot .bot-status {
+  margin-top: 8px;
+  color: #8f86a5;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#view-bot .bot-status i { width: 8px; height: 8px; }
+#view-bot .bot-native-welcome-mark { display: none !important; }
+#view-bot .bot-native-welcome {
+  min-height: min(48dvh, 360px);
+  padding: 28px 2px 24px;
+}
+#view-bot .bot-native-welcome h2 {
+  font-family: Poppins, sans-serif;
+  font-weight: 600;
+}
+#view-bot .bot-native-welcome p {
+  font-family: Poppins, sans-serif;
+}
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  grid-template-columns: 48px minmax(0, 1fr) 50px;
+  align-items: center;
+  gap: 9px;
+  margin-top: auto;
+  padding: 22px 0 calc(12px + var(--safe-bottom));
+}
+#view-bot #botShortcutsBtn {
+  grid-column: 1;
+  grid-row: 1;
+  width: 48px;
+  min-width: 48px;
+  height: 50px;
+  min-height: 50px;
+  border-radius: 16px;
+}
+#view-bot #botInput { grid-column: 2; grid-row: 1; min-width: 0; }
+#view-bot .bot-send {
+  grid-column: 3;
+  grid-row: 1;
+  width: 50px;
+  min-width: 50px;
+  height: 50px;
+  min-height: 50px;
 }
