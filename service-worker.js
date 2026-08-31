@@ -1,4 +1,4 @@
-const CACHE="nuapp-v153-onboarding-top-spacing";
+const CACHE="nuapp-v154-five-line-routine-cards";
 
 const CORE=[
   "./",
@@ -10,7 +10,7 @@ const CORE=[
   "./navigation.css?v=81-home-navigation-legibility",
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./typography-poppins-v1.css?v=20260830-poppins-v1",
-  "./daily.css?v=98a-responsive-day2",
+  "./daily.css?v=99-five-line-cards",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
@@ -40,7 +40,7 @@ const CORE=[
   "./notifications.js?v=143-single-sw",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
-  "./daily-view.js?v=102-sales-training",
+  "./daily-view.js?v=103-five-line-cards",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
