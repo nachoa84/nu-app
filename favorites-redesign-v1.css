@@ -711,7 +711,7 @@ body[data-active-view="favoritos"] .nav-btn .nav-icon svg {
   background: #fff;
 }
 #view-favoritos .favorite-native-routine .favorite-routine-tile[data-routine-id="wellspa-10"] .favorite-routine-cover img {
-  transform: scale(1.8);
+  transform: scale(2.05);
   background: transparent;
   mix-blend-mode: normal;
 }
