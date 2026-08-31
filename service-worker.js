@@ -1,4 +1,4 @@
-const CACHE="nuapp-v143-startup-stable";
+const CACHE="nuapp-v143-iris-stable";
 
 const CORE=[
   "./",
@@ -19,13 +19,13 @@ const CORE=[
   "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=126-assistant-spacing",
+  "./bot.css?v=143-iris-layout",
   "./favorites.css?v=94-bot-folders",
   "./bot-content.js?v=131-country-catalogs",
-  "./ui-core.js?v=126-iris-navigation",
+  "./ui-core.js?v=143-iris-clean",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=20260830-home-continuity-v4",
+  "./routine-products-v92.js?v=143-single-render",
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
@@ -36,13 +36,13 @@ const CORE=[
   "./assets/catalogos/catalogo-europa-02-2026.pdf",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
-  "./notifications.js?v=61b-progress-canonical",
+  "./notifications.js?v=143-single-sw",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
   "./daily-view.js?v=102-sales-training",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
-  "./app.js?v=142-stable-manual-update",
+  "./app.js?v=143-single-sw",
   "./backend-client.js?v=136-unified-daily-unlock",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
