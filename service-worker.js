@@ -1,4 +1,4 @@
-const CACHE="nuapp-v164-routine-balanced-text";
+const CACHE="nuapp-v165-routine-balanced-text";
 
 const CORE=[
   "./",
@@ -41,7 +41,7 @@ const CORE=[
   "./notifications.js?v=143-single-sw",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
-  "./daily-view.js?v=108-routine-balanced-text",
+  "./daily-view.js?v=109-routine-balanced-text",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
