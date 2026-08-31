@@ -156,17 +156,23 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .routine-content-card.action-step,
 #view-hoy.day-open .routine-content-card.action-step-static,
 #view-hoy.day-open .routine-content-card.objective-card {
-  padding: 22px 22px 20px;
+  padding: 18px 18px 17px;
 }
 
+/* Título y cuerpo comparten escala: el contenido se lee como una sola pieza. */
 #view-hoy.day-open .objective-card-header h3,
 #view-hoy.day-open .action-step-title {
   font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 1.42;
-  letter-spacing: -.018em;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.52;
+  letter-spacing: 0;
+  color: #17203b;
   overflow-wrap: anywhere;
+}
+
+#view-hoy.day-open .action-step > summary {
+  margin-bottom: 8px;
 }
 
 #view-hoy.day-open .native-details-body,
@@ -176,8 +182,8 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .native-check-item {
   font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;
-  font-weight: 400;
-  line-height: 1.55;
+  font-weight: 400 !important;
+  line-height: 1.52;
   letter-spacing: 0;
   text-transform: none;
   white-space: normal;
@@ -185,27 +191,31 @@ body.is-scrolled #view-bot .app-page-header h1 {
   word-break: normal;
 }
 
-/* Las líneas cortas en mayúsculas dejan de convertirse visualmente en
-   subtítulos fuertes. Se leen como parte del contenido salvo títulos reales. */
+/* Las líneas cortas/importadas dejan de verse como subtítulos arbitrarios. */
 #view-hoy.day-open .native-detail-label {
-  margin: 8px 0;
-  color: inherit;
+  margin: 5px 0;
+  color: #535d70;
+  opacity: 1;
 }
 
 #view-hoy.day-open .native-detail-paragraph {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+#view-hoy.day-open .native-detail-paragraph:last-child {
+  margin-bottom: 0;
 }
 
 #view-hoy.day-open .native-check-item {
   grid-template-columns: 20px minmax(0, 1fr);
   align-items: start;
-  gap: 8px;
-  margin: 8px 0;
+  gap: 9px;
+  margin: 7px 0;
 }
 
 #view-hoy.day-open .native-check-icon {
   align-self: start;
-  margin-top: .18em;
+  margin-top: .20em;
   line-height: 1;
 }
 
@@ -216,29 +226,39 @@ body.is-scrolled #view-bot .app-page-header h1 {
   flex: 0 0 17px;
 }
 
-/* Reduce el alto inicial de los días con mucho texto sin esconder contenido:
-   el + existente sigue permitiendo expandir la card. */
+/* Reduce el alto inicial de los días con mucho texto sin esconder contenido. */
 #view-hoy.day-open .five-line-body.is-collapsed {
-  max-height: calc(1.55em * 4);
+  max-height: calc(1.52em * 4);
 }
 
 #view-hoy.day-open .has-five-line-content {
-  padding-bottom: 48px;
+  padding-bottom: 44px;
 }
 
 #view-hoy.day-open .daily-card-expand {
-  right: 18px;
-  bottom: 14px;
-  width: 36px;
-  height: 36px;
-  font-size: 25px;
+  right: 14px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 23px;
+}
+
+/* Cards particularmente densas: menor tamaño solo cuando hay mucho contenido
+   estructurado dentro de la misma card (caso típico de preguntas/respuestas). */
+#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-details-body,
+#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .action-step-body,
+#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-detail-paragraph,
+#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-detail-label,
+#view-hoy.day-open .routine-content-card:has(.native-detail-paragraph:nth-child(6)) .native-check-item {
+  font-size: 13.5px;
+  line-height: 1.48;
 }
 
 /* Botones de rutina: misma escala y jerarquía táctil. */
 #view-hoy.day-open .training-card-open,
 #view-hoy.day-open .complete-day-btn,
 #view-hoy.day-open .native-day-progress-button {
-  min-height: 48px;
+  min-height: 46px;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
@@ -250,7 +270,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 #view-hoy.day-open .training-card {
-  min-height: 68px;
+  min-height: 64px;
   gap: 10px;
 }
 
@@ -283,7 +303,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   #view-hoy.day-open .routine-content-card.action-step,
   #view-hoy.day-open .routine-content-card.action-step-static,
   #view-hoy.day-open .routine-content-card.objective-card {
-    padding-left: 19px;
-    padding-right: 19px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
