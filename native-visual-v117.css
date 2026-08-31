@@ -288,6 +288,68 @@ body.is-scrolled #view-bot .app-page-header h1 {
   font-weight: 600;
 }
 
+/* =========================================================
+   Carrusel · scroll vertical prioritario y una sola superficie visual
+   ========================================================= */
+
+#view-hoy.day-open .routine-content-carousel,
+#view-hoy.day-open .routine-content-track,
+#view-hoy.day-open .routine-content-slide {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#view-hoy.day-open .routine-content-track {
+  height: auto !important;
+  overflow-x: hidden;
+  overflow-y: visible;
+  scroll-snap-type: none !important;
+  overscroll-behavior: auto;
+  -webkit-overflow-scrolling: auto;
+  touch-action: pan-y pinch-zoom;
+  transition: none !important;
+}
+
+#view-hoy.day-open .routine-content-slide {
+  overflow: visible;
+  padding: 0;
+  border: 0 !important;
+  outline: 0;
+}
+
+#view-hoy.day-open .routine-content-slide::before,
+#view-hoy.day-open .routine-content-slide::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Una única sombra: la card redondeada. Se elimina el rectángulo exterior. */
+#view-hoy.day-open .routine-content-card {
+  min-height: 300px;
+  border: 1px solid #e1e6ee;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(23, 32, 59, .08) !important;
+  overflow: hidden;
+}
+
+/* Las tres densidades comparten la misma geometría; solo cambia tipografía. */
+#view-hoy.day-open .routine-content-card.is-standard-copy,
+#view-hoy.day-open .routine-content-card.is-compact-copy,
+#view-hoy.day-open .routine-content-card.is-qa {
+  min-height: 300px;
+}
+
+#view-hoy.day-open .routine-content-dots {
+  margin-top: 14px;
+  margin-bottom: 18px;
+}
+
+#view-hoy.day-open .routine-content-dot {
+  touch-action: manipulation;
+}
+
 @media (max-width: 370px) {
   :root {
     --native-nav-gap-v117: 8px;
