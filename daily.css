@@ -1670,3 +1670,46 @@
   padding-right: 14px;
   padding-bottom: 14px;
 }
+
+
+/* V101 · Detalle de rutina unificado para todos los días */
+#app:has(#view-hoy.day-open),
+#view-hoy.day-open,
+#view-hoy.day-open .chat-wrap,
+#view-hoy.day-open .native-day-content {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+#view-hoy.day-open {
+  padding-inline: 16px;
+  color: #17203b;
+}
+
+#view-hoy.day-open .native-day-intro {
+  border-bottom: 0;
+  padding: 18px 0 16px;
+}
+
+#view-hoy.day-open .native-day-hero-media {
+  border-radius: 20px;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(24, 35, 52, .06);
+}
+
+#view-hoy.day-open .action-step-arrow {
+  display: none !important;
+}
+
+#view-hoy.day-open .action-step summary {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+#view-hoy.day-open .action-step-title {
+  padding-right: 0;
+}
+
+#view-hoy.day-open .native-day-progress-row {
+  margin-top: 12px;
+}
