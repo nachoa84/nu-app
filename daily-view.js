@@ -534,7 +534,6 @@ function createImportedActionStep(block, index) {
   details.append(summary, body);
   details.open = true;
   setupAnimatedDetails(details);
-  setupFiveLineExpansion(details, body);
 
   return details;
 }
@@ -601,7 +600,6 @@ function createObjectiveCard(block) {
     details.append(summary, body);
     details.open = true;
     setupAnimatedDetails(details);
-    setupFiveLineExpansion(card, body);
     card.appendChild(details);
   }
 
@@ -646,7 +644,6 @@ function createActionStep(block, index) {
   details.append(summary, body);
   details.open = true;
   setupAnimatedDetails(details);
-  setupFiveLineExpansion(details, body);
   return details;
 }
 
