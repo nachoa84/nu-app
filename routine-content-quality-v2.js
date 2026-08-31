@@ -114,6 +114,74 @@
     }, 0);
   };
 
+  function targetRoutineLines(qa = false) {
+    return qa ? 8.2 : 6.3;
+  }
+
+  if (typeof textUnitsForBalance === "function") {
+    balanceRoutinePool = function routineQualityBalancePool(pool, qa) {
+      if (!pool.length) return [];
+
+      const targetLines = targetRoutineLines(qa);
+      const units = [];
+
+      pool.forEach(block => {
+        textUnitsForBalance(block.content, qa).forEach(content => {
+          units.push({
+            content,
+            cost: estimateRoutineVisualLines(content, qa),
+            block
+          });
+        });
+      });
+
+      if (!units.length) return [];
+
+      const totalCost = units.reduce((sum, unit) => sum + unit.cost, 0);
+      const partCount = Math.max(1, Math.ceil(totalCost / targetLines));
+      const groups = [];
+      let current = [];
+      let currentCost = 0;
+      let consumedCost = 0;
+
+      const flush = () => {
+        if (!current.length) return;
+        const first = current[0].block;
+        groups.push({
+          ...first,
+          content: current.map(unit => unit.content).join("\n\n")
+        });
+        consumedCost += currentCost;
+        current = [];
+        currentCost = 0;
+      };
+
+      units.forEach((unit, index) => {
+        const groupsLeft = partCount - groups.length;
+        const remainingCost = totalCost - consumedCost;
+        const dynamicTarget = remainingCost / Math.max(groupsLeft, 1);
+        const candidateCost = currentCost + unit.cost;
+        const canStillCut = groups.length < partCount - 1;
+        const unitsLeft = units.length - index;
+        const groupsNeeded = partCount - groups.length;
+
+        if (current.length && canStillCut && unitsLeft >= groupsNeeded) {
+          const beforeDiff = Math.abs(dynamicTarget - currentCost);
+          const afterDiff = Math.abs(dynamicTarget - candidateCost);
+          if (beforeDiff <= afterDiff && currentCost >= dynamicTarget * 0.55) {
+            flush();
+          }
+        }
+
+        current.push(unit);
+        currentCost += unit.cost;
+      });
+
+      flush();
+      return groups;
+    };
+  }
+
   function labelForRoutineUrl(label, url) {
     const rawLabel = String(label || "").trim();
     const rawUrl = String(url || "").trim();
@@ -234,7 +302,7 @@
 
     const last = groups[groups.length - 1];
     const linkCost = block.links.length * 1.55;
-    const target = qa ? 8.8 : 6.8;
+    const target = targetRoutineLines(qa);
     const lastCost = estimateRoutineVisualLines(last.content, qa);
 
     if (lastCost + linkCost <= target * 1.08) {
