@@ -1772,3 +1772,49 @@
 #view-hoy.day-open .routine-content-slide .action-step-arrow {
   display: none !important;
 }
+
+
+/* V103 · Corrección estructural del carrusel y lectura */
+html:has(#view-hoy.day-open),
+body:has(#view-hoy.day-open),
+#app:has(#view-hoy.day-open) {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+#view-hoy.day-open .routine-content-track {
+  align-items: flex-start;
+}
+
+#view-hoy.day-open .routine-content-slide {
+  height: max-content;
+  align-self: flex-start;
+}
+
+#view-hoy.day-open .routine-content-slide .action-step-body {
+  margin: 0 !important;
+  padding: 14px !important;
+  max-width: none;
+}
+
+#view-hoy.day-open .routine-content-slide .action-step-title {
+  margin: 0;
+  padding: 0;
+}
+
+#view-hoy.day-open .five-line-body.is-collapsed {
+  display: block;
+  max-height: calc(1.52em * 5);
+  overflow: hidden;
+}
+
+#view-hoy.day-open .five-line-body.is-expanded {
+  display: block;
+  max-height: none;
+  overflow: visible;
+}
+
+#view-hoy.day-open .routine-content-slide .native-details-body {
+  margin: 0;
+  padding: 0;
+}
