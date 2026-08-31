@@ -197,3 +197,79 @@ body.keyboard-open #view-bot .bot-card.has-conversation .bot-form {
   height: 21px;
   stroke-width: 1.8;
 }
+
+/* Acciones de respuesta: legibles sin agrandar el contenedor */
+#view-bot .bot-message-action {
+  font-family: Poppins, sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+#view-bot .bot-message-action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.7;
+}
+/* Confirmación compacta inspirada en la referencia */
+body[data-active-view="bot"] .app-action-sheet {
+  align-items: center;
+  padding: 20px;
+}
+body[data-active-view="bot"] .app-action-sheet-inner {
+  width: min(320px, 100%);
+}
+body[data-active-view="bot"] .app-action-sheet-panel {
+  padding: 20px 14px 14px;
+  border-radius: 22px;
+}
+body[data-active-view="bot"] .app-action-sheet-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 10px;
+  border-radius: 16px;
+  background: rgba(255,122,50,.10);
+  color: #f05b14;
+}
+body[data-active-view="bot"] .app-action-sheet-icon svg {
+  width: 29px;
+  height: 29px;
+  stroke-width: 1.8;
+}
+body[data-active-view="bot"] .app-action-sheet-copy {
+  padding: 0 8px 16px;
+}
+body[data-active-view="bot"] .app-action-sheet-copy strong {
+  font-size: 17px;
+  line-height: 1.2;
+}
+body[data-active-view="bot"] .app-action-sheet-copy span {
+  margin-top: 7px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+body[data-active-view="bot"] .app-action-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+body[data-active-view="bot"] .app-action-sheet-actions button {
+  min-height: 40px;
+  border: 1px solid rgba(23,34,61,.12);
+  border-radius: 11px;
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+body[data-active-view="bot"] .app-action-sheet-actions .app-action-sheet-cancel {
+  margin: 0;
+  background: #fff;
+  color: #332947;
+}
+body[data-active-view="bot"] .app-action-sheet-actions .app-action-sheet-action {
+  border: 0;
+  background: #ff7a32;
+  color: #fff;
+}
