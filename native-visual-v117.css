@@ -150,7 +150,9 @@ body.is-scrolled #view-bot .app-page-header h1 {
 
 #view-hoy.day-open .routine-content-card {
   width: 100%;
+  height: 300px;
   min-height: 300px;
+  max-height: 300px;
   box-sizing: border-box;
 }
 
@@ -160,7 +162,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   padding: 20px;
 }
 
-/* Escala normal: igual para título y cuerpo. */
 #view-hoy.day-open .objective-card-header h3,
 #view-hoy.day-open .action-step-title,
 #view-hoy.day-open .native-details-body,
@@ -201,7 +202,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   margin-bottom: 0;
 }
 
-/* Solo contenido algo más largo: reducción leve. */
 #view-hoy.day-open .routine-content-card.is-compact-copy .objective-card-header h3,
 #view-hoy.day-open .routine-content-card.is-compact-copy .action-step-title,
 #view-hoy.day-open .routine-content-card.is-compact-copy .native-details-body,
@@ -212,7 +212,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   line-height: 1.5;
 }
 
-/* Q&A: única variante claramente más pequeña. */
 #view-hoy.day-open .routine-content-card.is-qa .objective-card-header h3,
 #view-hoy.day-open .routine-content-card.is-qa .action-step-title,
 #view-hoy.day-open .routine-content-card.is-qa .native-details-body,
@@ -259,7 +258,6 @@ body.is-scrolled #view-bot .app-page-header h1 {
   font-size: 23px;
 }
 
-/* Botones de rutina: misma altura, radio, tipografía y peso. */
 #view-hoy.day-open .training-card-open,
 #view-hoy.day-open .complete-day-btn,
 #view-hoy.day-open .native-day-progress-button {
@@ -289,7 +287,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 /* =========================================================
-   Carrusel · scroll vertical prioritario y una sola superficie visual
+   Carrusel · vertical primero, altura fija, una sola superficie
    ========================================================= */
 
 #view-hoy.day-open .routine-content-carousel,
@@ -301,9 +299,11 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 #view-hoy.day-open .routine-content-track {
-  height: auto !important;
+  height: 300px !important;
+  min-height: 300px;
+  max-height: 300px;
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: hidden;
   scroll-snap-type: none !important;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: auto;
@@ -312,7 +312,10 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 #view-hoy.day-open .routine-content-slide {
-  overflow: visible;
+  height: 300px;
+  min-height: 300px;
+  max-height: 300px;
+  overflow: hidden;
   padding: 0;
   border: 0 !important;
   outline: 0;
@@ -324,21 +327,20 @@ body.is-scrolled #view-bot .app-page-header h1 {
   content: none !important;
 }
 
-/* Una única sombra: la card redondeada. Se elimina el rectángulo exterior. */
 #view-hoy.day-open .routine-content-card {
-  min-height: 300px;
   border: 1px solid #e1e6ee;
   border-radius: 24px;
   background: #fff;
-  box-shadow: 0 10px 24px rgba(23, 32, 59, .08) !important;
+  box-shadow: 0 8px 20px rgba(23, 32, 59, .065) !important;
   overflow: hidden;
 }
 
-/* Las tres densidades comparten la misma geometría; solo cambia tipografía. */
 #view-hoy.day-open .routine-content-card.is-standard-copy,
 #view-hoy.day-open .routine-content-card.is-compact-copy,
 #view-hoy.day-open .routine-content-card.is-qa {
+  height: 300px;
   min-height: 300px;
+  max-height: 300px;
 }
 
 #view-hoy.day-open .routine-content-dots {
@@ -364,8 +366,15 @@ body.is-scrolled #view-bot .app-page-header h1 {
     font-size: 22px;
   }
 
-  #view-hoy.day-open .routine-content-card {
+  #view-hoy.day-open .routine-content-card,
+  #view-hoy.day-open .routine-content-track,
+  #view-hoy.day-open .routine-content-slide,
+  #view-hoy.day-open .routine-content-card.is-standard-copy,
+  #view-hoy.day-open .routine-content-card.is-compact-copy,
+  #view-hoy.day-open .routine-content-card.is-qa {
+    height: 286px !important;
     min-height: 286px;
+    max-height: 286px;
   }
 
   #view-hoy.day-open .routine-content-card.action-step,
