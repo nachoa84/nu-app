@@ -1,9 +1,7 @@
 name: Export Claude review ZIP
 
 on:
-  push:
-    branches:
-      - visual/claude-final-integration
+  workflow_dispatch:
 
 permissions:
   contents: read
