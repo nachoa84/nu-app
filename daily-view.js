@@ -294,10 +294,10 @@ function createCompactMediaItem(block, order, mediaBlocks) {
 
 function stripDecorativeSymbols(value) {
   return String(value || "")
-    .replace(/[\\p{Extended_Pictographic}\\uFE0F\\u200D]/gu, "")
-    .replace(/^[\\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
-    .replace(/([!?¡¿])\\1{1,}/gu, "$1")
-    .replace(/\\s{2,}/g, " ")
+    .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
+    .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
+    .replace(/([!?¡¿])\1{1,}/gu, "$1")
+    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
