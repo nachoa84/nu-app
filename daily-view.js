@@ -12,9 +12,11 @@ const DAY_OBJECTIVES = {
   6: "Aprendé a asesorar mejor a cada cliente.",
   7: "Cerrá tu primera semana con más ritmo y confianza."
 };
+
 function currentBlocks() {
   return days[selectedDay].blocks;
 }
+
 function addLinks(container, links) {
   if (!links || !links.length) return;
 
@@ -157,7 +159,6 @@ function createBlock(block) {
 }
 
 function createCompactMediaItem(block, order, mediaBlocks) {
-  // NU APP · MATERIALES MULTIRUTINA V92D
   const materialTitle = getActiveRoutineId() === "collagen-30"
     ? block.label
     : `Historia ${order} de ${mediaBlocks.length}`;
@@ -201,11 +202,6 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
-    // Ver comentario en favorites.js / swapVideoForCapturedFrame (ui-core.js):
-    // sin poster, esta miniatura recortada quedaría como un <video> real,
-    // y en Android Chrome ese <video> puede ignorar el overflow:hidden del
-    // contenedor y asomar por fuera del recuadro redondeado. Se reemplaza
-    // por una <img> con el primer frame capturado a canvas.
     swapVideoForCapturedFrame(media, preview);
     media.src = block.src;
   } else {
@@ -292,14 +288,24 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   return item;
 }
 
-function stripDecorativeSymbols(value) {
+function normalizeRoutineText(value) {
   return String(value || "")
-    .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\d\uFE0F?\u20E3/gu, "")
+    .replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D\u20E3]/gu, "")
+    .replace(/[*_`~]+/g, "")
+    .replace(/[ \t]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+}
+
+function stripDecorativeSymbols(value) {
+  return normalizeRoutineText(value)
     .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
     .replace(/^(?:paso\s*)?\d+\s*[.)\-:–—]\s*/iu, "")
-    .replace(/^[*_`]+|[*_`]+$/g, "")
     .replace(/([!?¡¿])\1{1,}/gu, "$1")
-    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
@@ -308,20 +314,27 @@ function cleanLeadingSymbols(value) {
 }
 
 function firstMeaningfulLine(content) {
-  const line = String(content || "")
+  const line = normalizeRoutineText(content)
     .split(/\n+/)
     .map(value => cleanLeadingSymbols(value))
     .find(Boolean) || "Tu acción de hoy";
 
-  return line.length > 68 ? `${line.slice(0, 65)}…` : line;
+  return line.length > 76 ? `${line.slice(0, 73)}…` : line;
 }
 
-function isImportedCollagenContentDay() {
-  return getActiveRoutineId() === "collagen-30" && Number(selectedDay) >= 8;
+function isQuestionAnswerContent(value) {
+  const text = normalizeRoutineText(value).toLowerCase();
+  if (!text) return false;
+
+  const explicitQa = /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|pregunta\s*[:\-]|respuesta\s*[:\-]/i.test(text);
+  const questionCount = (text.match(/[¿?]/g) || []).length;
+  const answerSignals = (text.match(/\b(?:sí|si|no|porque|puede|puedes|debe|debes|recomendamos|respuesta)\b/gi) || []).length;
+
+  return explicitQa || questionCount >= 3 || (questionCount >= 2 && answerSignals >= 2);
 }
 
 function importedTextParts(content, { stripStepNumber = false } = {}) {
-  const normalized = String(content || "").replace(/\r\n?/g, "\n");
+  const normalized = normalizeRoutineText(content);
   const lines = normalized.split("\n");
   const firstIndex = lines.findIndex(line => cleanLeadingSymbols(line));
 
@@ -333,26 +346,14 @@ function importedTextParts(content, { stripStepNumber = false } = {}) {
   }
 
   let heading = cleanLeadingSymbols(lines[firstIndex]);
-
-  // Elimina hashtags sueltos al inicio: #Texto o # Texto.
-  heading = heading
-    .replace(/^#+\s*/u, "")
-    .trim();
+  heading = heading.replace(/^#+\s*/u, "").trim();
 
   if (stripStepNumber) {
-    // Elimina numeraciones importadas como:
-    // 2️⃣ Texto, 2. Texto, 2) Texto, Paso 2: Texto.
     heading = heading
-      .replace(/^\s*\d+\ufe0f?\u20e3\s*/u, "")
-      .replace(
-        /^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu,
-        ""
-      )
+      .replace(/^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu, "")
       .trim();
   }
 
-  // Conserva todo lo que viene después de la primera línea.
-  // No elimina el primer párrafo completo.
   const body = lines
     .slice(firstIndex + 1)
     .join("\n")
@@ -413,134 +414,9 @@ function setupFiveLineExpansion(card, body) {
   window.addEventListener("resize", evaluate, { passive: true });
 }
 
-function createImportedObjectiveCard(block) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(block.content);
-
-  const card = document.createElement("section");
-  card.className = "objective-card";
-
-  const header = document.createElement("div");
-  header.className = "objective-card-header";
-
-  const copy = document.createElement("div");
-
-  const eyebrow = document.createElement("span");
-  eyebrow.textContent = "Objetivo";
-
-  const title = document.createElement("h3");
-  title.textContent = heading;
-
-  copy.append(eyebrow, title);
-  header.appendChild(copy);
-  card.appendChild(header);
-
-  if (detailText || block.links?.length) {
-    const details = document.createElement("details");
-    details.className = "native-details";
-
-    const summary = document.createElement("summary");
-    summary.innerHTML = `
-      <span class="details-label">Ver detalles</span>
-      <span class="details-arrow">${ICONS.down}</span>
-    `;
-
-    const body = document.createElement("div");
-    body.className = "native-details-body";
-
-    appendFormattedContent(body, detailText);
-    addLinks(body, block.links);
-
-    details.addEventListener("toggle", () => {
-      const label = summary.querySelector(".details-label");
-
-      if (label) {
-        label.textContent = details.open
-          ? "Ocultar detalles"
-          : "Ver detalles";
-      }
-    });
-
-    details.append(summary, body);
-    details.open = true;
-    setupAnimatedDetails(details);
-    card.appendChild(details);
-  }
-
-  return card;
-}
-
-function createImportedActionStep(block, index) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(
-    block.content,
-    { stripStepNumber: true }
-  );
-
-  const hasDetails =
-    Boolean(detailText) ||
-    Boolean(block.links?.length);
-
-  if (!hasDetails) {
-    const row = document.createElement("div");
-    row.className = "action-step action-step-static";
-
-    const inner = document.createElement("div");
-    inner.className = "action-step-static-row";
-
-    const number = document.createElement("span");
-    number.className = "action-step-number";
-    number.textContent = String(index);
-
-    const title = document.createElement("span");
-    title.className = "action-step-title";
-    title.textContent = heading;
-
-    inner.append(number, title);
-    row.appendChild(inner);
-
-    return row;
-  }
-
-  const details = document.createElement("details");
-  details.className = "action-step";
-
-  const summary = document.createElement("summary");
-
-  const number = document.createElement("span");
-  number.className = "action-step-number";
-  number.textContent = String(index);
-
-  const title = document.createElement("span");
-  title.className = "action-step-title";
-  title.textContent = heading;
-
-  const arrow = document.createElement("span");
-  arrow.className = "action-step-arrow";
-  arrow.innerHTML = ICONS.down;
-
-  summary.append(number, title, arrow);
-
-  const body = document.createElement("div");
-  body.className = "action-step-body";
-
-  appendFormattedContent(body, detailText);
-  addLinks(body, block.links);
-
-  details.append(summary, body);
-  details.open = true;
-  setupAnimatedDetails(details);
-
-  return details;
-}
-
 function appendFormattedContent(container, content, options = {}) {
   const { dropFirstParagraph = false } = options;
-  let paragraphs = String(content || "")
+  let paragraphs = normalizeRoutineText(content)
     .split(/\n\s*\n/)
     .map(value => value.trim())
     .filter(Boolean);
@@ -552,20 +428,23 @@ function appendFormattedContent(container, content, options = {}) {
   paragraphs.forEach(paragraph => {
     const lines = paragraph
       .split(/\n+/)
-      .map(value => value.trim())
+      .map(value => stripDecorativeSymbols(value))
       .filter(Boolean);
 
     lines.forEach(line => {
-      const normalizedLine = stripDecorativeSymbols(line);
-      if (!normalizedLine) return;
-
-      const isLabel = normalizedLine.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(normalizedLine);
-      const element = document.createElement(isLabel ? "div" : "p");
-      element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
-      element.textContent = normalizedLine;
+      const element = document.createElement("p");
+      element.className = "native-detail-paragraph";
+      element.textContent = line;
       container.appendChild(element);
     });
   });
+}
+
+function applyRoutineCardDensity(card, block) {
+  const text = normalizeRoutineText(block?.content || "");
+  card.classList.toggle("is-qa", isQuestionAnswerContent(text));
+  card.classList.toggle("is-compact-copy", !isQuestionAnswerContent(text) && text.length > 285);
+  card.classList.toggle("is-standard-copy", !isQuestionAnswerContent(text) && text.length <= 285);
 }
 
 function createObjectiveCard(block) {
@@ -603,26 +482,40 @@ function createObjectiveCard(block) {
     card.appendChild(details);
   }
 
+  applyRoutineCardDensity(card, block);
   return card;
 }
 
-function createActionStep(block, index) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedActionStep(block, index);
-  }
+function createImportedObjectiveCard(block) {
+  return createObjectiveCard(block);
+}
 
-  const { heading, body: detailText } = importedTextParts(block.content);
+function createImportedActionStep(block, index) {
+  const { heading, body: detailText } = importedTextParts(
+    block.content,
+    { stripStepNumber: true }
+  );
+
   const hasDetails = Boolean(detailText) || Boolean(block.links?.length);
 
   if (!hasDetails) {
     const row = document.createElement("div");
     row.className = "action-step action-step-static";
-    row.innerHTML = `
-      <div class="action-step-static-row">
-        <span class="action-step-number">${index}</span>
-        <span class="action-step-title">${heading}</span>
-      </div>
-    `;
+
+    const inner = document.createElement("div");
+    inner.className = "action-step-static-row";
+
+    const number = document.createElement("span");
+    number.className = "action-step-number";
+    number.textContent = String(index);
+
+    const title = document.createElement("span");
+    title.className = "action-step-title";
+    title.textContent = heading;
+
+    inner.append(number, title);
+    row.appendChild(inner);
+    applyRoutineCardDensity(row, block);
     return row;
   }
 
@@ -630,110 +523,165 @@ function createActionStep(block, index) {
   details.className = "action-step";
 
   const summary = document.createElement("summary");
-  summary.innerHTML = `
-    <span class="action-step-number">${index}</span>
-    <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
-    <span class="action-step-arrow">${ICONS.down}</span>
-  `;
+
+  const number = document.createElement("span");
+  number.className = "action-step-number";
+  number.textContent = String(index);
+
+  const title = document.createElement("span");
+  title.className = "action-step-title";
+  title.textContent = heading;
+
+  const arrow = document.createElement("span");
+  arrow.className = "action-step-arrow";
+  arrow.innerHTML = ICONS.down;
+
+  summary.append(number, title, arrow);
 
   const body = document.createElement("div");
   body.className = "action-step-body";
+
   appendFormattedContent(body, detailText);
   addLinks(body, block.links);
 
   details.append(summary, body);
   details.open = true;
   setupAnimatedDetails(details);
+  applyRoutineCardDensity(details, block);
+
   return details;
+}
+
+function createActionStep(block, index) {
+  return createImportedActionStep(block, index);
 }
 
 function isMaterialTransitionBlock(block) {
   if (!block || block.type !== "text" || block.links?.length) return false;
-  const text = stripDecorativeSymbols(block.content).replace(/\\s+/g, " ").trim();
+  const text = stripDecorativeSymbols(block.content).replace(/\s+/g, " ").trim();
   if (!text || text.length > 180) return false;
-  return /(?:aquí|aqui|a continuación|ahora)\\s+(?:está|esta|el|la|los|las|te dejo|te dejamos|comparto|encontrarás|encontraras)|material(?:es)?\\s+(?:de|para)|public(?:a|ar)\\s+(?:en|el|este)|contenido\\s+(?:para|de)\\s+(?:publicar|mercadeo)/i.test(text);
+  return /(?:aquí|aqui|a continuación|ahora)\s+(?:está|esta|el|la|los|las|te dejo|te dejamos|comparto|encontrarás|encontraras)|material(?:es)?\s+(?:de|para)|public(?:a|ar)\s+(?:en|el|este)|contenido\s+(?:para|de)\s+(?:publicar|mercadeo)/i.test(text);
+}
+
+function splitLongTextUnit(value, maxChars) {
+  const text = normalizeRoutineText(value);
+  if (text.length <= maxChars) return [text];
+
+  const sentences = text
+    .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÜÑ¿¡0-9])/u)
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  if (sentences.length <= 1) {
+    const words = text.split(/\s+/);
+    const chunks = [];
+    let current = "";
+    words.forEach(word => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (current && candidate.length > maxChars) {
+        chunks.push(current);
+        current = word;
+      } else {
+        current = candidate;
+      }
+    });
+    if (current) chunks.push(current);
+    return chunks;
+  }
+
+  const chunks = [];
+  let current = "";
+  sentences.forEach(sentence => {
+    const candidate = current ? `${current} ${sentence}` : sentence;
+    if (current && candidate.length > maxChars) {
+      chunks.push(current);
+      current = sentence;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+function splitBlockEvenly(block) {
+  const raw = normalizeRoutineText(block.content);
+  if (!raw) return [];
+
+  if (block.links?.length) {
+    return [{ ...block, content: raw }];
+  }
+
+  const qa = isQuestionAnswerContent(raw);
+  const maxChars = qa ? 430 : 340;
+  const paragraphs = raw
+    .split(/\n\s*\n/)
+    .map(value => value.trim())
+    .filter(Boolean);
+
+  const units = paragraphs.flatMap(paragraph => splitLongTextUnit(paragraph, maxChars));
+  const totalLength = units.reduce((sum, unit) => sum + unit.length, 0);
+  const partCount = Math.max(1, Math.ceil(totalLength / maxChars));
+  const targetLength = Math.max(1, Math.ceil(totalLength / partCount));
+  const groups = [];
+  let current = [];
+  let currentLength = 0;
+
+  const flush = () => {
+    if (!current.length) return;
+    groups.push(current.join("\n\n"));
+    current = [];
+    currentLength = 0;
+  };
+
+  units.forEach((unit, index) => {
+    const remainingUnits = units.length - index;
+    const remainingGroups = partCount - groups.length;
+    const candidateLength = currentLength
+      ? currentLength + unit.length + 2
+      : unit.length;
+    const shouldFlush =
+      current.length &&
+      groups.length < partCount - 1 &&
+      candidateLength > targetLength * 1.14 &&
+      remainingUnits >= remainingGroups;
+
+    if (shouldFlush) flush();
+
+    current.push(unit);
+    currentLength = current.length === 1
+      ? unit.length
+      : currentLength + unit.length + 2;
+  });
+  flush();
+
+  return groups.map(content => ({ ...block, content }));
 }
 
 function splitRoutineTextBlocks(blocks) {
-  const result = [];
-
-  blocks.forEach(block => {
-    const raw = String(block.content || "").replace(/\\r\\n?/g, "\\n").trim();
-    const paragraphs = raw
-      .split(/\\n\\s*\\n/)
-      .map(value => value.trim())
-      .filter(Boolean);
-
-    if (!paragraphs.length) return;
-
-    // Un enlace siempre viaja junto al párrafo que lo presenta.
-    if (block.links?.length) {
-      result.push({ ...block, content: paragraphs.join("\\n\\n") });
-      return;
-    }
-
-    let current = [];
-    let currentLength = 0;
-    const flush = () => {
-      if (!current.length) return;
-      result.push({ ...block, content: current.join("\\n\\n") });
-      current = [];
-      currentLength = 0;
-    };
-
-    paragraphs.forEach(paragraph => {
-      const nextLength = currentLength
-        ? currentLength + paragraph.length + 2
-        : paragraph.length;
-
-      // Cortamos sólo entre párrafos para no romper una idea.
-      if (current.length && nextLength > 330) flush();
-      current.push(paragraph);
-      currentLength = current.length === 1
-        ? paragraph.length
-        : currentLength + paragraph.length + 2;
-    });
-    flush();
-  });
-
-  // Une títulos o remates cortos con el texto siguiente para evitar cards
-  // desbalanceadas y mantener una lectura continua.
+  const result = blocks.flatMap(splitBlockEvenly);
   const balanced = [];
-  for (let index = 0; index < result.length; index += 1) {
-    const block = result[index];
-    const next = result[index + 1];
-    const blockLength = String(block.content || "").length;
-    const nextLength = String(next?.content || "").length;
-    const canJoinNext =
-      next &&
-      !block.links?.length &&
-      !next.links?.length &&
-      blockLength < 150 &&
-      blockLength + nextLength + 2 <= 360;
 
-    if (canJoinNext) {
-      balanced.push({
-        ...block,
-        content: `${block.content}\\n\\n${next.content}`
-      });
-      index += 1;
-      continue;
-    }
-
+  result.forEach(block => {
     const previous = balanced[balanced.length - 1];
-    const canJoinPrevious =
+    const blockText = normalizeRoutineText(block.content);
+    const previousText = normalizeRoutineText(previous?.content || "");
+    const sameDensity = previous &&
+      isQuestionAnswerContent(previousText) === isQuestionAnswerContent(blockText);
+    const canMerge =
       previous &&
+      sameDensity &&
       !previous.links?.length &&
       !block.links?.length &&
-      String(previous.content || "").length < 150 &&
-      String(previous.content || "").length + blockLength + 2 <= 360;
+      blockText.length < 95 &&
+      previousText.length + blockText.length + 2 <= 320;
 
-    if (canJoinPrevious) {
-      previous.content = `${previous.content}\\n\\n${block.content}`;
+    if (canMerge) {
+      previous.content = `${previous.content}\n\n${block.content}`;
     } else {
       balanced.push({ ...block });
     }
-  }
+  });
 
   return balanced;
 }
@@ -794,9 +742,7 @@ function renderStructuredDayDetail() {
         ? createObjectiveCard(block)
         : createActionStep(block, index);
       card.classList.add("routine-content-card");
-      if (String(block.content || "").length > 480) {
-        card.classList.add("is-long-copy");
-      }
+      applyRoutineCardDensity(card, block);
       slide.appendChild(card);
       track.appendChild(slide);
     });
