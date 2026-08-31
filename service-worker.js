@@ -1,4 +1,4 @@
-const CACHE="nuapp-v146-iris-dialog-refined";
+const CACHE="nuapp-v147-favorites-polish";
 
 const CORE=[
   "./",
@@ -21,6 +21,7 @@ const CORE=[
   "./shell.css?v=61b-progress-canonical",
   "./bot.css?v=143-iris-layout-5",
   "./favorites.css?v=94-bot-folders",
+  "./favorites-redesign-v1.css?v=144-favorites-polish",
   "./bot-content.js?v=131-country-catalogs",
   "./ui-core.js?v=143-iris-clean-4",
   "./routine-content.js?v=103a-unified-app-store",
