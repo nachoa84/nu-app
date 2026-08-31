@@ -141,6 +141,11 @@
     });
   }
 
+  function applyRoutineUiPolish() {
+    ensureRoutineCarouselControls();
+    polishRoutineMaterials();
+  }
+
   function isRoutinePreviewMode() {
     const params = new URLSearchParams(window.location.search);
     return params.get("preview") === "1" || params.get("routinePreview") === "1";
@@ -163,10 +168,19 @@
   const baseRenderStructuredDayDetail = renderStructuredDayDetail;
   renderStructuredDayDetail = function routineUiRenderDay() {
     const result = baseRenderStructuredDayDetail.apply(this, arguments);
-    requestAnimationFrame(() => {
-      ensureRoutineCarouselControls();
-      polishRoutineMaterials();
-    });
+    requestAnimationFrame(applyRoutineUiPolish);
     return result;
   };
+
+  const routineUiRoot = document.getElementById("view-hoy") || document.body;
+  const routineUiObserver = new MutationObserver(() => {
+    requestAnimationFrame(applyRoutineUiPolish);
+  });
+
+  routineUiObserver.observe(routineUiRoot, {
+    childList: true,
+    subtree: true
+  });
+
+  requestAnimationFrame(applyRoutineUiPolish);
 })();
