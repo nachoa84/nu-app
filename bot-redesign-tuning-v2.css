@@ -149,7 +149,7 @@ body[data-active-view="bot"] .app-action-sheet-cancel {
   font-family: Poppins, sans-serif;
 }
 body[data-active-view="bot"] .app-action-sheet-action {
-  background: linear-gradient(115deg, #ff7a32, #f05b14);
+  background: #ff7a32;
   color: #fff;
 }
 @media (max-width: 360px) {
@@ -178,4 +178,22 @@ body.keyboard-open #view-bot .bot-card.has-conversation .bot-form {
   margin: 0;
   padding: 10px 0 8px;
   transform: none !important;
+}
+
+/* Ajustes visuales finales: acciones y acceso rápido */
+#view-bot .bot-message-action {
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+#view-bot .bot-message-action svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.7;
+}
+#view-bot #botShortcutsBtn svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.8;
 }
