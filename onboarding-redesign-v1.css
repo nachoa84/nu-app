@@ -247,18 +247,10 @@
   isolation: isolate !important;
   padding-top: 8px !important;
 }
-.onboarding-welcome-step::before {
-  content: "" !important;
-  position: absolute !important;
-  z-index: -1 !important;
-  top: -84px !important;
-  right: -110px !important;
-  width: 270px !important;
-  height: 270px !important;
-  border-radius: 50% !important;
-  background: radial-gradient(circle at 35% 35%, rgba(246,201,166,.7), rgba(217,143,160,.45) 38%, rgba(90,62,107,.18) 67%, transparent 72%) !important;
-  filter: blur(2px) !important;
-  opacity: .78 !important;
+.onboarding-welcome-step {
+  position: relative !important;
+  isolation: auto !important;
+  background: linear-gradient(180deg, #fff 0%, #f7fbfc 100%) !important;
 }
 .onboarding-welcome-step .onboarding-heading {
   max-width: none !important;
