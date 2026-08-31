@@ -700,13 +700,16 @@ function showActionSheet({
   sheet.innerHTML = `
     <div class="app-action-sheet-inner" role="dialog" aria-modal="true" aria-label="${title}">
       <div class="app-action-sheet-panel">
+        <div class="app-action-sheet-icon" aria-hidden="true">${ICONS.trash}</div>
         <div class="app-action-sheet-copy">
           <strong>${title}</strong>
           ${message ? `<span>${message}</span>` : ""}
         </div>
-        <button type="button" class="app-action-sheet-action">${actionLabel}</button>
+        <div class="app-action-sheet-actions">
+          <button type="button" class="app-action-sheet-cancel">Cancelar</button>
+          <button type="button" class="app-action-sheet-action">${actionLabel}</button>
+        </div>
       </div>
-      <button type="button" class="app-action-sheet-cancel">Cancelar</button>
     </div>
   `;
 
