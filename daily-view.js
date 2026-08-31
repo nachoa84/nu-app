@@ -296,6 +296,8 @@ function stripDecorativeSymbols(value) {
   return String(value || "")
     .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
     .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
+    .replace(/^(?:paso\s*)?\d+\s*[.)\-:–—]\s*/iu, "")
+    .replace(/^[*_`]+|[*_`]+$/g, "")
     .replace(/([!?¡¿])\1{1,}/gu, "$1")
     .replace(/\s{2,}/g, " ")
     .trim();
