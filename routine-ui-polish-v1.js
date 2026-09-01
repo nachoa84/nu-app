@@ -11,7 +11,7 @@
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";
-    link.href = "routine-layout-final-v1.css?v=20260901-layout-v1";
+    link.href = "routine-layout-final-v1.css?v=20260901-layout-v2";
     document.head.appendChild(link);
   }
 
@@ -82,7 +82,11 @@
         ? estimateRoutineVisualLines(content, qa)
         : Math.ceil(content.length / 38);
 
-      card?.classList.toggle("is-short-copy", !qa && !hasLinks && visualLines <= 4.2);
+      const isShort = !qa && !hasLinks && visualLines <= 5.4;
+      const isLong = !qa && (hasLinks || visualLines >= 6.2);
+
+      card?.classList.toggle("is-short-copy", isShort);
+      card?.classList.toggle("is-long-copy", isLong);
       return card;
     };
 
@@ -108,8 +112,6 @@
           return;
         }
 
-        // Auto-repara un montaje incompleto: conserva los puntos y reconstruye
-        // el contenedor de navegación si faltan las flechas.
         if (existingControls && existingControls.contains(dots)) {
           existingControls.replaceWith(dots);
         }
