@@ -6,6 +6,7 @@ const assert = require("node:assert/strict");
 const {
   assertSafeProductionEnvironment,
   isBlockedReleasePublicPath,
+  isPublishedEnvironment,
   waitForHealthyBackend
 } = require("../release-entrypoint");
 
@@ -46,7 +47,27 @@ test("release guard conserva assets públicos requeridos", () => {
   }
 });
 
-test("development conserva flags de prueba", () => {
+test("detecta deployment publicado de Replit aunque NODE_ENV sea development", () => {
+  assert.equal(
+    isPublishedEnvironment({
+      REPLIT_DEPLOYMENT: "1",
+      NODE_ENV: "development"
+    }),
+    true
+  );
+
+  assert.equal(
+    isPublishedEnvironment({ NODE_ENV: "production" }),
+    true
+  );
+
+  assert.equal(
+    isPublishedEnvironment({ NODE_ENV: "development" }),
+    false
+  );
+});
+
+test("development conserva flags de prueba fuera de deployment publicado", () => {
   assert.doesNotThrow(() =>
     assertSafeProductionEnvironment({
       NODE_ENV: "development",
@@ -91,7 +112,37 @@ test("production exige base y rechaza flags de prueba", () => {
   );
 });
 
-test("health gate no consulta backend fuera de production", async () => {
+test("deployment de Replit aplica guard estricto aunque NODE_ENV sea development", () => {
+  assert.throws(
+    () => assertSafeProductionEnvironment({
+      REPLIT_DEPLOYMENT: "1",
+      NODE_ENV: "development"
+    }),
+    /DATABASE_URL/
+  );
+
+  assert.throws(
+    () => assertSafeProductionEnvironment({
+      REPLIT_DEPLOYMENT: "1",
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://example",
+      IRIS_AI_CONTROLLED_EXECUTION: "true"
+    }),
+    /IRIS_AI_CONTROLLED_EXECUTION/
+  );
+
+  assert.throws(
+    () => assertSafeProductionEnvironment({
+      REPLIT_DEPLOYMENT: "1",
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://example",
+      IRIS_AI_TEST_ENVIRONMENT: "development"
+    }),
+    /IRIS_AI_TEST_ENVIRONMENT/
+  );
+});
+
+test("health gate no consulta backend fuera de entorno publicado", async () => {
   let called = false;
   const ok = await waitForHealthyBackend({
     env: { NODE_ENV: "development" },
@@ -117,4 +168,25 @@ test("health gate acepta backend saludable en production", async () => {
   });
 
   assert.equal(ok, true);
+});
+
+test("health gate se activa con REPLIT_DEPLOYMENT=1", async () => {
+  let called = 0;
+  const ok = await waitForHealthyBackend({
+    env: {
+      REPLIT_DEPLOYMENT: "1",
+      NODE_ENV: "development",
+      PORT: "5000"
+    },
+    fetchImpl: async url => {
+      called += 1;
+      assert.equal(url, "http://127.0.0.1:5000/api/health");
+      return { ok: true, status: 200 };
+    },
+    timeoutMs: 100,
+    intervalMs: 1
+  });
+
+  assert.equal(ok, true);
+  assert.equal(called, 1);
 });
