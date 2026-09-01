@@ -16,12 +16,12 @@
   }
 
   function ensureRoutineQaModule() {
-    const id = "nu-routine-qa-modal-script-v1";
+    const id = "nu-routine-qa-modal-script-v2";
     if (document.getElementById(id)) return;
 
     const script = document.createElement("script");
     script.id = id;
-    script.src = "routine-qa-modal-v1.js?v=20260901-qa-v3";
+    script.src = "routine-qa-modal-v2.js?v=20260901-qa-v4";
     script.defer = true;
     document.head.appendChild(script);
   }
