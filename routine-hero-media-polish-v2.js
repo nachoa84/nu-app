@@ -5,6 +5,7 @@
   "use strict";
 
   const FINAL_LAYOUT_VERSION = "20260901-layout-v6";
+  const COMPLETION_STYLE_VERSION = "20260901-completion-v1";
 
   function syncLayoutVersion() {
     const link = document.getElementById("nu-routine-layout-final-v1");
@@ -13,6 +14,23 @@
     const nextHref = `routine-layout-final-v1.css?v=${FINAL_LAYOUT_VERSION}`;
     const currentHref = String(link.getAttribute("href") || "");
     if (currentHref !== nextHref) link.setAttribute("href", nextHref);
+  }
+
+  function ensureCompletionStyles() {
+    const id = "nu-routine-completion-final-v1";
+    let link = document.getElementById(id);
+
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+
+    const nextHref = `routine-completion-final-v1.css?v=${COMPLETION_STYLE_VERSION}`;
+    if (String(link.getAttribute("href") || "") !== nextHref) {
+      link.setAttribute("href", nextHref);
+    }
   }
 
   function cleanCompletedState() {
@@ -34,6 +52,7 @@
 
     view.dataset.routineId = routineId;
     syncLayoutVersion();
+    ensureCompletionStyles();
     cleanCompletedState();
   }
 
