@@ -32,7 +32,7 @@
 
     const script = document.createElement("script");
     script.id = id;
-    script.src = "routine-hero-media-polish-v2.js?v=20260901-hero-v2";
+    script.src = "routine-hero-media-polish-v2.js?v=20260901-hero-v3";
     script.defer = true;
     document.head.appendChild(script);
   }
