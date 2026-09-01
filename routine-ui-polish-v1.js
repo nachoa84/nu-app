@@ -11,7 +11,7 @@
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";
-    link.href = "routine-layout-final-v1.css?v=20260901-layout-v3";
+    link.href = "routine-layout-final-v1.css?v=20260901-layout-v4";
     document.head.appendChild(link);
   }
 
