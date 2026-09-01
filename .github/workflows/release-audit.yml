@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
 
       - name: Use stable npm for CI
         run: npm install --global npm@11.6.0 --no-audit --no-fund
