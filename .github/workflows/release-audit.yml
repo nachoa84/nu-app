@@ -18,18 +18,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: npm
+          node-version: "22"
 
       - name: Use stable npm for CI
         run: npm install --global npm@11.6.0 --no-audit --no-fund
 
       - name: Install exact dependencies
         shell: bash
+        env:
+          npm_config_cache: /tmp/nu-app-npm-cache
         run: |
           set -euo pipefail
+          node --version
           npm --version
-          npm ci --ignore-scripts --no-audit --no-fund
+          rm -rf node_modules /tmp/nu-app-npm-cache
+          npm ci --ignore-scripts --no-audit --no-fund --prefer-online --progress=false
           node -e "require.resolve('express'); require.resolve('pg'); require.resolve('web-push')"
 
       - name: Check JavaScript syntax
