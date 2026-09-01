@@ -12,7 +12,7 @@
     const link = document.createElement("link");
     link.id = STYLE_ID;
     link.rel = "stylesheet";
-    link.href = "routine-qa-modal-v1.css?v=20260901-qa-v4";
+    link.href = "routine-qa-modal-v1.css?v=20260901-qa-v5";
     document.head.appendChild(link);
   }
 
