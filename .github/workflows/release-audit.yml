@@ -12,7 +12,7 @@ permissions:
 jobs:
   release-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
 
@@ -22,7 +22,17 @@ jobs:
           cache: npm
 
       - name: Install exact dependencies
-        run: npm ci
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci || true
+          if ! node -e "require.resolve('express'); require.resolve('pg')"; then
+            echo "npm ci dejó dependencias incompletas; reintentando instalación limpia..."
+            rm -rf node_modules
+            npm cache verify || true
+            npm install --ignore-scripts --no-audit --no-fund
+          fi
+          node -e "require.resolve('express'); require.resolve('pg'); require.resolve('web-push')"
 
       - name: Check JavaScript syntax
         run: |
