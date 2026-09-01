@@ -32,6 +32,10 @@ jobs:
           node --version
           npm --version
           rm -rf node_modules /tmp/nu-app-npm-cache
+          # Replit writes its internal npm proxy into package-lock.json.
+          # GitHub cannot resolve package-firewall.replit.local, so normalize
+          # only the runner copy while preserving versions and integrity hashes.
+          sed -i 's#http://package-firewall.replit.local/npm/#https://registry.npmjs.org/#g' package-lock.json
           npm ci --ignore-scripts --no-audit --no-fund --prefer-online --progress=false
           node -e "require.resolve('express'); require.resolve('pg'); require.resolve('web-push')"
 
