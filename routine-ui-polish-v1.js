@@ -4,6 +4,17 @@
 (() => {
   "use strict";
 
+  function ensureRoutineLayoutStyles() {
+    const id = "nu-routine-layout-final-v1";
+    if (document.getElementById(id)) return;
+
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = "routine-layout-final-v1.css?v=20260901-layout-v1";
+    document.head.appendChild(link);
+  }
+
   function installRoutineTextPolish() {
     if (
       typeof normalizeRoutineText !== "function" ||
@@ -65,7 +76,14 @@
             .replace(/\s+([,.;:!?])/g, "$1")
             .trim();
 
-      return baseCreateBalancedTextCard({ ...block, content }, options);
+      const card = baseCreateBalancedTextCard({ ...block, content }, options);
+      const hasLinks = Array.isArray(block?.links) && block.links.length > 0;
+      const visualLines = typeof estimateRoutineVisualLines === "function"
+        ? estimateRoutineVisualLines(content, qa)
+        : Math.ceil(content.length / 38);
+
+      card?.classList.toggle("is-short-copy", !qa && !hasLinks && visualLines <= 4.2);
+      return card;
     };
 
     return true;
@@ -165,6 +183,7 @@
   }
 
   function applyRoutineUiPolish() {
+    ensureRoutineLayoutStyles();
     installRoutineTextPolish();
     ensureRoutineCarouselControls();
     polishRoutineMaterials();
