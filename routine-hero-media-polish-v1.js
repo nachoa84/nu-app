@@ -7,6 +7,32 @@
   const SAMPLE_SIZE = 64;
   const TARGET_OCCUPANCY = 0.7;
   const MAX_SCALE = 1.42;
+  const STYLE_ID = "nu-routine-hero-media-polish-v1";
+
+  function ensureStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      #view-hoy.day-open .native-day-hero-media img {
+        transform: scale(var(--routine-hero-product-scale, 1));
+        transform-origin: center;
+        transition: transform 180ms ease;
+      }
+
+      #view-hoy.day-open .native-day-hero-media img.has-light-opaque-bg {
+        mix-blend-mode: multiply;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #view-hoy.day-open .native-day-hero-media img {
+          transition: none;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -115,6 +141,7 @@
   }
 
   function polishRoutineHeroMedia() {
+    ensureStyles();
     document
       .querySelectorAll("#view-hoy.day-open .native-day-hero-media img")
       .forEach(polishImage);
