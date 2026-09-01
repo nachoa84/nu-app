@@ -56,15 +56,8 @@ test("detecta deployment publicado de Replit aunque NODE_ENV sea development", (
     true
   );
 
-  assert.equal(
-    isPublishedEnvironment({ NODE_ENV: "production" }),
-    true
-  );
-
-  assert.equal(
-    isPublishedEnvironment({ NODE_ENV: "development" }),
-    false
-  );
+  assert.equal(isPublishedEnvironment({ NODE_ENV: "production" }), true);
+  assert.equal(isPublishedEnvironment({ NODE_ENV: "development" }), false);
 });
 
 test("development conserva flags de prueba fuera de deployment publicado", () => {
@@ -72,7 +65,10 @@ test("development conserva flags de prueba fuera de deployment publicado", () =>
     assertSafeProductionEnvironment({
       NODE_ENV: "development",
       ENABLE_ADMIN_TEST_ROUTES: "true",
-      IRIS_AI_CONTROLLED_EXECUTION: "true"
+      IRIS_AI_CONTROLLED_EXECUTION: "true",
+      PILOT_ENABLED: "true",
+      PILOT_ADMIN_ROUTES_ENABLED: "true",
+      IRIS_AI_PILOT_ENABLED: "true"
     })
   );
 });
@@ -107,9 +103,29 @@ test("production exige base y rechaza flags de prueba", () => {
       DATABASE_URL: "postgresql://example",
       ENABLE_ADMIN_TEST_ROUTES: "false",
       ENABLE_DEMO_ROUTES: "false",
-      IRIS_AI_CONTROLLED_EXECUTION: "false"
+      IRIS_AI_CONTROLLED_EXECUTION: "false",
+      PILOT_ENABLED: "false",
+      PILOT_ADMIN_ROUTES_ENABLED: "false",
+      IRIS_AI_PILOT_ENABLED: "false"
     })
   );
+});
+
+test("primera salida rechaza activación accidental de funciones piloto", () => {
+  for (const flag of [
+    "PILOT_ENABLED",
+    "PILOT_ADMIN_ROUTES_ENABLED",
+    "IRIS_AI_PILOT_ENABLED"
+  ]) {
+    assert.throws(
+      () => assertSafeProductionEnvironment({
+        REPLIT_DEPLOYMENT: "1",
+        DATABASE_URL: "postgresql://example",
+        [flag]: "true"
+      }),
+      new RegExp(flag)
+    );
+  }
 });
 
 test("deployment de Replit aplica guard estricto aunque NODE_ENV sea development", () => {
