@@ -28,25 +28,45 @@ body:has(#view-hoy.day-open) #app {
 
 #view-hoy.day-open .daily-native-title > strong,
 #view-hoy.day-open #dailyNativeRoutineTitle {
-  font-size: 14px !important;
-  font-weight: 650 !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.015em !important;
+  font-size: 15.5px !important;
+  font-weight: 680 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.02em !important;
 }
 
-/* Routine hero media has one final shared geometry.
-   This intentionally overrides the old 50x60 native-visual box. */
+/* Routine hero owns the positioning context. Product media is removed from the
+   grid flow and anchored to the right edge so every routine shares one composition. */
+#view-hoy.day-open .native-day-hero {
+  position: relative !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy {
+  position: relative !important;
+  z-index: 2 !important;
+  width: calc(100% - 112px) !important;
+  max-width: calc(100% - 112px) !important;
+}
+
 #view-hoy.day-open .native-day-hero-media {
-  top: 16px !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  top: 10px !important;
   right: 18px !important;
-  width: 78px !important;
-  height: 86px !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 92px !important;
+  height: 98px !important;
   display: grid !important;
   place-items: center !important;
   overflow: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
+  transform: none !important;
 }
 
 #view-hoy.day-open .native-day-hero-media img {
@@ -181,16 +201,21 @@ body:has(#view-hoy.day-open) #app {
     padding-bottom: calc(86px + var(--safe-bottom)) !important;
   }
 
+  #view-hoy.day-open .native-day-hero-copy {
+    width: calc(100% - 98px) !important;
+    max-width: calc(100% - 98px) !important;
+  }
+
   #view-hoy.day-open .native-day-hero-media {
-    top: 15px !important;
-    right: 15px !important;
-    width: 70px !important;
-    height: 78px !important;
+    top: 9px !important;
+    right: 13px !important;
+    width: 82px !important;
+    height: 90px !important;
   }
 
   #view-hoy.day-open .daily-native-title > strong,
   #view-hoy.day-open #dailyNativeRoutineTitle {
-    font-size: 13.5px !important;
+    font-size: 15px !important;
   }
 
   #view-hoy.day-open .routine-content-track,
