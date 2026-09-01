@@ -1,0 +1,339 @@
+/* Nu App · Routine Q&A modal v1
+   Shared by Collagen+, WellSpa, Galvanic Spa and LumiSpa. */
+
+body.routine-qa-open {
+  overflow: hidden;
+}
+
+#view-hoy.day-open .routine-content-card.is-qa-launch {
+  min-height: 210px !important;
+  height: 210px !important;
+  max-height: 210px !important;
+  justify-content: center;
+  padding: 22px !important;
+  overflow: visible !important;
+}
+
+.routine-qa-launch-copy {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.routine-qa-launch-kicker {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #7a8290;
+}
+
+.routine-qa-launch-copy h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #1d2430;
+}
+
+.routine-qa-launch-copy p {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13.5px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #626b79;
+}
+
+.routine-qa-launch-button {
+  min-height: 40px;
+  margin-top: 5px;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 10px;
+  background: #f4f5f7;
+  color: #252b35;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.routine-qa-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+}
+
+.routine-qa-modal[hidden] {
+  display: none !important;
+}
+
+.routine-qa-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(23, 28, 37, .42);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.routine-qa-dialog {
+  position: relative;
+  width: min(92vw, 520px);
+  height: min(82dvh, 680px);
+  max-height: calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(220, 224, 231, .92);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(18, 23, 31, .22);
+}
+
+.routine-qa-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.routine-qa-heading {
+  min-width: 0;
+}
+
+.routine-qa-heading span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 500;
+  color: #89909b;
+}
+
+.routine-qa-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #202630;
+}
+
+.routine-qa-close {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #e4e7ec;
+  border-radius: 50%;
+  background: #fff;
+  color: #555e6b;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.routine-qa-viewport {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.routine-qa-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  transition: transform 240ms ease;
+  will-change: transform;
+}
+
+.routine-qa-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 22px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.routine-qa-slide-number {
+  margin-bottom: 13px;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  color: #969ca6;
+}
+
+.routine-qa-question {
+  margin: 0 0 18px;
+  font-size: clamp(18px, 4.8vw, 21px);
+  line-height: 1.34;
+  font-weight: 600;
+  color: #1d232d;
+}
+
+.routine-qa-answer-wrap {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
+}
+
+.routine-qa-answer {
+  margin: 0;
+  white-space: pre-line;
+  font-size: 14.5px;
+  line-height: 1.62;
+  font-weight: 400;
+  color: #4e5765;
+}
+
+.routine-qa-links {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.routine-qa-link {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid #e2e6eb;
+  border-radius: 10px;
+  color: #313844;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.routine-qa-controls {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 17px;
+  border-top: 1px solid #eef0f3;
+  background: #fff;
+}
+
+.routine-qa-arrow {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #e2e6eb;
+  border-radius: 50%;
+  background: #fff;
+  color: #505966;
+  font: inherit;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.routine-qa-arrow:disabled {
+  opacity: .28;
+  cursor: default;
+}
+
+.routine-qa-dots-wrap {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.routine-qa-counter {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 500;
+  color: #858c97;
+}
+
+.routine-qa-dots {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.routine-qa-dot {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #cfd4db;
+  cursor: pointer;
+  transition: width 160ms ease, background 160ms ease;
+}
+
+.routine-qa-dot.is-active {
+  width: 16px;
+  flex-basis: 16px;
+  background: #697280;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open .routine-content-card.is-qa-launch {
+    min-height: 202px !important;
+    height: 202px !important;
+    max-height: 202px !important;
+    padding: 19px !important;
+  }
+
+  .routine-qa-dialog {
+    width: calc(100vw - 24px);
+    height: min(84dvh, 640px);
+    border-radius: 18px;
+  }
+
+  .routine-qa-header {
+    padding: 17px 17px 11px;
+  }
+
+  .routine-qa-slide {
+    padding: 20px 18px 15px;
+  }
+
+  .routine-qa-question {
+    margin-bottom: 15px;
+    font-size: 17px;
+  }
+
+  .routine-qa-answer {
+    font-size: 14px;
+    line-height: 1.58;
+  }
+
+  .routine-qa-controls {
+    padding: 10px 17px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .routine-qa-track {
+    transition: none;
+  }
+}
