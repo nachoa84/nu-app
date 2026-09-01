@@ -67,7 +67,14 @@
         <div class="foco-live-image-card">
           <img src="assets/custom/foco-live-card.png" alt="Foco en vivo" />
         </div>
-        <a class="foco-live-join" href="${YOUTUBE_URL}" target="_blank" rel="noopener noreferrer">Ver en vivo</a>
+        <a class="foco-live-join" href="${YOUTUBE_URL}" target="_blank" rel="noopener noreferrer">
+          <svg class="foco-live-join-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle class="foco-live-dot" cx="12" cy="12" r="2.7"></circle>
+            <path d="M7.8 8.2a5.4 5.4 0 0 0 0 7.6M16.2 8.2a5.4 5.4 0 0 1 0 7.6"></path>
+            <path d="M4.8 5.2a9.6 9.6 0 0 0 0 13.6M19.2 5.2a9.6 9.6 0 0 1 0 13.6"></path>
+          </svg>
+          <span>Ver en vivo</span>
+        </a>
       </section>
     `;
 
