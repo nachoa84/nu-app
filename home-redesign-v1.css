@@ -35,10 +35,18 @@
     var(--home-white);
 }
 
-/* En mobile, el fondo de la app también cubre el área segura superior. */
+/* El área segura superior continúa el mismo degradado del Home.
+   Evita una franja sólida independiente en iPhone sin alterar
+   la barra de estado ni el layout del contenido. */
 @media (max-width: 599px) {
   body[data-active-view="hoy"] {
-    background: #00a7c8;
+    background:
+      radial-gradient(
+        ellipse 72% 170px at 0 0,
+        rgb(0 167 200 / 82%),
+        transparent 76%
+      ),
+      #ffffff;
   }
 }
 
