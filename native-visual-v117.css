@@ -9,7 +9,7 @@
 
 :root {
   --native-nav-gap-v117: 10px;
-  --routine-card-height: 230px;
+  --routine-card-height: 252px;
 }
 
 body,
@@ -134,12 +134,41 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 /* =========================================================
-   Rutinas · cards canónicas
+   Rutinas · composición global
    ========================================================= */
 
 #view-hoy.day-open .native-day-content {
   padding-bottom:
-    calc(var(--nav-height) + var(--native-nav-gap-v117) + var(--safe-bottom) + 112px);
+    calc(var(--nav-height) + var(--native-nav-gap-v117) + var(--safe-bottom) + 34px);
+}
+
+/* Banner de producto más compacto para que el contenido gane pantalla. */
+#view-hoy.day-open .native-day-hero {
+  min-height: 136px !important;
+  padding: 14px 15px 14px !important;
+  border-radius: 20px !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy h2 {
+  margin-bottom: 6px !important;
+  font-size: 29px !important;
+}
+
+#view-hoy.day-open .native-day-hero-media {
+  top: 22px !important;
+  right: 15px !important;
+  width: 50px !important;
+  height: 60px !important;
+}
+
+#view-hoy.day-open .native-day-progress-row {
+  left: 15px !important;
+  bottom: 24px !important;
+}
+
+#view-hoy.day-open .routine-content-heading {
+  margin-top: 24px !important;
+  margin-bottom: 14px !important;
 }
 
 #view-hoy.day-open .routine-content-slide {
@@ -163,11 +192,11 @@ body.is-scrolled #view-bot .app-page-header h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 18px 22px;
+  padding: 22px 24px;
   border: 1px solid #dde3eb;
   border-radius: 11px;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(23, 32, 59, .05) !important;
+  box-shadow: 0 5px 16px rgba(23, 32, 59, .045) !important;
   overflow: hidden;
 }
 
@@ -176,7 +205,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 9px;
+  gap: 10px;
   margin-block: auto;
 }
 
@@ -196,7 +225,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
   color: #17203b;
   font-size: 15px;
   font-weight: 400 !important;
-  line-height: 1.56;
+  line-height: 1.58;
   letter-spacing: 0;
   text-transform: none;
   white-space: normal;
@@ -208,24 +237,31 @@ body.is-scrolled #view-bot .app-page-header h1 {
   color: #28334c;
 }
 
+/* Q&A: misma familia visual, pero con jerarquía pregunta/respuesta más clara. */
 #view-hoy.day-open .routine-content-card.is-qa {
   justify-content: flex-start;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 20px 22px;
+  background: #fdfcfe;
 }
 
 #view-hoy.day-open .routine-content-card.is-qa .routine-flat-copy {
   justify-content: flex-start;
-  gap: 6px;
+  gap: 9px;
   margin-block: 0;
 }
 
-#view-hoy.day-open .routine-content-card.is-qa .routine-card-heading,
+#view-hoy.day-open .routine-content-card.is-qa .routine-card-heading {
+  color: #17203b;
+  font-size: 14.2px;
+  font-weight: 650 !important;
+  line-height: 1.42;
+}
+
 #view-hoy.day-open .routine-content-card.is-qa .native-detail-paragraph,
 #view-hoy.day-open .routine-content-card.is-qa .native-detail-label,
 #view-hoy.day-open .routine-content-card.is-qa .native-check-item {
-  font-size: 13.2px;
-  line-height: 1.44;
+  font-size: 13.8px;
+  line-height: 1.5;
 }
 
 #view-hoy.day-open .native-check-item {
@@ -251,7 +287,7 @@ body.is-scrolled #view-bot .app-page-header h1 {
 #view-hoy.day-open .resource-links {
   display: grid;
   gap: 7px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 #view-hoy.day-open .resource-link-row {
@@ -333,14 +369,14 @@ body.is-scrolled #view-bot .app-page-header h1 {
   content: none !important;
 }
 
-/* Navegación explícita: flechas + puntos. */
+/* Navegación explícita: más liviana y mejor separada de materiales. */
 #view-hoy.day-open .routine-content-controls {
   display: grid;
-  grid-template-columns: 38px minmax(0, auto) 38px;
+  grid-template-columns: 34px minmax(0, auto) 34px;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin: 10px 0 14px;
+  gap: 9px;
+  margin: 14px 0 22px;
 }
 
 #view-hoy.day-open .routine-content-controls .routine-content-dots {
@@ -348,38 +384,38 @@ body.is-scrolled #view-bot .app-page-header h1 {
 }
 
 #view-hoy.day-open .routine-content-arrow {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid #e1e6ee;
+  border: 1px solid #e5e9ef;
   border-radius: 50%;
-  background: #fff;
+  background: rgba(255,255,255,.94);
   color: #17203b;
   font-family: Poppins, sans-serif;
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 1;
-  box-shadow: 0 3px 10px rgba(23, 32, 59, .05);
+  box-shadow: 0 2px 7px rgba(23, 32, 59, .035);
   touch-action: manipulation;
 }
 
 #view-hoy.day-open .routine-content-arrow:disabled {
-  opacity: .28;
+  opacity: .22;
   box-shadow: none;
 }
 
 #view-hoy.day-open .routine-content-dots {
-  margin-top: 12px;
-  margin-bottom: 14px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 #view-hoy.day-open .routine-content-dot {
   touch-action: manipulation;
 }
 
-/* Materiales: sin contadores y con aire lateral real. */
+/* Materiales: más aire entre título, explicación y recursos. */
 #view-hoy.day-open .materials-section .section-count,
 #view-hoy.day-open .materials-section .resource-order {
   display: none !important;
@@ -387,34 +423,68 @@ body.is-scrolled #view-bot .app-page-header h1 {
 
 #view-hoy.day-open .materials-section {
   overflow: visible;
+  margin-top: 4px !important;
+}
+
+#view-hoy.day-open .materials-section .native-section-heading {
+  margin: 0 2px 20px !important;
+}
+
+#view-hoy.day-open .materials-section .native-section-heading h3 {
+  margin-bottom: 0 !important;
+}
+
+#view-hoy.day-open .materials-section .materials-intro {
+  max-width: 620px;
+  margin: 9px 0 0 !important;
+  color: #657086;
+  line-height: 1.5;
 }
 
 #view-hoy.day-open .materials-section .resource-sequence {
   box-sizing: border-box;
   margin-left: 0 !important;
   margin-right: 0 !important;
-  padding-left: 16px !important;
-  padding-right: 20px !important;
-  scroll-padding-left: 16px;
-  scroll-padding-right: 20px;
-  gap: 14px;
+  padding-left: 18px !important;
+  padding-right: 24px !important;
+  scroll-padding-left: 18px;
+  scroll-padding-right: 24px;
+  gap: 16px !important;
 }
 
 #view-hoy.day-open .materials-section .resource-row:first-child {
   margin-left: 0 !important;
 }
 
+#view-hoy.day-open .materials-section .resource-copy {
+  gap: 3px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy strong {
+  line-height: 1.3 !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy span {
+  color: #7a8395 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+
 @media (min-width: 600px) {
   #view-hoy.day-open .routine-flat-copy {
-    width: min(92%, 480px);
+    width: min(90%, 500px);
     margin-inline: auto;
+  }
+
+  #view-hoy.day-open .native-day-hero {
+    min-height: 140px !important;
   }
 }
 
 @media (max-width: 370px) {
   :root {
     --native-nav-gap-v117: 8px;
-    --routine-card-height: 220px;
+    --routine-card-height: 238px;
   }
 
   .bottom-nav {
@@ -426,24 +496,47 @@ body.is-scrolled #view-bot .app-page-header h1 {
     font-size: 22px;
   }
 
+  #view-hoy.day-open .native-day-hero {
+    min-height: 128px !important;
+    padding: 13px 13px 12px !important;
+  }
+
+  #view-hoy.day-open .native-day-hero-media {
+    top: 20px !important;
+    right: 12px !important;
+    width: 46px !important;
+    height: 56px !important;
+  }
+
+  #view-hoy.day-open .native-day-progress-row {
+    left: 13px !important;
+    bottom: 21px !important;
+  }
+
   #view-hoy.day-open .routine-content-card {
-    padding-left: 17px;
-    padding-right: 17px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
   #view-hoy.day-open .routine-content-controls {
-    grid-template-columns: 34px minmax(0, auto) 34px;
-    gap: 8px;
+    grid-template-columns: 32px minmax(0, auto) 32px;
+    gap: 7px;
+    margin-bottom: 20px;
   }
 
   #view-hoy.day-open .routine-content-arrow {
-    width: 32px;
-    height: 32px;
-    font-size: 22px;
+    width: 30px;
+    height: 30px;
+    font-size: 21px;
+  }
+
+  #view-hoy.day-open .materials-section .native-section-heading {
+    margin-bottom: 17px !important;
   }
 
   #view-hoy.day-open .materials-section .resource-sequence {
-    padding-left: 14px !important;
-    padding-right: 16px !important;
+    padding-left: 15px !important;
+    padding-right: 18px !important;
+    gap: 14px !important;
   }
 }
