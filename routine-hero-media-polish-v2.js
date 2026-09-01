@@ -6,7 +6,7 @@
 
   const FINAL_LAYOUT_VERSION = "20260901-layout-v6";
   const COMPLETION_STYLE_VERSION = "20260901-completion-v1";
-  const COPY_CLEANUP_VERSION = "20260901-copy-v1";
+  const COPY_CLEANUP_VERSION = "20260901-copy-v2";
 
   function syncLayoutVersion() {
     const link = document.getElementById("nu-routine-layout-final-v1");
