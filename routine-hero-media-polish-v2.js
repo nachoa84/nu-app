@@ -4,7 +4,7 @@
 (() => {
   "use strict";
 
-  const FINAL_LAYOUT_VERSION = "20260901-layout-v5";
+  const FINAL_LAYOUT_VERSION = "20260901-layout-v6";
 
   function syncLayoutVersion() {
     const link = document.getElementById("nu-routine-layout-final-v1");
