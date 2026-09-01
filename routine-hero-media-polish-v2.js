@@ -15,6 +15,12 @@
     if (currentHref !== nextHref) link.setAttribute("href", nextHref);
   }
 
+  function cleanCompletedState() {
+    document
+      .querySelectorAll("#view-hoy .complete-card.done .complete-done-copy p")
+      .forEach(node => node.remove());
+  }
+
   function syncRoutineTheme() {
     const view = document.getElementById("view-hoy");
     if (!view) return;
@@ -28,6 +34,7 @@
 
     view.dataset.routineId = routineId;
     syncLayoutVersion();
+    cleanCompletedState();
   }
 
   let queued = false;
