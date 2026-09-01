@@ -236,6 +236,134 @@ body:has(#view-hoy.day-open) #app {
   color: #848b99 !important;
 }
 
+/* Completion action · aligned with the app's current button language. */
+#view-hoy.day-open .complete-card:not(.done) {
+  min-height: 0 !important;
+  display: grid !important;
+  gap: 8px !important;
+  margin-top: 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .complete-day-btn {
+  width: 100% !important;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 18px !important;
+  border: 1px solid rgba(23,32,59,.08) !important;
+  border-radius: 16px !important;
+  background: #17203b !important;
+  color: #fff !important;
+  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.01em !important;
+  box-shadow: 0 5px 14px rgba(23,32,59,.08) !important;
+}
+
+#view-hoy.day-open .complete-day-btn .complete-action-check {
+  width: 18px !important;
+  height: 18px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+#view-hoy.day-open .complete-day-btn .complete-action-check svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+#view-hoy.day-open .complete-day-btn > span:last-child {
+  font-size: 0 !important;
+}
+
+#view-hoy.day-open .complete-day-btn > span:last-child::after {
+  content: "Marcar como hecho";
+  font-size: 14px;
+}
+
+#view-hoy.day-open .complete-helper {
+  margin-top: 0 !important;
+  color: #8a91a0 !important;
+  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+}
+
+/* Completed state is confirmation, not a disabled-looking button. */
+#view-hoy.day-open .complete-card.done {
+  min-height: 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-top: 18px !important;
+  padding: 14px 16px !important;
+  border: 1px solid #e4e8ee !important;
+  border-radius: 17px !important;
+  background: #f7f8fa !important;
+  color: #17203b !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .complete-done-copy h3 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  color: #17203b !important;
+  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+}
+
+#view-hoy.day-open .complete-done-copy h3 > span:last-child {
+  font-size: 0 !important;
+}
+
+#view-hoy.day-open .complete-done-copy h3 > span:last-child::after {
+  content: "Día completado";
+  font-size: 14px;
+}
+
+#view-hoy.day-open .complete-done-inline-check {
+  width: 24px !important;
+  height: 24px !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 24px !important;
+  border-radius: 50% !important;
+  background: #e7f5ee !important;
+  color: #39745b !important;
+}
+
+#view-hoy.day-open .complete-done-inline-check svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+#view-hoy.day-open .complete-done-copy p {
+  display: block !important;
+  margin: 4px 0 0 32px !important;
+  color: #7c8494 !important;
+  font-family: Poppins, Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  font-size: 0 !important;
+}
+
+#view-hoy.day-open .complete-done-copy p::after {
+  content: "Tu avance quedó registrado.";
+  font-size: 10.5px;
+}
+
 /* Compact the lower actions so the routine closes cleanly before the floating nav. */
 #view-hoy.day-open .training-card {
   min-height: 60px !important;
@@ -246,17 +374,6 @@ body:has(#view-hoy.day-open) #app {
 
 #view-hoy.day-open .training-card-open {
   min-height: 44px !important;
-}
-
-#view-hoy.day-open .complete-card,
-#view-hoy.day-open .complete-card.done {
-  min-height: 82px !important;
-  margin-top: 18px !important;
-  padding: 14px 18px !important;
-}
-
-#view-hoy.day-open .complete-day-btn {
-  min-height: 48px !important;
 }
 
 #view-hoy.day-open .native-day-progress-button {
@@ -332,5 +449,15 @@ body:has(#view-hoy.day-open) #app {
     padding-left: 16px !important;
     padding-right: 20px !important;
     gap: 16px !important;
+  }
+
+  #view-hoy.day-open .complete-day-btn {
+    min-height: 48px !important;
+    border-radius: 15px !important;
+    font-size: 13.5px !important;
+  }
+
+  #view-hoy.day-open .complete-day-btn > span:last-child::after {
+    font-size: 13.5px;
   }
 }
