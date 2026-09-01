@@ -5,7 +5,7 @@
   "description": "Nu App PWA con backend Node, PostgreSQL y Web Push",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node release-entrypoint.js",
     "dev": "node server.js",
     "test:v111": "node --test tests/notification-delivery-v111.test.js",
     "test:v113": "node --test tests/runtime-hardening-v113.test.js",
