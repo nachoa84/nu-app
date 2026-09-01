@@ -133,7 +133,10 @@ function assertSafeProductionEnvironment(env = process.env) {
   const forbiddenTrueFlags = [
     "ENABLE_ADMIN_TEST_ROUTES",
     "ENABLE_DEMO_ROUTES",
-    "IRIS_AI_CONTROLLED_EXECUTION"
+    "IRIS_AI_CONTROLLED_EXECUTION",
+    "PILOT_ENABLED",
+    "PILOT_ADMIN_ROUTES_ENABLED",
+    "IRIS_AI_PILOT_ENABLED"
   ];
 
   const enabledUnsafe = forbiddenTrueFlags.filter(name => trueFlag(env[name]));
