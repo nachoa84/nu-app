@@ -21,77 +21,11 @@
   color: var(--progress-ink);
 }
 
-/* Encabezado */
+/* Encabezado de Progreso retirado del diseño.
+   Se conserva en el DOM para no alterar la lógica existente,
+   pero no ocupa espacio visual. */
 #view-rutina .routine-page-header {
-  position: relative;
-  top: auto;
-  z-index: 2;
-  min-height: 136px;
-  display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
-  align-items: start;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 0;
-  padding: 12px 0 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-#view-rutina .routine-page-header > div {
-  min-width: 0;
-  padding-top: 7px;
-  text-align: right;
-}
-
-#view-rutina .routine-page-header .page-kicker {
-  display: block;
-  margin: 0 0 2px;
-  color: var(--progress-muted);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: .11em;
-  text-transform: uppercase;
-}
-
-#view-rutina .routine-page-header h1 {
-  margin: 0;
-  color: var(--progress-ink);
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -.055em;
-}
-
-#view-rutina .routine-back-btn {
-  width: 58px;
-  min-width: 58px;
-  height: 58px;
-  min-height: 58px;
-  display: grid;
-  place-items: center;
-  align-self: start;
-  margin-top: 2px;
-  border: 0;
-  border-radius: 50%;
-  background: #ffffff;
-  color: var(--progress-ink);
-  box-shadow: 0 9px 24px rgba(46, 29, 87, .08);
-}
-
-#view-rutina .routine-back-btn svg {
-  width: 25px;
-  height: 25px;
-  stroke-width: 2.8;
-}
-
-#view-rutina .routine-back-btn:active {
-  transform: scale(.96);
-  background: #ffffff;
+  display: none !important;
 }
 
 /* Contenido */
@@ -103,7 +37,7 @@
 
 /* Resumen */
 #view-rutina .app-progress-card {
-  margin-top: 4px;
+  margin-top: 14px;
   padding: 0;
   border: 0;
   border-radius: 0;
