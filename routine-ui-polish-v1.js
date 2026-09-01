@@ -11,7 +11,7 @@
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";
-    link.href = "routine-layout-final-v1.css?v=20260901-layout-v2";
+    link.href = "routine-layout-final-v1.css?v=20260901-layout-v3";
     document.head.appendChild(link);
   }
 
@@ -27,12 +27,12 @@
   }
 
   function ensureRoutineHeroMediaModule() {
-    const id = "nu-routine-hero-media-polish-script-v1";
+    const id = "nu-routine-hero-media-polish-script-v2";
     if (document.getElementById(id)) return;
 
     const script = document.createElement("script");
     script.id = id;
-    script.src = "routine-hero-media-polish-v1.js?v=20260901-hero-v1";
+    script.src = "routine-hero-media-polish-v2.js?v=20260901-hero-v2";
     script.defer = true;
     document.head.appendChild(script);
   }
