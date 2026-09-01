@@ -1,4 +1,4 @@
-const CACHE="nuapp-v166-routine-text-balanced";
+const CACHE="nuapp-v167-api-network-only";
 
 const CORE=[
   "./",
@@ -299,6 +299,18 @@ self.addEventListener("fetch",event=>{
 
   if(req.method!=="GET") return;
 
+  const requestUrl = new URL(req.url);
+  const isSameOriginApi =
+    requestUrl.origin === self.location.origin &&
+    requestUrl.pathname.startsWith("/api/");
+
+  // El estado del usuario, progreso, configuración y demás respuestas API
+  // siempre vienen del servidor. Nunca deben persistirse en Cache Storage.
+  if (isSameOriginApi) {
+    event.respondWith(fetch(req, { cache: "no-store" }));
+    return;
+  }
+
   if(req.headers.has("range")){
     event.respondWith(
       handleRangeRequest(req)
@@ -334,7 +346,6 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  const requestUrl = new URL(req.url);
   const isCurrentCodeAsset =
     requestUrl.origin === self.location.origin &&
     /\.(css|js)$/i.test(requestUrl.pathname);
