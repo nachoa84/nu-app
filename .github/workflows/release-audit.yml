@@ -1,0 +1,43 @@
+name: Nu App release audit
+
+on:
+  push:
+    branches:
+      - visual/claude-final-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Check JavaScript syntax
+        run: |
+          find . -maxdepth 1 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+          node --check scripts/release-static-audit.js
+
+      - name: Audit static release references
+        run: node scripts/release-static-audit.js
+
+      - name: Run release unit tests
+        shell: bash
+        run: |
+          mapfile -t TESTS < <(find tests -maxdepth 1 -type f -name '*.test.js' ! -name '*.integration.test.js' | sort)
+          node --test "${TESTS[@]}" \
+            pilot-crypto-v0.test.js \
+            pilot-identity-routes-v0.test.js \
+            pilot-identity-server-v0.test.js \
+            pilot-identity-store-v0.test.js
