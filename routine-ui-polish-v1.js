@@ -15,6 +15,17 @@
     document.head.appendChild(link);
   }
 
+  function ensureRoutineQaModule() {
+    const id = "nu-routine-qa-modal-script-v1";
+    if (document.getElementById(id)) return;
+
+    const script = document.createElement("script");
+    script.id = id;
+    script.src = "routine-qa-modal-v1.js?v=20260901-qa-v1";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function installRoutineTextPolish() {
     if (
       typeof normalizeRoutineText !== "function" ||
@@ -186,6 +197,7 @@
 
   function applyRoutineUiPolish() {
     ensureRoutineLayoutStyles();
+    ensureRoutineQaModule();
     installRoutineTextPolish();
     ensureRoutineCarouselControls();
     polishRoutineMaterials();
