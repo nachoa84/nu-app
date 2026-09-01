@@ -1132,7 +1132,7 @@
 
         removeOverlay();
         renderProfileUI();
-      }, 2900);
+      }, 4100);
     }
 
     function bindStepEvents() {

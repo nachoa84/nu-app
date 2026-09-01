@@ -387,17 +387,17 @@ body.onboarding-open {
 
 /* Indicadores */
 .onboarding-step-indicator {
-  height: 6px;
+  height: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin: 40px auto 0;
+  gap: 10px;
+  margin: 36px auto 0;
 }
 
 .onboarding-step-indicator span {
-  width: 24px;
-  height: 5px;
+  width: 18px;
+  height: 4px;
   display: block;
   border-radius: 999px;
   background: #e3e2e9;
@@ -546,8 +546,8 @@ body.onboarding-open {
       #f34a12 0deg,
       #e95024 95deg,
       #bb4147 185deg,
-      #8d365e 334deg,
-      transparent 334deg 360deg
+      #8d365e 358deg,
+      transparent 358deg 360deg
     );
 
   -webkit-mask:
@@ -565,7 +565,7 @@ body.onboarding-open {
     );
 
   animation:
-    preparing-orbit 1.72s cubic-bezier(.42,.08,.24,1) forwards;
+    preparing-orbit 2.18s cubic-bezier(.42,.08,.24,1) forwards;
 }
 
 /* círculo completo que aparece al cerrarse */
@@ -602,7 +602,7 @@ body.onboarding-open {
   opacity: 0;
 
   animation:
-    preparing-close .68s cubic-bezier(.22,1.28,.36,1) 1.58s forwards;
+    preparing-close .88s cubic-bezier(.22,1.28,.36,1) 2.02s forwards;
 }
 
 @keyframes preparing-orbit {
@@ -611,32 +611,32 @@ body.onboarding-open {
   }
 
   34% {
-    transform: rotate(560deg) scale(.98);
+    transform: rotate(720deg) scale(.98);
   }
 
   74% {
-    transform: rotate(1120deg) scale(1);
+    transform: rotate(1380deg) scale(1);
   }
 
   100% {
-    transform: rotate(1500deg) scale(.97);
-    opacity: .22;
+    transform: rotate(1860deg) scale(.98);
+    opacity: .16;
   }
 }
 
 @keyframes preparing-close {
   0% {
     opacity: 0;
-    transform: scale(.86);
+    transform: scale(.82);
   }
 
-  36% {
+  34% {
     opacity: 1;
-    transform: scale(1.14);
+    transform: scale(1.18);
   }
 
-  66% {
-    transform: scale(.90);
+  64% {
+    transform: scale(.86);
   }
 
   100% {
@@ -656,15 +656,15 @@ body.onboarding-open {
 
 .preparing-sparks i {
   --x: 0px;
-  --y: -52px;
+  --y: -70px;
   --r: 0deg;
 
   position: absolute;
   left: 50%;
   top: 50%;
 
-  width: 7px;
-  height: 3px;
+  width: 9px;
+  height: 4px;
 
   margin-left: -3px;
   margin-top: -2px;
@@ -686,75 +686,75 @@ body.onboarding-open {
     scale(.2);
 
   animation:
-    preparing-splash .82s
+    preparing-splash 1.08s
     cubic-bezier(.15,.7,.2,1)
-    2.02s
+    2.58s
     forwards;
 }
 
 .preparing-sparks i:nth-child(1) {
-  --x: 3px;
-  --y: -62px;
+  --x: 4px;
+  --y: -86px;
   --r: -78deg;
 }
 
 .preparing-sparks i:nth-child(2) {
-  --x: 35px;
-  --y: -52px;
+  --x: 50px;
+  --y: -72px;
   --r: -42deg;
 }
 
 .preparing-sparks i:nth-child(3) {
-  --x: 57px;
-  --y: -26px;
+  --x: 78px;
+  --y: -34px;
   --r: -18deg;
 }
 
 .preparing-sparks i:nth-child(4) {
-  --x: 62px;
-  --y: 10px;
+  --x: 84px;
+  --y: 14px;
   --r: 15deg;
 }
 
 .preparing-sparks i:nth-child(5) {
-  --x: 42px;
-  --y: 48px;
+  --x: 58px;
+  --y: 70px;
   --r: 46deg;
 }
 
 .preparing-sparks i:nth-child(6) {
   --x: -2px;
-  --y: 63px;
+  --y: 88px;
   --r: 84deg;
 }
 
 .preparing-sparks i:nth-child(7) {
-  --x: -43px;
-  --y: 48px;
+  --x: -58px;
+  --y: 70px;
   --r: 128deg;
 }
 
 .preparing-sparks i:nth-child(8) {
-  --x: -63px;
-  --y: 12px;
+  --x: -86px;
+  --y: 16px;
   --r: 164deg;
 }
 
 .preparing-sparks i:nth-child(9) {
-  --x: -55px;
-  --y: -31px;
+  --x: -76px;
+  --y: -42px;
   --r: 204deg;
 }
 
 .preparing-sparks i:nth-child(10) {
-  --x: -31px;
-  --y: -56px;
+  --x: -44px;
+  --y: -78px;
   --r: 238deg;
 }
 
 .preparing-sparks i:nth-child(3n) {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
 }
 
@@ -787,24 +787,26 @@ body.onboarding-open {
         calc(-50% + var(--y))
       )
       rotate(var(--r))
-      scale(1.30);
+      scale(1.60);
   }
 }
 
 .onboarding-preparing h2 {
-  max-width: 310px;
+  max-width: 320px;
   margin: 0;
   color: var(--ob-ink);
   font-size: 27px;
   font-weight: 700;
-  line-height: 1.13;
+  line-height: 1.16;
   letter-spacing: -.035em;
 }
 
 .onboarding-preparing p {
-  margin: 18px 0 0;
+  max-width: 290px;
+  margin: 28px 0 0;
   color: var(--ob-muted);
   font-size: 16px;
+  line-height: 1.6;
 }
 
 .preparing-shape {
