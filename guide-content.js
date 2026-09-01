@@ -100,11 +100,6 @@ const GUIDE_STEPS = [
     ],
     resources: [
       {
-        title: "Activá tu asistente virtual / BOT",
-        url: "https://www.skool.com/teamelites/classroom/92e166e7?md=34d59c28aa45443ab93b064241ae3533",
-        type: "tool"
-      },
-      {
         title: "Cómo contestar tus primeras consultas",
         url: "https://www.skool.com/teamelites/classroom/92e166e7?md=517402404ced4c2b89c7d4bd342fecbf",
         type: "guide"
