@@ -12,7 +12,7 @@
     const link = document.createElement("link");
     link.id = STYLE_ID;
     link.rel = "stylesheet";
-    link.href = "routine-qa-modal-v1.css?v=20260901-qa-v1";
+    link.href = "routine-qa-modal-v1.css?v=20260901-qa-v2";
     document.head.appendChild(link);
   }
 
@@ -122,12 +122,10 @@
   }
 
   function splitQuestionLine(rawLine) {
-    let line = stripDecorations(rawLine);
+    const line = stripDecorations(rawLine);
     if (!line || /^q\s*&\s*a\b/i.test(line) || /^preguntas\s+frecuentes$/i.test(line)) return null;
 
-    if (/^engorda$/i.test(line)) {
-      return { question: "¿Engorda?", remainder: "" };
-    }
+    if (/^engorda$/i.test(line)) return { question: "¿Engorda?", remainder: "" };
 
     const hasQuestion = line.includes("?");
     const looksImportedQuestion = /^(?:es|tiene|hay|pueden)\b/i.test(line) && hasQuestion;
@@ -136,16 +134,16 @@
     let end = -1;
     if (line.startsWith("¿")) {
       const openings = (line.match(/¿/g) || []).length;
-      if (openings > 1) end = line.lastIndexOf("?");
-      else end = line.indexOf("?");
+      end = openings > 1 ? line.lastIndexOf("?") : line.indexOf("?");
     } else {
       end = line.indexOf("?");
     }
     if (end < 0) return null;
 
-    const question = cleanQuestion(line.slice(0, end + 1));
-    const remainder = line.slice(end + 1).replace(/^[\s\-–—:]+/, "").trim();
-    return { question, remainder };
+    return {
+      question: cleanQuestion(line.slice(0, end + 1)),
+      remainder: line.slice(end + 1).replace(/^[\s\-–—:]+/, "").trim()
+    };
   }
 
   function parseQaBlock(block) {
@@ -190,12 +188,16 @@
     });
 
     flush();
+
     if (pairs.length && Array.isArray(block?.links) && block.links.length) {
-      pairs[pairs.length - 1].links = block.links.map(link => ({
-        label: String(link.label || link.url || "Abrir recurso"),
-        url: String(link.url || "")
-      })).filter(link => link.url);
+      pairs[pairs.length - 1].links = block.links
+        .map(link => ({
+          label: String(link.label || link.url || "Abrir recurso"),
+          url: String(link.url || "")
+        }))
+        .filter(link => link.url);
     }
+
     return pairs;
   }
 
@@ -219,8 +221,7 @@
 
   function pairNeedle(value, fromEnd = false) {
     const words = keyText(value).split(" ").filter(Boolean);
-    const chosen = fromEnd ? words.slice(-6) : words.slice(0, 6);
-    return chosen.join(" ");
+    return (fromEnd ? words.slice(-6) : words.slice(0, 6)).join(" ");
   }
 
   function ensureModal() {
@@ -249,12 +250,12 @@
     `;
     document.body.appendChild(modal);
 
-    const close = () => closeModal();
-    modal.querySelector(".routine-qa-backdrop")?.addEventListener("click", close);
-    modal.querySelector(".routine-qa-close")?.addEventListener("click", close);
+    modal.querySelector(".routine-qa-backdrop")?.addEventListener("click", closeModal);
+    modal.querySelector(".routine-qa-close")?.addEventListener("click", closeModal);
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && !modal.hidden) closeModal();
     });
+
     return modal;
   }
 
@@ -265,6 +266,7 @@
   function renderModalIndex(index) {
     const modal = ensureModal();
     activeIndex = Math.max(0, Math.min(activePairs.length - 1, index));
+
     const track = modal.querySelector(".routine-qa-track");
     const dots = Array.from(modal.querySelectorAll(".routine-qa-dot"));
     const counter = modal.querySelector(".routine-qa-counter");
@@ -294,6 +296,7 @@
     const next = modal.querySelector(".routine-qa-next");
 
     if (context) context.textContent = `${data.routineTitle} · Día ${data.day}`;
+
     if (track) {
       track.innerHTML = "";
       data.pairs.forEach((pair, index) => {
@@ -301,16 +304,13 @@
         slide.className = "routine-qa-slide";
         slide.setAttribute("aria-label", `Pregunta ${index + 1} de ${data.pairs.length}`);
 
-        const number = document.createElement("span");
-        number.className = "routine-qa-slide-number";
-        number.textContent = `Pregunta ${index + 1}`;
-
         const question = document.createElement("h3");
         question.className = "routine-qa-question";
         question.textContent = pair.question;
 
         const answerWrap = document.createElement("div");
         answerWrap.className = "routine-qa-answer-wrap";
+
         const answer = document.createElement("p");
         answer.className = "routine-qa-answer";
         answer.textContent = pair.answer;
@@ -331,7 +331,7 @@
           answerWrap.appendChild(links);
         }
 
-        slide.append(number, question, answerWrap);
+        slide.append(question, answerWrap);
         track.appendChild(slide);
       });
     }
@@ -376,34 +376,23 @@
   function closeModal() {
     const modal = document.getElementById(MODAL_ID);
     if (!modal || modal.hidden) return;
+
     modal.hidden = true;
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("routine-qa-open");
     activePairs = [];
     activeIndex = 0;
+
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
     lastFocus = null;
   }
 
-  function prepareQaCarousel() {
-    ensureStyles();
-    const data = currentQaData();
-    if (!data) return;
-
-    const carousel = document.querySelector("#view-hoy .routine-content-carousel");
-    if (!carousel) return;
-    const key = `${data.routineId}:${data.day}:${data.pairs.length}`;
-    if (carousel.dataset.qaModalPrepared === key) return;
-
-    const track = carousel.querySelector(".routine-content-track");
-    const dots = carousel.querySelector(".routine-content-dots");
-    const slides = track ? Array.from(track.querySelectorAll(".routine-content-slide")) : [];
-    if (!track || !slides.length || !dots) return;
-
+  function fallbackQaIndexes(slides, data) {
     const firstNeedle = pairNeedle(data.pairs[0].question);
     const lastNeedle = pairNeedle(data.pairs[data.pairs.length - 1].answer, true);
     let firstIndex = slides.findIndex(slide => keyText(slide.textContent).includes(firstNeedle));
     let lastIndex = -1;
+
     for (let index = slides.length - 1; index >= 0; index -= 1) {
       if (keyText(slides[index].textContent).includes(lastNeedle)) {
         lastIndex = index;
@@ -415,6 +404,7 @@
       const fallbackNeedle = pairNeedle(data.pairs[0].answer);
       firstIndex = slides.findIndex(slide => keyText(slide.textContent).includes(fallbackNeedle));
     }
+
     if (lastIndex < firstIndex) {
       const lastQuestionNeedle = pairNeedle(data.pairs[data.pairs.length - 1].question);
       for (let index = slides.length - 1; index >= firstIndex; index -= 1) {
@@ -424,11 +414,71 @@
         }
       }
     }
-    if (firstIndex < 0 || lastIndex < firstIndex) return;
 
-    const dotButtons = Array.from(dots.querySelectorAll(".routine-content-dot"));
+    if (firstIndex < 0 || lastIndex < firstIndex) return [];
+    return Array.from({ length: lastIndex - firstIndex + 1 }, (_, offset) => firstIndex + offset);
+  }
+
+  function rebuildMainDots(track, dots) {
+    const slides = Array.from(track.querySelectorAll(".routine-content-slide"));
+    if (!slides.length) return;
+
+    dots.innerHTML = "";
+    slides.forEach((_, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "routine-content-dot";
+      dot.setAttribute("aria-label", `Ver contenido ${index + 1}`);
+      dot.addEventListener("click", () => {
+        track.scrollTo({ left: track.clientWidth * index, behavior: "smooth" });
+      });
+      dots.appendChild(dot);
+    });
+
+    const setActive = () => {
+      const index = Math.max(0, Math.min(
+        slides.length - 1,
+        Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
+      ));
+      dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
+        dot.classList.toggle("is-active", dotIndex === index);
+        dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
+      });
+    };
+
+    if (!track.dataset.qaDotsScrollReady) {
+      track.dataset.qaDotsScrollReady = "true";
+      track.addEventListener("scroll", setActive, { passive: true });
+    }
+    setActive();
+  }
+
+  function prepareQaCarousel() {
+    ensureStyles();
+    const data = currentQaData();
+    if (!data) return;
+
+    const carousel = document.querySelector("#view-hoy .routine-content-carousel");
+    if (!carousel) return;
+
+    const key = `${data.routineId}:${data.day}:${data.pairs.length}`;
+    if (carousel.dataset.qaModalPrepared === key) return;
+
+    const track = carousel.querySelector(".routine-content-track");
+    const dots = carousel.querySelector(".routine-content-dots");
+    const slides = track ? Array.from(track.querySelectorAll(".routine-content-slide")) : [];
+    if (!track || !slides.length || !dots) return;
+
+    let qaIndexes = slides
+      .map((slide, index) => slide.querySelector(".routine-content-card.is-qa") ? index : -1)
+      .filter(index => index >= 0);
+
+    if (!qaIndexes.length) qaIndexes = fallbackQaIndexes(slides, data);
+    if (!qaIndexes.length) return;
+
+    const firstIndex = qaIndexes[0];
     const firstSlide = slides[firstIndex];
-    const firstCard = firstSlide.querySelector(".routine-content-card");
+    const firstCard = firstSlide?.querySelector(".routine-content-card");
     if (!firstCard) return;
 
     firstCard.classList.remove("is-qa", "is-standard-copy", "is-short-copy", "is-long-copy");
@@ -437,28 +487,35 @@
 
     const copy = document.createElement("div");
     copy.className = "routine-qa-launch-copy";
+
     const kicker = document.createElement("span");
     kicker.className = "routine-qa-launch-kicker";
     kicker.textContent = "Preguntas frecuentes";
+
     const title = document.createElement("h3");
     title.textContent = `Q&A · ${data.pairs.length} preguntas`;
+
     const description = document.createElement("p");
     description.textContent = "Revisá una pregunta y su respuesta por vez.";
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "routine-qa-launch-button";
     button.textContent = "Ver preguntas";
     button.addEventListener("click", () => openModal(data, button));
+
     copy.append(kicker, title, description, button);
     firstCard.appendChild(copy);
 
-    for (let index = lastIndex; index > firstIndex; index -= 1) {
-      slides[index]?.remove();
-      dotButtons[index]?.remove();
-    }
+    qaIndexes
+      .slice(1)
+      .sort((a, b) => b - a)
+      .forEach(index => slides[index]?.remove());
 
     const controls = carousel.querySelector(".routine-content-controls");
     if (controls && controls.contains(dots)) controls.replaceWith(dots);
+
+    rebuildMainDots(track, dots);
     carousel.dataset.controlsReady = "false";
     carousel.dataset.qaModalPrepared = key;
 
@@ -469,8 +526,16 @@
 
   const root = document.getElementById("view-hoy") || document.body;
   const observer = new MutationObserver(() => requestAnimationFrame(prepareQaCarousel));
-  observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+  observer.observe(root, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"]
+  });
 
-  document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(prepareQaCarousel), { once: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    requestAnimationFrame(prepareQaCarousel);
+  }, { once: true });
+
   requestAnimationFrame(prepareQaCarousel);
 })();
