@@ -1,9 +1,10 @@
 /*
   NU APP · NAVEGACIÓN FLOTANTE CANÓNICA V1
-  Una sola apariencia para Inicio, Favoritos e Iris.
+  Una sola apariencia para Inicio, Progreso, Favoritos e Iris.
 */
 
 body[data-active-view="hoy"] .bottom-nav,
+body[data-active-view="rutina"] .bottom-nav,
 body[data-active-view="favoritos"] .bottom-nav,
 body[data-active-view="bot"] .bottom-nav {
   bottom: calc(10px + var(--safe-bottom)) !important;
@@ -20,6 +21,7 @@ body[data-active-view="bot"] .bottom-nav {
 }
 
 body[data-active-view="hoy"] .nav-btn,
+body[data-active-view="rutina"] .nav-btn,
 body[data-active-view="favoritos"] .nav-btn,
 body[data-active-view="bot"] .nav-btn {
   position: relative;
@@ -31,12 +33,14 @@ body[data-active-view="bot"] .nav-btn {
 }
 
 body[data-active-view="hoy"] .nav-btn.active,
+body[data-active-view="rutina"] .nav-btn.active,
 body[data-active-view="favoritos"] .nav-btn.active,
 body[data-active-view="bot"] .nav-btn.active {
   color: #0b2058 !important;
 }
 
 body[data-active-view="hoy"] .nav-btn.active::after,
+body[data-active-view="rutina"] .nav-btn.active::after,
 body[data-active-view="favoritos"] .nav-btn.active::after,
 body[data-active-view="bot"] .nav-btn.active::after {
   content: "" !important;
@@ -51,6 +55,7 @@ body[data-active-view="bot"] .nav-btn.active::after {
 }
 
 body[data-active-view="hoy"] .nav-btn > span:last-child,
+body[data-active-view="rutina"] .nav-btn > span:last-child,
 body[data-active-view="favoritos"] .nav-btn > span:last-child,
 body[data-active-view="bot"] .nav-btn > span:last-child {
   position: absolute !important;
@@ -62,6 +67,7 @@ body[data-active-view="bot"] .nav-btn > span:last-child {
 }
 
 body[data-active-view="hoy"] .nav-btn .nav-icon,
+body[data-active-view="rutina"] .nav-btn .nav-icon,
 body[data-active-view="favoritos"] .nav-btn .nav-icon,
 body[data-active-view="bot"] .nav-btn .nav-icon {
   width: 32px !important;
@@ -69,6 +75,7 @@ body[data-active-view="bot"] .nav-btn .nav-icon {
 }
 
 body[data-active-view="hoy"] .nav-btn .nav-icon svg,
+body[data-active-view="rutina"] .nav-btn .nav-icon svg,
 body[data-active-view="favoritos"] .nav-btn .nav-icon svg,
 body[data-active-view="bot"] .nav-btn .nav-icon svg {
   width: 26px !important;
@@ -84,6 +91,7 @@ body.keyboard-open .bottom-nav {
 
 @media (max-width: 370px) {
   body[data-active-view="hoy"] .bottom-nav,
+  body[data-active-view="rutina"] .bottom-nav,
   body[data-active-view="favoritos"] .bottom-nav,
   body[data-active-view="bot"] .bottom-nav {
     width: calc(100% - 22px) !important;
