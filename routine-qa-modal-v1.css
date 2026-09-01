@@ -88,7 +88,7 @@ body.routine-qa-open {
 .routine-qa-dialog {
   position: relative;
   width: min(92vw, 520px);
-  height: min(65dvh, 560px);
+  height: min(50dvh, 440px);
   max-height: calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -295,7 +295,7 @@ body.routine-qa-open {
 
   .routine-qa-dialog {
     width: calc(100vw - 24px);
-    height: 65dvh;
+    height: min(52dvh, 440px);
     border-radius: 18px;
   }
 
