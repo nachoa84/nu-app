@@ -20,6 +20,20 @@ body:has(#view-hoy.day-open) #app {
   padding-bottom: calc(90px + var(--safe-bottom)) !important;
 }
 
+/* Routine day header: the banner already communicates progress. */
+#view-hoy.day-open .daily-native-title > span,
+#view-hoy.day-open #dailyNativeDayLabel {
+  display: none !important;
+}
+
+#view-hoy.day-open .daily-native-title > strong,
+#view-hoy.day-open #dailyNativeRoutineTitle {
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.015em !important;
+}
+
 /* Routine hero media has one final shared geometry.
    This intentionally overrides the old 50x60 native-visual box. */
 #view-hoy.day-open .native-day-hero-media {
@@ -172,6 +186,11 @@ body:has(#view-hoy.day-open) #app {
     right: 15px !important;
     width: 70px !important;
     height: 78px !important;
+  }
+
+  #view-hoy.day-open .daily-native-title > strong,
+  #view-hoy.day-open #dailyNativeRoutineTitle {
+    font-size: 13.5px !important;
   }
 
   #view-hoy.day-open .routine-content-track,
