@@ -6,7 +6,7 @@
 
   const FINAL_LAYOUT_VERSION = "20260901-layout-v6";
   const COMPLETION_STYLE_VERSION = "20260901-completion-v1";
-  const LEGACY_INTRO_ROUTINES = ["wellspa-10", "galvanicspa-10", "lumispa-10"];
+  const COPY_CLEANUP_VERSION = "20260901-copy-v1";
 
   function syncLayoutVersion() {
     const link = document.getElementById("nu-routine-layout-final-v1");
@@ -34,30 +34,15 @@
     }
   }
 
-  function removeLegacyWhatsAppIntroBlocks() {
-    try {
-      if (typeof PRODUCT_ROUTINE_DAYS === "undefined" || !PRODUCT_ROUTINE_DAYS) return;
+  function ensureRoutineCopyCleanup() {
+    const id = "nu-routine-copy-cleanup-v1";
+    if (document.getElementById(id)) return;
 
-      LEGACY_INTRO_ROUTINES.forEach(routineId => {
-        const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.["1"];
-        if (!day || !Array.isArray(day.blocks) || day.blocks.length < 2) return;
-
-        const first = String(day.blocks[0]?.content || "");
-        const second = String(day.blocks[1]?.content || "");
-        const firstIsLegacy =
-          /te has suscrito satisfactoriamente/i.test(first) &&
-          /mi negocio de nu skin/i.test(first) &&
-          /para recibir el contenido y los links de forma correcta/i.test(first);
-        const secondIsLegacy =
-          /list@ para desafiarte e iniciar el challenge/i.test(second) &&
-          /durante el challenge/i.test(second) &&
-          /diariamente y por este medio/i.test(second);
-
-        if (firstIsLegacy && secondIsLegacy) {
-          day.blocks.splice(0, 2);
-        }
-      });
-    } catch (_) {}
+    const script = document.createElement("script");
+    script.id = id;
+    script.src = `routine-copy-cleanup-v1.js?v=${COPY_CLEANUP_VERSION}`;
+    script.defer = true;
+    document.head.appendChild(script);
   }
 
   function cleanCompletedState() {
@@ -70,7 +55,7 @@
     const view = document.getElementById("view-hoy");
     if (!view) return;
 
-    removeLegacyWhatsAppIntroBlocks();
+    ensureRoutineCopyCleanup();
 
     let routineId = "collagen-30";
     try {
