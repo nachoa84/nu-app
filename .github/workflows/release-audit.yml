@@ -39,6 +39,9 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund --prefer-online --progress=false
           node -e "require.resolve('express'); require.resolve('pg'); require.resolve('web-push')"
 
+      - name: Audit production dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Check JavaScript syntax
         run: |
           find . -maxdepth 1 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
