@@ -1,0 +1,299 @@
+/* Iris · layout final
+   Una sola capa de composición para encabezado, conversación y composer.
+   La lógica de Iris permanece en bot.js. */
+#view-bot.active {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
+  overflow: hidden;
+}
+#view-bot .bot-page-header {
+  flex: 0 0 auto;
+  min-height: 0;
+  margin: 0 2px 12px;
+  padding: calc(20px + var(--safe-top)) 0 0;
+}
+#view-bot .bot-page-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 0;
+  gap: 0;
+}
+#view-bot .bot-page-header > div:first-child::before,
+#view-bot .bot-page-header h1::before,
+#view-bot .bot-page-header h1::after {
+  content: none !important;
+  display: none !important;
+}
+#view-bot .bot-eyebrow {
+  display: block;
+  margin: 0 0 6px;
+  color: #8f86a5;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+#view-bot .bot-page-header h1 {
+  margin: 0;
+  color: #332947;
+  font-family: Poppins, sans-serif !important;
+  font-size: 34px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.04em !important;
+}
+#view-bot .bot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #4f8f62;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+#view-bot .bot-status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6f9e73;
+  box-shadow: 0 0 0 3px rgba(111,158,115,.14);
+}
+#view-bot .bot-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 0 !important;
+  background: transparent;
+}
+#view-bot .bot-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding: 8px 0 12px;
+  scroll-padding-bottom: 16px;
+}
+#view-bot .bot-native-welcome {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 8px 48px;
+  text-align: center;
+}
+#view-bot .bot-native-welcome-mark { display: none !important; }
+#view-bot .bot-native-welcome h2 {
+  max-width: 330px;
+  margin: 0 auto;
+  color: #332947;
+  font-family: Poppins, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+#view-bot .bot-native-welcome p {
+  max-width: 350px;
+  margin: 12px auto 0;
+  color: #857d91;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr) 50px !important;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 16px 0 8px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+#view-bot .bot-form::before,
+#view-bot .bot-form::after { content: none !important; display: none !important; }
+#view-bot .bot-form #botShortcutsBtn { grid-column: 1; grid-row: 1; }
+#view-bot .bot-form #botInput { grid-column: 2; grid-row: 1; min-width: 0; }
+#view-bot .bot-form .bot-send { grid-column: 3; grid-row: 1; }
+body[data-active-view="bot"] .app-action-sheet {
+  font-family: Poppins, sans-serif;
+  background: rgba(16,22,63,.26);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+body[data-active-view="bot"] .app-action-sheet-panel,
+body[data-active-view="bot"] .app-action-sheet-cancel {
+  border-radius: 24px;
+  box-shadow: 0 18px 48px rgba(16,22,63,.16);
+}
+body[data-active-view="bot"] .app-action-sheet-copy strong,
+body[data-active-view="bot"] .app-action-sheet-copy span,
+body[data-active-view="bot"] .app-action-sheet-action,
+body[data-active-view="bot"] .app-action-sheet-cancel {
+  font-family: Poppins, sans-serif;
+}
+body[data-active-view="bot"] .app-action-sheet-action {
+  background: #ff7a32;
+  color: #fff;
+}
+@media (max-width: 360px) {
+  #view-bot .bot-form,
+  #view-bot .bot-card.has-conversation .bot-form {
+    grid-template-columns: 44px minmax(0,1fr) 46px !important;
+  }
+  #view-bot .bot-form #botShortcutsBtn { width: 44px; min-width: 44px; }
+  #view-bot .bot-form .bot-send { width: 46px; min-width: 46px; }
+}
+body.keyboard-open #view-bot.active {
+  height: var(--bot-visual-height);
+  min-height: 0;
+  max-height: var(--bot-visual-height);
+  padding-bottom: 0;
+}
+body.keyboard-open #view-bot .bot-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+body.keyboard-open #view-bot .bot-form,
+body.keyboard-open #view-bot .bot-card.has-conversation .bot-form {
+  position: relative;
+  margin: 0;
+  padding: 10px 0 8px;
+  transform: none !important;
+}
+
+/* Ajustes visuales finales: acciones y acceso rápido */
+#view-bot .bot-message-action {
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+#view-bot .bot-message-action svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.7;
+}
+#view-bot #botShortcutsBtn svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.8;
+}
+
+/* Acciones de respuesta: legibles sin agrandar el contenedor */
+#view-bot .bot-message-action {
+  font-family: Poppins, sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+#view-bot .bot-message-action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.7;
+}
+/* Confirmación compacta inspirada en la referencia */
+body[data-active-view="bot"] .app-action-sheet {
+  align-items: center;
+  padding: 20px;
+}
+body[data-active-view="bot"] .app-action-sheet-inner {
+  width: min(320px, 100%);
+}
+body[data-active-view="bot"] .app-action-sheet-panel {
+  padding: 20px 14px 14px;
+  border-radius: 22px;
+}
+body[data-active-view="bot"] .app-action-sheet-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 10px;
+  border-radius: 16px;
+  background: rgba(255,122,50,.10);
+  color: #f05b14;
+}
+body[data-active-view="bot"] .app-action-sheet-icon svg {
+  width: 29px;
+  height: 29px;
+  stroke-width: 1.8;
+}
+body[data-active-view="bot"] .app-action-sheet-copy {
+  padding: 0 8px 16px;
+}
+body[data-active-view="bot"] .app-action-sheet-copy strong {
+  font-size: 17px;
+  line-height: 1.2;
+}
+body[data-active-view="bot"] .app-action-sheet-copy span {
+  margin-top: 7px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+body[data-active-view="bot"] .app-action-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+body[data-active-view="bot"] .app-action-sheet-actions button {
+  min-height: 40px;
+  border: 1px solid rgba(23,34,61,.12);
+  border-radius: 11px;
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+body[data-active-view="bot"] .app-action-sheet-actions .app-action-sheet-cancel {
+  margin: 0;
+  background: #fff;
+  color: #332947;
+}
+body[data-active-view="bot"] .app-action-sheet-actions .app-action-sheet-action {
+  border: 0;
+  background: #ff7a32;
+  color: #fff;
+}
+
+/* Refinamiento final de acciones y confirmación */
+#view-bot .bot-message-action {
+  min-height: 38px;
+  padding: 0 8px;
+  gap: 5px;
+  font-size: 11.5px;
+}
+body[data-active-view="bot"] .app-action-sheet-icon {
+  background: rgba(51,41,71,.08);
+  color: #332947;
+}
+body[data-active-view="bot"] .app-action-sheet-copy strong {
+  font-size: 18px;
+}
+body[data-active-view="bot"] .app-action-sheet-copy span {
+  font-size: 12.2px;
+}
+body[data-active-view="bot"] .app-action-sheet-actions button {
+  font-size: 12.2px;
+}
+body[data-active-view="bot"] .app-action-sheet-actions .app-action-sheet-action {
+  background: #332947;
+}

@@ -190,8 +190,9 @@ function createRoutineChoiceCardV92a(config) {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>${config.title}</h2></div>
+      <p class="home-routine-day">Rutina de ${config.totalDays} días</p>
       <button class="home-routine-open" type="button" aria-label="Abrir rutina ${config.title}">
-        <span>Continuar Día ${currentDay}</span>
+        <span>${currentDay > 1 ? `Continuar Día ${currentDay}` : "Comenzar rutina"}</span>
         <span aria-hidden="true">›</span>
       </button>
     </div>`;
@@ -280,6 +281,7 @@ function getRoutineCardStateV92b(config) {
 function createFixedRoutineCardV92b(config) {
   const state = getRoutineCardStateV92b(config);
   const currentDay = Math.max(1, Math.min(Number(state.currentDay || 1), config.totalDays));
+  const percent = Math.min(100, Math.round((currentDay / config.totalDays) * 100));
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-active home-routine-card-fixed";
   card.dataset.routineId = config.id;
@@ -290,8 +292,13 @@ function createFixedRoutineCardV92b(config) {
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>${config.title}</h2></div>
+      <p class="home-routine-day">Día ${currentDay} de ${config.totalDays}</p>
+      <div class="home-routine-progress-row">
+        <div class="home-routine-progress" aria-hidden="true"><span style="width:${percent}%"></span></div>
+        <span class="home-routine-percent">${percent}%</span>
+      </div>
       <button class="home-routine-continue" type="button" aria-label="Abrir rutina ${config.title}">
-        <span>Continuar Día ${currentDay}</span>
+        <span>${currentDay > 1 ? `Continuar Día ${currentDay}` : "Comenzar rutina"}</span>
         <span class="home-routine-continue-icon" aria-hidden="true">›</span>
       </button>
     </div>`;
@@ -303,330 +310,77 @@ function createFixedRoutineCardV92b(config) {
 function createUpcomingPharmanexCardV123() {
   const card = document.createElement("article");
   card.className = "home-routine-card home-routine-card-placeholder";
+  card.dataset.routineId = "pharmanex-upcoming";
   card.setAttribute("aria-disabled", "true");
   card.innerHTML = `
-    <div class="home-routine-cover" aria-hidden="true">
-      <img src="assets/custom/routine-pharmanex-home.png" alt="" loading="lazy" />
+    <div class="home-routine-cover home-routine-cover-pharmanex" aria-hidden="true">
+      <div class="home-pharmanex-mark">
+        <svg viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+          <path d="M31.5 51V29.5" />
+          <path d="M31.5 38C22 37.5 15.5 31.5 14 22c9.5.5 16 6.5 17.5 16Z" />
+          <path d="M32 31.5C33.5 21 40.5 14 51 13c-1 10.5-8 17.5-19 18.5Z" />
+          <path d="M31.5 46c-7.5 0-12.5-3.5-15-10.5 7.5-.5 12.5 3 15 10.5Z" />
+        </svg>
+        <span>PHARMANEX</span>
+      </div>
     </div>
     <div class="home-routine-body">
       <div class="home-routine-heading"><h2>Suplementos</h2></div>
-      <p class="home-routine-day">Próximamente</p>
+      <p class="home-routine-day">Pharmanex · Próximamente</p>
+      <span class="home-routine-placeholder-label">Nueva rutina</span>
     </div>`;
   return card;
 }
 
-renderRoutineCardsV92a = function renderRoutineCardsV92b() {
+function syncRoutineCardV124(card, config) {
+  const state = getRoutineCardStateV92b(config);
+  const currentDay = Math.max(1, Math.min(Number(state.currentDay || 1), config.totalDays));
+  const percent = Math.min(100, Math.round((currentDay / config.totalDays) * 100));
+  const day = card.querySelector(".home-routine-day");
+  const percentNode = card.querySelector(".home-routine-percent");
+  const progress = card.querySelector(".home-routine-progress span");
+  const action = card.querySelector(".home-routine-continue span");
+  const image = card.querySelector(".home-routine-cover img");
+  if (day) day.textContent = `Día ${currentDay} de ${config.totalDays}`;
+  if (percentNode) percentNode.textContent = `${percent}%`;
+  if (progress) progress.style.width = `${percent}%`;
+  if (action) action.textContent = currentDay > 1 ? `Continuar Día ${currentDay}` : "Comenzar rutina";
+  if (image) {
+    image.src = config.cover;
+    image.alt = config.title;
+  }
+  card.dataset.selected = String(config.id === getActiveRoutineId());
+}
+
+renderRoutineCardsV92a = function renderRoutineCardsV124() {
   const container = document.querySelector(".home-routines");
   if (!container) return;
   document.querySelector(".home-routine-selector")?.remove();
-  const fragment = document.createDocumentFragment();
-  ROUTINE_CARD_ORDER_V92B.forEach(routineId => {
-    const config = ROUTINE_CATALOG[routineId];
-    if (config) fragment.appendChild(createFixedRoutineCardV92b(config));
-  });
-  fragment.appendChild(createUpcomingPharmanexCardV123());
-  container.replaceChildren(fragment);
-};
 
-// NU APP · PULIDO MULTIRUTINA V92C
-getRoutineHeroV92a = function getRoutineHeroV106a() {
-  if (getActiveRoutineId() === "collagen-30") {
-    return "assets/custom/collagen-day-hero.jpg";
-  }
-  const config = getActiveRoutineConfig();
-  return config.hero || config.cover;
-};
+  const desired = ROUTINE_CARD_ORDER_V92B
+    .map(routineId => ROUTINE_CATALOG[routineId])
+    .filter(Boolean);
+  desired.push({ id: "pharmanex-upcoming", placeholder: true });
 
-Object.values(PRODUCT_ROUTINE_DAYS).forEach(routine => {
-  Object.values(routine.days).forEach(day => {
-    let mediaOrder = 0;
-    day.blocks.forEach(block => {
-      if (block.type !== "media") return;
-      mediaOrder += 1;
-      const label = String(block.label || "").trim();
-      if (/^(?:h\.?264m?|mp4|mov|m4v|video|imagen|image|archivo|[a-z])$/iu.test(label)) {
-        block.label = `${block.mediaType === "image" ? "Imagen" : "Video"} ${mediaOrder}`;
-      }
-    });
-  });
-});
+  const existing = new Map(
+    Array.from(container.querySelectorAll("[data-routine-id]"))
+      .map(card => [card.dataset.routineId, card])
+  );
 
-// NU APP · NOMBRES CANÓNICOS DE MATERIALES V96
-function canonicalRoutineDocumentLabelV96(routineId, block) {
-  if (routineId === "wellspa-10") return "Información técnica de WellSpa";
-  if (routineId === "lumispa-10") return "Información técnica de LumiSpa";
-  if (routineId === "galvanicspa-10") {
-    return /preguntas frecuentes/iu.test(String(block?.label || ""))
-      ? "Preguntas frecuentes de Galvanic Spa"
-      : "Información técnica de Galvanic Spa";
-  }
-  return block?.label || "Documento";
-}
-
-function normalizeRoutineDayMaterialNamesV96(routineId, day) {
-  const media = (day?.blocks || []).filter(block => block?.type === "media");
-  media.forEach((block, index) => {
-    block.label = `Historia ${index + 1} de ${media.length}`;
-  });
-  (day?.blocks || []).forEach(block => {
-    if (block?.type === "action" && block.resourceKind === "document") {
-      block.label = canonicalRoutineDocumentLabelV96(routineId, block);
+  desired.forEach((config, index) => {
+    let card = existing.get(config.id);
+    if (config.placeholder) {
+      if (!card) card = createUpcomingPharmanexCardV123();
+    } else if (!card) {
+      card = createFixedRoutineCardV92b(config);
+    } else {
+      syncRoutineCardV124(card, config);
     }
-  });
-}
-
-Object.entries(PRODUCT_ROUTINE_DAYS).forEach(([routineId, routine]) => {
-  Object.values(routine.days || {}).forEach(day => {
-    normalizeRoutineDayMaterialNamesV96(routineId, day);
-  });
-});
-
-Object.values(COLLAGEN_ROUTINE_DAYS).forEach(day => {
-  normalizeRoutineDayMaterialNamesV96("collagen-30", day);
-});
-
-// NU APP · CORRECCIÓN CONSERVADORA DE TEXTOS V97
-function polishImportedRoutineTextV97(value, routineId) {
-  let text = String(value || "")
-    .replace(/\bA\s+demás\b/giu, "Además")
-    .replace(/\bWhatapp\b/giu, "WhatsApp")
-    .replace(/\bInstragram\b/giu, "Instagram")
-    .replace(/\btíps\b/giu, "tips")
-    .replace(/\bpreguntes\b/giu, "preguntas")
-    .replace(/\bcuentes\b/giu, "clientes")
-    .replace(/\bprocupan\b/giu, "preocupan")
-    .replace(/\bexpeciencia\b/giu, "experiencia")
-    .replace(/\bpracticas y efectivas\b/giu, "prácticas y efectivas")
-    .replace(/\bmas poder\b/giu, "más poder")
-    .replace(/\btransformo tu piel\b/giu, "transformó tu piel")
-    .replace(/\bHack de venta lll\b/gu, "Hack de venta III")
-    .replace(/\bHack de venta lV\b/gu, "Hack de venta IV")
-    .replace(/\bSi, de 2 años\b/gu, "Sí, de 2 años")
-    .replace(/[ \t]{2,}/gu, " ")
-    .replace(/!{2,}/gu, "!")
-    .replace(/\?{2,}/gu, "?");
-
-  if (routineId === "galvanicspa-10") {
-    text = text.replace(/#WELLSPAIO10/gu, "#GALVANICSPA10");
-  }
-
-  return text;
-}
-
-Object.entries(PRODUCT_ROUTINE_DAYS).forEach(([routineId, routine]) => {
-  Object.values(routine.days || {}).forEach(day => {
-    day.title = polishImportedRoutineTextV97(day.title, routineId);
-    day.hero = polishImportedRoutineTextV97(day.hero, routineId);
-    day.description = polishImportedRoutineTextV97(day.description, routineId);
-    (day.blocks || []).forEach(block => {
-      if (block?.type === "text" && block.content) {
-        block.content = polishImportedRoutineTextV97(block.content, routineId);
-      }
-    });
-  });
-});
-
-// NU APP · RETIRO DE BIENVENIDAS MANYCHAT V97A
-const MANYCHAT_WELCOME_TAGS_V97A = {
-  "lumispa-10": "10LumiSpaIO",
-  "wellspa-10": "WELLSPAIO10",
-  "galvanicspa-10": "GALVANICSPA10"
-};
-
-Object.entries(MANYCHAT_WELCOME_TAGS_V97A).forEach(([routineId, tag]) => {
-  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.["1"];
-  const firstTextBlock = (day?.blocks || []).find(block => block?.type === "text");
-  if (!firstTextBlock?.content) return;
-
-  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const welcomePattern = new RegExp(
-    String.raw`\s*Al\s+_?Challenge\s+#${escapedTag}_?\s*\n+\s*Te recomendamos tener este número agendado como\.\.\.\s*\n+\s*MI NEGOCIO DE NU SKIN\s*\n+\s*Para recibir el contenido y los Links de forma correcta\.?`,
-    "iu"
-  );
-
-  const before = String(firstTextBlock.content);
-  const after = before.replace(welcomePattern, "").trim();
-  if (after !== before.trim()) {
-    firstTextBlock.content = after;
-    firstTextBlock.hideObjectiveDetailsV97a = true;
-  }
-});
-
-// NU APP · DÍA 2 RESPONSIVO V98A
-["lumispa-10", "wellspa-10", "galvanicspa-10"].forEach(routineId => {
-  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.["2"];
-  const tutorial = (day?.blocks || []).find(block =>
-    block?.type === "text" && /^\s*2\)\s*Te compartimos estos 2 tutoriales:/iu.test(String(block.content || ""))
-  );
-  if (tutorial) {
-    tutorial.content = String(tutorial.content).replace(/^\s*2\)\s*/u, "");
-  }
-});
-
-// NU APP · ETIQUETAS DE YOUTUBE V99
-function labelRoutineLinkV99(routineId, dayNumber, url, label) {
-  const day = PRODUCT_ROUTINE_DAYS[routineId]?.days?.[String(dayNumber)];
-  if (!day) return;
-  (day.blocks || []).forEach(block => {
-    (block.links || []).forEach(link => {
-      if (String(link.url || "") === url) link.label = label;
-    });
-  });
-}
-
-labelRoutineLinkV99(
-  "lumispa-10",
-  1,
-  "https://youtu.be/J7c38OZ8Z1M",
-  "Video · Conocé LumiSpa"
-);
-
-[
-  ["wellspa-10", "WellSpa"],
-  ["galvanicspa-10", "Galvanic Spa"],
-  ["lumispa-10", "LumiSpa"]
-].forEach(([routineId, routineTitle]) => {
-  labelRoutineLinkV99(
-    routineId,
-    2,
-    "https://youtu.be/rRPg_-xCEzo",
-    "Tutorial 1 · Crear un enlace de invitación"
-  );
-  labelRoutineLinkV99(
-    routineId,
-    2,
-    "https://youtu.be/x2y94PPZw0A?si=M5EnYw9ya3HIg6NN",
-    `Tutorial 2 · Crear una oferta de ${routineTitle}`
-  );
-});
-
-
-// NU APP · CARDS DE AVANCE REAL V100
-function getRoutineCardProgressV100(config) {
-  const state = getRoutineCardStateV92b(config);
-  let completed = 0;
-  for (let day = 1; day <= Number(config.totalDays); day++) {
-    const key = config.backend
-      ? `day${day}Complete`
-      : `day:${config.id}:${day}:complete`;
-    if (localStorage.getItem(key) === "1") completed += 1;
-  }
-  const currentDay = config.backend
-    ? Math.max(1, Math.min(Number(state.currentDay || 1), config.totalDays))
-    : Math.max(1, Math.min(
-        typeof getNextPendingProductRoutineDayV100 === "function"
-          ? getNextPendingProductRoutineDayV100(config.id, config.totalDays)
-          : Number(state.currentDay || 1),
-        config.totalDays
-      ));
-  return {
-    currentDay,
-    completed,
-    complete: completed >= Number(config.totalDays),
-    percent: Math.min(100, Math.round((completed / Number(config.totalDays)) * 100))
-  };
-}
-
-createFixedRoutineCardV92b = function createFixedRoutineCardV100(config) {
-  const progress = getRoutineCardProgressV100(config);
-  const action = `Continuar Día ${progress.currentDay}`;
-  const card = document.createElement("article");
-  card.className = "home-routine-card home-routine-card-active home-routine-card-fixed";
-  card.dataset.routineId = config.id;
-  card.dataset.selected = String(config.id === getActiveRoutineId());
-  card.innerHTML = `
-    <div class="home-routine-cover" aria-hidden="true">
-      <img src="${config.cover}" alt="" loading="lazy" />
-    </div>
-    <div class="home-routine-body">
-      <div class="home-routine-heading"><h2>${config.title}</h2></div>
-      <button class="home-routine-continue" type="button" aria-label="Abrir rutina ${config.title}">
-        <span>${action}</span>
-        <span class="home-routine-continue-icon" aria-hidden="true">›</span>
-      </button>
-    </div>`;
-  card.querySelector("button").onclick = () => openRoutineFromCardV92a(config.id);
-  return card;
-};
-
-
-// NU APP · APERTURA DESDE NOTIFICACIÓN V101A
-function clearRoutineNotificationParamsV101A() {
-  const url = new URL(window.location.href);
-  ["routine", "day", "notification", "routineNotifications"].forEach(key =>
-    url.searchParams.delete(key)
-  );
-  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-}
-
-function openRoutineNotificationTargetV101A() {
-  const notificationParams = new URLSearchParams(window.location.search);
-  const grouped = notificationParams.get("routineNotifications") === "1";
-  const routineId = notificationParams.get("routine");
-  const day = Number(notificationParams.get("day"));
-
-  if (grouped) {
-    document.querySelector('[data-view="hoy"]')?.click();
-    closeNativeDayView();
-    if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
-    clearRoutineNotificationParamsV101A();
-    return;
-  }
-
-  if (!ROUTINE_CATALOG[routineId] || !Number.isInteger(day)) return;
-  const totalDays = Number(ROUTINE_CATALOG[routineId].totalDays);
-  if (day < 1 || day > totalDays) return;
-
-  setActiveRoutineV92(routineId);
-  selectDay(day, true);
-  clearRoutineNotificationParamsV101A();
-}
-
-window.addEventListener("load", () => {
-  window.setTimeout(openRoutineNotificationTargetV101A, 250);
-}, { once: true });
-
-// NU APP · LIMPIEZA DÍA 2 Y GALERÍAS V107
-(function applyRoutineDayCleanupV107() {
-  const galleryLabels = {
-    "lumispa-10": "Ver galería de resultados de LumiSpa",
-    "wellspa-10": "Ver galería de resultados de WellSpa",
-    "galvanicspa-10": "Ver galería de resultados de Galvanic Spa"
-  };
-
-  Object.entries(galleryLabels).forEach(([routineId, galleryLabel]) => {
-    const routine = PRODUCT_ROUTINE_DAYS?.[routineId];
-    if (!routine?.days) return;
-
-    const day2 = routine.days["2"];
-    const day2Objective = day2?.blocks?.find(block => block.type === "text");
-    if (day2Objective) {
-      day2Objective.content = "";
-      day2Objective.links = [];
-      day2Objective.hideObjectiveDetailsV97a = true;
+    if (card !== container.children[index]) {
+      container.insertBefore(card, container.children[index] || null);
     }
-
-    const day6 = routine.days["6"];
-    day6?.blocks?.forEach(block => {
-      block.links?.forEach(link => {
-        if (/^https?:\/\//i.test(String(link.url || ""))) {
-          link.label = galleryLabel;
-        }
-      });
-    });
+    existing.delete(config.id);
   });
-})();
 
-// NU APP · GALERÍA OFICIAL GALVANIC V107A
-(function applyOfficialGalvanicGalleryV107a() {
-  const day6 = PRODUCT_ROUTINE_DAYS?.["galvanicspa-10"]?.days?.["6"];
-  day6?.blocks?.forEach(block => {
-    block.links?.forEach(link => {
-      if (/^https?:\/\//i.test(String(link.url || ""))) {
-        link.url = "https://nuskinsocial.smugmug.com/Social/LATAM/Productos/AgeLOC/Galvanic";
-        link.label = "Ver galería de resultados de Galvanic Spa";
-      }
-    });
-  });
-})();
-
+  existing.forEach(card => card.remove());
+};

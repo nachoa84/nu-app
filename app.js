@@ -69,27 +69,14 @@ if (installBtn) installBtn.onclick = async () => {
   installBtn?.classList.add("hidden");
 };
 
-// NU APP · ACTUALIZACIÓN AUTOMÁTICA CONTROLADA V128
-const APP_VERSION_V128 = "128-controlled-auto-update";
-localStorage.setItem("nuapp:active-version", APP_VERSION_V128);
-const APP_UPDATE_RELOAD_KEY_V128 = "nuapp:update-reload-v128";
-const APP_UPDATED_NOTICE_KEY_V128 = "nuapp:updated-notice-v128";
-
-function botDraftIsActiveV128() {
-  const input = document.getElementById("botInput");
-  return Boolean(input && String(input.value || "").trim());
-}
-
-function reloadForAppUpdateV128() {
-  if (sessionStorage.getItem(APP_UPDATE_RELOAD_KEY_V128) === "1") return;
-  sessionStorage.setItem(APP_UPDATE_RELOAD_KEY_V128, "1");
-  sessionStorage.setItem(APP_UPDATED_NOTICE_KEY_V128, "1");
-  window.location.reload();
-}
-
-function activateWaitingWorkerV128(registration) {
+// NU APP · ACTUALIZACIÓN ESTABLE V142
+// Las versiones nuevas quedan en espera y solo se activan cuando la persona
+// elige "Actualizar". Esto evita reinicios durante el arranque.
+const APP_VERSION_V142 = "142-stable-manual-update";
+localStorage.setItem("nuapp:active-version", APP_VERSION_V142);
+function activateWaitingWorkerV142(registration) {
   if (!registration?.waiting) return false;
-  registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V128" });
+  registration.waiting.postMessage({ type: "NUAPP_SKIP_WAITING_V142" });
   return true;
 }
 
@@ -99,24 +86,24 @@ async function registerAppServiceWorker() {
     { updateViaCache: "none" }
   );
 
-  let updating = false;
+  let updatePromptVisible = false;
 
   const handleReadyUpdate = () => {
-    if (!registration.waiting || updating) return;
-    updating = true;
+    if (!registration.waiting || updatePromptVisible) return;
+    if (typeof toast !== "function") return;
 
-    if (botDraftIsActiveV128() && typeof toast === "function") {
-      toast("Hay una actualización lista.", {
-        type: "info",
-        actionLabel: "Actualizar",
-        duration: 10000,
-        onAction: () => activateWaitingWorkerV128(registration)
-      });
-      updating = false;
-      return;
-    }
+    updatePromptVisible = true;
+    toast("Hay una actualización lista.", {
+      type: "info",
+      actionLabel: "Actualizar",
+      duration: 15000,
+      onAction: () => activateWaitingWorkerV142(registration)
+    });
 
-    activateWaitingWorkerV128(registration);
+    // Permite volver a ofrecerla más adelante si el aviso venció.
+    window.setTimeout(() => {
+      updatePromptVisible = false;
+    }, 15500);
   };
 
   if (registration.waiting && navigator.serviceWorker.controller) {
@@ -158,21 +145,8 @@ async function registerAppServiceWorker() {
 
   return registration;
 }
+window.getAppServiceWorkerRegistration = registerAppServiceWorker;
 
-navigator.serviceWorker?.addEventListener("controllerchange", () => {
-  reloadForAppUpdateV128();
-});
-
-window.addEventListener("pageshow", () => {
-  if (sessionStorage.getItem(APP_UPDATED_NOTICE_KEY_V128) !== "1") return;
-  sessionStorage.removeItem(APP_UPDATED_NOTICE_KEY_V128);
-  sessionStorage.removeItem(APP_UPDATE_RELOAD_KEY_V128);
-  setTimeout(() => {
-    if (typeof toast === "function") {
-      toast("Nu App se actualizó", { type: "success", duration: 2600 });
-    }
-  }, 500);
-});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -209,29 +183,10 @@ renderDays();
 renderFavorites();
 ensureDemoControls();
 
-// NU APP · HERO GALVANIC SPA V4
-// Mantiene la misma estructura de las otras rutinas y muestra el dispositivo completo.
+// Nu App · Galvanic Spa hero asset.
+// Geometry is owned by the shared routine layout, like every other routine.
 if (typeof ROUTINE_CATALOG !== "undefined" && ROUTINE_CATALOG["galvanicspa-10"]) {
   ROUTINE_CATALOG["galvanicspa-10"].hero = "assets/custom/routine-galvanicspa-hero-v4.png";
-}
-
-if (!document.getElementById("galvanicSpaHeroV4Style")) {
-  const galvanicHeroStyle = document.createElement("style");
-  galvanicHeroStyle.id = "galvanicSpaHeroV4Style";
-  galvanicHeroStyle.textContent = `
-    .native-day-hero-media img[src*="routine-galvanicspa-hero-v4.png"] {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      object-fit: contain;
-      object-position: center;
-      background: transparent;
-      transform: none;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-  `;
-  document.head.appendChild(galvanicHeroStyle);
 }
 
 setupMultiRoutineV92();

@@ -279,15 +279,11 @@
         ${
           apple
             ? `
-              <button id="showIosInstallGuide" class="onboarding-primary" type="button">
-                Agregar a inicio
-              </button>
-
-              <p class="install-gate-hint">
-                Solo te va a tomar unos segundos.
+              <p class="install-gate-hint ios-install-intro">
+                Seguí estos pasos en Safari:
               </p>
 
-              <div id="iosInstallGuide" class="ios-install-guide" hidden>
+              <div id="iosInstallGuide" class="ios-install-guide">
                 <div class="ios-install-step">
                   <span>1</span>
                   <div class="ios-install-step-body">
@@ -354,12 +350,7 @@
     document.body.classList.add("onboarding-open");
     document.body.appendChild(overlay);
 
-    if (apple) {
-      document.getElementById("showIosInstallGuide")?.addEventListener("click", () => {
-        const guide = document.getElementById("iosInstallGuide");
-        if (guide) guide.hidden = false;
-      });
-    } else {
+    if (!apple) {
       const installButton = document.getElementById("androidInstallBtn");
       const message = document.getElementById("androidInstallMessage");
 
@@ -448,18 +439,9 @@
 
     function stepIndicator() {
       return `
-        <div class="onboarding-progress" aria-label="Paso ${state.step} de 2">
-          <div class="onboarding-progress-head">
-            <span>${state.step} de 2</span>
-            <strong>${state.step === 1 ? "Presentación" : "Bienvenida"}</strong>
-          </div>
-          <div class="onboarding-progress-track">
-            <span style="width:${state.step === 1 ? "50%" : "100%"}"></span>
-          </div>
-          <div class="onboarding-progress-labels" aria-hidden="true">
-            <span class="${state.step >= 1 ? "is-active" : ""}">Presentación</span>
-            <span class="${state.step >= 2 ? "is-active" : ""}">Bienvenida</span>
-          </div>
+        <div class="onboarding-step-indicator" aria-label="Paso ${state.step} de 2">
+          <span class="${state.step === 1 ? "is-active" : ""}"></span>
+          <span class="${state.step === 2 ? "is-active" : ""}"></span>
         </div>
       `;
     }
@@ -478,7 +460,6 @@
           </header>
 
           <div class="onboarding-body">
-            ${stepIndicator()}
             <div class="onboarding-step-content onboarding-enter-${state.step === 1 ? "left" : "right"}">
               ${state.step === 1 ? renderPresentationStep() : renderObjectiveStep()}
             </div>
@@ -493,13 +474,12 @@
       return `
         <section class="onboarding-step">
           <div class="onboarding-heading">
-            <span class="onboarding-eyebrow">EMPECEMOS</span>
-            <h1>${isEdit ? "Actualizá tu perfil" : "¡Hola! 👋"}</h1>
+            <h1>${isEdit ? "Actualizá tu perfil" : "Contanos un poco sobre vos"}</h1>
             <p>
               ${
                 isEdit
                   ? "Actualizá los datos que usamos para personalizar tu rutina."
-                  : "Contanos un poquito sobre vos para personalizar tu experiencia durante estos 30 días."
+                  : "Así personalizamos tu experiencia durante estos 30 días."
               }
             </p>
           </div>
@@ -602,6 +582,7 @@
               Continuar
               <span>${icon("chevron")}</span>
             </button>
+            ${stepIndicator()}
           </div>
         </section>
       `;
@@ -611,7 +592,6 @@
       return `
         <section class="onboarding-step onboarding-welcome-step">
           <div class="onboarding-heading">
-            <span class="onboarding-eyebrow">BIENVENID@</span>
             <h1>Bienvenidos a nuestra comunidad global</h1>
           </div>
 
@@ -639,18 +619,19 @@
               Lo que empieza hoy puede crecer mucho más de lo que imaginás. Paso a paso, con constancia, con visión y con una comunidad caminando con vos.
             </p>
 
-            <p class="onboarding-welcome-closing">
-              Esto recién comienza.
-            </p>
+
           </div>
 
-          <button
-            id="finishOnboardingBtn"
-            class="onboarding-primary"
-            type="button"
-          >
-            Empecemos
-          </button>
+          <div class="onboarding-finish-area">
+            <button
+              id="finishOnboardingBtn"
+              class="onboarding-primary"
+              type="button"
+            >
+              Empecemos
+            </button>
+            ${stepIndicator()}
+          </div>
         </section>
       `;
     }
@@ -1028,17 +1009,43 @@
     function showPreparing() {
       overlay.innerHTML = `
         <div class="onboarding-preparing">
-          <div class="preparing-mark">
-            ${icon("check")}
-          </div>
-          <h2>${isEdit ? "Cambios guardados" : "Preparando tu rutina…"}</h2>
-          <p>
-            ${
+          <div class="preparing-shape preparing-shape-one"></div>
+          <div class="preparing-shape preparing-shape-two"></div>
+          <div class="preparing-shape preparing-shape-three"></div>
+
+          <div class="preparing-content">
+            <div class="preparing-animation" aria-hidden="true">
+              <div class="preparing-spinner"></div>
+
+              <div class="preparing-sparks">
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+              </div>
+            </div>
+
+            <h2>${
               isEdit
-                ? "Tu perfil quedó actualizado."
-                : `Todo listo, ${escapeHtml(state.name)}.`
-            }
-          </p>
+                ? "Cambios guardados"
+                : "Estamos organizando tu espacio"
+            }</h2>
+
+            <p>
+              ${
+                isEdit
+                  ? "Tu perfil quedó actualizado."
+                  : `Todo listo, ${escapeHtml(state.name)}.`
+              }
+            </p>
+
+          </div>
         </div>
       `;
     }
@@ -1125,7 +1132,7 @@
 
         removeOverlay();
         renderProfileUI();
-      }, 760);
+      }, 4100);
     }
 
     function bindStepEvents() {

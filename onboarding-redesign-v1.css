@@ -1,0 +1,382 @@
+/* =========================================================
+   Onboarding redesign · approved reference
+   Strong visual overrides because onboarding.css loads later.
+   Keeps existing onboarding logic, validation and persistence intact.
+   ========================================================= */
+
+.onboarding-overlay {
+  background: #fbfafd !important;
+  color: #2a2440 !important;
+  font-family: Poppins, sans-serif !important;
+}
+
+.onboarding-panel {
+  background: #fbfafd !important;
+}
+
+.onboarding-topbar {
+  min-height: calc(42px + var(--safe-top)) !important;
+  padding: calc(7px + var(--safe-top)) 24px 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.onboarding-brand { display: none !important; }
+.onboarding-back,
+.onboarding-back-spacer { width: 34px !important; height: 34px !important; }
+.onboarding-back {
+  border: 0 !important;
+  border-radius: 11px !important;
+  background: rgba(42,36,64,.055) !important;
+  color: #2a2440 !important;
+}
+
+.onboarding-body {
+  padding: 8px 24px calc(22px + var(--safe-bottom)) !important;
+}
+
+/* Progress */
+.onboarding-progress {
+  position: relative !important;
+  width: 100% !important;
+  max-width: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 4px auto 22px !important;
+}
+.onboarding-progress-head { display: contents !important; }
+.onboarding-progress-head span {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+  color: #b7b0cc !important;
+  white-space: nowrap !important;
+}
+.onboarding-progress-head strong,
+.onboarding-progress-labels { display: none !important; }
+.onboarding-progress-track {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+  background: rgba(42,36,64,.08) !important;
+}
+.onboarding-progress-track span {
+  background: linear-gradient(115deg,#e2542e 0%,#c4432a 42%,#5a3e6b 130%) !important;
+}
+
+.onboarding-step {
+  min-height: calc(100dvh - 108px - var(--safe-top)) !important;
+}
+
+/* STEP 1 · exact supplied direction */
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading {
+  max-width: none !important;
+  margin: 0 0 26px !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-eyebrow { display: none !important; }
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1 {
+  margin: 0 !important;
+  color: #2a2440 !important;
+  font-size: 0 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.015em !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1::after {
+  content: "Contanos un poco sobre vos" !important;
+  display: block !important;
+  max-width: 300px !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.015em !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading p {
+  max-width: 260px !important;
+  margin: 8px 0 0 !important;
+  color: #8a82a3 !important;
+  font-size: 0 !important;
+  line-height: 1.5 !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading p::after {
+  content: "Así personalizamos tu experiencia durante estos 30 días." !important;
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}
+
+.onboarding-fields {
+  max-width: none !important;
+  gap: 0 !important;
+  margin: 0 !important;
+}
+.onboarding-input-card,
+.onboarding-select-card {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 18px !important;
+  gap: 8px !important;
+  padding: 0 0 10px !important;
+  margin: 0 0 26px !important;
+  border: 0 !important;
+  border-bottom: 1.5px solid rgba(42,36,64,.12) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left !important;
+}
+.onboarding-input-card:focus-within {
+  border-bottom-color: #2a2440 !important;
+  box-shadow: none !important;
+}
+.onboarding-field-icon { display: none !important; }
+.onboarding-input-copy { gap: 6px !important; }
+.onboarding-input-copy small,
+.onboarding-birth-head small {
+  color: #a78bc4 !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+.onboarding-input-copy input,
+.onboarding-input-copy strong {
+  height: auto !important;
+  min-height: 24px !important;
+  color: #2a2440 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+.onboarding-input-copy input::placeholder,
+.onboarding-input-copy strong.is-placeholder {
+  color: #c7c0da !important;
+  font-weight: 500 !important;
+}
+.onboarding-field-chevron {
+  align-self: end !important;
+  padding-bottom: 3px !important;
+  color: #b7b0cc !important;
+}
+.onboarding-field-chevron svg { width: 13px !important; height: 13px !important; }
+
+/* Date: still three validated inputs internally, but one visual field */
+.onboarding-birth-block {
+  padding: 0 0 10px !important;
+  margin: 0 0 22px !important;
+  border: 0 !important;
+  border-bottom: 1.5px solid rgba(42,36,64,.12) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.onboarding-birth-head { margin: 0 0 6px !important; }
+.onboarding-birth-head strong { display: none !important; }
+.onboarding-birth-inputs {
+  display: grid !important;
+  grid-template-columns: 30px 12px 30px 12px 54px !important;
+  justify-content: start !important;
+  gap: 2px !important;
+}
+.onboarding-birth-inputs > span {
+  color: #c7c0da !important;
+  font-size: 16px !important;
+  line-height: 32px !important;
+}
+.birth-part {
+  width: 100% !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: #2a2440 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+  box-shadow: none !important;
+}
+.birth-part:focus { border: 0 !important; box-shadow: none !important; }
+.birth-part::placeholder { color: #c7c0da !important; font-weight: 500 !important; }
+.onboarding-privacy-note { display: none !important; }
+
+.onboarding-bottom-action {
+  margin-top: auto !important;
+  padding-top: 26px !important;
+}
+.onboarding-primary {
+  min-height: 52px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(115deg,#e2542e 0%,#c4432a 45%,#5a3e6b 130%) !important;
+  color: #fff !important;
+  box-shadow: 0 16px 28px -12px rgba(90,62,107,.5) !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: .20em !important;
+  text-transform: uppercase !important;
+}
+
+/* STEP 2 · same identity, with a subtle visual background */
+.onboarding-welcome-step {
+  position: relative !important;
+  isolation: isolate !important;
+  padding-top: 8px !important;
+}
+.onboarding-welcome-step {
+  position: relative !important;
+  isolation: auto !important;
+  background: linear-gradient(180deg, #fff 0%, #f7fbfc 100%) !important;
+}
+.onboarding-welcome-step .onboarding-heading {
+  max-width: none !important;
+  margin: 0 0 24px !important;
+  padding-top: 4px !important;
+}
+.onboarding-welcome-step .onboarding-eyebrow {
+  color: #8f78aa !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+  letter-spacing: .14em !important;
+}
+.onboarding-welcome-step .onboarding-heading h1 {
+  max-width: 330px !important;
+  color: #2a2440 !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: clamp(32px,9vw,40px) !important;
+  font-weight: 700 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.045em !important;
+}
+.onboarding-welcome-copy {
+  color: #61596f !important;
+  font-size: 13.5px !important;
+  line-height: 1.52 !important;
+}
+.onboarding-welcome-copy p { margin-bottom: 14px !important; }
+.onboarding-welcome-note {
+  margin: 22px 0 !important;
+  padding: 18px 18px 16px !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.72) !important;
+  box-shadow: 0 12px 28px -24px rgba(42,36,64,.32) !important;
+}
+.onboarding-welcome-note strong { color: #2a2440 !important; }
+.onboarding-welcome-closing {
+  color: #2a2440 !important;
+  font-weight: 700 !important;
+}
+.onboarding-welcome-step .onboarding-primary { margin-top: 20px !important; }
+
+/* PREPARING · close the flow with the same visual language */
+.onboarding-preparing {
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 32px 24px !important;
+  background: #fbfafd !important;
+  color: #2a2440 !important;
+  text-align: center !important;
+}
+.onboarding-preparing::before,
+.onboarding-preparing::after {
+  content: "" !important;
+  position: absolute !important;
+  border-radius: 50% !important;
+  pointer-events: none !important;
+}
+.onboarding-preparing::before {
+  top: -90px !important;
+  right: -95px !important;
+  width: 260px !important;
+  height: 260px !important;
+  background: radial-gradient(circle,#f6c9a6 0%,#d98fa0 42%,rgba(90,62,107,.12) 68%,transparent 72%) !important;
+  opacity: .5 !important;
+}
+.onboarding-preparing::after {
+  bottom: -120px !important;
+  left: -100px !important;
+  width: 280px !important;
+  height: 280px !important;
+  background: radial-gradient(circle,rgba(90,62,107,.16),transparent 70%) !important;
+}
+.preparing-mark {
+  width: 58px !important;
+  height: 58px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg,#e2542e 0%,#c4432a 48%,#5a3e6b 130%) !important;
+  color: #fff !important;
+  box-shadow: 0 18px 32px -18px rgba(90,62,107,.6) !important;
+}
+.preparing-mark svg { width: 25px !important; height: 25px !important; }
+.onboarding-preparing h2 {
+  margin: 18px 0 6px !important;
+  color: #2a2440 !important;
+  font-family: Poppins, sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.03em !important;
+}
+.onboarding-preparing p {
+  margin: 0 !important;
+  color: #8a82a3 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+@media (max-width: 370px) {
+  .onboarding-body { padding-right: 20px !important; padding-left: 20px !important; }
+  .onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1::after { font-size: 24px !important; }
+  .onboarding-welcome-step .onboarding-heading h1 { font-size: 32px !important; }
+}
+
+
+/* Onboarding · márgenes consistentes */
+.onboarding-body {
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-fields,
+.onboarding-step:not(.onboarding-welcome-step) .objective-options,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-time-section,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-error,
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-bottom-action,
+.onboarding-welcome-step .onboarding-heading,
+.onboarding-welcome-step .onboarding-welcome-copy,
+.onboarding-welcome-step .onboarding-primary {
+  width: 100% !important;
+  max-width: 340px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1,
+.onboarding-welcome-step .onboarding-heading h1 {
+  max-width: 340px !important;
+}
+
+
+/* Onboarding · separación superior del contenido */
+.onboarding-body {
+  padding-top: 24px !important;
+}

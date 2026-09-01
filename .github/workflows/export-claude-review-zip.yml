@@ -1,0 +1,28 @@
+name: Export Claude review ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Build review ZIP
+        run: |
+          zip -r nu-comunidad-claude-review.zip . \
+            -x ".git/*" \
+            -x ".github/workflows/export-claude-review-zip.yml"
+
+      - name: Upload review ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu-comunidad-claude-review
+          path: nu-comunidad-claude-review.zip
+          if-no-files-found: error
+          retention-days: 7

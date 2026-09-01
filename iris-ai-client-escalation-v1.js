@@ -40,7 +40,17 @@
   }
 
   function isClientEnabledV1(globalObject = root) {
-    return globalObject?.NU_IRIS_AI_ESCALATION_ENABLED === true;
+    if (globalObject?.NU_IRIS_AI_ESCALATION_ENABLED === true) {
+      return true;
+    }
+
+    try {
+      return new URLSearchParams(
+        globalObject?.location?.search || ""
+      ).get("irisTest") === "1";
+    } catch (_) {
+      return false;
+    }
   }
 
   function isDeterministicMissV1(response) {

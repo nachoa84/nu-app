@@ -12,9 +12,11 @@ const DAY_OBJECTIVES = {
   6: "Aprendé a asesorar mejor a cada cliente.",
   7: "Cerrá tu primera semana con más ritmo y confianza."
 };
+
 function currentBlocks() {
   return days[selectedDay].blocks;
 }
+
 function addLinks(container, links) {
   if (!links || !links.length) return;
 
@@ -157,7 +159,6 @@ function createBlock(block) {
 }
 
 function createCompactMediaItem(block, order, mediaBlocks) {
-  // NU APP · MATERIALES MULTIRUTINA V92D
   const materialTitle = getActiveRoutineId() === "collagen-30"
     ? block.label
     : `Historia ${order} de ${mediaBlocks.length}`;
@@ -201,6 +202,7 @@ function createCompactMediaItem(block, order, mediaBlocks) {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
     media.addEventListener("loadedmetadata", thumbReady, { once: true });
+    swapVideoForCapturedFrame(media, preview);
     media.src = block.src;
   } else {
     media.alt = "";
@@ -286,27 +288,99 @@ function createCompactMediaItem(block, order, mediaBlocks) {
   return item;
 }
 
-function cleanLeadingSymbols(value) {
+function restoreRoutineNames(value) {
   return String(value || "")
-    .replace(/^[\s✅☑️✔️✨🔥🚀🙌🏻🧡💛]+/u, "")
+    .replace(/collagen\+/gi, "Collagen+")
+    .replace(/wellspa\s*io/gi, "WellSpa iO")
+    .replace(/wellspa/gi, "WellSpa")
+    .replace(/galvanic\s+spa/gi, "Galvanic Spa")
+    .replace(/lumispa/gi, "LumiSpa")
+    .replace(/nu\s+skin/gi, "Nu Skin")
+    .replace(/instagram/gi, "Instagram")
+    .replace(/facebook/gi, "Facebook")
+    .replace(/whatsapp/gi, "WhatsApp")
+    .replace(/\bstela\b/gi, "Stela")
+    .replace(/\bq\s*&\s*a\b/gi, "Q&A");
+}
+
+function sentenceCaseImportedLine(value) {
+  let line = String(value || "").trim();
+  if (!line) return "";
+  if (/https?:\/\//i.test(line)) return restoreRoutineNames(line);
+
+  const letters = line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "");
+  const allCaps = letters.length >= 5 && letters === letters.toUpperCase();
+
+  if (allCaps && !/^Q&A$/i.test(line)) {
+    const lowered = line.toLocaleLowerCase("es");
+    line = lowered.charAt(0).toLocaleUpperCase("es") + lowered.slice(1);
+  }
+
+  return restoreRoutineNames(line);
+}
+
+function normalizeRoutineText(value) {
+  const cleaned = String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\d\uFE0F?\u20E3/gu, "")
+    .replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D\u20E3]/gu, "")
+    .replace(/[*_`~]+/g, "")
+    .replace(/\bpreguntes\b/gi, "preguntas")
+    .replace(/\binstragram\b/gi, "Instagram")
+    .replace(/\bwhatapp\b/gi, "WhatsApp")
+    .replace(/\bwhatsapp\b/gi, "WhatsApp")
+    .replace(/\ba\s+demás\b/gi, "Además")
+    .replace(/\btíps\b/gi, "tips")
+    .replace(/\baquí\s+esta\b/gi, "Aquí está")
+    .replace(/\baqui\s+esta\b/gi, "Aquí está")
+    .replace(/\bpracticas\b/gi, "prácticas")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[ \t]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  return cleaned
+    .split("\n")
+    .map(sentenceCaseImportedLine)
+    .join("\n")
     .trim();
 }
 
+function stripDecorativeSymbols(value) {
+  return normalizeRoutineText(value)
+    .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️]+/u, "")
+    .replace(/^(?:paso\s*)?\d+\s*[.)\-:–—]\s*/iu, "")
+    .replace(/([!?¡¿])\1{1,}/gu, "$1")
+    .trim();
+}
+
+function cleanLeadingSymbols(value) {
+  return stripDecorativeSymbols(value);
+}
+
 function firstMeaningfulLine(content) {
-  const line = String(content || "")
+  const line = normalizeRoutineText(content)
     .split(/\n+/)
     .map(value => cleanLeadingSymbols(value))
     .find(Boolean) || "Tu acción de hoy";
 
-  return line.length > 68 ? `${line.slice(0, 65)}…` : line;
+  return line.length > 76 ? `${line.slice(0, 73)}…` : line;
 }
 
-function isImportedCollagenContentDay() {
-  return getActiveRoutineId() === "collagen-30" && Number(selectedDay) >= 8;
+function isQuestionAnswerContent(value) {
+  const text = normalizeRoutineText(value).toLowerCase();
+  if (!text) return false;
+
+  const explicitQa = /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|pregunta\s*[:\-]|respuesta\s*[:\-]/i.test(text);
+  const questionCount = (text.match(/[¿?]/g) || []).length;
+  const answerSignals = (text.match(/\b(?:sí|si|no|porque|puede|puedes|debe|debes|recomendamos|respuesta)\b/gi) || []).length;
+
+  return explicitQa || questionCount >= 3 || (questionCount >= 2 && answerSignals >= 2);
 }
 
 function importedTextParts(content, { stripStepNumber = false } = {}) {
-  const normalized = String(content || "").replace(/\r\n?/g, "\n");
+  const normalized = normalizeRoutineText(content);
   const lines = normalized.split("\n");
   const firstIndex = lines.findIndex(line => cleanLeadingSymbols(line));
 
@@ -318,26 +392,14 @@ function importedTextParts(content, { stripStepNumber = false } = {}) {
   }
 
   let heading = cleanLeadingSymbols(lines[firstIndex]);
-
-  // Elimina hashtags sueltos al inicio: #Texto o # Texto.
-  heading = heading
-    .replace(/^#+\s*/u, "")
-    .trim();
+  heading = heading.replace(/^#+\s*/u, "").trim();
 
   if (stripStepNumber) {
-    // Elimina numeraciones importadas como:
-    // 2️⃣ Texto, 2. Texto, 2) Texto, Paso 2: Texto.
     heading = heading
-      .replace(/^\s*\d+\ufe0f?\u20e3\s*/u, "")
-      .replace(
-        /^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu,
-        ""
-      )
+      .replace(/^\s*(?:paso\s*)?#?\d+\s*(?:[.)\-:–—]\s*|\s+)/iu, "")
       .trim();
   }
 
-  // Conserva todo lo que viene después de la primera línea.
-  // No elimina el primer párrafo completo.
   const body = lines
     .slice(firstIndex + 1)
     .join("\n")
@@ -349,132 +411,58 @@ function importedTextParts(content, { stripStepNumber = false } = {}) {
   };
 }
 
-function createImportedObjectiveCard(block) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(block.content);
+function setupFiveLineExpansion(card, body) {
+  if (!card || !body || body.dataset.fiveLineReady === "true") return;
+  body.dataset.fiveLineReady = "true";
+  body.classList.add("five-line-body");
 
-  const card = document.createElement("section");
-  card.className = "objective-card";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "daily-card-expand";
+  toggle.hidden = true;
+  toggle.setAttribute("aria-label", "Mostrar más");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = '<span aria-hidden="true">+</span>';
 
-  const header = document.createElement("div");
-  header.className = "objective-card-header";
+  let expanded = false;
+  const setExpanded = value => {
+    expanded = value;
+    body.classList.toggle("is-collapsed", !expanded);
+    body.classList.toggle("is-expanded", expanded);
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", expanded ? "Mostrar menos" : "Mostrar más");
+    toggle.querySelector("span").textContent = expanded ? "−" : "+";
+  };
 
-  const copy = document.createElement("div");
+  toggle.addEventListener("click", () => setExpanded(!expanded));
+  card.classList.add("has-five-line-content");
+  card.appendChild(toggle);
 
-  const eyebrow = document.createElement("span");
-  eyebrow.textContent = "Objetivo";
-
-  const title = document.createElement("h3");
-  title.textContent = heading;
-
-  copy.append(eyebrow, title);
-  header.appendChild(copy);
-  card.appendChild(header);
-
-  if (detailText || block.links?.length) {
-    const details = document.createElement("details");
-    details.className = "native-details";
-
-    const summary = document.createElement("summary");
-    summary.innerHTML = `
-      <span class="details-label">Ver detalles</span>
-      <span class="details-arrow">${ICONS.down}</span>
-    `;
-
-    const body = document.createElement("div");
-    body.className = "native-details-body";
-
-    appendFormattedContent(body, detailText);
-    addLinks(body, block.links);
-
-    details.addEventListener("toggle", () => {
-      const label = summary.querySelector(".details-label");
-
-      if (label) {
-        label.textContent = details.open
-          ? "Ocultar detalles"
-          : "Ver detalles";
+  const evaluate = () => {
+    if (!body.isConnected) {
+      requestAnimationFrame(evaluate);
+      return;
+    }
+    setExpanded(false);
+    requestAnimationFrame(() => {
+      if (body.scrollHeight > body.clientHeight + 2) {
+        toggle.hidden = false;
+        card.classList.add("is-expandable");
+      } else {
+        toggle.hidden = true;
+        card.classList.remove("is-expandable");
+        body.classList.remove("is-collapsed");
       }
     });
+  };
 
-    details.append(summary, body);
-    setupAnimatedDetails(details);
-    card.appendChild(details);
-  }
-
-  return card;
-}
-
-function createImportedActionStep(block, index) {
-  const {
-    heading,
-    body: detailText
-  } = importedTextParts(
-    block.content,
-    { stripStepNumber: true }
-  );
-
-  const hasDetails =
-    Boolean(detailText) ||
-    Boolean(block.links?.length);
-
-  if (!hasDetails) {
-    const row = document.createElement("div");
-    row.className = "action-step action-step-static";
-
-    const inner = document.createElement("div");
-    inner.className = "action-step-static-row";
-
-    const number = document.createElement("span");
-    number.className = "action-step-number";
-    number.textContent = String(index);
-
-    const title = document.createElement("span");
-    title.className = "action-step-title";
-    title.textContent = heading;
-
-    inner.append(number, title);
-    row.appendChild(inner);
-
-    return row;
-  }
-
-  const details = document.createElement("details");
-  details.className = "action-step";
-
-  const summary = document.createElement("summary");
-
-  const number = document.createElement("span");
-  number.className = "action-step-number";
-  number.textContent = String(index);
-
-  const title = document.createElement("span");
-  title.className = "action-step-title";
-  title.textContent = heading;
-
-  const arrow = document.createElement("span");
-  arrow.className = "action-step-arrow";
-  arrow.innerHTML = ICONS.down;
-
-  summary.append(number, title, arrow);
-
-  const body = document.createElement("div");
-  body.className = "action-step-body";
-
-  appendFormattedContent(body, detailText);
-  addLinks(body, block.links);
-
-  details.append(summary, body);
-  setupAnimatedDetails(details);
-
-  return details;
+  requestAnimationFrame(evaluate);
+  window.addEventListener("resize", evaluate, { passive: true });
 }
 
 function appendFormattedContent(container, content, options = {}) {
   const { dropFirstParagraph = false } = options;
-  let paragraphs = String(content || "")
+  let paragraphs = normalizeRoutineText(content)
     .split(/\n\s*\n/)
     .map(value => value.trim())
     .filter(Boolean);
@@ -486,120 +474,250 @@ function appendFormattedContent(container, content, options = {}) {
   paragraphs.forEach(paragraph => {
     const lines = paragraph
       .split(/\n+/)
-      .map(value => value.trim())
+      .map(value => stripDecorativeSymbols(value))
       .filter(Boolean);
 
     lines.forEach(line => {
-      if (/^(✅|☑️|✔️)/u.test(line)) {
-        const check = document.createElement("div");
-        check.className = "native-check-item";
-        check.innerHTML = `
-          <span class="native-check-icon" aria-hidden="true">${ICONS.checkCircleFilled}</span>
-          <span>${line.replace(/^(✅|☑️|✔️)\s*/u, "")}</span>
-        `;
-        container.appendChild(check);
-        return;
-      }
-
-      const isLabel = line.length < 34 && /^[A-ZÁÉÍÓÚÜÑ0-9\s:]+$/u.test(line);
-      const element = document.createElement(isLabel ? "div" : "p");
-      element.className = isLabel ? "native-detail-label" : "native-detail-paragraph";
+      const element = document.createElement("p");
+      element.className = "native-detail-paragraph";
       element.textContent = line;
       container.appendChild(element);
     });
   });
 }
 
-function createObjectiveCard(block) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedObjectiveCard(block);
-  }
+function estimateRoutineVisualLines(value, qa = false) {
+  const text = normalizeRoutineText(value);
+  if (!text) return 0;
+  const charsPerLine = qa ? 43 : 38;
+  const paragraphs = text.split(/\n\s*\n/).filter(Boolean);
+  return paragraphs.reduce((sum, paragraph) => {
+    const explicitLines = paragraph.split(/\n+/).filter(Boolean);
+    const paragraphLines = explicitLines.reduce(
+      (lineSum, line) => lineSum + Math.max(1, Math.ceil(line.length / charsPerLine)),
+      0
+    );
+    return sum + paragraphLines + 0.35;
+  }, 0);
+}
 
+function applyRoutineCardDensity(card, block) {
+  const text = normalizeRoutineText(block?.content || "");
+  const qa = isQuestionAnswerContent(text);
+  card.classList.toggle("is-qa", qa);
+  card.classList.toggle("is-standard-copy", !qa);
+  card.classList.remove("is-compact-copy");
+}
+
+function createBalancedTextCard(block, { stripStepNumber = false } = {}) {
+  const { heading, body } = importedTextParts(block.content, { stripStepNumber });
   const card = document.createElement("section");
-  card.className = "objective-card";
+  card.className = "objective-card routine-flat-card";
 
-  const header = document.createElement("div");
-  header.className = "objective-card-header";
-  header.innerHTML = `
-    <div>
-      <span>Objetivo</span>
-      <h3>${getRoutineDayObjectiveV92a(selectedDay, DAY_OBJECTIVES[selectedDay] || firstMeaningfulLine(block.content))}</h3>
-    </div>
-  `;
+  const copy = document.createElement("div");
+  copy.className = "routine-flat-copy";
 
-  card.appendChild(header);
-
-  const fullText = String(block.content || "").trim();
-  if (fullText && !block.hideObjectiveDetailsV97a) {
-    const details = document.createElement("details");
-    details.className = "native-details";
-
-    const summary = document.createElement("summary");
-    summary.innerHTML = `<span class="details-label">Ver detalles</span><span class="details-arrow">${ICONS.down}</span>`;
-
-    const body = document.createElement("div");
-    body.className = "native-details-body";
-    appendFormattedContent(body, fullText, { dropFirstParagraph: true });
-    addLinks(body, block.links);
-
-    details.addEventListener("toggle", () => {
-      summary.querySelector(".details-label").textContent = details.open ? "Ocultar detalles" : "Ver detalles";
-    });
-
-    details.append(summary, body);
-    setupAnimatedDetails(details);
-    card.appendChild(details);
+  if (heading) {
+    const first = document.createElement("p");
+    first.className = "routine-card-heading";
+    first.textContent = heading;
+    copy.appendChild(first);
   }
 
+  if (body) {
+    appendFormattedContent(copy, body);
+  }
+
+  addLinks(copy, block.links);
+  card.appendChild(copy);
+  applyRoutineCardDensity(card, block);
   return card;
 }
 
-function createActionStep(block, index) {
-  if (isImportedCollagenContentDay()) {
-    return createImportedActionStep(block, index);
+function createObjectiveCard(block) {
+  return createBalancedTextCard(block);
+}
+
+function createImportedObjectiveCard(block) {
+  return createBalancedTextCard(block);
+}
+
+function createImportedActionStep(block) {
+  return createBalancedTextCard(block, { stripStepNumber: true });
+}
+
+function createActionStep(block) {
+  return createImportedActionStep(block);
+}
+
+function isMaterialTransitionBlock(block) {
+  if (!block || block.type !== "text" || block.links?.length) return false;
+  const text = stripDecorativeSymbols(block.content).replace(/\s+/g, " ").trim();
+  if (!text || text.length > 180) return false;
+  return /(?:aquí|aqui|a continuación|ahora)\s+(?:está|esta|el|la|los|las|te dejo|te dejamos|comparto|encontrarás|encontraras)|material(?:es)?\s+(?:de|para)|public(?:a|ar)\s+(?:en|el|este)|contenido\s+(?:para|de)\s+(?:publicar|mercadeo)/i.test(text);
+}
+
+function splitVisualUnit(value, qa, lineBudget) {
+  const text = normalizeRoutineText(value);
+  if (!text) return [];
+  if (estimateRoutineVisualLines(text, qa) <= lineBudget) return [text];
+
+  const words = text.split(/\s+/).filter(Boolean);
+  const result = [];
+  let current = "";
+
+  words.forEach(word => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (current && estimateRoutineVisualLines(candidate, qa) > lineBudget) {
+      result.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  });
+
+  if (current) result.push(current);
+  return result;
+}
+
+function textUnitsForBalance(value, qa) {
+  const text = normalizeRoutineText(value);
+  if (!text) return [];
+
+  if (qa) {
+    const lines = text.split(/\n+/).map(item => item.trim()).filter(Boolean);
+    const units = [];
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      if (line.includes("?") && lines[index + 1] && !lines[index + 1].includes("?")) {
+        units.push(`${line}\n${lines[index + 1]}`);
+        index += 1;
+      } else {
+        units.push(line);
+      }
+    }
+    return units.flatMap(unit => splitVisualUnit(unit, true, 4.7));
   }
 
-  const paragraphs = String(block.content || "")
-    .split(/\n\s*\n/)
-    .map(value => value.trim())
-    .filter(Boolean);
-  const hasDetails = paragraphs.length > 1 || Boolean(block.links?.length);
+  const paragraphs = text.split(/\n\s*\n/).map(item => item.trim()).filter(Boolean);
+  const units = [];
 
-  if (!hasDetails) {
-    const row = document.createElement("div");
-    row.className = "action-step action-step-static";
-    row.innerHTML = `
-      <div class="action-step-static-row">
-        <span class="action-step-number">${index}</span>
-        <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
-      </div>
-    `;
-    return row;
-  }
+  paragraphs.forEach(paragraph => {
+    const sentences = paragraph
+      .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÜÑ¿¡0-9])/u)
+      .map(item => item.trim())
+      .filter(Boolean);
 
-  const details = document.createElement("details");
-  details.className = "action-step";
+    const source = sentences.length ? sentences : [paragraph];
+    source.forEach(sentence => {
+      units.push(...splitVisualUnit(sentence, false, 4.2));
+    });
+  });
 
-  const summary = document.createElement("summary");
-  summary.innerHTML = `
-    <span class="action-step-number">${index}</span>
-    <span class="action-step-title">${firstMeaningfulLine(block.content)}</span>
-    <span class="action-step-arrow">${ICONS.down}</span>
-  `;
+  return units;
+}
 
-  const body = document.createElement("div");
-  body.className = "action-step-body";
-  appendFormattedContent(body, block.content, { dropFirstParagraph: true });
-  addLinks(body, block.links);
+function balanceRoutinePool(pool, qa) {
+  if (!pool.length) return [];
 
-  details.append(summary, body);
-  setupAnimatedDetails(details);
-  return details;
+  const targetLines = qa ? 8.8 : 6.8;
+  const units = [];
+
+  pool.forEach(block => {
+    textUnitsForBalance(block.content, qa).forEach(content => {
+      units.push({
+        content,
+        cost: estimateRoutineVisualLines(content, qa),
+        block
+      });
+    });
+  });
+
+  if (!units.length) return [];
+
+  const totalCost = units.reduce((sum, unit) => sum + unit.cost, 0);
+  const partCount = Math.max(1, Math.ceil(totalCost / targetLines));
+  const groups = [];
+  let current = [];
+  let currentCost = 0;
+  let consumedCost = 0;
+
+  const flush = () => {
+    if (!current.length) return;
+    const first = current[0].block;
+    groups.push({
+      ...first,
+      content: current.map(unit => unit.content).join("\n\n")
+    });
+    consumedCost += currentCost;
+    current = [];
+    currentCost = 0;
+  };
+
+  units.forEach((unit, index) => {
+    const groupsLeft = partCount - groups.length;
+    const remainingCost = totalCost - consumedCost;
+    const dynamicTarget = remainingCost / Math.max(groupsLeft, 1);
+    const candidateCost = currentCost + unit.cost;
+    const canStillCut = groups.length < partCount - 1;
+    const unitsLeft = units.length - index;
+    const groupsNeeded = partCount - groups.length;
+
+    if (current.length && canStillCut && unitsLeft >= groupsNeeded) {
+      const beforeDiff = Math.abs(dynamicTarget - currentCost);
+      const afterDiff = Math.abs(dynamicTarget - candidateCost);
+      if (beforeDiff <= afterDiff && currentCost >= dynamicTarget * 0.58) {
+        flush();
+      }
+    }
+
+    current.push(unit);
+    currentCost += unit.cost;
+  });
+
+  flush();
+  return groups;
+}
+
+function splitRoutineTextBlocks(blocks) {
+  const output = [];
+  let pool = [];
+  let poolQa = null;
+
+  const flushPool = () => {
+    if (!pool.length) return;
+    output.push(...balanceRoutinePool(pool, Boolean(poolQa)));
+    pool = [];
+    poolQa = null;
+  };
+
+  blocks.forEach(block => {
+    const normalized = normalizeRoutineText(block.content);
+    if (!normalized) return;
+
+    if (block.links?.length) {
+      flushPool();
+      output.push({ ...block, content: normalized });
+      return;
+    }
+
+    const qa = isQuestionAnswerContent(normalized);
+    if (pool.length && qa !== poolQa) flushPool();
+    if (!pool.length) poolQa = qa;
+    pool.push({ ...block, content: normalized });
+  });
+
+  flushPool();
+  return output;
 }
 
 function renderStructuredDayDetail() {
   const blocks = currentBlocks();
-  const textBlocks = blocks.filter(block => block.type === "text");
+  const rawTextBlocks = blocks.filter(block => block.type === "text");
+  const materialIntroBlocks = rawTextBlocks.filter(isMaterialTransitionBlock);
+  const textBlocks = splitRoutineTextBlocks(
+    rawTextBlocks.filter(block => !isMaterialTransitionBlock(block))
+  );
   const mediaBlocks = blocks.filter(block => block.type === "media");
   const actionBlocks = blocks.filter(block => block.type === "action");
   const completeBlock = blocks.find(block => block.type === "complete");
@@ -614,51 +732,76 @@ function renderStructuredDayDetail() {
     <div class="native-day-hero">
       <div class="native-day-hero-copy">
         <h2>Día ${selectedDay}</h2>
-        <p>Tu acción de hoy</p>
+        <p>TU ACCIÓN DE HOY</p>
       </div>
       <div class="native-day-hero-media" aria-hidden="true">
         <img src="${getRoutineHeroV92a()}" alt="" />
       </div>
-    </div>
-    <div class="native-day-progress-row">
-      <div class="native-day-progress" aria-label="Progreso: ${selectedDay} de ${TOTAL_PROGRAM_DAYS}">
-        <span style="width:${Math.min(100, Math.round((selectedDay / TOTAL_PROGRAM_DAYS) * 100))}%"></span>
+      <div class="native-day-progress-row">
+        <div class="native-day-progress" aria-label="Progreso: ${selectedDay} de ${TOTAL_PROGRAM_DAYS}">
+          <span style="width:${Math.min(100, Math.round((selectedDay / TOTAL_PROGRAM_DAYS) * 100))}%"></span>
+        </div>
+        <small>${selectedDay} de ${TOTAL_PROGRAM_DAYS}</small>
       </div>
-      <small>${selectedDay} de ${TOTAL_PROGRAM_DAYS}</small>
     </div>
   `;
   chat.appendChild(intro);
 
   if (textBlocks.length) {
-    const planGroup = document.createElement("section");
-    planGroup.className = "day-plan-group";
+    const carousel = document.createElement("section");
+    carousel.className = "routine-content-carousel";
+    carousel.setAttribute("aria-label", "Contenido de la rutina");
 
-    const objective = createObjectiveCard(textBlocks[0]);
-    objective.classList.add("day-plan-objective");
-    planGroup.appendChild(objective);
+    const heading = document.createElement("h3");
+    heading.className = "routine-content-heading";
+    heading.textContent = "Contenido del día";
 
-    if (textBlocks.length > 1) {
-      const steps = document.createElement("section");
-      steps.className = "native-section steps-section day-plan-steps";
-      steps.innerHTML = `
-        <div class="native-section-heading">
-          <div>
-            <h3>Pasos de hoy</h3>
-          </div>
-          <small class="section-count">${textBlocks.length - 1}</small>
-        </div>
-      `;
+    const track = document.createElement("div");
+    track.className = "routine-content-track";
 
-      const list = document.createElement("div");
-      list.className = "action-step-list";
-      textBlocks.slice(1).forEach((block, index) => {
-        list.appendChild(createActionStep(block, index + 1));
+    textBlocks.forEach((block, index) => {
+      const slide = document.createElement("article");
+      slide.className = "routine-content-slide";
+      slide.dataset.slideIndex = String(index);
+      const card = index === 0
+        ? createObjectiveCard(block)
+        : createActionStep(block, index);
+      card.classList.add("routine-content-card");
+      applyRoutineCardDensity(card, block);
+      slide.appendChild(card);
+      track.appendChild(slide);
+    });
+
+    const dots = document.createElement("div");
+    dots.className = "routine-content-dots";
+    dots.setAttribute("aria-label", "Navegación del contenido");
+    textBlocks.forEach((_, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "routine-content-dot";
+      dot.setAttribute("aria-label", `Ver contenido ${index + 1}`);
+      dot.addEventListener("click", () => {
+        track.scrollTo({ left: track.clientWidth * index, behavior: "smooth" });
       });
-      steps.appendChild(list);
-      planGroup.appendChild(steps);
-    }
+      dots.appendChild(dot);
+    });
 
-    chat.appendChild(planGroup);
+    const setActiveDot = () => {
+      const index = Math.max(0, Math.min(
+        textBlocks.length - 1,
+        Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
+      ));
+      dots.querySelectorAll(".routine-content-dot").forEach((dot, dotIndex) => {
+        dot.classList.toggle("is-active", dotIndex === index);
+        dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
+      });
+    };
+
+    track.addEventListener("scroll", setActiveDot, { passive: true });
+    requestAnimationFrame(setActiveDot);
+
+    carousel.append(heading, track, dots);
+    chat.appendChild(carousel);
   }
 
   if (mediaBlocks.length) {
@@ -672,6 +815,15 @@ function renderStructuredDayDetail() {
         <small class="section-count">${mediaBlocks.length}</small>
       </div>
     `;
+
+    if (materialIntroBlocks.length) {
+      const introText = document.createElement("p");
+      introText.className = "materials-intro";
+      introText.textContent = materialIntroBlocks
+        .map(block => stripDecorativeSymbols(block.content))
+        .join(" ");
+      materials.querySelector(".native-section-heading > div").appendChild(introText);
+    }
 
     const list = document.createElement("div");
     list.className = "resource-sequence";

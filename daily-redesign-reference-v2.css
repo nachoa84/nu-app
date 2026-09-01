@@ -1,0 +1,473 @@
+/* =========================================================
+   NU APP · DETALLE DIARIO · REFERENCIA APROBADA V2
+   Composición fiel a la referencia enviada por el usuario.
+   Visual-only override sobre daily-redesign-v1.css.
+   ========================================================= */
+
+#view-hoy.day-open {
+  --ref-bg: #f4eff8;
+  --ref-ink: #17152f;
+  --ref-muted: #887d9c;
+  --ref-lilac: #a58cca;
+  --ref-coral: #ef6a43;
+  --ref-plum: #54345f;
+  --ref-card: rgba(255,255,255,.93);
+  padding: calc(10px + var(--safe-top)) 16px calc(28px + var(--safe-bottom));
+  background: var(--ref-bg);
+}
+
+#view-hoy.day-open .chat-wrap {
+  padding: 0 0 20px;
+}
+
+/* HEADER */
+#view-hoy.day-open .daily-native-header:not([hidden]) {
+  min-height: 58px;
+  grid-template-columns: 40px minmax(0,1fr) 40px;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+#view-hoy.day-open .daily-native-back,
+#view-hoy.day-open .daily-native-progress {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.9) !important;
+  color: #635a70 !important;
+  box-shadow: 0 7px 18px rgba(49,35,62,.07) !important;
+}
+
+#view-hoy.day-open .daily-native-title {
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+#view-hoy.day-open .daily-native-title span {
+  order: 1;
+  color: #9f8bbb;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .18em;
+}
+
+#view-hoy.day-open .daily-native-title strong {
+  order: 2;
+  color: var(--ref-ink);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+
+#view-hoy.day-open .continuous-day-detail,
+#view-hoy.day-open .daily-detail {
+  gap: 12px;
+}
+
+/* HERO */
+#view-hoy.day-open .native-day-intro {
+  position: relative;
+  margin: 0;
+}
+
+#view-hoy.day-open .native-day-hero {
+  position: relative;
+  min-height: 156px;
+  display: block;
+  margin: 0;
+  padding: 18px 16px 16px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 16% 100%, rgba(246,201,166,.92), transparent 38%),
+    radial-gradient(circle at 92% 5%, rgba(236,154,174,.78), transparent 34%),
+    linear-gradient(150deg, #cf7994 0%, #a55982 42%, #653d68 70%, #4a315c 100%);
+  box-shadow: 0 12px 28px rgba(68,42,78,.12);
+}
+
+#view-hoy.day-open .native-day-hero::after {
+  content: "";
+  position: absolute;
+  width: 146px;
+  height: 146px;
+  right: -54px;
+  top: -66px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#view-hoy.day-open .native-day-hero-copy {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 82px);
+}
+
+#view-hoy.day-open .native-day-hero-copy h2 {
+  margin: 0 0 7px;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 31px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+#view-hoy.day-open .native-day-hero-copy p {
+  margin: 0;
+  color: rgba(255,255,255,.88);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+#view-hoy.day-open .native-day-hero-media {
+  position: absolute;
+  z-index: 2;
+  top: 28px;
+  right: 14px;
+  width: 54px;
+  height: 68px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .native-day-hero-media img {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 8px rgba(45,25,55,.2));
+}
+
+#view-hoy.day-open .native-day-progress-row {
+  position: absolute;
+  z-index: 3;
+  left: 16px;
+  bottom: 38px;
+  width: 96px;
+  display: grid;
+  grid-template-columns: 52px auto;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+#view-hoy.day-open .native-day-progress {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.22);
+}
+
+#view-hoy.day-open .native-day-progress span {
+  background: #ffd655;
+}
+
+#view-hoy.day-open .native-day-progress-row small {
+  color: #ffd655;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* OBJETIVO */
+#view-hoy.day-open .day-plan-group {
+  gap: 14px;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-objective,
+#view-hoy.day-open .objective-card {
+  padding: 16px 16px 13px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--ref-card);
+  box-shadow: 0 8px 22px rgba(42,31,58,.055);
+}
+
+#view-hoy.day-open .objective-card-header span {
+  margin-bottom: 7px;
+  color: #ad94cb;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+#view-hoy.day-open .objective-card-header h3 {
+  color: var(--ref-ink);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -.01em;
+}
+
+#view-hoy.day-open .native-details {
+  margin-top: 6px;
+  border: 0;
+}
+
+#view-hoy.day-open .native-details summary {
+  min-height: 24px;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 1px 0 0;
+  color: #e45135;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+#view-hoy.day-open .native-details .details-arrow {
+  width: 12px;
+  transform: rotate(-90deg);
+}
+
+#view-hoy.day-open .native-details[open] .details-arrow {
+  transform: rotate(0deg);
+}
+
+#view-hoy.day-open .native-details-body {
+  padding-top: 10px;
+  color: #5f566c;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* PLAN */
+#view-hoy.day-open .day-plan-group .day-plan-steps {
+  position: relative;
+  padding: 12px 2px 0;
+}
+
+#view-hoy.day-open .day-plan-steps::before {
+  content: "Tu plan de hoy";
+  margin: 0 0 16px;
+  color: var(--ref-ink);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading {
+  position: absolute;
+  top: 13px;
+  right: 2px;
+  display: block;
+  margin: 0;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading > div {
+  display: none;
+}
+
+#view-hoy.day-open .day-plan-steps .section-count {
+  color: #a891c3;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+#view-hoy.day-open .day-plan-steps .section-count::after {
+  content: " PASOS";
+}
+
+#view-hoy.day-open .action-step-list {
+  display: grid;
+  gap: 0;
+}
+
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  border: 0;
+}
+
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-static-row {
+  min-height: 0;
+  grid-template-columns: 28px minmax(0,1fr) 18px;
+  align-items: start;
+  gap: 7px;
+  padding: 7px 0 12px;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  grid-template-columns: 28px minmax(0,1fr);
+}
+
+#view-hoy.day-open .action-step-number {
+  width: auto;
+  height: auto;
+  display: block;
+  padding-top: 1px;
+  border-radius: 0;
+  background: transparent;
+  color: #b095cb;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+}
+
+#view-hoy.day-open .action-step-number::before {
+  content: "0";
+}
+
+#view-hoy.day-open .action-step-title {
+  color: #2f2940;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+#view-hoy.day-open .action-step-arrow {
+  padding-top: 1px;
+  color: #b4aabd;
+}
+
+#view-hoy.day-open .action-step-body {
+  padding: 0 0 12px 35px;
+  color: #655c72;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+/* Mantener los bloques posteriores, pero en el mismo lenguaje. */
+#view-hoy.day-open .materials-section,
+#view-hoy.day-open .resources-section {
+  padding-top: 8px;
+}
+
+#view-hoy.day-open .materials-section > h3,
+#view-hoy.day-open .materials-section .native-section-heading h3,
+#view-hoy.day-open .resources-section > h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+#view-hoy.day-open .resource-row,
+#view-hoy.day-open .training-card {
+  background: var(--ref-card);
+}
+
+/* CTA en el flujo normal: nunca debe flotar sobre "Ver progreso" ni sobre
+   la capacitación. Ver mobile-last-mile-v1.css para el estado done. */
+#view-hoy.day-open .complete-card:not(.done) {
+  position: static;
+  z-index: auto;
+  width: 100%;
+  margin: 18px 0 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+#view-hoy.day-open .complete-card:not(.done) > h3,
+#view-hoy.day-open .complete-card:not(.done) > p,
+#view-hoy.day-open .complete-card:not(.done) .complete-helper {
+  display: none;
+}
+
+#view-hoy.day-open .complete-day-btn {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(115deg,#e85b39 0%,#c24b42 48%,#7a3f62 100%);
+  color: #fff;
+  box-shadow: none;
+  font-family: Jost, Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+#view-hoy.day-open .complete-day-btn .complete-action-check {
+  display: none;
+}
+
+/* Estado completado: badge compacto, sin tarjeta final pesada. */
+#view-hoy.day-open .complete-card.done {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy {
+  display: flex;
+  justify-content: center;
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: #54705a;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(48,37,60,.06);
+}
+
+#view-hoy.day-open .complete-card.done .complete-done-copy p {
+  display: none;
+}
+
+/* El botón secundario de progreso no compite con el CTA. */
+#view-hoy.day-open .native-day-progress-button {
+  margin-top: 10px;
+  border: 0;
+  background: transparent;
+  color: #8d8398;
+  box-shadow: none;
+}
+
+@media (max-width: 370px) {
+  #view-hoy.day-open {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  #view-hoy.day-open .native-day-hero {
+    min-height: 150px;
+    border-radius: 22px;
+  }
+
+  #view-hoy.day-open .native-day-hero-copy h2 {
+    font-size: 29px;
+  }
+}

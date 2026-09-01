@@ -1,0 +1,140 @@
+/* Foco en vivo · tarjeta clara integrada en Nu App */
+body.foco-live-open {
+  overflow: hidden;
+}
+
+.foco-live-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: grid;
+  place-items: center;
+  padding: 24px 20px calc(24px + var(--safe-bottom, 0px));
+  background: rgba(246, 247, 249, .78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.foco-live-modal[hidden] {
+  display: none !important;
+}
+
+.foco-live-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+}
+
+.foco-live-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(290px, 100%);
+  display: grid;
+  gap: 22px;
+  justify-items: center;
+  padding: 20px 14px 24px;
+  border: 1px solid rgba(48, 79, 154, .10);
+  border-radius: 26px;
+  background: var(--app-surface, #fff);
+  box-shadow: 0 22px 70px rgba(35, 63, 130, .16);
+  animation: foco-live-in .28s cubic-bezier(.22, .8, .2, 1) both;
+}
+
+.foco-live-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(31, 42, 68, .08);
+  color: var(--app-text, #17223d);
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.foco-live-close svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.foco-live-close:focus {
+  outline: none;
+}
+
+.foco-live-close:focus-visible {
+  outline: 2px solid rgba(48, 79, 154, .35);
+  outline-offset: 3px;
+}
+
+.foco-live-image-card {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 19px;
+  background: var(--app-surface-soft, #f3f5f8);
+  aspect-ratio: 1.28;
+  box-shadow: inset 0 0 0 1px rgba(48, 79, 154, .08);
+}
+
+.foco-live-image-card img,
+.foco-live-art {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.foco-live-image-card img {
+  object-fit: cover;
+}
+
+ .foco-live-join {
+  width: min(250px, 100%);
+  margin-top: 2px;
+  min-height: 50px;
+  display: grid;
+  place-items: center;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--app-accent, #304f9a);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: 0 10px 22px rgba(48, 79, 154, .18);
+}
+
+.foco-live-join:active {
+  transform: scale(.98);
+}
+
+@keyframes foco-live-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foco-live-dialog {
+    animation: none;
+  }
+}

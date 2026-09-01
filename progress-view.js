@@ -23,8 +23,7 @@ function renderDays() {
     Math.round((state.currentDay / TOTAL_PROGRAM_DAYS) * 100)
   );
 
-  const currentComplete =
-    isDayComplete(state.currentDay);
+  const currentComplete = isDayComplete(state.currentDay);
 
   const progressCard = document.createElement("section");
   progressCard.className = "app-progress-card";
@@ -100,54 +99,31 @@ function renderDays() {
   }
 
   const weekCards = weeks.map(week => {
-    const weekHasAvailableDay =
-      isPreviewMode ||
-      week.start <= state.currentDay;
+    const weekHasAvailableDay = isPreviewMode || week.start <= state.currentDay;
 
     const card = document.createElement("section");
     card.className =
-      `app-week-card ${
-        weekHasAvailableDay
-          ? "app-week-open"
-          : "app-week-locked-card"
-      }`;
+      `app-week-card ${weekHasAvailableDay ? "app-week-open" : "app-week-locked-card"}`;
 
     const head = document.createElement("div");
     head.className =
-      `app-week-open-head${
-        weekHasAvailableDay
-          ? ""
-          : " app-week-locked-head"
-      }`;
+      `app-week-open-head${weekHasAvailableDay ? "" : " app-week-locked-head"}`;
 
     head.innerHTML = `
       <div>
         <strong>Semana ${week.number}</strong>
         <span>Días ${week.start}–${week.end}</span>
       </div>
-      ${
-        weekHasAvailableDay
-          ? ""
-          : `<span class="app-week-lock" aria-label="Bloqueada">${ICONS.lock}</span>`
-      }
+      ${weekHasAvailableDay ? "" : `<span class="app-week-lock" aria-label="Bloqueada">${ICONS.lock}</span>`}
     `;
 
     const weekDays = document.createElement("div");
     weekDays.className =
-      `app-week-days${
-        weekHasAvailableDay
-          ? ""
-          : " app-week-days-locked"
-      }`;
+      `app-week-days${weekHasAvailableDay ? "" : " app-week-days-locked"}`;
 
     for (let day = week.start; day <= week.end; day++) {
       const hasContent = Boolean(days[day]);
-      const available =
-        hasContent &&
-        (
-          isPreviewMode ||
-          day <= state.currentDay
-        );
+      const available = hasContent && (isPreviewMode || day <= state.currentDay);
       const complete = isDayComplete(day);
       const current = day === state.currentDay;
 
@@ -157,22 +133,15 @@ function renderDays() {
       dayButton.textContent = String(day);
       dayButton.setAttribute("aria-label", `Día ${day}`);
 
-      if (complete) {
-        dayButton.classList.add("is-complete");
-      }
-
-      if (current) {
-        dayButton.classList.add("is-current");
-      }
+      if (complete) dayButton.classList.add("is-complete");
+      if (current) dayButton.classList.add("is-current");
 
       if (!available) {
         dayButton.classList.add("is-future", "is-locked");
         dayButton.disabled = true;
         dayButton.setAttribute(
           "aria-label",
-          hasContent
-            ? `Día ${day} bloqueado`
-            : `Día ${day} sin contenido`
+          hasContent ? `Día ${day} bloqueado` : `Día ${day} sin contenido`
         );
       } else {
         dayButton.onclick = () => {
@@ -188,11 +157,6 @@ function renderDays() {
     return card;
   });
 
-  grid.append(
-    progressCard,
-    todayCard,
-    ...weekCards
-  );
-
+  grid.append(progressCard, todayCard, ...weekCards);
   ensureDemoControls();
 }

@@ -1,4 +1,4 @@
-const CACHE="nuapp-v136-unified-daily-unlock";
+const CACHE="nuapp-v168-shell-precache-aligned";
 
 const CORE=[
   "./",
@@ -6,37 +6,49 @@ const CORE=[
   "./tokens.css?v=61b-progress-canonical",
   "./base.css?v=129-ios-horizontal-stability",
   "./splash.css?v=61b-progress-canonical",
-  "./splash.js?v=61b-progress-canonical",
+  "./splash.js?v=122-session-resume",
   "./navigation.css?v=81-home-navigation-legibility",
-  "./daily.css?v=98a-responsive-day2",
+  "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
+  "./typography-poppins-v1.css?v=20260830-poppins-v1",
+  "./home-redesign-v1.css?v=20260831-routine-state-scope",
+  "./daily.css?v=109-routine-text-balanced",
   "./progress.css?v=83-routine-progress-legibility",
   "./media-preview.css?v=85a-media-legibility",
   "./shared.css?v=87-shared-ui-legibility",
-  "./ui-core.css?v=87-shared-ui-legibility",
+  "./ui-core.css?v=143-iris-clean-2",
   "./notifications.css?v=86-notifications-legibility",
+  "./foco-live.css?v=2",
   "./home.css?v=126-mobile-header-spacing",
   "./shell.css?v=61b-progress-canonical",
-  "./bot.css?v=126-assistant-spacing",
+  "./bot.css?v=143-iris-layout-9",
   "./favorites.css?v=94-bot-folders",
-  "./bot-content.js?v=79-loi-navegacion",
-  "./ui-core.js?v=126-iris-navigation",
+  "./favorites-redesign-v1.css?v=146-wellspa-scale",
+  "./bot-content.js?v=131-country-catalogs",
+  "./ui-core.js?v=143-iris-clean-4",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
-  "./routine-products-v92.js?v=123-pharmanex-card",
+  "./routine-products-v92.js?v=143-single-render",
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
-  "./bot.js?v=124a-iris-layout",
-  "./bot-shortcuts-v95.js?v=125-nuskin-category-logo",
+  "./iris-ai-client-escalation-v1.js?v=1",
+  "./bot.js?v=143-keyboard-layout",
+  "./bot-shortcuts-v95.js?v=126-grid-access-icon",
   "./assets/custom/nuskin-logo-icon.svg",
+  "./assets/custom/foco-live-card.png",
+  "./assets/catalogos/catalogo-europa-02-2026.pdf",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
-  "./notifications.js?v=61b-progress-canonical",
-  "./home-view.js?v=61b-progress-canonical",
-  "./daily-view.js?v=102-sales-training",
+  "./notifications.js?v=143-single-sw",
+  "./notifications-redesign-v2.js?v=143-no-legacy-css",
+  "./foco-live.js?v=2",
+  "./home-view.js?v=20260830-home-continuity-v4",
+  "./daily-view.js?v=110-routine-text-balanced",
+  "./routine-content-quality-v2.js?v=20260831-quality-v2",
+  "./routine-ui-polish-v1.js?v=20260901-polish-v2",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
-  "./app.js?v=128-controlled-auto-update",
+  "./app.js?v=143-single-sw",
   "./backend-client.js?v=136-unified-daily-unlock",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
@@ -142,7 +154,7 @@ self.addEventListener("install",event=>{
 });
 
 self.addEventListener("message", event => {
-  if (event.data?.type === "NUAPP_SKIP_WAITING_V128") {
+  if (event.data?.type === "NUAPP_SKIP_WAITING_V142" || event.data?.type === "NUAPP_SKIP_WAITING_V143") {
     self.skipWaiting();
   }
 });
@@ -291,6 +303,18 @@ self.addEventListener("fetch",event=>{
 
   if(req.method!=="GET") return;
 
+  const requestUrl = new URL(req.url);
+  const isSameOriginApi =
+    requestUrl.origin === self.location.origin &&
+    requestUrl.pathname.startsWith("/api/");
+
+  // El estado del usuario, progreso, configuración y demás respuestas API
+  // siempre vienen del servidor. Nunca deben persistirse en Cache Storage.
+  if (isSameOriginApi) {
+    event.respondWith(fetch(req, { cache: "no-store" }));
+    return;
+  }
+
   if(req.headers.has("range")){
     event.respondWith(
       handleRangeRequest(req)
@@ -326,7 +350,26 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  const requestUrl = new URL(req.url);
+  const isCurrentCodeAsset =
+    requestUrl.origin === self.location.origin &&
+    /\.(css|js)$/i.test(requestUrl.pathname);
+
+  // CSS y JavaScript se consultan primero en red. Si no hay conexión,
+  // se usa la copia offline. Así una página nueva no queda mezclada con
+  // código o estilos de una versión anterior.
+  if (isCurrentCodeAsset) {
+    event.respondWith(
+      fetch(req, { cache: "no-store" })
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(cache => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
   const isVideoAsset = /\.(mp4|mov|m4v|webm)$/i.test(requestUrl.pathname);
 
   if (isVideoAsset) {
@@ -395,6 +438,9 @@ self.addEventListener(
           notificationId:
             data.notificationId ||
             data.tag ||
+            null,
+          focoKind:
+            data.focoKind ||
             null
         },
         tag:
@@ -404,6 +450,26 @@ self.addEventListener(
           }
         )
     ];
+
+    if (data.focoEvent && data.focoKind) {
+      tasks.push(
+        self.clients
+          .matchAll({
+            type: "window",
+            includeUncontrolled: true
+          })
+          .then(windowClients =>
+            Promise.all(
+              windowClients.map(client =>
+                client.postMessage({
+                  type: "NU_FOCO_EVENT",
+                  payload: data
+                })
+              )
+            )
+          )
+      );
+    }
 
     if (
       self.navigator &&

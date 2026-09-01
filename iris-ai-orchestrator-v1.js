@@ -135,6 +135,29 @@ function localOkV1(candidate) {
   };
 }
 
+function normalizeResolvedScopeV1(scope, input) {
+  if (!scope || typeof scope !== "object" || Array.isArray(scope)) return null;
+
+  const country = String(scope.country || "").trim().toUpperCase();
+  const category = String(scope.category || "").trim();
+  const productSlug = String(scope.productSlug || "").trim();
+  const inputCountry = String(input.country || "").trim().toUpperCase();
+
+  if (!country || country !== inputCountry || !category || !productSlug) {
+    return null;
+  }
+
+  if (input.category != null && String(input.category) !== category) {
+    return null;
+  }
+
+  if (input.productSlug != null && String(input.productSlug) !== productSlug) {
+    return null;
+  }
+
+  return Object.freeze({ country, category, productSlug });
+}
+
 function createIrisAiOrchestratorV1({
   retrieveDocumentChunks,
   provider = createNoopIrisAiProviderV1(),
@@ -142,10 +165,14 @@ function createIrisAiOrchestratorV1({
   prepareRetrievalQueries = prepareIrisRetrievalQueriesV1,
   timeoutMs = DEFAULT_OPERATION_TIMEOUT_MS_V1,
   policyRuntime = null,
-  localResponseEngine = null
+  localResponseEngine = null,
+  resolveRetrievalScope = null
 } = {}) {
   if (typeof retrieveDocumentChunks !== "function") throw new IrisAiOrchestratorErrorV1("Se requiere retrieveDocumentChunks.");
   if (typeof prepareRetrievalQueries !== "function") throw new IrisAiOrchestratorErrorV1("Se requiere prepareRetrievalQueries.");
+  if (resolveRetrievalScope != null && typeof resolveRetrievalScope !== "function") {
+    throw new IrisAiOrchestratorErrorV1("resolveRetrievalScope inválido.");
+  }
   assertIrisAiProviderV1(provider);
   const runtime = assertPolicyRuntimeV1(policyRuntime);
   const localEngine = assertLocalResponseEngineV1(localResponseEngine, runtime);
@@ -196,11 +223,47 @@ function createIrisAiOrchestratorV1({
       }
     }
 
+    let retrievalInput = localInput;
+    if (resolveRetrievalScope) {
+      let resolvedScope;
+      try {
+        resolvedScope = await withTimeoutV1(
+          () => resolveRetrievalScope(localInput),
+          { timeoutMs }
+        );
+      } catch (error) {
+        return fallback(error?.code === "IRIS_TIMEOUT" ? "scope_resolution_timeout" : "scope_resolution_error");
+      }
+
+      const scope = normalizeResolvedScopeV1(resolvedScope, localInput);
+      if (!scope) return fallback("scope_unresolved");
+
+      retrievalInput = {
+        ...localInput,
+        country: scope.country,
+        category: scope.category,
+        productSlug: scope.productSlug
+      };
+    }
+
     let fragments = [];
     try {
-      const queries = prepareRetrievalQueries({ question: normalizedQuestion, productSlug });
+      const queries = prepareRetrievalQueries({
+        question: normalizedQuestion,
+        productSlug: retrievalInput.productSlug
+      });
       for (const query of queries) {
-        const candidateFragments = await withTimeoutV1(() => retrieveDocumentChunks({ query, language, country, category, productSlug, limit: MAX_FRAGMENTS_V1 }), { timeoutMs });
+        const candidateFragments = await withTimeoutV1(
+          () => retrieveDocumentChunks({
+            query,
+            language: retrievalInput.language,
+            country: retrievalInput.country,
+            category: retrievalInput.category,
+            productSlug: retrievalInput.productSlug,
+            limit: MAX_FRAGMENTS_V1
+          }),
+          { timeoutMs }
+        );
         if (Array.isArray(candidateFragments) && candidateFragments.length > 0) {
           fragments = candidateFragments;
           break;
@@ -218,7 +281,7 @@ function createIrisAiOrchestratorV1({
     if (localEngine) {
       try {
         const local = await withTimeoutV1(
-          () => localEngine.resolveAfterRetrieval({ ...localInput, context }),
+          () => localEngine.resolveAfterRetrieval({ ...retrievalInput, context }),
           { timeoutMs }
         );
         retrievalAssessment = local.retrieval;

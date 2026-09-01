@@ -1,0 +1,179 @@
+/* NU APP · IRIS REFINEMENT V2
+   Ajuste visual final de Iris: tipografia global + compositor con accesos rapidos junto a Enviar. */
+
+#view-bot,
+#view-bot *,
+.bot-document-sheet,
+.bot-document-sheet * {
+  font-family: var(--nu-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif) !important;
+}
+
+/* Header */
+#view-bot .bot-page-header {
+  min-height: 68px !important;
+  align-items: center !important;
+  margin: 0 2px 14px !important;
+}
+
+#view-bot .bot-page-header > div:first-child::before {
+  margin-bottom: 5px !important;
+  font-family: inherit !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .14em !important;
+}
+
+#view-bot .bot-page-header h1,
+#view-bot .app-page-header h1 {
+  font-family: inherit !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+}
+
+#view-bot .bot-status {
+  margin-top: 6px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+/* En header queda solo limpiar conversacion. */
+#view-bot .bot-header-actions {
+  margin-top: 0 !important;
+}
+
+#view-bot .bot-header-actions .icon-button {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Respuestas */
+#view-bot .bot-message-bot .bubble.bot,
+#view-bot .bot-response-stack .bubble.bot {
+  max-width: 92% !important;
+  color: #302844 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.62 !important;
+  letter-spacing: -.006em !important;
+}
+
+#view-bot .bot-message-user .bubble,
+#view-bot .bubble.user {
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+}
+
+#view-bot .bot-resource-copy small,
+#view-bot .bot-document-header small {
+  font-family: inherit !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .12em !important;
+}
+
+#view-bot .bot-resource-copy strong {
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  letter-spacing: -.012em !important;
+}
+
+#view-bot .bot-resource-copy span {
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+}
+
+#view-bot .bot-message-action {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .06em !important;
+}
+
+/* Composer: input + accesos rapidos + enviar */
+#view-bot .bot-form,
+#view-bot .bot-card.has-conversation .bot-form {
+  grid-template-columns: minmax(0,1fr) 42px 50px !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+#view-bot .bot-form input {
+  min-width: 0 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: -.006em !important;
+}
+
+#view-bot #botShortcutsBtn.bot-composer-shortcuts {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  align-self: center !important;
+  margin: 0 !important;
+  border: 1px solid rgba(67,52,95,.07) !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.86) !important;
+  color: #6b5879 !important;
+  box-shadow: 0 7px 18px rgba(55,43,77,.045) !important;
+}
+
+#view-bot #botShortcutsBtn.bot-composer-shortcuts svg {
+  width: 17px !important;
+  height: 17px !important;
+  stroke-width: 1.7 !important;
+}
+
+#view-bot #botShortcutsBtn.bot-composer-shortcuts:active {
+  transform: scale(.95) !important;
+  background: #f0eaf6 !important;
+}
+
+#view-bot .bot-send {
+  width: 50px !important;
+  min-width: 50px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  background: linear-gradient(135deg,#e65334 0%,#b64652 50%,#6c3c68 100%) !important;
+  box-shadow: 0 10px 22px rgba(112,55,79,.18) !important;
+}
+
+.bot-document-header h2 {
+  font-family: inherit !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.03em !important;
+}
+
+@media (max-width: 370px) {
+  #view-bot .bot-form,
+  #view-bot .bot-card.has-conversation .bot-form {
+    grid-template-columns: minmax(0,1fr) 40px 46px !important;
+    gap: 6px !important;
+  }
+
+  #view-bot #botShortcutsBtn.bot-composer-shortcuts {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+
+  #view-bot .bot-send {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+  }
+}

@@ -1,0 +1,506 @@
+/* NU APP · DAILY REFERENCE FORCE V3
+   Final scoped override for approved daily detail composition. */
+
+body:has(#view-hoy.day-open) .bottom-nav {
+  display: none !important;
+}
+
+body:has(#view-hoy.day-open) #app {
+  padding-bottom: 0 !important;
+}
+
+#view-hoy.day-open {
+  padding: calc(10px + var(--safe-top)) 16px 82px !important;
+  background: #f4eff8 !important;
+}
+
+#view-hoy.day-open .chat-wrap {
+  margin-top: 0 !important;
+  padding: 0 0 40px !important;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .daily-native-header:not([hidden]) {
+  min-height: 58px !important;
+  display: grid !important;
+  grid-template-columns: 40px minmax(0,1fr) 40px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .daily-native-title {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  text-align: center !important;
+}
+
+#view-hoy.day-open .daily-native-title span {
+  order: 1 !important;
+  color: #a18bbf !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+
+#view-hoy.day-open .daily-native-title strong {
+  order: 2 !important;
+  color: #17152f !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.02em !important;
+}
+
+#view-hoy.day-open .continuous-day-detail,
+#view-hoy.day-open .daily-detail {
+  gap: 12px !important;
+}
+
+#view-hoy.day-open .native-day-intro {
+  position: relative !important;
+  margin: 0 !important;
+}
+
+#view-hoy.day-open .native-day-hero {
+  position: relative !important;
+  min-height: 156px !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 18px 16px 16px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background:
+    radial-gradient(circle at 16% 100%, rgba(246,201,166,.92), transparent 38%),
+    radial-gradient(circle at 92% 5%, rgba(236,154,174,.78), transparent 34%),
+    linear-gradient(150deg,#cf7994 0%,#a55982 42%,#653d68 70%,#4a315c 100%) !important;
+  box-shadow: 0 12px 28px rgba(68,42,78,.12) !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy {
+  position: relative !important;
+  z-index: 2 !important;
+  width: calc(100% - 82px) !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy h2 {
+  margin: 0 0 7px !important;
+  color: #fff !important;
+  font-family: Georgia,"Times New Roman",serif !important;
+  font-size: 31px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy p {
+  margin: 0 !important;
+  color: rgba(255,255,255,.9) !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+#view-hoy.day-open .native-day-hero-media {
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 27px !important;
+  right: 14px !important;
+  width: 54px !important;
+  height: 68px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .native-day-hero-media img {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 8px 8px rgba(45,25,55,.2)) !important;
+}
+
+#view-hoy.day-open .native-day-progress-row {
+  position: absolute !important;
+  z-index: 3 !important;
+  left: 16px !important;
+  bottom: 38px !important;
+  width: 96px !important;
+  display: grid !important;
+  grid-template-columns: 52px auto !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+
+#view-hoy.day-open .native-day-progress {
+  height: 4px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.25) !important;
+}
+
+#view-hoy.day-open .native-day-progress span {
+  background: #ffd655 !important;
+}
+
+#view-hoy.day-open .native-day-progress-row small {
+  color: #ffd655 !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+#view-hoy.day-open .day-plan-group {
+  overflow: visible !important;
+  display: grid !important;
+  gap: 14px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-objective,
+#view-hoy.day-open .objective-card {
+  padding: 16px 16px 13px !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: 0 8px 22px rgba(42,31,58,.055) !important;
+}
+
+#view-hoy.day-open .objective-card-header span {
+  margin-bottom: 7px !important;
+  color: #ad94cb !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+#view-hoy.day-open .objective-card-header h3 {
+  margin: 0 !important;
+  color: #17152f !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+}
+
+#view-hoy.day-open .native-details {
+  margin-top: 6px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .native-details summary {
+  min-height: 24px !important;
+  width: fit-content !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  padding: 1px 0 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #e45135 !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+#view-hoy.day-open .day-plan-group .day-plan-steps {
+  position: relative !important;
+  padding: 12px 2px 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .day-plan-steps::before {
+  content: "Tu plan de hoy" !important;
+  display: block !important;
+  margin: 0 0 16px !important;
+  color: #17152f !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading {
+  position: absolute !important;
+  top: 13px !important;
+  right: 2px !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+#view-hoy.day-open .day-plan-steps .native-section-heading > div {
+  display: none !important;
+}
+
+#view-hoy.day-open .day-plan-steps .section-count {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #a891c3 !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .12em !important;
+}
+
+#view-hoy.day-open .action-step-list {
+  display: grid !important;
+  gap: 0 !important;
+}
+
+#view-hoy.day-open .action-step,
+#view-hoy.day-open .action-step-static {
+  overflow: visible !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .action-step summary,
+#view-hoy.day-open .action-step-static-row {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: 28px minmax(0,1fr) 18px !important;
+  align-items: start !important;
+  gap: 7px !important;
+  margin: 0 !important;
+  padding: 7px 0 12px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+#view-hoy.day-open .action-step-static-row {
+  grid-template-columns: 28px minmax(0,1fr) !important;
+}
+
+#view-hoy.day-open .action-step-number {
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  padding: 1px 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #b095cb !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+}
+
+#view-hoy.day-open .action-step-title {
+  color: #2f2940 !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+}
+
+#view-hoy.day-open .complete-card:not(.done) {
+  position: static !important;
+  z-index: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  margin: 26px 0 0 !important;
+  display: block !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#view-hoy.day-open .complete-card:not(.done) > h3,
+#view-hoy.day-open .complete-card:not(.done) > p,
+#view-hoy.day-open .complete-card:not(.done) .complete-helper {
+  display: none !important;
+}
+
+#view-hoy.day-open .complete-day-btn {
+  width: 100% !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(115deg,#e85b39 0%,#c24b42 48%,#7a3f62 100%) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  font-family: Jost,Inter,system-ui,sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+}
+
+#view-hoy.day-open .complete-day-btn .complete-action-check {
+  display: none !important;
+}
+
+/* MATERIALES · preview full-bleed como referencia aprobada */
+#view-hoy.day-open .materials-section {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: start !important;
+}
+
+#view-hoy.day-open .materials-section .resource-row {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-order,
+#view-hoy.day-open .materials-section .resource-disclosure,
+#view-hoy.day-open .materials-section .resource-row-actions {
+  display: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-thumb {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  display: block !important;
+  overflow: hidden !important;
+  /* Fuerza a que el clip del borde redondeado se respete incluso con
+     <video>: sin esto, algunos motores (iOS/WebView) componen el video
+     en una capa aparte que ignora el overflow:hidden del padre y la
+     imagen/video termina asomando por fuera del recuadro. */
+  isolation: isolate !important;
+  corner-shape: round !important;
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #fff 100%) !important;
+  mask-image: radial-gradient(circle, #fff 100%, #fff 100%) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: #e9e2ef !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-thumb > img,
+#view-hoy.day-open .materials-section .resource-thumb > video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: inherit !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+#view-hoy.day-open .materials-section .resource-main {
+  display: block !important;
+  min-width: 0 !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy {
+  display: block !important;
+  min-width: 0 !important;
+  padding: 0 1px !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy strong {
+  display: block !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  color: #211a36 !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.22 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#view-hoy.day-open .materials-section .resource-copy span {
+  display: block !important;
+  margin: 2px 0 0 !important;
+  color: #aa91bd !important;
+  font-family: Inter,system-ui,sans-serif !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+/* MATERIALES · conservar carrusel horizontal */
+#view-hoy.day-open .materials-section .resource-sequence {
+  display: flex !important;
+  grid-template-columns: none !important;
+  gap: 10px !important;
+  align-items: flex-start !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  /* El último item necesita el mismo aire que el resto contra el borde
+     derecho del carrusel, si no queda pegado/cortado al final del scroll. */
+  padding: 0 16px 6px 0 !important;
+  scroll-snap-type: x proximity !important;
+  scroll-padding-inline: 0 16px !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-x: contain !important;
+  scrollbar-width: none !important;
+  touch-action: pan-x pan-y !important;
+}
+
+#view-hoy.day-open .materials-section .resource-sequence::-webkit-scrollbar {
+  display: none !important;
+}
+
+#view-hoy.day-open .materials-section .resource-row {
+  flex: 0 0 calc((100% - 20px) / 3) !important;
+  width: calc((100% - 20px) / 3) !important;
+  min-width: calc((100% - 20px) / 3) !important;
+  scroll-snap-align: start !important;
+}

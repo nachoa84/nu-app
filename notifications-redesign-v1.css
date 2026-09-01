@@ -1,0 +1,292 @@
+
+/* =========================================================
+   Notifications redesign · approved reference
+   Visual-only overrides. Push/time logic remains unchanged.
+   Typography: Inter + Jost.
+   ========================================================= */
+
+.notification-settings {
+  background: rgba(20, 16, 34, .28);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.notification-settings-sheet {
+  width: min(430px, 100%);
+  max-height: min(82dvh, 720px);
+  padding: 12px 0 calc(26px + var(--safe-bottom));
+  border: 0;
+  border-radius: 26px 26px 0 0;
+  background: #fbfafd;
+  box-shadow: 0 -20px 50px -20px rgba(20, 16, 34, .40);
+  font-family: Poppins, sans-serif;
+}
+
+.notification-settings-grabber {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 16px;
+  border-radius: 3px;
+  background: rgba(42, 36, 64, .15);
+}
+
+.notification-settings-header {
+  min-height: 0;
+  align-items: flex-start;
+  padding: 0 22px 6px;
+}
+
+.notification-settings-header h2 {
+  margin: 0;
+  color: #2a2440;
+  font-family: Poppins, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.notification-settings-close {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(42, 36, 64, .06);
+  color: #2a2440;
+  box-shadow: none;
+}
+
+.notification-settings-close svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.3;
+}
+
+.notification-settings-intro {
+  max-width: 240px;
+  margin: 0;
+  padding: 0 22px 4px;
+  color: #8a82a3;
+  font-family: Poppins, sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.notification-settings-list {
+  border: 0;
+  background: transparent;
+}
+
+.notification-settings-row {
+  min-height: 0;
+  gap: 16px;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(42, 36, 64, .07);
+}
+
+.notification-settings-row + .notification-settings-row {
+  border-top: 1px solid rgba(42, 36, 64, .07);
+}
+
+.notification-settings-copy {
+  gap: 2px;
+}
+
+.notification-settings-row strong {
+  color: #2a2440;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.notification-settings-copy span {
+  max-width: 190px;
+  color: #8a82a3;
+  font-family: Poppins, sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Existing button behaves visually as the approved iOS-style switch. */
+.notification-enable-btn {
+  position: relative;
+  flex: 0 0 46px;
+  width: 46px;
+  min-width: 46px;
+  height: 27px;
+  min-height: 27px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #d9d0e8;
+  color: transparent;
+  font-size: 0;
+  box-shadow: none;
+  transition: background .25s ease;
+}
+
+.notification-enable-btn::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .20);
+  transform: translateX(0);
+  transition: transform .25s cubic-bezier(.3, 1.3, .4, 1);
+}
+
+.notification-enable-btn.is-active {
+  background: linear-gradient(115deg, #e2542e, #5a3e6b);
+  color: transparent;
+}
+
+.notification-enable-btn.is-active::after {
+  transform: translateX(19px);
+}
+
+.notification-enable-btn:active:not(:disabled) {
+  transform: none;
+}
+
+.notification-time-value {
+  min-width: auto;
+  color: #5a3e6b;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: .06em;
+}
+
+.notification-change-time-btn {
+  min-height: 0;
+  margin: 0;
+  padding: 16px 22px;
+  border: 0;
+  border-top: 1px solid rgba(42, 36, 64, .07);
+  border-radius: 0;
+  color: #2a2440;
+  font-family: Poppins, sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.notification-change-time-chevron {
+  color: #8a82a3;
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.notification-time-editor {
+  margin: 0;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.notification-time-picker {
+  padding: 14px 0 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.notification-time-picker-labels {
+  padding: 0 0 6px;
+  color: #a79ec2;
+  font-family: Poppins, sans-serif;
+  font-size: 10.5px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.notification-time-wheel-shell {
+  height: 132px;
+}
+
+.notification-time-selection {
+  top: 44px;
+  right: 10px;
+  left: 10px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(90, 62, 107, .08);
+  box-shadow: none;
+}
+
+.notification-time-option {
+  color: #c7c0da;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 1;
+  transform: none;
+}
+
+.notification-time-option.is-selected {
+  color: #2a2440;
+  font-family: Poppins, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  opacity: 1;
+  transform: none;
+}
+
+.notification-time-separator {
+  color: #2a2440;
+  font-family: Poppins, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.notification-time-actions {
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.notification-time-actions button {
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1.4px solid rgba(42, 36, 64, .15);
+  border-radius: 999px;
+  background: transparent;
+  color: #6b6480;
+  font-family: Poppins, sans-serif;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+#notificationTimeSaveBtn {
+  border-color: transparent;
+  background: linear-gradient(115deg, #e2542e 0%, #c4432a 45%, #5a3e6b 130%);
+  color: #fff;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: .20em;
+  box-shadow: 0 12px 22px -12px rgba(90, 62, 107, .50);
+}
+
+@media (min-width: 520px) {
+  .notification-settings-sheet {
+    border-radius: 26px;
+  }
+}

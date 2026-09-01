@@ -1,0 +1,238 @@
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+
+const ROOT = path.resolve(__dirname, "..");
+
+function read(name) {
+  return fs.readFileSync(path.join(ROOT, name), "utf8");
+}
+
+function evaluate(source, exportExpression) {
+  const context = vm.createContext({ console });
+  vm.runInContext(`${source}\n;globalThis.__auditExport = ${exportExpression};`, context, {
+    timeout: 2000
+  });
+  return context.__auditExport;
+}
+
+function loadCollagenDays() {
+  const context = vm.createContext({ console });
+  vm.runInContext(read("routine-content.js"), context, { timeout: 2000 });
+  vm.runInContext(read("routine-content-collagen-8-30.js"), context, { timeout: 2000 });
+  vm.runInContext("globalThis.__auditDays = days;", context, { timeout: 2000 });
+  return context.__auditDays;
+}
+
+function loadProductDays() {
+  return evaluate(
+    read("routine-products-v92.js"),
+    "({ catalog: ROUTINE_CATALOG, days: PRODUCT_ROUTINE_DAYS })"
+  );
+}
+
+function textBlocks(days) {
+  const rows = [];
+  Object.entries(days || {}).forEach(([day, value]) => {
+    (value?.blocks || []).forEach((block, blockIndex) => {
+      if (block?.type !== "text") return;
+      rows.push({ day: Number(day), blockIndex, block });
+    });
+  });
+  return rows;
+}
+
+function countMatches(text, regex) {
+  return (String(text || "").match(regex) || []).length;
+}
+
+function looksLikeAllCapsLine(line) {
+  const letters = String(line || "").replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "");
+  return letters.length >= 6 && letters === letters.toUpperCase();
+}
+
+function explicitQa(text) {
+  return /\bq\s*&\s*a\b|preguntas?\s+frecuentes|preguntas?\s+y\s+respuestas?|(?:^|\n)\s*pregunta\s*[:\-]|(?:^|\n)\s*respuesta\s*[:\-]/i.test(text);
+}
+
+function cleanQaLine(value) {
+  return String(value || "")
+    .replace(/^[\s•·▪▫◦‣⁃→➜➤✔✓✅☑️\-–—]+/u, "")
+    .trim();
+}
+
+function isQuestionLine(value) {
+  const line = cleanQaLine(value);
+  return Boolean(line) && /[?]/.test(line);
+}
+
+function isLikelyDirectAnswer(value) {
+  const line = cleanQaLine(value).toLocaleLowerCase("es");
+  if (!line || isQuestionLine(line) || line.length < 3) return false;
+
+  return /^(?:sí\b|si\b|no\b|depende\b|desde\b|cuando\b|por\b|porque\b|puede\b|puedes\b|se\b|el\b|la\b|los\b|las\b|beauty\b|nu\s*skin\b|wellspa\b|galvanic\b|lumispa\b|recomendamos\b|aproximadamente\b|hasta\b|entre\b)/i.test(line);
+}
+
+function structuralQa(text) {
+  const lines = String(text || "")
+    .split(/\n+/)
+    .map(cleanQaLine)
+    .filter(Boolean);
+
+  let pairs = 0;
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    if (!isQuestionLine(lines[index])) continue;
+    if (!isLikelyDirectAnswer(lines[index + 1])) continue;
+    pairs += 1;
+  }
+
+  // La app exige dos pares reales cuando no hay una etiqueta Q&A explícita.
+  // Esto evita clasificar como Q&A listas de preguntas comerciales o de cierre.
+  return pairs >= 2;
+}
+
+const typoPatterns = [
+  ["personailzada", /\bpersonailzada\b/i],
+  ["testimonos", /\btestimonos\b/i],
+  ["Instragram", /\binstragram\b/i],
+  ["Whatapp", /\bwhatapp\b/i],
+  ["A demás", /\ba\s+demás\b/i],
+  ["típs", /\btíps\b/i],
+  ["practicas", /\bpracticas\b/i],
+  ["a traves", /\ba\s+traves\b/i],
+  ["con las cambios", /\bcon\s+las\s+cambios\b/i],
+  ["runing", /\bruning\b/i],
+  ["lV/IV", /\blV\b/],
+  ["NuSkin", /\bNuSkin\b/],
+  ["wellnes&Skincare", /\bwellnes\s*&\s*skincare\b/i],
+  ["perdida de brillo", /\bperdida\s+de\s+brillo\b/i],
+  ["Ahora si", /\bahora\s+si\b/i],
+  ["Si, no tiene", /\bsi,\s+no\s+tiene\b/i],
+  ["Si, de 2 años", /\bsi,\s+de\s+2\s+años\b/i],
+  ["tu lo comercializas", /\btu\s+lo\s+comercializas\b/i],
+  ["por esta nuevo comienzo", /\bpor\s+esta\s+nuevo\s+comienzo\b/i],
+  ["especifico", /\bespecifico\b/i],
+  ["esta dado", /\besta\s+dado\b/i]
+];
+
+const punctuationPatterns = [
+  ["question_without_opening:Qué te parece", /(^|[\s“\"])(Qué te parece\?)/i],
+  ["question_without_opening:Estas interesado", /(^|[\s“\"])(Estas interesado\?)/i],
+  ["question_without_opening:Vas a aprovechar", /(^|[\s“\"])(Vas a aprovechar esta oferta\?)/i],
+  ["question_without_opening:Como quieres", /(^|[\s“\"])(Como quieres abonarlo\?)/i],
+  ["question_without_opening:Cual es la dolencia", /(^|[\s“\"])(Cuál es la dolencia\?)/i],
+  ["question_without_opening:Es apto celíacos", /(^|\n)\s*Es apto para cel[ií]acos\?/i],
+  ["question_without_opening:Es apto diabéticos", /(^|\n)\s*Es apto para diab[eé]ticos\?/i],
+  ["question_without_opening:Colorantes", /(^|\n)\s*Tiene colorantes artificiales\?/i],
+  ["question_without_opening:Ayunas", /(^|\n)\s*Hay que beberlo en ayunas\?/i],
+  ["question_without_opening:Embarazo", /(^|\n)\s*Pueden consumirlo embarazadas/i]
+];
+
+function auditBlock(routine, row) {
+  const text = String(row.block?.content || "");
+  const lines = text.split(/\n/);
+  const links = Array.isArray(row.block?.links) ? row.block.links : [];
+  const issues = [];
+
+  const rawUrls = countMatches(text, /https?:\/\/\S+/g);
+  const inlineLinks = countMatches(text, /\[[^\]]+\]\s*https?:\/\/\S+/g);
+  const inlineAnchors = countMatches(text, /<<inline-button-anchor:[^>]+>>/g);
+  const hashtags = countMatches(text, /(^|\s)#[\wÁÉÍÓÚÜÑáéíóúüñ+]+/g);
+  const allCapsLines = lines.filter(looksLikeAllCapsLine).length;
+  const blankRuns = countMatches(text, /\n\s*\n\s*\n/g);
+  const questionMarks = countMatches(text, /\?/g);
+  const campaignNoise = countMatches(text, /\b(?:CHALLENGE|IMPORTANTE|COMENZAMOS)\b/g);
+
+  if (rawUrls) issues.push(`raw_urls:${rawUrls}`);
+  if (inlineLinks) issues.push(`inline_links:${inlineLinks}`);
+  if (inlineAnchors) issues.push(`inline_anchors:${inlineAnchors}`);
+  if (links.length) issues.push(`link_buttons:${links.length}`);
+  if (hashtags) issues.push(`hashtags:${hashtags}`);
+  if (allCapsLines) issues.push(`all_caps_lines:${allCapsLines}`);
+  if (blankRuns) issues.push(`excess_blank_runs:${blankRuns}`);
+  if (campaignNoise) issues.push(`campaign_caps:${campaignNoise}`);
+  if (text.length > 700) issues.push(`very_long:${text.length}`);
+  else if (text.length > 420) issues.push(`long:${text.length}`);
+
+  const isQa = explicitQa(text) || structuralQa(text);
+  if (isQa) issues.push("qa_candidate");
+  else if (questionMarks >= 3) issues.push(`multi_question_normal:${questionMarks}`);
+
+  typoPatterns.forEach(([name, regex]) => {
+    if (regex.test(text)) issues.push(`typo:${name}`);
+  });
+
+  punctuationPatterns.forEach(([name, regex]) => {
+    if (regex.test(text)) issues.push(name);
+  });
+
+  return {
+    routine,
+    day: row.day,
+    block: row.blockIndex + 1,
+    chars: text.length,
+    issues
+  };
+}
+
+function productRoutineDays(product, routineId) {
+  const entry = product.days?.[routineId];
+  return entry?.days || entry || {};
+}
+
+function main() {
+  const collagen = loadCollagenDays();
+  const product = loadProductDays();
+  const routines = [
+    ["Collagen+", collagen],
+    ["WellSpa", productRoutineDays(product, "wellspa-10")],
+    ["Galvanic Spa", productRoutineDays(product, "galvanicspa-10")],
+    ["LumiSpa", productRoutineDays(product, "lumispa-10")]
+  ];
+
+  const rows = routines.flatMap(([name, days]) =>
+    textBlocks(days).map(row => auditBlock(name, row))
+  );
+
+  const flagged = rows.filter(row => row.issues.length);
+  const qa = flagged.filter(row => row.issues.includes("qa_candidate"));
+  const links = flagged.filter(row => row.issues.some(issue => /^(?:raw_urls|inline_links|inline_anchors|link_buttons):/.test(issue)));
+  const textDefects = flagged.filter(row => row.issues.some(issue => /^(?:all_caps_lines|excess_blank_runs|campaign_caps|typo|hashtags|question_without_opening):?/.test(issue)));
+  const density = flagged.filter(row => row.issues.some(issue => /^(?:long|very_long):/.test(issue)));
+
+  const dayCount = routines.reduce((sum, [, days]) => sum + Object.keys(days || {}).length, 0);
+
+  console.log(`Rutinas auditadas: ${routines.length}`);
+  console.log(`Días encontrados: ${dayCount} / 60`);
+  console.log(`Bloques de texto auditados: ${rows.length}`);
+  console.log(`Bloques con observaciones: ${flagged.length}`);
+  console.log(`Q&A candidatos: ${qa.length}`);
+  console.log(`Bloques con links: ${links.length}`);
+  console.log(`Bloques con defectos de texto/formato: ${textDefects.length}`);
+  console.log(`Bloques largos: ${density.length}`);
+
+  if (dayCount !== 60) {
+    process.exitCode = 2;
+    console.error(`ADVERTENCIA: se esperaban 60 días y se encontraron ${dayCount}.`);
+  }
+
+  const print = (title, list) => {
+    console.log(`\n=== ${title} ===`);
+    list.forEach(row => {
+      console.log(`${row.routine} · Día ${row.day} · bloque ${row.block}: ${row.issues.join(", ")}`);
+    });
+  };
+
+  print("Q&A", qa);
+  print("LINKS", links);
+  print("TEXTO / FORMATO", textDefects);
+  print("DENSIDAD", density);
+
+  if (process.argv.includes("--json")) {
+    console.log("\n=== JSON ===");
+    console.log(JSON.stringify({ dayCount, rows, flagged, qa, links, textDefects, density }, null, 2));
+  }
+}
+
+main();
