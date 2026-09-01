@@ -35,10 +35,16 @@
     var(--home-white);
 }
 
-body[data-active-view="hoy"],
+/* En mobile, el fondo de la app también cubre el área segura superior. */
+@media (max-width: 599px) {
+  body[data-active-view="hoy"] {
+    background: #00a7c8;
+  }
+}
+
 body[data-active-view="hoy"] main,
 body[data-active-view="hoy"] #app {
-  background: var(--home-white);
+  background: #ffffff;
 }
 
 /* Encabezado */
@@ -135,7 +141,7 @@ body.is-scrolled #view-hoy .home-bell-btn {
 #view-hoy #homeGuideSection.home-guide-section {
   position: relative;
   z-index: 1;
-  min-height: calc(100svh - 200px - var(--safe-top));
+  min-height: calc(100svh - 276px - var(--safe-top));
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -160,8 +166,8 @@ body.is-scrolled #view-hoy .home-bell-btn {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(150px, 1fr) auto;
-  gap: 18px;
+  grid-template-rows: minmax(130px, 1fr) auto;
+  gap: 14px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -177,7 +183,7 @@ body.is-scrolled #view-hoy .home-bell-btn {
   place-items: center;
   align-self: stretch;
   margin: 0;
-  padding: 14px 0 0;
+  padding: 8px 0 0;
   border: 0 !important;
   border-radius: 0;
   background: transparent !important;
@@ -244,7 +250,7 @@ body.is-scrolled #view-hoy .home-bell-btn {
 
 #view-hoy #homeGuideSection .home-guide-stage-label {
   display: block;
-  margin: 0 0 22px;
+  margin: 0 0 16px;
   color: var(--home-orange);
   font-size: 14px;
   font-weight: 500;
@@ -322,7 +328,6 @@ body.is-scrolled #view-hoy .home-bell-btn {
   font-weight: 400;
   line-height: 1;
 }
-
 
 /* Rutinas: una card por fila */
 #view-hoy .home-routines-section {
@@ -556,7 +561,6 @@ body.is-scrolled #view-hoy .home-bell-btn {
   font-weight: 600;
   letter-spacing: .05em;
 }
-
 
 /* Navegación inferior como el mockup aprobado */
 body[data-active-view="hoy"] .bottom-nav {
