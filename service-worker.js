@@ -1,4 +1,4 @@
-const CACHE="nuapp-v167-api-network-only";
+const CACHE="nuapp-v168-shell-precache-aligned";
 
 const CORE=[
   "./",
@@ -6,7 +6,7 @@ const CORE=[
   "./tokens.css?v=61b-progress-canonical",
   "./base.css?v=129-ios-horizontal-stability",
   "./splash.css?v=61b-progress-canonical",
-  "./splash.js?v=61b-progress-canonical",
+  "./splash.js?v=122-session-resume",
   "./navigation.css?v=81-home-navigation-legibility",
   "./app-navigation-floating-v1.css?v=20260830-floating-nav-v1",
   "./typography-poppins-v1.css?v=20260830-poppins-v1",
@@ -31,6 +31,7 @@ const CORE=[
   "./multiroutine-v92.css?v=106e-lumispa-interior-image",
   "./routine-state.js?v=136-unified-daily-unlock",
   "./routine-sync.js?v=136-unified-daily-unlock",
+  "./iris-ai-client-escalation-v1.js?v=1",
   "./bot.js?v=143-keyboard-layout",
   "./bot-shortcuts-v95.js?v=126-grid-access-icon",
   "./assets/custom/nuskin-logo-icon.svg",
@@ -39,9 +40,12 @@ const CORE=[
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
   "./favorites.js?v=96-material-names",
   "./notifications.js?v=143-single-sw",
+  "./notifications-redesign-v2.js?v=143-no-legacy-css",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
   "./daily-view.js?v=110-routine-text-balanced",
+  "./routine-content-quality-v2.js?v=20260831-quality-v2",
+  "./routine-ui-polish-v1.js?v=20260901-polish-v2",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
