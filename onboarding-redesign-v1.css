@@ -81,18 +81,6 @@
   max-width: none !important;
   margin: 0 0 26px !important;
 }
-.onboarding-step:not(.onboarding-welcome-step) .onboarding-heading::before {
-  content: "👋" !important;
-  width: 46px !important;
-  height: 46px !important;
-  display: grid !important;
-  place-items: center !important;
-  margin: 0 0 14px !important;
-  border-radius: 50% !important;
-  background: linear-gradient(135deg,#f6c9a6,#d98fa0 55%,#5a3e6b) !important;
-  font-size: 20px !important;
-  box-shadow: 0 10px 24px -16px rgba(90,62,107,.42) !important;
-}
 .onboarding-step:not(.onboarding-welcome-step) .onboarding-eyebrow { display: none !important; }
 .onboarding-step:not(.onboarding-welcome-step) .onboarding-heading h1 {
   margin: 0 !important;
