@@ -9,6 +9,42 @@ body:has(#view-hoy.day-open) #app {
 
 #view-hoy.day-open {
   padding-bottom: 0 !important;
+
+  --routine-hero-start: #f39a61;
+  --routine-hero-end: #e8794d;
+  --routine-hero-text: #ffffff;
+  --routine-hero-text-soft: rgba(255,255,255,.94);
+  --routine-hero-track: rgba(255,255,255,.38);
+  --routine-hero-fill: rgba(255,255,255,.94);
+  --routine-hero-blur: rgba(255,232,214,.30);
+}
+
+#view-hoy.day-open[data-routine-id="collagen-30"] {
+  --routine-hero-start: #f39a61;
+  --routine-hero-end: #e8794d;
+  --routine-hero-blur: rgba(255,226,202,.28);
+}
+
+#view-hoy.day-open[data-routine-id="lumispa-10"] {
+  --routine-hero-start: #8ed8f0;
+  --routine-hero-end: #64b9dd;
+  --routine-hero-blur: rgba(241,252,255,.34);
+}
+
+#view-hoy.day-open[data-routine-id="wellspa-10"] {
+  --routine-hero-start: #7ccfc2;
+  --routine-hero-end: #50ac9f;
+  --routine-hero-blur: rgba(231,255,250,.30);
+}
+
+#view-hoy.day-open[data-routine-id="galvanicspa-10"] {
+  --routine-hero-start: #e7eaf0;
+  --routine-hero-end: #cbd2dc;
+  --routine-hero-text: #273247;
+  --routine-hero-text-soft: rgba(39,50,71,.80);
+  --routine-hero-track: rgba(39,50,71,.16);
+  --routine-hero-fill: rgba(39,50,71,.72);
+  --routine-hero-blur: rgba(255,255,255,.55);
 }
 
 #view-hoy.day-open .chat-wrap {
@@ -28,58 +64,91 @@ body:has(#view-hoy.day-open) #app {
 
 #view-hoy.day-open .daily-native-title > strong,
 #view-hoy.day-open #dailyNativeRoutineTitle {
-  font-size: 15.5px !important;
-  font-weight: 680 !important;
-  line-height: 1.18 !important;
-  letter-spacing: -0.02em !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
 }
 
-/* Routine hero owns the positioning context. Product media is removed from the
-   grid flow and anchored to the right edge so every routine shares one composition. */
+/* Final hero: text-led, product-free and themed by routine. */
 #view-hoy.day-open .native-day-hero {
   position: relative !important;
+  min-height: 150px !important;
   display: block !important;
   overflow: hidden !important;
+  padding: 20px 20px 48px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, var(--routine-hero-start), var(--routine-hero-end)) !important;
+  box-shadow: 0 10px 22px rgba(40,50,70,.09) !important;
+  isolation: isolate;
+}
+
+#view-hoy.day-open .native-day-hero::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  top: -42px !important;
+  right: -34px !important;
+  width: 190px !important;
+  height: 132px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--routine-hero-blur) !important;
+  filter: blur(32px) !important;
+  opacity: .72 !important;
+  pointer-events: none !important;
 }
 
 #view-hoy.day-open .native-day-hero-copy {
   position: relative !important;
   z-index: 2 !important;
-  width: calc(100% - 112px) !important;
-  max-width: calc(100% - 112px) !important;
-}
-
-#view-hoy.day-open .native-day-hero-media {
-  position: absolute !important;
-  z-index: 1 !important;
-  top: 10px !important;
-  right: 18px !important;
-  left: auto !important;
-  bottom: auto !important;
-  width: 92px !important;
-  height: 98px !important;
-  display: grid !important;
-  place-items: center !important;
-  overflow: visible !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-#view-hoy.day-open .native-day-hero-media img {
   width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  padding: 0 !important;
-  object-fit: contain !important;
-  object-position: center !important;
-  background: transparent !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
+  max-width: 100% !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy h2 {
+  margin: 0 0 7px !important;
+  color: var(--routine-hero-text) !important;
+  font-size: clamp(34px, 9.6vw, 40px) !important;
+  font-weight: 760 !important;
+  line-height: .98 !important;
+  letter-spacing: -.05em !important;
+}
+
+#view-hoy.day-open .native-day-hero-copy p {
+  margin: 0 !important;
+  color: var(--routine-hero-text-soft) !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: .055em !important;
+}
+
+/* Product imagery is intentionally removed from the banner. */
+#view-hoy.day-open .native-day-hero-media {
+  display: none !important;
+}
+
+#view-hoy.day-open .native-day-progress-row {
+  right: 20px !important;
+  bottom: 17px !important;
+  left: 20px !important;
+  gap: 10px !important;
+}
+
+#view-hoy.day-open .native-day-progress {
+  height: 5px !important;
+  background: var(--routine-hero-track) !important;
+}
+
+#view-hoy.day-open .native-day-progress > span {
+  background: var(--routine-hero-fill) !important;
+}
+
+#view-hoy.day-open .native-day-progress-row > small {
+  color: var(--routine-hero-text) !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
 }
 
 /* Content carousel owns the breathing room; cards own their own visible height. */
@@ -201,21 +270,28 @@ body:has(#view-hoy.day-open) #app {
     padding-bottom: calc(86px + var(--safe-bottom)) !important;
   }
 
-  #view-hoy.day-open .native-day-hero-copy {
-    width: calc(100% - 98px) !important;
-    max-width: calc(100% - 98px) !important;
+  #view-hoy.day-open .native-day-hero {
+    min-height: 142px !important;
+    padding: 18px 17px 46px !important;
   }
 
-  #view-hoy.day-open .native-day-hero-media {
-    top: 9px !important;
-    right: 13px !important;
-    width: 82px !important;
-    height: 90px !important;
+  #view-hoy.day-open .native-day-hero-copy h2 {
+    font-size: 33px !important;
+  }
+
+  #view-hoy.day-open .native-day-hero-copy p {
+    font-size: 14.5px !important;
+  }
+
+  #view-hoy.day-open .native-day-progress-row {
+    right: 17px !important;
+    bottom: 16px !important;
+    left: 17px !important;
   }
 
   #view-hoy.day-open .daily-native-title > strong,
   #view-hoy.day-open #dailyNativeRoutineTitle {
-    font-size: 15px !important;
+    font-size: 16px !important;
   }
 
   #view-hoy.day-open .routine-content-track,
