@@ -21,7 +21,7 @@
 
     const script = document.createElement("script");
     script.id = id;
-    script.src = "routine-qa-modal-v1.js?v=20260901-qa-v1";
+    script.src = "routine-qa-modal-v1.js?v=20260901-qa-v3";
     script.defer = true;
     document.head.appendChild(script);
   }
