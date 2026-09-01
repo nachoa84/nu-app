@@ -48,7 +48,7 @@ function normalizedRequestPath(value) {
 
 function isInternalServerModule(normalizedPath) {
   if (!normalizedPath.startsWith("/")) return false;
-  if (normalizedPath.includes("/" , 1)) return false;
+  if (normalizedPath.includes("/", 1)) return false;
 
   const basename = normalizedPath.slice(1);
 
@@ -114,8 +114,15 @@ function trueFlag(value) {
   return String(value || "").trim().toLowerCase() === "true";
 }
 
+function isPublishedEnvironment(env = process.env) {
+  return (
+    String(env.REPLIT_DEPLOYMENT || "").trim() === "1" ||
+    String(env.NODE_ENV || "").trim().toLowerCase() === "production"
+  );
+}
+
 function assertSafeProductionEnvironment(env = process.env) {
-  if (String(env.NODE_ENV || "").trim().toLowerCase() !== "production") {
+  if (!isPublishedEnvironment(env)) {
     return;
   }
 
@@ -150,7 +157,7 @@ async function waitForHealthyBackend({
   timeoutMs = 30000,
   intervalMs = 1500
 } = {}) {
-  if (String(env.NODE_ENV || "").trim().toLowerCase() !== "production") {
+  if (!isPublishedEnvironment(env)) {
     return true;
   }
 
@@ -193,7 +200,7 @@ async function boot() {
 
   require("./server");
 
-  if (String(process.env.NODE_ENV || "").trim().toLowerCase() === "production") {
+  if (isPublishedEnvironment(process.env)) {
     try {
       await waitForHealthyBackend();
       console.log("Production health gate: OK");
@@ -216,6 +223,7 @@ module.exports = {
   assertSafeProductionEnvironment,
   installStaticReleaseGuard,
   isBlockedReleasePublicPath,
+  isPublishedEnvironment,
   normalizedRequestPath,
   trueFlag,
   waitForHealthyBackend
