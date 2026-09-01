@@ -47,6 +47,41 @@ jobs:
       - name: Audit static release references
         run: node scripts/release-static-audit.js
 
+      - name: Audit PWA shell and API cache policy
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const sw = fs.readFileSync('service-worker.js', 'utf8');
+
+          const appShellRefs = new Set();
+          for (const match of html.matchAll(/<(?:script\b[^>]*\bsrc|link\b[^>]*\bhref)=["']([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/gi)) {
+            const ref = match[1];
+            if (!/^https?:\/\//i.test(ref)) appShellRefs.add(ref.replace(/^\.\//, ''));
+          }
+
+          const precacheRefs = new Set(
+            [...sw.matchAll(/["']\.\/([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/g)]
+              .map(match => match[1])
+          );
+
+          const missing = [...appShellRefs].filter(ref => !precacheRefs.has(ref));
+          if (missing.length) {
+            throw new Error(`PWA precache missing active shell assets: ${missing.join(', ')}`);
+          }
+
+          if (!sw.includes('requestUrl.pathname.startsWith("/api/")')) {
+            throw new Error('Service Worker must explicitly bypass Cache Storage for /api/.');
+          }
+
+          if (!sw.includes('event.respondWith(fetch(req, { cache: "no-store" }))')) {
+            throw new Error('Service Worker API bypass must be network-only/no-store.');
+          }
+
+          console.log('PWA SHELL/CACHE AUDIT: OK');
+          NODE
+
       - name: Run release unit tests
         shell: bash
         run: |
