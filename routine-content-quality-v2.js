@@ -100,11 +100,11 @@
       320,
       Number(window.innerWidth || document.documentElement?.clientWidth || 390)
     );
-    const visualWidth = Math.min(480, viewportWidth);
+    const visualWidth = Math.min(500, viewportWidth);
 
-    if (visualWidth <= 360) return qa ? 39 : 34;
-    if (visualWidth <= 430) return qa ? 43 : 38;
-    return qa ? 49 : 44;
+    if (visualWidth <= 360) return qa ? 38 : 34;
+    if (visualWidth <= 430) return qa ? 42 : 38;
+    return qa ? 48 : 45;
   }
 
   estimateRoutineVisualLines = function routineQualityVisualLines(value, qa = false) {
@@ -124,9 +124,9 @@
   };
 
   function targetRoutineLines(qa = false) {
-    // Reserva aire dentro de la card y evita que el último renglón quede pegado
-    // a los bordes en pantallas angostas.
-    return qa ? 8.0 : 6.0;
+    // El Q&A usa tipografía más legible y se reparte antes: preferimos una
+    // card adicional a volver a comprimir preguntas y respuestas largas.
+    return qa ? 6.6 : 6.0;
   }
 
   if (typeof textUnitsForBalance === "function") {
