@@ -77,11 +77,44 @@ function assertNoSensitiveReleaseArtifacts() {
 
 function assertServerPublicGuard() {
   const server = fs.readFileSync(path.join(root, "server.js"), "utf8");
+  const releaseEntrypoint = fs.readFileSync(
+    path.join(root, "release-entrypoint.js"),
+    "utf8"
+  );
+
   if (!server.includes("function isBlockedPublicPath")) {
-    failures.push("Falta el guard de rutas públicas en server.js");
+    failures.push("Falta el guard base de rutas públicas en server.js");
   }
   if (!server.includes("express.static")) {
     failures.push("No se encontró configuración de archivos estáticos");
+  }
+  if (!releaseEntrypoint.includes("installStaticReleaseGuard")) {
+    failures.push("Falta el guard estático de release");
+  }
+  if (!releaseEntrypoint.includes("REPLIT_DEPLOYMENT")) {
+    failures.push("El entrypoint no detecta el deployment publicado de Replit");
+  }
+  if (!releaseEntrypoint.includes("waitForHealthyBackend")) {
+    failures.push("El entrypoint no verifica /api/health en Publishing");
+  }
+}
+
+function assertProtectedProductionEntrypoint() {
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(root, "package.json"), "utf8")
+  );
+  const replitConfig = fs.readFileSync(path.join(root, ".replit"), "utf8");
+
+  if (packageJson?.scripts?.start !== "node release-entrypoint.js") {
+    failures.push("npm start debe usar release-entrypoint.js");
+  }
+
+  if (!/\[deployment\][\s\S]*?run\s*=\s*"npm start"/.test(replitConfig)) {
+    failures.push("Replit deployment debe arrancar mediante npm start");
+  }
+
+  if (!/deploymentTarget\s*=\s*"cloudrun"/.test(replitConfig)) {
+    failures.push("No se encontró deploymentTarget cloudrun esperado");
   }
 }
 
@@ -89,6 +122,7 @@ assertLocalReferencesFromHtml();
 assertServiceWorkerCore();
 assertNoSensitiveReleaseArtifacts();
 assertServerPublicGuard();
+assertProtectedProductionEntrypoint();
 
 if (failures.length) {
   console.error("\nRELEASE STATIC AUDIT: FAILED\n");
