@@ -26,6 +26,17 @@
     document.head.appendChild(script);
   }
 
+  function ensureRoutineHeroMediaModule() {
+    const id = "nu-routine-hero-media-polish-script-v1";
+    if (document.getElementById(id)) return;
+
+    const script = document.createElement("script");
+    script.id = id;
+    script.src = "routine-hero-media-polish-v1.js?v=20260901-hero-v1";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function installRoutineTextPolish() {
     if (
       typeof normalizeRoutineText !== "function" ||
@@ -198,6 +209,7 @@
   function applyRoutineUiPolish() {
     ensureRoutineLayoutStyles();
     ensureRoutineQaModule();
+    ensureRoutineHeroMediaModule();
     installRoutineTextPolish();
     ensureRoutineCarouselControls();
     polishRoutineMaterials();
