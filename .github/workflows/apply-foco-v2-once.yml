@@ -1,0 +1,39 @@
+name: Apply Foco V2 once
+
+on:
+  push:
+    branches:
+      - feature/foco-cron-v2
+    paths:
+      - ".github/workflows/apply-foco-v2-once.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/foco-cron-v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Apply Foco V2
+        run: |
+          node scripts/apply-foco-cron-v2.js
+          node scripts/separate-foco-scheduler-v2.js
+          node --check server.js
+          git diff --check
+
+      - name: Commit branch update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js schema.sql
+          git commit -m "Implement reliable Foco V2 delivery"
+          git push origin HEAD:feature/foco-cron-v2
