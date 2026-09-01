@@ -20,6 +20,34 @@ body:has(#view-hoy.day-open) #app {
   padding-bottom: calc(90px + var(--safe-bottom)) !important;
 }
 
+/* Routine hero media has one final shared geometry.
+   This intentionally overrides the old 50x60 native-visual box. */
+#view-hoy.day-open .native-day-hero-media {
+  top: 16px !important;
+  right: 18px !important;
+  width: 78px !important;
+  height: 86px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#view-hoy.day-open .native-day-hero-media img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: transparent !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
 /* Content carousel owns the breathing room; cards own their own visible height. */
 #view-hoy.day-open .routine-content-track,
 #view-hoy.day-open .routine-content-slide {
@@ -137,6 +165,13 @@ body:has(#view-hoy.day-open) #app {
 @media (max-width: 370px) {
   #view-hoy.day-open .native-day-content {
     padding-bottom: calc(86px + var(--safe-bottom)) !important;
+  }
+
+  #view-hoy.day-open .native-day-hero-media {
+    top: 15px !important;
+    right: 15px !important;
+    width: 70px !important;
+    height: 78px !important;
   }
 
   #view-hoy.day-open .routine-content-track,
