@@ -61,6 +61,37 @@ CREATE INDEX IF NOT EXISTS idx_foco_notification_runs_due
   ON foco_notification_runs(status, scheduled_for)
   WHERE status IN ('pending', 'failed');
 
+-- NU APP · ENTREGAS DE FOCO POR DISPOSITIVO V2
+CREATE TABLE IF NOT EXISTS foco_notification_deliveries (
+  id BIGSERIAL PRIMARY KEY,
+  event_key TEXT NOT NULL
+    REFERENCES foco_notification_runs(event_key) ON DELETE CASCADE,
+  subscription_id BIGINT NULL
+    REFERENCES push_subscriptions(id) ON DELETE SET NULL,
+  endpoint_hash TEXT NOT NULL,
+  subscription_snapshot JSONB NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  processing_at TIMESTAMPTZ NULL,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ NULL,
+  UNIQUE (event_key, endpoint_hash),
+  CHECK (
+    status IN ('pending', 'processing', 'retryable', 'sent', 'permanent')
+  )
+);
+
+CREATE INDEX IF NOT EXISTS idx_foco_notification_deliveries_due
+  ON foco_notification_deliveries(event_key, status, next_attempt_at)
+  WHERE status IN ('pending', 'retryable');
+
+CREATE INDEX IF NOT EXISTS idx_foco_notification_deliveries_processing
+  ON foco_notification_deliveries(processing_at)
+  WHERE status = 'processing';
+
 CREATE TABLE IF NOT EXISTS notification_jobs (
   id BIGSERIAL PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
