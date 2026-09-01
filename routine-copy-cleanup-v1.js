@@ -69,6 +69,26 @@
       text = text.replace(pattern, label);
     });
 
+    // Final safe orthography pass for obvious source typos only.
+    text = text
+      .replace(/\bpersonailzada\b/gi, "personalizada")
+      .replace(/\bpreguntes\b/gi, "preguntas")
+      .replace(/\bcuentes\b/gi, "clientes")
+      .replace(/\bexpeciencia\b/gi, "experiencia")
+      .replace(/\bprocupan\b/gi, "preocupan")
+      .replace(/\btransformo\b/gi, "transformó")
+      .replace(/\bruning\b/gi, "running")
+      .replace(/\bWhatapp\b/gi, "WhatsApp")
+      .replace(/\bInstragram\b/gi, "Instagram")
+      .replace(/\bpracticas\b/gi, "prácticas")
+      .replace(/\bNuSkin\b/g, "Nu Skin")
+      .replace(/\bA\s+demás\b/gi, "Además")
+      .replace(/\bperdida de brillo\b/gi, "pérdida de brillo")
+      .replace(/\bte de una respuesta\b/gi, "te dé una respuesta")
+      .replace(/\bAhora si\b/g, "Ahora sí")
+      .replace(/\bAqui esta\b/gi, "Aquí está")
+      .replace(/\bAqui estan\b/gi, "Aquí están");
+
     // Remove remaining bot-style day markers without touching useful numeric content.
     text = text
       .replace(/#D[IÍ]A\s*(\d+)/gi, "Día $1")
