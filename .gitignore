@@ -1,3 +1,23 @@
 node_modules/
 npm-debug.log*
 .env
+
+# Local/development backups and exports
+*.bak
+*.bak-*
+*.backup
+*backup*.sql
+*.dump
+*.log
+
+# Temporary review/debug artifacts
+preview-*.html
+push-test.html
+*_DIAGNOSTICO.txt
+gemini-ios-debug-*.txt
+file-tree.txt
+nu-app-inventario-archivos.txt
+
+# Replit/chat working attachments and generated screenshots
+attached_assets/
+screenshots/
