@@ -12,7 +12,8 @@ const INTERNAL_ROOT_FILES = new Set([
   "/notification-delivery-v111.js",
   "/runtime-config-v113.js",
   "/http-cache-v114.js",
-  "/shared-rate-limit-v115.js"
+  "/shared-rate-limit-v115.js",
+  "/analytics-basic-server-v1.js"
 ]);
 
 const INTERNAL_DIRECTORIES = new Set([
