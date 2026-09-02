@@ -1712,6 +1712,146 @@
     "hidden": true
   },
   {
+    "id": "fichas-tecnicas",
+    "title": "Fichas técnicas",
+    "command": "fichas tecnicas",
+    "aliases": [
+      "fichas técnicas",
+      "ver fichas tecnicas",
+      "ver fichas técnicas",
+      "documentacion tecnica",
+      "documentación técnica"
+    ],
+    "phrases": [
+      "quiero ver las fichas tecnicas",
+      "quiero ver las fichas técnicas",
+      "donde estan las fichas tecnicas",
+      "dónde están las fichas técnicas"
+    ],
+    "keywords": [
+      "fichas tecnicas",
+      "documentacion tecnica"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Consultá las fichas técnicas disponibles de los productos."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "Beauty Focus Collagen+",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/collagen-plus.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "ageLOC LumiSpa",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/ageloc-lumispa.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "ageLOC Galvanic Spa",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/ageloc-galvanic-spa.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "ageLOC WellSpa iO",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/ageloc-wellspa-io.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "ageLOC Boost",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/ageloc-boost.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "ageLOC Youth",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/ageloc-youth.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "LifePak",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/lifepak.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "LifePak Elements",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/lifepak-elements.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "Nu Biome",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/nu-biome.pdf"
+          }
+        ]
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA",
+        "title": "Optimum Omega",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "/assets/iris/fichas-tecnicas/optimum-omega.pdf"
+          }
+        ]
+      }
+    ],
+    "sourceFlow": "FICHAS TECNICAS",
+    "hidden": true
+  },
+  {
     "id": "box-colageno",
     "title": "Box Colágeno",
     "command": "box colageno",

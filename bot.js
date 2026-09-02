@@ -365,11 +365,10 @@ function openBotDocument(documentBlock) {
   const layer = document.createElement("div");
   layer.className = "bot-document-layer";
 
-  // V35.10.3: posición forzada desde JS para que la guía quede realmente
-  // arriba dentro del viewport, incluso si el navegador conserva CSS anterior.
-  layer.style.alignItems = "flex-start";
+  // Centra el documento dentro del viewport y conserva margen seguro.
+  layer.style.alignItems = "center";
   layer.style.justifyContent = "center";
-  layer.style.paddingTop = "max(52px, 7dvh)";
+  layer.style.paddingTop = "18px";
   layer.style.paddingLeft = "14px";
   layer.style.paddingRight = "14px";
   layer.style.paddingBottom = "18px";
