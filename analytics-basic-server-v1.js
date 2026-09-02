@@ -43,6 +43,8 @@ async function ensureAnalyticsSchema() {
         ADD COLUMN IF NOT EXISTS guide_completed_at TIMESTAMPTZ NULL;
       ALTER TABLE users
         ADD COLUMN IF NOT EXISTS guide_completed_steps INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS guide_total_steps INTEGER NOT NULL DEFAULT 9;
       CREATE INDEX IF NOT EXISTS idx_users_pwa_installed_at
         ON users(pwa_installed_at)
         WHERE pwa_installed_at IS NOT NULL;
@@ -114,12 +116,16 @@ function attachBasicAnalytics(app) {
              ELSE guide_completed_at
            END,
            guide_completed_steps = GREATEST(guide_completed_steps, $5::integer),
+           guide_total_steps = CASE
+             WHEN $6::integer > 0 THEN $6::integer
+             ELSE guide_total_steps
+           END,
            last_seen_at = NOW(),
            updated_at = NOW()
          WHERE id = $1
          RETURNING id, pwa_installed_at, guide_started_at,
-                   guide_completed_at, guide_completed_steps`,
-        [userId, installed, guideStarted, guideComplete, guideCompletedSteps]
+                   guide_completed_at, guide_completed_steps, guide_total_steps`,
+        [userId, installed, guideStarted, guideComplete, guideCompletedSteps, guideTotalSteps]
       );
 
       if (!result.rowCount) {
@@ -153,7 +159,7 @@ function attachBasicAnalytics(app) {
     try {
       await ensureAnalyticsSchema();
 
-      const [overview, countries, notifications, completedUsers] = await Promise.all([
+      const [overview, countries, notifications, completedUsers, guideProgressUsers] = await Promise.all([
         pool.query(
           `SELECT
              COUNT(*)::int AS total_users,
@@ -189,6 +195,24 @@ function attachBasicAnalytics(app) {
            WHERE guide_completed_at IS NOT NULL
            ORDER BY guide_completed_at DESC
            LIMIT 200`
+        ),
+        pool.query(
+          `SELECT
+             id,
+             name,
+             country,
+             guide_completed_steps,
+             guide_total_steps,
+             guide_started_at,
+             guide_completed_at,
+             (guide_completed_at IS NOT NULL) AS completed
+           FROM users
+           WHERE guide_started_at IS NOT NULL
+           ORDER BY
+             (guide_completed_at IS NULL) DESC,
+             guide_completed_steps DESC,
+             guide_started_at DESC
+           LIMIT 200`
         )
       ]);
 
@@ -197,7 +221,8 @@ function attachBasicAnalytics(app) {
         overview: overview.rows[0],
         countries: countries.rows,
         notifications: notifications.rows[0],
-        guideCompletedUsers: completedUsers.rows
+        guideCompletedUsers: completedUsers.rows,
+        guideProgressUsers: guideProgressUsers.rows
       });
     } catch (error) {
       console.error("[basic-analytics] summary error:", error);
