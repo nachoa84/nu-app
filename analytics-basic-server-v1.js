@@ -8,6 +8,10 @@ const { databasePoolOptionsV113 } = require("./runtime-config-v113");
 const originalListen = express.application.listen;
 const originalStatic = express.static;
 const ANALYTICS_SINCE = "2026-09-02";
+const SYNC_WINDOW_MS = 60 * 1000;
+const SYNC_MAX_PER_WINDOW = 30;
+const USER_ID_PATTERN = /^[A-Za-z0-9_-]{8,200}$/;
+const syncRateBuckets = new Map();
 let analyticsAttached = false;
 let analyticsPool = null;
 let schemaPromise = null;
@@ -93,11 +97,114 @@ function normalizeCount(value, max = 100) {
   return Math.min(number, max);
 }
 
+function clientKey(req) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || req.ip || req.socket?.remoteAddress || "unknown";
+}
+
+function allowAnalyticsSync(req, res) {
+  const now = Date.now();
+  const key = clientKey(req);
+  const current = syncRateBuckets.get(key);
+
+  if (!current || now - current.startedAt >= SYNC_WINDOW_MS) {
+    syncRateBuckets.set(key, { startedAt: now, count: 1 });
+    return true;
+  }
+
+  if (current.count >= SYNC_MAX_PER_WINDOW) {
+    const retryAfterSeconds = Math.max(
+      1,
+      Math.ceil((SYNC_WINDOW_MS - (now - current.startedAt)) / 1000)
+    );
+    res.set("Retry-After", String(retryAfterSeconds));
+    res.status(429).json({ ok: false, error: "Demasiadas actualizaciones de analytics." });
+    return false;
+  }
+
+  current.count += 1;
+  return true;
+}
+
+function validateSyncBody(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return { ok: false, error: "Payload inválido." };
+  }
+
+  const allowedKeys = new Set([
+    "userId",
+    "installed",
+    "guideStarted",
+    "guideCompletedSteps",
+    "guideTotalSteps"
+  ]);
+  if (Object.keys(body).some(key => !allowedKeys.has(key))) {
+    return { ok: false, error: "Payload contiene campos no permitidos." };
+  }
+
+  const userId = String(body.userId || "").trim();
+  if (!USER_ID_PATTERN.test(userId)) {
+    return { ok: false, error: "Usuario inválido." };
+  }
+
+  if (body.installed !== undefined && typeof body.installed !== "boolean") {
+    return { ok: false, error: "installed inválido." };
+  }
+
+  if (body.guideStarted !== undefined && typeof body.guideStarted !== "boolean") {
+    return { ok: false, error: "guideStarted inválido." };
+  }
+
+  const guideCompletedSteps = normalizeCount(body.guideCompletedSteps, 50);
+  const guideTotalSteps = normalizeCount(body.guideTotalSteps, 50);
+
+  if (
+    body.guideCompletedSteps !== undefined &&
+    Number(body.guideCompletedSteps) !== guideCompletedSteps
+  ) {
+    return { ok: false, error: "guideCompletedSteps inválido." };
+  }
+
+  if (
+    body.guideTotalSteps !== undefined &&
+    Number(body.guideTotalSteps) !== guideTotalSteps
+  ) {
+    return { ok: false, error: "guideTotalSteps inválido." };
+  }
+
+  if (guideTotalSteps > 0 && guideCompletedSteps > guideTotalSteps) {
+    return { ok: false, error: "Progreso de guía inválido." };
+  }
+
+  return {
+    ok: true,
+    value: {
+      userId,
+      installed: body.installed === true,
+      guideStarted: body.guideStarted === true || guideCompletedSteps > 0,
+      guideCompletedSteps,
+      guideTotalSteps
+    }
+  };
+}
+
 function attachBasicAnalytics(app) {
   if (analyticsAttached) return;
   analyticsAttached = true;
 
   app.post("/api/analytics/sync", async (req, res) => {
+    if (!allowAnalyticsSync(req, res)) return;
+
+    const contentLength = Number(req.headers["content-length"] || 0);
+    if (contentLength > 4096) {
+      return res.status(413).json({ ok: false, error: "Payload demasiado grande." });
+    }
+
+    const validation = validateSyncBody(req.body);
+    if (!validation.ok) {
+      return res.status(400).json({ ok: false, error: validation.error });
+    }
+
     const pool = getPool();
     if (!pool) {
       return res.status(503).json({ ok: false, error: "Base de datos no disponible." });
@@ -106,15 +213,13 @@ function attachBasicAnalytics(app) {
     try {
       await ensureAnalyticsSchema();
 
-      const userId = String(req.body?.userId || "").trim();
-      if (!userId || userId.length > 200) {
-        return res.status(400).json({ ok: false, error: "Usuario inválido." });
-      }
-
-      const installed = req.body?.installed === true;
-      const guideCompletedSteps = normalizeCount(req.body?.guideCompletedSteps, 50);
-      const guideTotalSteps = normalizeCount(req.body?.guideTotalSteps, 50);
-      const guideStarted = req.body?.guideStarted === true || guideCompletedSteps > 0;
+      const {
+        userId,
+        installed,
+        guideStarted,
+        guideCompletedSteps,
+        guideTotalSteps
+      } = validation.value;
       const guideComplete = guideTotalSteps > 0 && guideCompletedSteps >= guideTotalSteps;
 
       const result = await pool.query(
