@@ -8,7 +8,6 @@ const { databasePoolOptionsV113 } = require("./runtime-config-v113");
 const originalListen = express.application.listen;
 const originalStatic = express.static;
 const ANALYTICS_SINCE = "2026-09-02";
-const USER_TYPES = new Set(["unknown", "real", "test"]);
 let analyticsAttached = false;
 let analyticsPool = null;
 let schemaPromise = null;
@@ -47,8 +46,6 @@ async function ensureAnalyticsSchema() {
         ADD COLUMN IF NOT EXISTS guide_completed_steps INTEGER NOT NULL DEFAULT 0;
       ALTER TABLE users
         ADD COLUMN IF NOT EXISTS guide_total_steps INTEGER NOT NULL DEFAULT 9;
-      ALTER TABLE users
-        ADD COLUMN IF NOT EXISTS analytics_user_type TEXT NOT NULL DEFAULT 'unknown';
       CREATE INDEX IF NOT EXISTS idx_users_pwa_installed_at
         ON users(pwa_installed_at)
         WHERE pwa_installed_at IS NOT NULL;
@@ -56,7 +53,6 @@ async function ensureAnalyticsSchema() {
         ON users(guide_completed_at)
         WHERE guide_completed_at IS NOT NULL;
       CREATE INDEX IF NOT EXISTS idx_users_last_seen_at ON users(last_seen_at);
-      CREATE INDEX IF NOT EXISTS idx_users_analytics_user_type ON users(analytics_user_type);
     `).catch(error => {
       schemaPromise = null;
       throw error;
@@ -95,13 +91,6 @@ function normalizeCount(value, max = 100) {
   const number = Number(value);
   if (!Number.isInteger(number) || number < 0) return 0;
   return Math.min(number, max);
-}
-
-function scopeWhere(scope, alias = "u") {
-  if (scope === "real") return `${alias}.analytics_user_type = 'real'`;
-  if (scope === "test") return `${alias}.analytics_user_type = 'test'`;
-  if (scope === "unknown") return `${alias}.analytics_user_type = 'unknown'`;
-  return "TRUE";
 }
 
 function attachBasicAnalytics(app) {
@@ -152,8 +141,7 @@ function attachBasicAnalytics(app) {
            updated_at = NOW()
          WHERE id = $1
          RETURNING id, pwa_installed_at, guide_started_at,
-                   guide_completed_at, guide_completed_steps, guide_total_steps,
-                   analytics_user_type`,
+                   guide_completed_at, guide_completed_steps, guide_total_steps`,
         [userId, installed, guideStarted, guideComplete, guideCompletedSteps, guideTotalSteps]
       );
 
@@ -168,43 +156,6 @@ function attachBasicAnalytics(app) {
     }
   });
 
-  app.post("/api/analytics/user-type", async (req, res) => {
-    if (!requireAdmin(req, res)) return;
-
-    const pool = getPool();
-    if (!pool) {
-      return res.status(503).json({ ok: false, error: "Base de datos no disponible." });
-    }
-
-    try {
-      await ensureAnalyticsSchema();
-      const userId = String(req.body?.userId || "").trim();
-      const userType = String(req.body?.userType || "").trim().toLowerCase();
-
-      if (!userId || userId.length > 200 || !USER_TYPES.has(userType)) {
-        return res.status(400).json({ ok: false, error: "Clasificación inválida." });
-      }
-
-      const result = await pool.query(
-        `UPDATE users
-            SET analytics_user_type = $2,
-                updated_at = NOW()
-          WHERE id = $1
-          RETURNING id, name, country, analytics_user_type`,
-        [userId, userType]
-      );
-
-      if (!result.rowCount) {
-        return res.status(404).json({ ok: false, error: "Usuario no encontrado." });
-      }
-
-      return res.json({ ok: true, user: result.rows[0] });
-    } catch (error) {
-      console.error("[basic-analytics] user type error:", error);
-      return res.status(500).json({ ok: false, error: "No se pudo clasificar el usuario." });
-    }
-  });
-
   app.get("/api/analytics/summary", async (req, res) => {
     if (!requireAdmin(req, res)) return;
 
@@ -213,101 +164,77 @@ function attachBasicAnalytics(app) {
       return res.status(503).json({ ok: false, error: "Base de datos no disponible." });
     }
 
-    const requestedScope = String(req.query?.scope || "all").toLowerCase();
-    const scope = ["all", "real", "test", "unknown"].includes(requestedScope)
-      ? requestedScope
-      : "all";
-    const where = scopeWhere(scope, "u");
-
     try {
       await ensureAnalyticsSchema();
 
-      const [overview, countries, notifications, completedUsers, guideProgressUsers, breakdown, users] = await Promise.all([
+      const [overview, countries, notifications, completedUsers, guideProgressUsers, users] = await Promise.all([
         pool.query(
           `SELECT
              COUNT(*)::int AS total_users,
-             COUNT(*) FILTER (WHERE u.pwa_installed_at IS NOT NULL)::int AS installed,
-             COUNT(*) FILTER (WHERE u.last_seen_at >= NOW() - INTERVAL '1 day')::int AS active_1d,
-             COUNT(*) FILTER (WHERE u.last_seen_at >= NOW() - INTERVAL '7 days')::int AS active_7d,
-             COUNT(*) FILTER (WHERE u.last_seen_at >= NOW() - INTERVAL '30 days')::int AS active_30d,
-             COUNT(*) FILTER (WHERE u.guide_started_at IS NOT NULL)::int AS guide_started,
-             COUNT(*) FILTER (WHERE u.guide_completed_at IS NOT NULL)::int AS guide_completed
-           FROM users u
-           WHERE ${where}`
+             COUNT(*) FILTER (WHERE pwa_installed_at IS NOT NULL)::int AS installed,
+             COUNT(*) FILTER (WHERE last_seen_at >= NOW() - INTERVAL '1 day')::int AS active_1d,
+             COUNT(*) FILTER (WHERE last_seen_at >= NOW() - INTERVAL '7 days')::int AS active_7d,
+             COUNT(*) FILTER (WHERE last_seen_at >= NOW() - INTERVAL '30 days')::int AS active_30d,
+             COUNT(*) FILTER (WHERE guide_started_at IS NOT NULL)::int AS guide_started,
+             COUNT(*) FILTER (WHERE guide_completed_at IS NOT NULL)::int AS guide_completed
+           FROM users`
         ),
         pool.query(
-          `SELECT u.country, COUNT(*)::int AS installed
-           FROM users u
-           WHERE ${where}
-             AND u.pwa_installed_at IS NOT NULL
-           GROUP BY u.country
-           ORDER BY installed DESC, u.country ASC`
+          `SELECT country, COUNT(*)::int AS installed
+           FROM users
+           WHERE pwa_installed_at IS NOT NULL
+           GROUP BY country
+           ORDER BY installed DESC, country ASC`
         ),
         pool.query(
           `SELECT
-             (SELECT COUNT(DISTINCT ps.user_id)::int
-                FROM push_subscriptions ps
-                JOIN users u ON u.id = ps.user_id
-               WHERE ${where}) AS notifications_enabled,
+             (SELECT COUNT(DISTINCT user_id)::int FROM push_subscriptions) AS notifications_enabled,
              (SELECT COUNT(DISTINCT b.user_id)::int
                 FROM notification_delivery_batches b
                 JOIN notification_deliveries d ON d.logical_key = b.logical_key
-                JOIN users u ON u.id = b.user_id
-               WHERE ${where} AND d.status = 'sent') AS users_reached,
+               WHERE d.status = 'sent') AS users_reached,
              (SELECT COUNT(*)::int
-                FROM notification_deliveries d
-                JOIN notification_delivery_batches b ON b.logical_key = d.logical_key
-                JOIN users u ON u.id = b.user_id
-               WHERE ${where} AND d.status = 'sent') AS successful_device_deliveries`
+                FROM notification_deliveries
+               WHERE status = 'sent') AS successful_device_deliveries`
         ),
         pool.query(
-          `SELECT u.id, u.name, u.country, u.guide_completed_at, u.analytics_user_type
-           FROM users u
-           WHERE ${where}
-             AND u.guide_completed_at IS NOT NULL
-           ORDER BY u.guide_completed_at DESC
+          `SELECT id, name, country, guide_completed_at
+           FROM users
+           WHERE guide_completed_at IS NOT NULL
+           ORDER BY guide_completed_at DESC
            LIMIT 200`
         ),
         pool.query(
           `SELECT
-             u.id,
-             u.name,
-             u.country,
-             u.analytics_user_type,
-             u.guide_completed_steps,
-             u.guide_total_steps,
-             u.guide_started_at,
-             u.guide_completed_at,
-             (u.guide_completed_at IS NOT NULL) AS completed
-           FROM users u
-           WHERE ${where}
-             AND u.guide_started_at IS NOT NULL
+             id,
+             name,
+             country,
+             guide_completed_steps,
+             guide_total_steps,
+             guide_started_at,
+             guide_completed_at,
+             (guide_completed_at IS NOT NULL) AS completed
+           FROM users
+           WHERE guide_started_at IS NOT NULL
            ORDER BY
-             (u.guide_completed_at IS NULL) DESC,
-             u.guide_completed_steps DESC,
-             u.guide_started_at DESC
+             (guide_completed_at IS NULL) DESC,
+             guide_completed_steps DESC,
+             guide_started_at DESC
            LIMIT 200`
         ),
         pool.query(
-          `SELECT analytics_user_type, COUNT(*)::int AS users
-             FROM users
-            GROUP BY analytics_user_type
-            ORDER BY analytics_user_type`
-        ),
-        pool.query(
           `SELECT
-             u.id,
-             u.name,
-             u.country,
-             u.analytics_user_type,
-             u.created_at,
-             u.last_seen_at,
-             u.pwa_installed_at,
-             u.guide_completed_steps,
-             u.guide_total_steps,
-             (u.guide_completed_at IS NOT NULL) AS guide_completed
-           FROM users u
-           ORDER BY u.last_seen_at DESC NULLS LAST, u.created_at DESC
+             id,
+             name,
+             country,
+             created_at,
+             last_seen_at,
+             pwa_installed_at,
+             guide_completed_steps,
+             guide_total_steps,
+             (guide_completed_at IS NOT NULL) AS guide_completed
+           FROM users
+           ORDER BY last_seen_at DESC NULLS LAST, created_at DESC
            LIMIT 250`
         )
       ]);
@@ -315,11 +242,9 @@ function attachBasicAnalytics(app) {
       return res.json({
         ok: true,
         analyticsSince: ANALYTICS_SINCE,
-        scope,
         overview: overview.rows[0],
         countries: countries.rows,
         notifications: notifications.rows[0],
-        userBreakdown: breakdown.rows,
         users: users.rows,
         guideCompletedUsers: completedUsers.rows,
         guideProgressUsers: guideProgressUsers.rows
