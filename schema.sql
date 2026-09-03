@@ -222,3 +222,65 @@ CREATE TABLE IF NOT EXISTS rate_limit_buckets (
 
 CREATE INDEX IF NOT EXISTS idx_rate_limit_buckets_expires
   ON rate_limit_buckets(expires_at);
+
+
+-- NU APP · QSTASH ROUTINE PILOT V1
+-- Guarda únicamente mensajes reales de Collagen+ programados por el piloto.
+-- La fila se crea sólo después de que QStash devuelve un messageId válido.
+CREATE TABLE IF NOT EXISTS qstash_routine_pilot_jobs (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  cycle INTEGER NOT NULL,
+  day INTEGER NOT NULL,
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  message_id TEXT NOT NULL,
+  delivery_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'scheduled',
+  source TEXT NOT NULL DEFAULT 'unknown',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, cycle, day),
+  CHECK (day BETWEEN 1 AND 30),
+  CHECK (status IN ('scheduled', 'claimed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_qstash_routine_pilot_due
+  ON qstash_routine_pilot_jobs(status, scheduled_for)
+  WHERE status = 'scheduled';
+
+-- Mientras exista una programación QStash válida para ese mismo usuario,
+-- ciclo y día, evita que el scheduler viejo cree un segundo aviso. Si QStash
+-- no llegó a programarse, no existe una fila scheduled y el sistema viejo
+-- continúa funcionando como fallback.
+CREATE OR REPLACE FUNCTION suppress_legacy_notification_job_for_qstash_pilot()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.kind = 'day_available' AND EXISTS (
+    SELECT 1
+    FROM qstash_routine_pilot_jobs AS pilot
+    WHERE pilot.user_id = NEW.user_id
+      AND pilot.cycle = NEW.cycle
+      AND pilot.day = NEW.day
+      AND pilot.status = 'scheduled'
+      AND ABS(EXTRACT(EPOCH FROM (pilot.scheduled_for - NOW()))) <= 600
+  ) THEN
+    UPDATE qstash_routine_pilot_jobs
+    SET status = 'claimed', updated_at = NOW()
+    WHERE user_id = NEW.user_id
+      AND cycle = NEW.cycle
+      AND day = NEW.day
+      AND status = 'scheduled';
+
+    RETURN NULL;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_notification_jobs_qstash_routine_pilot
+  ON notification_jobs;
+
+CREATE TRIGGER trg_notification_jobs_qstash_routine_pilot
+BEFORE INSERT ON notification_jobs
+FOR EACH ROW
+EXECUTE FUNCTION suppress_legacy_notification_job_for_qstash_pilot();

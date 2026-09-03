@@ -14,6 +14,7 @@ const INTERNAL_ROOT_FILES = new Set([
   "/http-cache-v114.js",
   "/shared-rate-limit-v115.js",
   "/qstash-notification-server-v1.js",
+  "/qstash-routine-pilot-v1.js",
   "/analytics-basic-server-v1.js"
 ]);
 
@@ -138,7 +139,8 @@ function assertSafeProductionEnvironment(env = process.env) {
     "IRIS_AI_CONTROLLED_EXECUTION",
     "PILOT_ENABLED",
     "PILOT_ADMIN_ROUTES_ENABLED",
-    "IRIS_AI_PILOT_ENABLED"
+    "IRIS_AI_PILOT_ENABLED",
+    "QSTASH_ROUTINE_PILOT_ENABLED"
   ];
 
   const enabledUnsafe = forbiddenTrueFlags.filter(name => trueFlag(env[name]));
