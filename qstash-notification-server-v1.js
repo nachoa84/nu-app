@@ -12,6 +12,7 @@ const webpush = require("web-push");
 const { databasePoolOptionsV113 } = require("./runtime-config-v113");
 
 const originalListen = express.application.listen;
+const originalUse = express.application.use;
 const originalJson = express.json;
 
 // Deliberadamente fuera de /api: server.js aplica un rate limiter compartido
@@ -531,6 +532,19 @@ function attachQStashPilot(app) {
 
   prioritizeQStashRoutes(app);
 }
+
+// Registrar el piloto apenas server.js instala su primer middleware
+// (express.json). Así las rutas QStash quedan antes de los gates/fallbacks
+// generales de /api y no dependen de app.listen() para existir.
+express.application.use = function qstashPilotUse(...args) {
+  const result = originalUse.apply(this, args);
+
+  if (!attached) {
+    attachQStashPilot(this);
+  }
+
+  return result;
+};
 
 express.application.listen = function qstashPilotListen(...args) {
   attachQStashPilot(this);
