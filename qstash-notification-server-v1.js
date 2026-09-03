@@ -310,6 +310,45 @@ async function publishQStashMessage({ destination, body, seconds }) {
   return responseBody || {};
 }
 
+function prioritizeQStashRoutes(app) {
+  let stack = null;
+
+  try {
+    const router = app.router || app._router;
+    if (Array.isArray(router?.stack)) {
+      stack = router.stack;
+    }
+  } catch (_) {
+    stack = null;
+  }
+
+  if (!stack) return false;
+
+  const paths = new Set([
+    TEST_STATUS_PATH,
+    TEST_SCHEDULE_PATH,
+    DELIVERY_PATH
+  ]);
+  const qstashLayers = [];
+
+  for (let index = stack.length - 1; index >= 0; index -= 1) {
+    const layer = stack[index];
+    if (paths.has(layer?.route?.path)) {
+      qstashLayers.unshift(stack.splice(index, 1)[0]);
+    }
+  }
+
+  if (!qstashLayers.length) return false;
+
+  // Las rutas necesitan el JSON parser para req.body y req.rawBody, pero
+  // deben quedar antes de los rate limiters/fallbacks generales de /api.
+  const jsonParserIndex = stack.findIndex(layer => layer?.name === "jsonParser");
+  const insertAt = jsonParserIndex >= 0 ? jsonParserIndex + 1 : 0;
+  stack.splice(insertAt, 0, ...qstashLayers);
+
+  return true;
+}
+
 function attachQStashPilot(app) {
   if (attached) return;
   attached = true;
@@ -489,6 +528,8 @@ function attachQStashPilot(app) {
       });
     }
   });
+
+  prioritizeQStashRoutes(app);
 }
 
 express.application.listen = function qstashPilotListen(...args) {
@@ -504,5 +545,6 @@ module.exports = {
   verifyJwtWithKey,
   verifyQStashSignature,
   encryptPayload,
-  decryptPayload
+  decryptPayload,
+  prioritizeQStashRoutes
 };
