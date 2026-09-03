@@ -21,6 +21,10 @@ test("release guard bloquea directorios y módulos internos", () => {
     "/iris-ai-server-runtime-v1.js",
     "/iris-document-retrieval-store-v1.js",
     "/pilot-identity-store-v0.js",
+    "/pilot-qstash-product-routines-v1.js",
+    "/qstash-notification-server-v1.js",
+    "/qstash-routine-pilot-v1.js",
+    "/qstash-main-rollout-v1.js",
     "/runtime-config-v113.js",
     "/internal.csv"
   ];
@@ -68,7 +72,8 @@ test("development conserva flags de prueba fuera de deployment publicado", () =>
       IRIS_AI_CONTROLLED_EXECUTION: "true",
       PILOT_ENABLED: "true",
       PILOT_ADMIN_ROUTES_ENABLED: "true",
-      IRIS_AI_PILOT_ENABLED: "true"
+      IRIS_AI_PILOT_ENABLED: "true",
+      QSTASH_ROUTINE_PILOT_ENABLED: "true"
     })
   );
 });
@@ -106,7 +111,9 @@ test("production exige base y rechaza flags de prueba", () => {
       IRIS_AI_CONTROLLED_EXECUTION: "false",
       PILOT_ENABLED: "false",
       PILOT_ADMIN_ROUTES_ENABLED: "false",
-      IRIS_AI_PILOT_ENABLED: "false"
+      IRIS_AI_PILOT_ENABLED: "false",
+      QSTASH_ROUTINE_PILOT_ENABLED: "false",
+      QSTASH_ROUTINE_NOTIFICATIONS_ENABLED: "true"
     })
   );
 });
@@ -115,7 +122,8 @@ test("primera salida rechaza activación accidental de funciones piloto", () => 
   for (const flag of [
     "PILOT_ENABLED",
     "PILOT_ADMIN_ROUTES_ENABLED",
-    "IRIS_AI_PILOT_ENABLED"
+    "IRIS_AI_PILOT_ENABLED",
+    "QSTASH_ROUTINE_PILOT_ENABLED"
   ]) {
     assert.throws(
       () => assertSafeProductionEnvironment({
