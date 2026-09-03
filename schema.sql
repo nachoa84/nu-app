@@ -118,8 +118,6 @@ CREATE TABLE IF NOT EXISTS product_routine_day_progress (
 CREATE INDEX IF NOT EXISTS idx_product_routine_progress_user
   ON product_routine_day_progress(user_id, routine_id, day);
 
-
-
 -- NU APP · PROGRAMACIÓN UNIFICADA DE RUTINAS V101
 -- En V101 se registran los avisos de las rutinas de producto.
 -- V101a incorporará Collagen+ al envío agrupado usando esta misma cola.
@@ -208,7 +206,6 @@ CREATE INDEX IF NOT EXISTS idx_notification_deliveries_processing
   ON notification_deliveries(processing_at)
   WHERE status = 'processing';
 
-
 -- NU APP · RATE LIMITING COMPARTIDO V115
 CREATE TABLE IF NOT EXISTS rate_limit_buckets (
   namespace TEXT NOT NULL,
@@ -222,3 +219,128 @@ CREATE TABLE IF NOT EXISTS rate_limit_buckets (
 
 CREATE INDEX IF NOT EXISTS idx_rate_limit_buckets_expires
   ON rate_limit_buckets(expires_at);
+
+-- NU APP · QSTASH ROUTINE PILOT V1
+-- Guarda únicamente mensajes reales de Collagen+ programados por el piloto.
+-- La fila se crea sólo después de que QStash devuelve un messageId válido.
+CREATE TABLE IF NOT EXISTS qstash_routine_pilot_jobs (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  cycle INTEGER NOT NULL,
+  day INTEGER NOT NULL,
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  message_id TEXT NOT NULL,
+  delivery_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'scheduled',
+  source TEXT NOT NULL DEFAULT 'unknown',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, cycle, day),
+  CHECK (day BETWEEN 1 AND 30),
+  CHECK (status IN ('scheduled', 'claimed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_qstash_routine_pilot_due
+  ON qstash_routine_pilot_jobs(status, scheduled_for)
+  WHERE status = 'scheduled';
+
+-- Mientras exista una programación QStash válida para ese mismo usuario,
+-- ciclo y día, evita que el scheduler viejo cree un segundo aviso. Si QStash
+-- no llegó a programarse, no existe una fila scheduled y el sistema viejo
+-- continúa funcionando como fallback.
+CREATE OR REPLACE FUNCTION suppress_legacy_notification_job_for_qstash_pilot()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.kind = 'day_available' AND EXISTS (
+    SELECT 1
+    FROM qstash_routine_pilot_jobs AS pilot
+    WHERE pilot.user_id = NEW.user_id
+      AND pilot.cycle = NEW.cycle
+      AND pilot.day = NEW.day
+      AND pilot.status = 'scheduled'
+      AND ABS(EXTRACT(EPOCH FROM (pilot.scheduled_for - NOW()))) <= 600
+  ) THEN
+    UPDATE qstash_routine_pilot_jobs
+    SET status = 'claimed', updated_at = NOW()
+    WHERE user_id = NEW.user_id
+      AND cycle = NEW.cycle
+      AND day = NEW.day
+      AND status = 'scheduled';
+
+    RETURN NULL;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_notification_jobs_qstash_routine_pilot
+  ON notification_jobs;
+
+CREATE TRIGGER trg_notification_jobs_qstash_routine_pilot
+BEFORE INSERT ON notification_jobs
+FOR EACH ROW
+EXECUTE FUNCTION suppress_legacy_notification_job_for_qstash_pilot();
+
+-- NU APP · QSTASH PRODUCT ROUTINES PILOT V1
+-- Piloto para LumiSpa, WellSpa y Galvanic Spa. Se mantiene separado de
+-- Collagen+ para no alterar su piloto ya validado.
+CREATE TABLE IF NOT EXISTS qstash_product_routine_pilot_jobs (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  routine_id TEXT NOT NULL,
+  cycle INTEGER NOT NULL DEFAULT 1,
+  day INTEGER NOT NULL,
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  message_id TEXT NOT NULL,
+  delivery_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'scheduled',
+  source TEXT NOT NULL DEFAULT 'unknown',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, routine_id, cycle, day),
+  CHECK (routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10')),
+  CHECK (day BETWEEN 1 AND 10),
+  CHECK (status IN ('scheduled', 'claimed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_qstash_product_routine_pilot_due
+  ON qstash_product_routine_pilot_jobs(status, scheduled_for)
+  WHERE status = 'scheduled';
+
+CREATE OR REPLACE FUNCTION suppress_legacy_product_routine_job_for_qstash_pilot()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.kind = 'day_available'
+     AND NEW.routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10')
+     AND EXISTS (
+       SELECT 1
+       FROM qstash_product_routine_pilot_jobs AS pilot
+       WHERE pilot.user_id = NEW.user_id
+         AND pilot.routine_id = NEW.routine_id
+         AND pilot.cycle = NEW.cycle
+         AND pilot.day = NEW.day
+         AND pilot.status = 'scheduled'
+         AND ABS(EXTRACT(EPOCH FROM (pilot.scheduled_for - NEW.scheduled_for))) <= 60
+     )
+  THEN
+    UPDATE qstash_product_routine_pilot_jobs
+    SET status = 'claimed', updated_at = NOW()
+    WHERE user_id = NEW.user_id
+      AND routine_id = NEW.routine_id
+      AND cycle = NEW.cycle
+      AND day = NEW.day
+      AND status = 'scheduled';
+
+    RETURN NULL;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_routine_notification_jobs_qstash_product_pilot
+  ON routine_notification_jobs;
+
+CREATE TRIGGER trg_routine_notification_jobs_qstash_product_pilot
+BEFORE INSERT ON routine_notification_jobs
+FOR EACH ROW
+EXECUTE FUNCTION suppress_legacy_product_routine_job_for_qstash_pilot();

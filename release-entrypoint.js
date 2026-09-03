@@ -12,7 +12,10 @@ const INTERNAL_ROOT_FILES = new Set([
   "/notification-delivery-v111.js",
   "/runtime-config-v113.js",
   "/http-cache-v114.js",
-  "/shared-rate-limit-v115.js"
+  "/shared-rate-limit-v115.js",
+  "/qstash-notification-server-v1.js",
+  "/qstash-routine-pilot-v1.js",
+  "/qstash-main-rollout-v1.js"
 ]);
 
 const INTERNAL_DIRECTORIES = new Set([
@@ -136,7 +139,8 @@ function assertSafeProductionEnvironment(env = process.env) {
     "IRIS_AI_CONTROLLED_EXECUTION",
     "PILOT_ENABLED",
     "PILOT_ADMIN_ROUTES_ENABLED",
-    "IRIS_AI_PILOT_ENABLED"
+    "IRIS_AI_PILOT_ENABLED",
+    "QSTASH_ROUTINE_PILOT_ENABLED"
   ];
 
   const enabledUnsafe = forbiddenTrueFlags.filter(name => trueFlag(env[name]));
@@ -196,10 +200,15 @@ async function waitForHealthyBackend({
 }
 
 async function boot() {
+  // Primero valida los Secrets/flags externos de Production. Sólo después
+  // el wrapper interno puede traducir el rollout seguro al piloto validado.
   assertSafeProductionEnvironment(process.env);
 
   const express = require("express");
   installStaticReleaseGuard(express);
+
+  const { installMainQStashRollout } = require("./qstash-main-rollout-v1");
+  installMainQStashRollout(process.env);
 
   require("./server");
 
