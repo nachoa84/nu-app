@@ -5,8 +5,8 @@
   "description": "Nu App PWA con backend Node, PostgreSQL y Web Push",
   "main": "server.js",
   "scripts": {
-    "start": "node -r ./analytics-basic-server-v1.js server.js",
-    "dev": "node -r ./analytics-basic-server-v1.js server.js",
+    "start": "node -r ./qstash-notification-server-v1.js -r ./analytics-basic-server-v1.js server.js",
+    "dev": "node -r ./qstash-notification-server-v1.js -r ./analytics-basic-server-v1.js server.js",
     "test:v111": "node --test tests/notification-delivery-v111.test.js",
     "test:v113": "node --test tests/runtime-hardening-v113.test.js",
     "test:v114": "node --test tests/http-cache-v114.test.js",
