@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nu App · Analytics</title>
+  <style>
+    :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172033; background: #f4f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #f4f6f8; }
+    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 30px 0 50px; }
+    h1 { margin: 0; font-size: 30px; font-weight: 760; letter-spacing: -0.03em; }
+    .sub { margin-top: 6px; color: #667085; font-size: 14px; }
+    .notice { margin-top: 10px; display: inline-flex; padding: 7px 10px; background: #fff4ed; color: #b54708; border-radius: 999px; font-size: 12px; font-weight: 650; }
+    .auth, .section, .card { background: white; border: 1px solid #e4e7ec; box-shadow: 0 8px 24px rgba(15, 23, 42, .04); }
+    .auth { border-radius: 16px; padding: 16px; margin: 18px 0 16px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+    label { display: block; font-size: 12px; color: #667085; margin-bottom: 6px; }
+    input { width: 100%; height: 42px; border: 1px solid #d0d5dd; border-radius: 12px; padding: 0 12px; font: inherit; background: white; }
+    button { height: 42px; border: 0; border-radius: 12px; padding: 0 16px; font: inherit; font-weight: 650; cursor: pointer; background: #e65b2f; color: white; }
+    button.secondary { background: white; color: #344054; border: 1px solid #d0d5dd; }
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
+    .status { font-size: 13px; color: #667085; }
+    .status.error { color: #b42318; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { border-radius: 16px; padding: 17px; }
+    .metric-label { color: #667085; font-size: 12px; margin-bottom: 7px; }
+    .metric-value { font-size: 28px; font-weight: 760; letter-spacing: -0.03em; }
+    .section { border-radius: 16px; padding: 18px; margin-top: 16px; }
+    .section h2 { font-size: 17px; margin: 0 0 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 11px 8px; border-bottom: 1px solid #eef0f2; vertical-align: middle; }
+    th { color: #667085; font-size: 12px; font-weight: 650; }
+    tr:last-child td { border-bottom: 0; }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 12px; background: #f2f4f7; color: #475467; }
+    .pill.done { background: #ecfdf3; color: #027a48; }
+    .progress { height: 10px; background: #eef0f2; border-radius: 999px; overflow: hidden; min-width: 130px; margin-top: 5px; }
+    .progress > span { display: block; height: 100%; background: #e65b2f; border-radius: inherit; }
+    .empty { color: #98a2b3; font-size: 14px; padding: 8px 0; }
+    .auth.hidden { display: none; }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 1180px); padding-top: 18px; }
+      .auth { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .metric-value { font-size: 24px; }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div>
+      <h1>Analytics · Nu Comunidad</h1>
+      <div class="sub">Panel de desarrollo para instalaciones, actividad, guía y notificaciones.</div>
+      <div class="notice">Analytics de instalación/guía activo desde 02/09/2026</div>
+    </div>
+    <section id="auth" class="auth">
+      <div><label for="token">ADMIN_TEST_TOKEN</label><input id="token" type="password" autocomplete="off" placeholder="Ingresá el token administrativo" /></div>
+      <button id="loadBtn" type="button">Ver analytics</button>
+    </section>
+    <div class="toolbar"><button id="refreshBtn" class="secondary" type="button" disabled>Actualizar</button><span id="status" class="status">Ingresá el token para cargar los datos.</span></div>
+    <section id="dashboard" hidden>
+      <div class="grid" id="metrics"></div>
+      <section class="section"><h2>Usuarios</h2><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>País</th><th>Última actividad</th><th>Instalada</th></tr></thead><tbody id="usersBody"></tbody></table></div></section>
+      <section class="section"><h2>Instalaciones por país</h2><div id="countries"></div></section>
+      <section class="section"><h2>Progreso de la guía</h2><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>País</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="guideBody"></tbody></table></div></section>
+      <section class="section"><h2>Notificaciones</h2><div id="notifications"></div></section>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const tokenInput = document.getElementById('token'); const loadBtn = document.getElementById('loadBtn'); const refreshBtn = document.getElementById('refreshBtn'); const statusEl = document.getElementById('status'); const dashboard = document.getElementById('dashboard'); const auth = document.getElementById('auth'); const metrics = document.getElementById('metrics'); const countries = document.getElementById('countries'); const guideBody = document.getElementById('guideBody'); const usersBody = document.getElementById('usersBody'); const notifications = document.getElementById('notifications'); let token = '';
+      function metric(label, value) { return `<div class="card"><div class="metric-label">${label}</div><div class="metric-value">${value}</div></div>`; }
+      function escapeHtml(value) { return String(value ?? '').replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch])); }
+      function formatDate(value) { if (!value) return '—'; const date = new Date(value); return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(); }
+      function render(data) {
+        const o = data.overview || {}; metrics.innerHTML = [metric('Usuarios registrados', o.total_users ?? 0), metric('Instalaciones', o.installed ?? 0), metric('Activos 24 h', o.active_1d ?? 0), metric('Activos 7 días', o.active_7d ?? 0), metric('Activos 30 días', o.active_30d ?? 0), metric('Guía iniciada', o.guide_started ?? 0), metric('Guía completada', o.guide_completed ?? 0), metric('Notificaciones activas', data.notifications?.notifications_enabled ?? 0)].join('');
+        const allUsers = Array.isArray(data.users) ? data.users : []; usersBody.innerHTML = allUsers.length ? allUsers.map(user => `<tr><td>${escapeHtml(user.name || user.id || 'Usuario')}</td><td>${escapeHtml(user.country || '—')}</td><td>${escapeHtml(formatDate(user.last_seen_at))}</td><td>${user.pwa_installed_at ? 'Sí' : 'No'}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No hay usuarios.</td></tr>';
+        const countryRows = Array.isArray(data.countries) ? data.countries : []; countries.innerHTML = countryRows.length ? `<div class="table-wrap"><table><thead><tr><th>País</th><th>Instalaciones</th></tr></thead><tbody>${countryRows.map(row => `<tr><td>${escapeHtml(row.country || 'Sin país')}</td><td>${Number(row.installed || 0)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Todavía no hay instalaciones registradas.</div>';
+        const guideUsers = Array.isArray(data.guideProgressUsers) ? data.guideProgressUsers : []; guideBody.innerHTML = guideUsers.length ? guideUsers.map(user => { const done = Number(user.guide_completed_steps || 0); const total = Math.max(1, Number(user.guide_total_steps || 9)); const pct = Math.min(100, Math.round((done / total) * 100)); return `<tr><td>${escapeHtml(user.name || user.id || 'Usuario')}</td><td>${escapeHtml(user.country || '—')}</td><td><div>${done} de ${total} · ${pct}%</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="pill ${user.completed ? 'done' : ''}">${user.completed ? 'Completada' : 'En progreso'}</span></td></tr>`; }).join('') : '<tr><td colspan="4" class="empty">Nadie inició la guía todavía.</td></tr>';
+        const n = data.notifications || {}; notifications.innerHTML = `<div class="grid">${metric('Habilitadas', n.notifications_enabled ?? 0)}${metric('Usuarios alcanzados', n.users_reached ?? 0)}${metric('Entregas exitosas', n.successful_device_deliveries ?? 0)}</div>`;
+      }
+      async function load() { if (!token) token = tokenInput.value.trim(); if (!token) { statusEl.textContent = 'Ingresá el token administrativo.'; statusEl.className = 'status error'; return; } statusEl.textContent = 'Cargando…'; statusEl.className = 'status'; loadBtn.disabled = true; refreshBtn.disabled = true; try { const response = await fetch('/api/analytics/summary', { headers: { 'x-admin-token': token }, cache: 'no-store' }); const data = await response.json().catch(() => ({})); if (!response.ok || !data.ok) throw new Error(data.error || `Error ${response.status}`); render(data); dashboard.hidden = false; auth.classList.add('hidden'); refreshBtn.disabled = false; tokenInput.value = ''; statusEl.textContent = `Actualizado ${new Date().toLocaleTimeString()}`; statusEl.className = 'status'; } catch (error) { dashboard.hidden = true; auth.classList.remove('hidden'); token = ''; statusEl.textContent = error.message || 'No se pudo cargar analytics.'; statusEl.className = 'status error'; } finally { loadBtn.disabled = false; } }
+      loadBtn.addEventListener('click', () => { token = tokenInput.value.trim(); load(); }); refreshBtn.addEventListener('click', load); tokenInput.addEventListener('keydown', event => { if (event.key === 'Enter') { token = tokenInput.value.trim(); load(); } });
+    })();
+  </script>
+</body>
+</html>
