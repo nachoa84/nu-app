@@ -8,8 +8,53 @@ const path = require("node:path");
 const {
   DB_POOL_MAX_DEFAULT_V113,
   DB_POOL_MAX_LIMIT_V113,
-  databasePoolOptionsV113
+  databasePoolOptionsV113,
+  legacySchedulerEnabledV1
 } = require("../runtime-config-v113");
+
+test("scheduler legacy permanece habilitado sin configuración", () => {
+  assert.equal(
+    legacySchedulerEnabledV1({}),
+    true
+  );
+});
+
+test("scheduler legacy sólo se desactiva con false explícito", () => {
+  assert.equal(
+    legacySchedulerEnabledV1({
+      LEGACY_SCHEDULER_ENABLED: "false"
+    }),
+    false
+  );
+
+  assert.equal(
+    legacySchedulerEnabledV1({
+      LEGACY_SCHEDULER_ENABLED: " FALSE "
+    }),
+    false
+  );
+
+  assert.equal(
+    legacySchedulerEnabledV1({
+      LEGACY_SCHEDULER_ENABLED: "true"
+    }),
+    true
+  );
+
+  assert.equal(
+    legacySchedulerEnabledV1({
+      LEGACY_SCHEDULER_ENABLED: "0"
+    }),
+    true
+  );
+
+  assert.equal(
+    legacySchedulerEnabledV1({
+      LEGACY_SCHEDULER_ENABLED: ""
+    }),
+    true
+  );
+});
 
 test("el pool usa límites seguros por defecto", () => {
   const options = databasePoolOptionsV113("postgres://example", {});
