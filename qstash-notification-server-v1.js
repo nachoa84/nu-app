@@ -21,7 +21,9 @@ const originalJson = express.json;
 const DELIVERY_PATH = "/_qstash/push-delivery";
 const TEST_SCHEDULE_PATH = "/api/admin/qstash-test-schedule-latest";
 const TEST_STATUS_PATH = "/api/admin/qstash-test-status";
-const QSTASH_API_BASE = "https://qstash.upstash.io/v2/publish/";
+const QSTASH_API_BASE = String(
+  process.env.QSTASH_URL || "https://qstash.upstash.io"
+).trim().replace(/\/$/, "");
 
 let attached = false;
 let pool = null;
@@ -283,7 +285,7 @@ function normalizeSubscription(value) {
 
 async function publishQStashMessage({ destination, body, seconds }) {
   const { token } = qstashConfig();
-  const response = await fetch(`${QSTASH_API_BASE}${destination}`, {
+  const response = await fetch(`${QSTASH_API_BASE}/v2/publish/${destination}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
