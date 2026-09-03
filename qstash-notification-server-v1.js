@@ -14,7 +14,10 @@ const { databasePoolOptionsV113 } = require("./runtime-config-v113");
 const originalListen = express.application.listen;
 const originalJson = express.json;
 
-const DELIVERY_PATH = "/api/qstash/push-delivery";
+// Deliberadamente fuera de /api: server.js aplica un rate limiter compartido
+// respaldado por PostgreSQL a los POST /api. La entrega QStash debe poder
+// despertar el servidor y enviar Web Push sin consultar la base.
+const DELIVERY_PATH = "/_qstash/push-delivery";
 const TEST_SCHEDULE_PATH = "/api/admin/qstash-test-schedule-latest";
 const TEST_STATUS_PATH = "/api/admin/qstash-test-status";
 const QSTASH_API_BASE = "https://qstash.upstash.io/v2/publish/";
@@ -103,6 +106,7 @@ function qstashConfig() {
     token: String(process.env.QSTASH_TOKEN || "").trim(),
     currentSigningKey: String(process.env.QSTASH_CURRENT_SIGNING_KEY || "").trim(),
     nextSigningKey: String(process.env.QSTASH_NEXT_SIGNING_KEY || "").trim(),
+    payloadEncryptionKey: String(process.env.QSTASH_PAYLOAD_ENCRYPTION_KEY || "").trim(),
     destination: destinationUrl()
   };
 }
@@ -113,6 +117,7 @@ function qstashConfigured() {
     config.token &&
     config.currentSigningKey &&
     config.nextSigningKey &&
+    config.payloadEncryptionKey &&
     config.destination
   );
 }
@@ -195,6 +200,59 @@ function verifyQStashSignature(signature, body, expectedUrl) {
   );
 }
 
+function encryptionKey() {
+  const secret = qstashConfig().payloadEncryptionKey;
+  return secret
+    ? crypto.createHash("sha256").update(secret).digest()
+    : null;
+}
+
+function encryptPayload(value) {
+  const key = encryptionKey();
+  if (!key) throw new Error("QSTASH_PAYLOAD_ENCRYPTION_KEY no configurado.");
+
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const plaintext = Buffer.from(JSON.stringify(value), "utf8");
+  const ciphertext = Buffer.concat([
+    cipher.update(plaintext),
+    cipher.final()
+  ]);
+  const tag = cipher.getAuthTag();
+
+  return {
+    alg: "A256GCM",
+    iv: iv.toString("base64url"),
+    tag: tag.toString("base64url"),
+    ciphertext: ciphertext.toString("base64url")
+  };
+}
+
+function decryptPayload(envelope) {
+  const key = encryptionKey();
+  if (!key) throw new Error("QSTASH_PAYLOAD_ENCRYPTION_KEY no configurado.");
+  if (!envelope || envelope.alg !== "A256GCM") {
+    throw new Error("Envelope QStash inválido.");
+  }
+
+  const iv = Buffer.from(String(envelope.iv || ""), "base64url");
+  const tag = Buffer.from(String(envelope.tag || ""), "base64url");
+  const ciphertext = Buffer.from(String(envelope.ciphertext || ""), "base64url");
+
+  if (iv.length !== 12 || tag.length !== 16 || !ciphertext.length) {
+    throw new Error("Envelope QStash incompleto.");
+  }
+
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+  decipher.setAuthTag(tag);
+  const plaintext = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final()
+  ]);
+
+  return JSON.parse(plaintext.toString("utf8"));
+}
+
 function normalizeSeconds(value) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return 300;
@@ -268,6 +326,7 @@ function attachQStashPilot(app) {
       tokenConfigured: Boolean(config.token),
       currentSigningKeyConfigured: Boolean(config.currentSigningKey),
       nextSigningKeyConfigured: Boolean(config.nextSigningKey),
+      payloadEncryptionKeyConfigured: Boolean(config.payloadEncryptionKey),
       deliveryPath: DELIVERY_PATH
     });
   });
@@ -278,7 +337,7 @@ function attachQStashPilot(app) {
     if (!qstashConfigured()) {
       return res.status(503).json({
         ok: false,
-        error: "QStash no está configurado. Faltan token, signing keys o QSTASH_DESTINATION_BASE_URL."
+        error: "QStash no está configurado. Faltan token, signing keys, encryption key o QSTASH_DESTINATION_BASE_URL."
       });
     }
 
@@ -315,7 +374,7 @@ function attachQStashPilot(app) {
       }
 
       const deliveryId = crypto.randomUUID();
-      const bodyObject = {
+      const privateMessage = {
         version: 1,
         deliveryId,
         subscription,
@@ -326,7 +385,10 @@ function attachQStashPilot(app) {
           tag: `qstash_pilot_${deliveryId}`
         }
       };
-      const rawBody = JSON.stringify(bodyObject);
+      const rawBody = JSON.stringify({
+        version: 1,
+        envelope: encryptPayload(privateMessage)
+      });
       const destination = destinationUrl();
       const result = await publishQStashMessage({
         destination,
@@ -355,7 +417,7 @@ function attachQStashPilot(app) {
 
   app.post(DELIVERY_PATH, async (req, res) => {
     const config = qstashConfig();
-    if (!config.currentSigningKey || !config.nextSigningKey || !config.destination) {
+    if (!config.currentSigningKey || !config.nextSigningKey || !config.payloadEncryptionKey || !config.destination) {
       return res.status(503).json({ ok: false, error: "Verificación QStash no configurada." });
     }
 
@@ -372,7 +434,14 @@ function attachQStashPilot(app) {
       return res.status(503).json({ ok: false, error: "Web Push no configurado." });
     }
 
-    const message = req.body || {};
+    let message;
+    try {
+      message = decryptPayload(req.body?.envelope);
+    } catch (error) {
+      console.error("[qstash-pilot] decrypt error:", error);
+      return res.status(400).json({ ok: false, error: "Payload QStash inválido." });
+    }
+
     const subscription = normalizeSubscription(message.subscription);
     if (!subscription || !message.payload || typeof message.payload !== "object") {
       return res.status(400).json({ ok: false, error: "Mensaje QStash inválido." });
@@ -433,5 +502,7 @@ module.exports = {
   TEST_STATUS_PATH,
   normalizeBaseUrl,
   verifyJwtWithKey,
-  verifyQStashSignature
+  verifyQStashSignature,
+  encryptPayload,
+  decryptPayload
 };
