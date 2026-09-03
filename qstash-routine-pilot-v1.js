@@ -47,10 +47,15 @@ function pilotEnabled() {
 
 function isPilotUser(userId) {
   const normalized = String(userId || "").trim();
+  const ids = pilotUserIds();
+
   return Boolean(
     pilotEnabled() &&
     normalized &&
-    pilotUserIds().has(normalized)
+    (
+      ids.has("*") ||
+      ids.has(normalized)
+    )
   );
 }
 
