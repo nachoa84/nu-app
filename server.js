@@ -19,7 +19,8 @@ const {
   summarizeDeliveryRowsV111
 } = require("./notification-delivery-v111");
 const {
-  databasePoolOptionsV113
+  databasePoolOptionsV113,
+  legacySchedulerEnabledV1
 } = require("./runtime-config-v113");
 const {
   shouldHonorRangeV114,
@@ -63,6 +64,11 @@ const SCHEDULER_INTERVAL_MS =
       30000
     ),
     5000
+  );
+
+const LEGACY_SCHEDULER_ENABLED =
+  legacySchedulerEnabledV1(
+    process.env
   );
 
 const DATABASE_URL =
@@ -465,6 +471,28 @@ if (PILOT_ENABLED || PILOT_ADMIN_ROUTES_ENABLED) {
 if (pilotRoutes) {
   app.use(pilotRoutes);
 }
+
+// NU APP · LEGACY SCHEDULER CONTROL V1
+// Con el scheduler apagado, el cron autenticado finaliza antes del
+// rate limiter de escrituras respaldado por PostgreSQL.
+// Con el scheduler habilitado, continúa por el flujo histórico.
+app.post(
+  "/api/cron/scheduler-run",
+  (req, res, next) => {
+    if (LEGACY_SCHEDULER_ENABLED) {
+      return next();
+    }
+
+    try {
+      assertCronSecret(req);
+      return res
+        .status(204)
+        .end();
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
 
 app.use(
   "/api",
@@ -2383,6 +2411,7 @@ async function runLeaderMaintenanceV116(deadline) {
 }
 
 async function runSchedulerCycle() {
+  if (!LEGACY_SCHEDULER_ENABLED) return;
   if (schedulerRunning || !pool) return;
   schedulerRunning = true;
   const startedAt = Date.now();
@@ -2447,6 +2476,13 @@ async function runSchedulerCycle() {
 }
 
 function startScheduler() {
+  if (!LEGACY_SCHEDULER_ENABLED) {
+    console.log(
+      "Scheduler legacy desactivado por LEGACY_SCHEDULER_ENABLED=false."
+    );
+    return;
+  }
+
   if (!pool) {
     console.warn(
       "Scheduler no iniciado: falta base de datos."

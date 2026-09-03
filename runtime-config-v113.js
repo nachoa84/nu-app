@@ -11,6 +11,20 @@ function boundedIntegerV113(value, fallback, minimum, maximum) {
   return Math.min(Math.max(Math.trunc(parsed), minimum), maximum);
 }
 
+function legacySchedulerEnabledV1(env = process.env) {
+  const value =
+    String(
+      env?.LEGACY_SCHEDULER_ENABLED ??
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+  // Fail-open al comportamiento histórico.
+  // Sólo "false" explícito desactiva el scheduler legacy.
+  return value !== "false";
+}
+
 function databasePoolOptionsV113(databaseUrl, env = process.env) {
   if (!databaseUrl) return null;
   return {
@@ -39,5 +53,6 @@ function databasePoolOptionsV113(databaseUrl, env = process.env) {
 module.exports = {
   DB_POOL_MAX_DEFAULT_V113,
   DB_POOL_MAX_LIMIT_V113,
-  databasePoolOptionsV113
+  databasePoolOptionsV113,
+  legacySchedulerEnabledV1
 };
