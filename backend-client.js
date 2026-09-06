@@ -443,6 +443,359 @@
     return payload.state;
   }
 
+
+  // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V169
+  // PostgreSQL sigue siendo la única autoridad para avanzar días.
+  // El cliente solo vuelve a consultar el estado oficial en momentos
+  // naturales de uso y exactamente cuando vence un nextUnlockAt confirmado.
+  // No hay polling ni cálculo local de currentDay.
+  const ACTIVE_SYNC_PASSIVE_MIN_MS = 4000;
+  const ACTIVE_SYNC_INITIAL_GRACE_MS = 3000;
+  const ACTIVE_SYNC_UNLOCK_GRACE_MS = 750;
+
+  let activeSyncPromise = null;
+  let activeSyncLastStartedAt = 0;
+  let activeSyncReadyAt = 0;
+  let canonicalNextUnlockAt = null;
+  let productNextUnlockAt = null;
+  let unlockRefreshTimer = null;
+  let unlockRefreshTarget = null;
+  let lastDueUnlockAttempt = null;
+
+  function parseUnlockTimestamp(value) {
+    if (value === null || value === undefined || value === "") {
+      return null;
+    }
+
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return numeric;
+    }
+
+    const parsed = Date.parse(String(value));
+    return Number.isFinite(parsed) && parsed > 0
+      ? parsed
+      : null;
+  }
+
+  function hasStoredProfileWithId() {
+    const profile = getProfile();
+    return Boolean(profile?.userId);
+  }
+
+  function hasLocalProductRoutineState() {
+    return PRODUCT_ROUTINE_IDS_V98.some(
+      routineId =>
+        Boolean(
+          localStorage.getItem(
+            `routineState:${routineId}`
+          )
+        )
+    );
+  }
+
+  function isDocumentVisible() {
+    return (
+      typeof document === "undefined" ||
+      document.visibilityState !== "hidden"
+    );
+  }
+
+  function clearUnlockRefreshTimer() {
+    if (unlockRefreshTimer !== null) {
+      clearTimeout(unlockRefreshTimer);
+      unlockRefreshTimer = null;
+    }
+    unlockRefreshTarget = null;
+  }
+
+  function nextKnownUnlockAt() {
+    const candidates = [
+      canonicalNextUnlockAt,
+      productNextUnlockAt
+    ].filter(value =>
+      Number.isFinite(value) && value > 0
+    );
+
+    return candidates.length
+      ? Math.min(...candidates)
+      : null;
+  }
+
+  function scheduleKnownUnlockRefresh() {
+    clearUnlockRefreshTimer();
+
+    const target = nextKnownUnlockAt();
+    if (!target) {
+      lastDueUnlockAttempt = null;
+      return;
+    }
+
+    if (
+      lastDueUnlockAttempt !== null &&
+      lastDueUnlockAttempt !== target
+    ) {
+      lastDueUnlockAttempt = null;
+    }
+
+    const now = Date.now();
+    if (
+      target <= now &&
+      lastDueUnlockAttempt === target
+    ) {
+      return;
+    }
+
+    const delay = Math.max(
+      target - now + ACTIVE_SYNC_UNLOCK_GRACE_MS,
+      0
+    );
+
+    unlockRefreshTarget = target;
+    unlockRefreshTimer = setTimeout(() => {
+      unlockRefreshTimer = null;
+      unlockRefreshTarget = null;
+      lastDueUnlockAttempt = target;
+
+      if (
+        !isDocumentVisible() ||
+        (typeof navigator !== "undefined" && navigator.onLine === false)
+      ) {
+        return;
+      }
+
+      refreshActiveState(
+        "unlock-due",
+        { force: true }
+      ).catch(error => {
+        console.warn(
+          "No se pudo refrescar el estado al vencer el desbloqueo.",
+          error
+        );
+      });
+    }, delay);
+  }
+
+  function rememberCanonicalUnlock(state) {
+    canonicalNextUnlockAt =
+      parseUnlockTimestamp(
+        state?.nextUnlockAt
+      );
+
+    scheduleKnownUnlockRefresh();
+  }
+
+  function rememberProductUnlocks(state) {
+    const routines =
+      state?.routines || {};
+
+    const candidates =
+      PRODUCT_ROUTINE_IDS_V98
+        .map(routineId =>
+          parseUnlockTimestamp(
+            routines[routineId]?.nextUnlockAt
+          )
+        )
+        .filter(value =>
+          Number.isFinite(value) && value > 0
+        );
+
+    productNextUnlockAt =
+      candidates.length
+        ? Math.min(...candidates)
+        : null;
+
+    scheduleKnownUnlockRefresh();
+  }
+
+  async function refreshActiveState(
+    reason = "active",
+    { force = false } = {}
+  ) {
+    if (!hasStoredProfileWithId()) {
+      return null;
+    }
+
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.onLine === false
+    ) {
+      return null;
+    }
+
+    if (activeSyncPromise) {
+      return activeSyncPromise;
+    }
+
+    const now = Date.now();
+    if (
+      !force &&
+      now - activeSyncLastStartedAt <
+        ACTIVE_SYNC_PASSIVE_MIN_MS
+    ) {
+      return null;
+    }
+
+    activeSyncLastStartedAt = now;
+
+    activeSyncPromise = (async () => {
+      const canonicalState =
+        await getState();
+
+      let productState = null;
+      if (hasLocalProductRoutineState()) {
+        try {
+          productState =
+            await getProductRoutineStatesV136();
+        } catch (error) {
+          console.warn(
+            "No se pudo refrescar el estado activo de las rutinas de producto.",
+            error
+          );
+        }
+      }
+
+      emit(
+        "backend-status",
+        {
+          connected: true,
+          reason
+        }
+      );
+
+      return {
+        canonicalState,
+        productState,
+        reason
+      };
+    })();
+
+    try {
+      return await activeSyncPromise;
+    } catch (error) {
+      emit(
+        "backend-status",
+        {
+          connected: false,
+          reason,
+          error: error.message
+        }
+      );
+      throw error;
+    } finally {
+      activeSyncPromise = null;
+    }
+  }
+
+  function requestPassiveActiveSync(reason) {
+    if (
+      !activeSyncReadyAt ||
+      !isDocumentVisible()
+    ) {
+      return;
+    }
+
+    if (
+      Date.now() - activeSyncReadyAt <
+      ACTIVE_SYNC_INITIAL_GRACE_MS
+    ) {
+      return;
+    }
+
+    refreshActiveState(reason)
+      .catch(error => {
+        console.warn(
+          "No se pudo reconciliar el estado activo de la rutina.",
+          error
+        );
+      });
+  }
+
+  function markActiveSyncReady() {
+    if (!activeSyncReadyAt) {
+      activeSyncReadyAt = Date.now();
+    }
+  }
+
+  window.addEventListener(
+    "backend-state-updated",
+    event => {
+      rememberCanonicalUnlock(
+        event.detail
+      );
+    }
+  );
+
+  window.addEventListener(
+    "product-routines-state-updated",
+    event => {
+      rememberProductUnlocks(
+        event.detail
+      );
+    }
+  );
+
+  if (
+    typeof document !== "undefined" &&
+    document.readyState !== "loading"
+  ) {
+    markActiveSyncReady();
+  } else {
+    window.addEventListener(
+      "DOMContentLoaded",
+      markActiveSyncReady
+    );
+  }
+
+  if (typeof document !== "undefined") {
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.visibilityState === "visible") {
+          requestPassiveActiveSync(
+            "visibilitychange"
+          );
+        }
+      }
+    );
+  }
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      requestPassiveActiveSync(
+        "pageshow"
+      );
+    }
+  );
+
+  window.addEventListener(
+    "focus",
+    () => {
+      requestPassiveActiveSync(
+        "focus"
+      );
+    }
+  );
+
+  window.addEventListener(
+    "online",
+    () => {
+      if (!isDocumentVisible()) return;
+
+      refreshActiveState(
+        "online",
+        { force: true }
+      ).catch(error => {
+        console.warn(
+          "No se pudo reconciliar el estado después de recuperar conexión.",
+          error
+        );
+      });
+    }
+  );
+
+
   window.BackendAPI = {
     bootstrapFromLocal,
     getState,
@@ -455,6 +808,7 @@
     updateProfile,
     demoAdvance,
     health,
+    refreshActiveState,
     ensureUserId,
     getProfile
   };
