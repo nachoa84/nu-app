@@ -156,6 +156,7 @@ test("error al cambiar de día: no reemplaza la pantalla actual", async () => {
   const h = harness();
   const wait = deferred();
   h.setComplete(() => wait.promise);
+  h.setRead(async () => h.state([1, 2], 4));
   const original = h.redraw();
   const task = h.button(original).onclick();
   h.select(4);
