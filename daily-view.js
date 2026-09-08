@@ -64,6 +64,83 @@ function addLinks(container, links) {
   container.appendChild(wrap);
 }
 
+// NU APP · CONFIRMACIÓN DE PROGRESO COLLAGEN V170
+// No confirma ni repite el POST sin verificar el estado oficial.
+const collagenCompletionPendingV170 = new Map();
+const collagenCompletionFailedV170 = new Set();
+
+function isCollagenCompletionPendingV170(day) {
+  const userId = String(getRoutineProfile()?.userId || "");
+  return collagenCompletionPendingV170.has(`${userId}:${Number(day)}`);
+}
+
+function isCollagenDayConfirmedV170(state, day, userId) {
+  return Boolean(
+    state &&
+    String(state.userId || "") === String(userId) &&
+    Array.isArray(state.completedDays) &&
+    state.completedDays.some(value => Number(value) === Number(day))
+  );
+}
+
+function confirmCollagenDayV170(day) {
+  const safeDay = Number(day);
+  const userId = String(getRoutineProfile()?.userId || "");
+  if (!userId || !Number.isInteger(safeDay) || safeDay < 1 || safeDay > 30) {
+    return Promise.reject(new Error("No se pudo identificar el día o la cuenta."));
+  }
+
+  const key = `${userId}:${safeDay}`;
+  if (collagenCompletionPendingV170.has(key)) {
+    return collagenCompletionPendingV170.get(key);
+  }
+
+  const task = (async () => {
+    const api = window.BackendAPI;
+    let state = null;
+    let originalError = null;
+
+    try {
+      if (!api || typeof api.completeDay !== "function") {
+        throw new Error("Backend no disponible.");
+      }
+      state = await api.completeDay(safeDay);
+    } catch (error) {
+      originalError = error;
+    }
+
+    if (String(getRoutineProfile()?.userId || "") !== userId) {
+      throw new Error("La cuenta cambió durante el registro.");
+    }
+
+    // Un error puede ocurrir después del COMMIT. Consultar una vez
+    // permite recuperar el día sin repetir automáticamente el POST.
+    if (!isCollagenDayConfirmedV170(state, safeDay, userId)) {
+      try {
+        if (!api || typeof api.getState !== "function") {
+          throw new Error("No se pudo consultar el estado oficial.");
+        }
+        state = await api.getState();
+      } catch (error) {
+        console.warn("No se pudo verificar el completado de Collagen.", error);
+      }
+    }
+
+    if (String(getRoutineProfile()?.userId || "") !== userId) {
+      throw new Error("La cuenta cambió durante el registro.");
+    }
+    if (!isCollagenDayConfirmedV170(state, safeDay, userId)) {
+      throw originalError || new Error("El servidor no confirmó el día completado.");
+    }
+    return state;
+  })().finally(() => {
+    collagenCompletionPendingV170.delete(key);
+  });
+
+  collagenCompletionPendingV170.set(key, task);
+  return task;
+}
+
 function createBlock(block) {
   if (block.type === "action") {
     const card = document.createElement("section");
@@ -101,11 +178,17 @@ function createBlock(block) {
     const card = document.createElement("div");
     card.className = "complete-card";
 
-    const done = isDayComplete(selectedDay);
+    const day = Number(selectedDay);
+    const routineId = getActiveRoutineId();
+    const userId = String(getRoutineProfile()?.userId || "");
+    const backendManaged = isBackendManagedRoutine();
+    const completionKey = `${userId}:${day}`;
+    const done = isDayComplete(day);
 
     const renderDoneState = ({ animate = false } = {}) => {
       card.classList.add("done");
       card.classList.toggle("just-completed", animate && !prefersReducedMotion());
+      card.removeAttribute("aria-busy");
       card.innerHTML = `
         <div class="complete-done-copy">
           <h3><span class="complete-done-inline-check" aria-hidden="true">${ICONS.check}</span><span>Hecho hoy</span></h3>
@@ -118,6 +201,7 @@ function createBlock(block) {
     };
 
     if (done) {
+      if (backendManaged) collagenCompletionFailedV170.delete(completionKey);
       renderDoneState();
       return card;
     }
@@ -135,25 +219,80 @@ function createBlock(block) {
     helper.className = "complete-helper";
     helper.textContent = "Solo registra tu avance";
 
-    btn.onclick = () => {
-      setDayComplete(selectedDay, true);
-      if (navigator.vibrate) navigator.vibrate(12);
-      renderDoneState({ animate: true });
+    const renderPendingState = () => {
+      btn.disabled = true;
+      btn.setAttribute("aria-disabled", "true");
+      card.setAttribute("aria-busy", "true");
+      btn.textContent = "Guardando...";
+      helper.removeAttribute("role");
+      helper.textContent = "Estamos confirmando tu avance.";
+    };
+
+    const renderRetryState = () => {
+      btn.disabled = false;
+      btn.removeAttribute("aria-disabled");
+      card.removeAttribute("aria-busy");
+      btn.innerHTML = `<span class="complete-action-check" aria-hidden="true">${ICONS.check}</span><span>Volver a intentar</span>`;
+      helper.setAttribute("role", "alert");
+      helper.textContent = "No pudimos confirmar el registro. Revisá tu conexión y volvé a intentarlo.";
+    };
+
+    btn.onclick = async () => {
+      // Las rutinas de producto mantienen su flujo existente.
+      if (!backendManaged) {
+        setDayComplete(day, true);
+        if (navigator.vibrate) navigator.vibrate(12);
+        renderDoneState({ animate: true });
+        renderDays();
+        return;
+      }
+
+      if (isCollagenCompletionPendingV170(day)) return;
+      collagenCompletionFailedV170.delete(completionKey);
+      renderPendingState();
       renderDays();
 
-      if (window.BackendAPI && isBackendManagedRoutine()) {
-        window.BackendAPI
-          .completeDay(selectedDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
+      const stillHere = () =>
+        getActiveRoutineId() === routineId &&
+        String(getRoutineProfile()?.userId || "") === userId;
+      const refreshDetached = () => {
+        if (Number(selectedDay) === day && !card.isConnected) {
+          renderStructuredDayDetail();
+        }
+      };
+
+      try {
+        await confirmCollagenDayV170(day);
+        collagenCompletionFailedV170.delete(completionKey);
+        if (!stillHere()) return;
+        if (Number(selectedDay) !== day || !card.isConnected) {
+          refreshDetached();
+          return;
+        }
+        // La marca local solo se escribe tras la confirmación oficial.
+        setDayComplete(day, true);
+        if (navigator.vibrate) navigator.vibrate(12);
+        renderDoneState({ animate: true });
+        renderDays();
+      } catch (error) {
+        console.warn("No se pudo confirmar el completado de Collagen.", error);
+        if (!stillHere()) return;
+        collagenCompletionFailedV170.add(completionKey);
+        if (Number(selectedDay) !== day || !card.isConnected) {
+          refreshDetached();
+          return;
+        }
+        renderRetryState();
+        renderDays();
       }
     };
 
     card.append(btn, helper);
+    if (backendManaged && isCollagenCompletionPendingV170(day)) {
+      renderPendingState();
+    } else if (backendManaged && collagenCompletionFailedV170.has(completionKey)) {
+      renderRetryState();
+    }
     return card;
   }
 }
