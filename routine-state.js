@@ -97,7 +97,8 @@ function clearCompletedDays(maxDays = TOTAL_PROGRAM_DAYS) {
 
 function replaceCompletedDays(
   completedDays = [],
-  maxDays = TOTAL_PROGRAM_DAYS
+  maxDays = TOTAL_PROGRAM_DAYS,
+  completedAtByDay = {}
 ) {
   const completedSet =
     new Set(
@@ -116,6 +117,18 @@ function replaceCompletedDays(
 
     if (completedSet.has(day)) {
       localStorage.setItem(completeKey, "1");
+
+      const completedAt =
+        completedAtByDay[String(day)] ??
+        completedAtByDay[day];
+
+      const completedAtNumber = Number(completedAt);
+      if (Number.isFinite(completedAtNumber)) {
+        localStorage.setItem(
+          completedAtKey,
+          String(completedAtNumber)
+        );
+      }
     } else {
       localStorage.removeItem(completeKey);
       localStorage.removeItem(completedAtKey);
