@@ -122,6 +122,10 @@ class Element {
   removeAttribute(key) { this.attributes.delete(key); }
   getAttribute(key) { return this.attributes.get(key) ?? null; }
   append(...children) { this.children.push(...children); }
+  appendChild(child) {
+    this.append(child);
+    return child;
+  }
   querySelector(selector) {
     if (selector === ".app-checkin-btn") return this.checkin ||= new Element("button");
     if (selector === ".app-today-main") return this.main ||= new Element("button");
