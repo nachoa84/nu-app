@@ -47,10 +47,6 @@ function saveRoutineState(state) {
     getRoutineStateStorageKey(),
     JSON.stringify(state)
   );
-  if (!isBackendManagedRoutine() && window.BackendAPI) {
-    window.BackendAPI.openProductRoutineDay(getActiveRoutineId(), Number(state.currentDay || 1))
-      .catch(error => console.warn("No se pudo sincronizar la selección de rutina.", error));
-  }
 }
 
 function getDayCompleteStorageKey(day) {
@@ -91,11 +87,6 @@ function setDayComplete(day, complete = true) {
   }
 
   rememberDayCompletionTimestamp(day, complete);
-
-  if (complete && !isBackendManagedRoutine() && window.BackendAPI) {
-    window.BackendAPI.completeProductRoutineDay(getActiveRoutineId(), Number(day))
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
-  }
 }
 
 function clearCompletedDays(maxDays = TOTAL_PROGRAM_DAYS) {
@@ -361,9 +352,8 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
 
-  if (complete && window.BackendAPI) {
-    window.BackendAPI
-      .completeProductRoutineDay(routineId, safeDay)
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
-  }
+  // Desde V171 el POST de completado se ejecuta únicamente desde
+  // RoutineCompletionV171/confirmRoutineDayV171. Esta función solo aplica
+  // estado local ya confirmado o limpia marcas locales.
+  void routineId;
 };

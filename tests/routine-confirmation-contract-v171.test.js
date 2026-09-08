@@ -73,6 +73,7 @@ function backendHarness() {
     setTimeout: () => 1, clearTimeout() {},
     Date, JSON, Promise, Map, Set, Number, String, Error, URL, URLSearchParams
   });
+  vm.runInContext(read("routine-state-gate-v171.js"), context, { filename: "routine-state-gate-v171.js" });
   vm.runInContext(read("backend-client.js"), context, { filename: "backend-client.js" });
   return { api: window.BackendAPI, store, events, requests,
     respond(fn) { responder = fn; },
@@ -168,7 +169,7 @@ function uiHarness(routineId) {
   });
   vm.runInContext(read("routine-state.js"), context, { filename: "routine-state.js" });
   const daily = read("daily-view.js");
-  vm.runInContext(between(daily, "// NU APP · CONFIRMACIÓN DE PROGRESO COLLAGEN V170", "function createCompactMediaItem"), context);
+  vm.runInContext(between(daily, "// NU APP · CONFIRMACIÓN DE PROGRESO V171", "function createCompactMediaItem"), context);
   vm.runInContext(read("progress-view.js"), context);
   return { context, store, calls, wait, grid,
     card: () => context.createBlock({ type: "complete" }),

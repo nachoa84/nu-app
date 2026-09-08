@@ -75,20 +75,32 @@ function renderDays() {
 
   const checkinBtn = todayCard.querySelector(".app-checkin-btn");
   if (!currentComplete) {
-    checkinBtn.onclick = () => {
-      if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
-      setDayComplete(state.currentDay, true);
-      renderDays();
+    checkinBtn.onclick = async () => {
+      const routineId = getActiveRoutineId();
+      const day = Number(state.currentDay);
 
-      if (window.BackendAPI && isBackendManagedRoutine()) {
-        window.BackendAPI
-          .completeDay(state.currentDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
+      if (typeof confirmRoutineDayV171 !== "function") {
+        console.warn("Confirmador V171 no disponible.");
+        return;
+      }
+
+      if (isRoutineCompletionPendingV171?.(day, routineId)) return;
+
+      checkinBtn.disabled = true;
+      checkinBtn.setAttribute("aria-busy", "true");
+
+      try {
+        await confirmRoutineDayV171(day, routineId);
+        setDayComplete(day, true);
+        if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+        renderDays();
+      } catch (error) {
+        console.warn(
+          "No se pudo confirmar el completado con el backend.",
+          error
+        );
+        checkinBtn.disabled = false;
+        checkinBtn.removeAttribute("aria-busy");
       }
     };
   }

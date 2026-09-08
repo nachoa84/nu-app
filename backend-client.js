@@ -168,14 +168,23 @@
   }
 
   function publishState(state) {
-    if (!state) return;
+    if (!state) return null;
 
-    syncProfileFromState(state);
+    const accepted =
+      window.NuRoutineStateGateV171?.acceptCollagenState
+        ? window.NuRoutineStateGateV171.acceptCollagenState(state)
+        : state;
+
+    if (!accepted) return null;
+
+    syncProfileFromState(accepted);
 
     emit(
       "backend-state-updated",
-      state
+      accepted
     );
+
+    return accepted;
   }
 
   async function bootstrapFromLocal() {
@@ -392,7 +401,17 @@
   }
 
   function publishProductRoutineStatesV98(state) {
-    if (state) emit("product-routines-state-updated", state);
+    if (!state) return null;
+
+    const accepted =
+      window.NuRoutineStateGateV171?.acceptProductState
+        ? window.NuRoutineStateGateV171.acceptProductState(state)
+        : state;
+
+    if (!accepted) return null;
+
+    emit("product-routines-state-updated", accepted);
+    return accepted;
   }
 
   async function bootstrapProductRoutinesV98() {
