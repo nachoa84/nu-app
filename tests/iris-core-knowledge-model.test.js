@@ -138,6 +138,58 @@ test("bloquea evidencia no aprobada", () => {
   );
 });
 
+test("bloquea evidencia de otro mercado", () => {
+  const evidence = approvedPdfEvidence({ market: "MX" });
+
+  assert.throws(
+    () => createKnowledgeUnit({
+      type: "fact",
+      subject: "collagen-plus",
+      topic: "usage",
+      market: "AR",
+      language: "es",
+      content: "Una medida al día.",
+      evidence: [evidence],
+      state: "approved"
+    }),
+    IrisKnowledgeUnitError
+  );
+});
+
+test("permite evidencia GLOBAL para conocimiento de mercado", () => {
+  const evidence = approvedPdfEvidence({ market: "GLOBAL" });
+  const unit = createKnowledgeUnit({
+    type: "fact",
+    subject: "collagen-plus",
+    topic: "usage",
+    market: "AR",
+    language: "es",
+    content: "Una medida al día.",
+    evidence: [evidence],
+    state: "approved"
+  });
+
+  assert.equal(unit.answerable, true);
+});
+
+test("bloquea evidencia de otro idioma", () => {
+  const evidence = approvedPdfEvidence({ language: "en" });
+
+  assert.throws(
+    () => createKnowledgeUnit({
+      type: "fact",
+      subject: "collagen-plus",
+      topic: "usage",
+      market: "AR",
+      language: "es",
+      content: "Una medida al día.",
+      evidence: [evidence],
+      state: "approved"
+    }),
+    IrisKnowledgeUnitError
+  );
+});
+
 test("estado pending nunca es answerable", () => {
   const evidence = approvedPdfEvidence();
   const unit = createKnowledgeUnit({
