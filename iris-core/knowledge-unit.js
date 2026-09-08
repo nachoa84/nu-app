@@ -46,7 +46,11 @@ function optionalText(value, label, maxLength = 1000) {
   return requiredText(value, label, maxLength);
 }
 
-function normalizeEvidenceIds(evidence) {
+function evidenceMarketCompatible(evidenceMarket, knowledgeMarket) {
+  return evidenceMarket === knowledgeMarket || evidenceMarket === "GLOBAL";
+}
+
+function normalizeEvidenceIds(evidence, { market, language }) {
   if (!Array.isArray(evidence) || evidence.length === 0) {
     throw new IrisKnowledgeUnitError("La unidad debe tener al menos una evidencia.");
   }
@@ -60,6 +64,16 @@ function normalizeEvidenceIds(evidence) {
     }
     if (item.reconstructionRequired === true) {
       throw new IrisKnowledgeUnitError("La evidencia requiere reconstrucción antes de aprobar conocimiento.");
+    }
+    if (!evidenceMarketCompatible(item.market, market)) {
+      throw new IrisKnowledgeUnitError(
+        `La evidencia de mercado ${item.market} no puede respaldar conocimiento ${market}.`
+      );
+    }
+    if (item.language !== language) {
+      throw new IrisKnowledgeUnitError(
+        `La evidencia en ${item.language} no puede respaldar conocimiento en ${language}.`
+      );
     }
     return item.evidenceId;
   }));
@@ -89,7 +103,7 @@ function createKnowledgeUnit(input = {}) {
   const subject = requiredText(input.subject, "subject", 200);
   const topic = requiredText(input.topic, "topic", 100);
   const content = requiredText(input.content, "content", 8000);
-  const evidenceIds = normalizeEvidenceIds(input.evidence);
+  const evidenceIds = normalizeEvidenceIds(input.evidence, { market, language });
 
   const canonical = {
     type,
@@ -115,5 +129,6 @@ module.exports = {
   KNOWLEDGE_STATES,
   KNOWLEDGE_TYPES,
   IrisKnowledgeUnitError,
-  createKnowledgeUnit
+  createKnowledgeUnit,
+  evidenceMarketCompatible
 };
