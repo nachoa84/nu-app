@@ -81,6 +81,20 @@ test("normalizePageSpans conserva orden y coordenadas de evidencia", () => {
   assert.equal(spans[1].y, 680);
 });
 
+test("geometría permite distinguir columnas aunque el texto lineal sea ambiguo", () => {
+  const spans = normalizePageSpans([
+    { str: "Beneficio izquierdo", hasEOL: false, transform: [1, 0, 0, 1, 40, 600] },
+    { str: "Beneficio derecho", hasEOL: true, transform: [1, 0, 0, 1, 320, 600] },
+    { str: "Detalle izquierdo", hasEOL: false, transform: [1, 0, 0, 1, 40, 580] },
+    { str: "Detalle derecho", hasEOL: true, transform: [1, 0, 0, 1, 320, 580] }
+  ]);
+
+  assert.deepEqual(spans.map(span => span.x), [40, 320, 40, 320]);
+  assert.deepEqual(spans.map(span => span.y), [600, 600, 580, 580]);
+  assert.equal(spans[0].sourceIndex, 0);
+  assert.equal(spans[3].sourceIndex, 3);
+});
+
 test("extractor devuelve cada página por separado y en orden", async () => {
   const extractPdf = createPrototypePdfExtractor({
     loadPdfJs: async () => fakePdfJs([
