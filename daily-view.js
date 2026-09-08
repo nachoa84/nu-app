@@ -64,6 +64,161 @@ function addLinks(container, links) {
   container.appendChild(wrap);
 }
 
+// NU APP · CONFIRMACIÓN DE PROGRESO V171
+// Collagen y las rutinas de producto comparten el mismo flujo: no se marca
+// localmente hasta que el estado oficial confirma la cuenta/rutina/día.
+const routineCompletionPendingV171 = new Map();
+const routineCompletionFailedV171 = new Set();
+
+function getRoutineCompletionKeyV171(day, routineId = getActiveRoutineId()) {
+  const userId = String(getRoutineProfile()?.userId || "");
+  return `${userId}:${String(routineId || "")}:${Number(day)}`;
+}
+
+function isRoutineDayConfirmedV171(state, routineId, day, userId) {
+  if (!state || String(state.userId || "") !== String(userId || "")) return false;
+
+  if (routineId === "collagen-30") {
+    return Array.isArray(state.completedDays) &&
+      state.completedDays.some(value => Number(value) === Number(day));
+  }
+
+  const routine = state.routines?.[routineId];
+  return Boolean(
+    routine &&
+    routine.initialized === true &&
+    Array.isArray(routine.completedDays) &&
+    routine.completedDays.some(value => Number(value) === Number(day))
+  );
+}
+
+function isRoutineCompletionPendingV171(day, routineId = getActiveRoutineId()) {
+  if (window.RoutineCompletionV171?.isPending) {
+    try {
+      return window.RoutineCompletionV171.isPending({ routineId, day });
+    } catch (_) {
+      return false;
+    }
+  }
+
+  return routineCompletionPendingV171.has(
+    getRoutineCompletionKeyV171(day, routineId)
+  );
+}
+
+function isRoutineCompletionFailedV171(day, routineId = getActiveRoutineId()) {
+  if (window.RoutineCompletionV171?.isFailed) {
+    try {
+      return window.RoutineCompletionV171.isFailed({ routineId, day });
+    } catch (_) {
+      return false;
+    }
+  }
+
+  return routineCompletionFailedV171.has(
+    getRoutineCompletionKeyV171(day, routineId)
+  );
+}
+
+function confirmRoutineDayFallbackV171(day, routineId = getActiveRoutineId()) {
+  const safeDay = Number(day);
+  const userId = String(getRoutineProfile()?.userId || "");
+  const key = getRoutineCompletionKeyV171(safeDay, routineId);
+
+  if (!userId || !Number.isInteger(safeDay)) {
+    return Promise.reject(new Error("No se pudo identificar el día o la cuenta."));
+  }
+
+  if (routineCompletionPendingV171.has(key)) {
+    return routineCompletionPendingV171.get(key);
+  }
+
+  const task = (async () => {
+    const api = window.BackendAPI;
+    let state = null;
+    let originalError = null;
+
+    try {
+      if (!api) throw new Error("Backend no disponible.");
+
+      if (routineId === "collagen-30") {
+        if (typeof api.completeDay !== "function") throw new Error("Backend no disponible.");
+        state = await api.completeDay(safeDay);
+      } else {
+        if (typeof api.completeProductRoutineDay !== "function") throw new Error("Backend no disponible.");
+        state = await api.completeProductRoutineDay(routineId, safeDay);
+      }
+    } catch (error) {
+      originalError = error;
+    }
+
+    if (
+      String(getRoutineProfile()?.userId || "") !== userId ||
+      getActiveRoutineId() !== routineId
+    ) {
+      throw new Error("La cuenta o la rutina cambió durante el registro.");
+    }
+
+    if (!isRoutineDayConfirmedV171(state, routineId, safeDay, userId)) {
+      try {
+        if (!api) throw new Error("No se pudo consultar el estado oficial.");
+
+        if (routineId === "collagen-30") {
+          if (typeof api.getState !== "function") throw new Error("No se pudo consultar el estado oficial.");
+          state = await api.getState();
+        } else {
+          if (typeof api.getProductRoutineStatesV136 !== "function") throw new Error("No se pudo consultar el estado oficial.");
+          state = await api.getProductRoutineStatesV136();
+        }
+      } catch (error) {
+        console.warn("No se pudo verificar el completado de la rutina.", error);
+      }
+    }
+
+    if (
+      String(getRoutineProfile()?.userId || "") !== userId ||
+      getActiveRoutineId() !== routineId
+    ) {
+      throw new Error("La cuenta o la rutina cambió durante el registro.");
+    }
+
+    if (!isRoutineDayConfirmedV171(state, routineId, safeDay, userId)) {
+      throw originalError || new Error("El servidor no confirmó el día completado.");
+    }
+
+    return state;
+  })().finally(() => {
+    routineCompletionPendingV171.delete(key);
+  });
+
+  routineCompletionPendingV171.set(key, task);
+  return task;
+}
+
+function confirmRoutineDayV171(day, routineId = getActiveRoutineId()) {
+  if (window.RoutineCompletionV171?.completeDay) {
+    return window.RoutineCompletionV171.completeDay({ routineId, day });
+  }
+
+  return confirmRoutineDayFallbackV171(day, routineId);
+}
+
+// Compatibilidad con las pruebas y llamadas V170 de Collagen.
+const collagenCompletionPendingV170 = routineCompletionPendingV171;
+const collagenCompletionFailedV170 = routineCompletionFailedV171;
+
+function isCollagenCompletionPendingV170(day) {
+  return isRoutineCompletionPendingV171(day, "collagen-30");
+}
+
+function isCollagenDayConfirmedV170(state, day, userId) {
+  return isRoutineDayConfirmedV171(state, "collagen-30", day, userId);
+}
+
+function confirmCollagenDayV170(day) {
+  return confirmRoutineDayV171(day, "collagen-30");
+}
+
 function createBlock(block) {
   if (block.type === "action") {
     const card = document.createElement("section");
@@ -101,11 +256,16 @@ function createBlock(block) {
     const card = document.createElement("div");
     card.className = "complete-card";
 
-    const done = isDayComplete(selectedDay);
+    const day = Number(selectedDay);
+    const routineId = getActiveRoutineId();
+    const userId = String(getRoutineProfile()?.userId || "");
+    const completionKey = getRoutineCompletionKeyV171(day, routineId);
+    const done = isDayComplete(day);
 
     const renderDoneState = ({ animate = false } = {}) => {
       card.classList.add("done");
       card.classList.toggle("just-completed", animate && !prefersReducedMotion());
+      card.removeAttribute("aria-busy");
       card.innerHTML = `
         <div class="complete-done-copy">
           <h3><span class="complete-done-inline-check" aria-hidden="true">${ICONS.check}</span><span>Hecho hoy</span></h3>
@@ -118,6 +278,7 @@ function createBlock(block) {
     };
 
     if (done) {
+      routineCompletionFailedV171.delete(completionKey);
       renderDoneState();
       return card;
     }
@@ -135,25 +296,71 @@ function createBlock(block) {
     helper.className = "complete-helper";
     helper.textContent = "Solo registra tu avance";
 
-    btn.onclick = () => {
-      setDayComplete(selectedDay, true);
-      if (navigator.vibrate) navigator.vibrate(12);
-      renderDoneState({ animate: true });
+    const renderPendingState = () => {
+      btn.disabled = true;
+      btn.setAttribute("aria-disabled", "true");
+      card.setAttribute("aria-busy", "true");
+      btn.textContent = "Guardando...";
+      helper.removeAttribute("role");
+      helper.textContent = "Estamos confirmando tu avance.";
+    };
+
+    const renderRetryState = () => {
+      btn.disabled = false;
+      btn.removeAttribute("aria-disabled");
+      card.removeAttribute("aria-busy");
+      btn.innerHTML = `<span class="complete-action-check" aria-hidden="true">${ICONS.check}</span><span>Volver a intentar</span>`;
+      helper.setAttribute("role", "alert");
+      helper.textContent = "No pudimos confirmar el registro. Revisá tu conexión y volvé a intentarlo.";
+    };
+
+    btn.onclick = async () => {
+      if (isRoutineCompletionPendingV171(day, routineId)) return;
+      routineCompletionFailedV171.delete(completionKey);
+      renderPendingState();
       renderDays();
 
-      if (window.BackendAPI && isBackendManagedRoutine()) {
-        window.BackendAPI
-          .completeDay(selectedDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
+      const stillHere = () =>
+        getActiveRoutineId() === routineId &&
+        String(getRoutineProfile()?.userId || "") === userId;
+      const refreshDetached = () => {
+        if (Number(selectedDay) === day && !card.isConnected) {
+          renderStructuredDayDetail();
+        }
+      };
+
+      try {
+        await confirmRoutineDayV171(day, routineId);
+        routineCompletionFailedV171.delete(completionKey);
+        if (!stillHere()) return;
+        if (Number(selectedDay) !== day || !card.isConnected) {
+          refreshDetached();
+          return;
+        }
+        // La marca local solo se escribe tras la confirmación oficial.
+        setDayComplete(day, true);
+        if (navigator.vibrate) navigator.vibrate(12);
+        renderDoneState({ animate: true });
+        renderDays();
+      } catch (error) {
+        console.warn("No se pudo confirmar el completado de la rutina.", error);
+        if (!stillHere()) return;
+        routineCompletionFailedV171.add(completionKey);
+        if (Number(selectedDay) !== day || !card.isConnected) {
+          refreshDetached();
+          return;
+        }
+        renderRetryState();
+        renderDays();
       }
     };
 
     card.append(btn, helper);
+    if (isRoutineCompletionPendingV171(day, routineId)) {
+      renderPendingState();
+    } else if (isRoutineCompletionFailedV171(day, routineId)) {
+      renderRetryState();
+    }
     return card;
   }
 }

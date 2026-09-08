@@ -7,9 +7,9 @@ const vm = require("node:vm");
 
 // Execute the actual completion controller, not a rewritten implementation.
 const source = fs.readFileSync(path.join(__dirname, "..", "daily-view.js"), "utf8");
-const start = source.indexOf("// NU APP · CONFIRMACIÓN DE PROGRESO COLLAGEN V170");
+const start = source.indexOf("// NU APP · CONFIRMACIÓN DE PROGRESO V171");
 const end = source.indexOf("function createCompactMediaItem", start);
-assert.ok(start >= 0 && end > start, "Falta el controlador V170");
+assert.ok(start >= 0 && end > start, "Falta el controlador V171");
 const code = source.slice(start, end);
 
 class Element {

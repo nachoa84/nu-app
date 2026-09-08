@@ -27,6 +27,13 @@ function applyBackendRoutineState(serverState) {
       1
     );
 
+  localState.cycle =
+    Number(
+      serverState.cycle ||
+      localState.cycle ||
+      1
+    );
+
   localState.openedDays =
     openedDays;
 
@@ -46,7 +53,8 @@ function applyBackendRoutineState(serverState) {
   // La persistencia local de completados vive en routine-state.js.
   replaceCompletedDays(
     serverState.completedDays || [],
-    TOTAL_PROGRAM_DAYS
+    TOTAL_PROGRAM_DAYS,
+    serverState.completedAtByDay || {}
   );
 
   if (!isPreviewMode) {
@@ -209,6 +217,7 @@ window.addEventListener("product-routines-state-updated", event => {
     const nextUnlockAt = serverState.nextUnlockAt
       ? Number(serverState.nextUnlockAt)
       : null;
+    const completedAtByDay = serverState.completedAtByDay || {};
     const localState = {
       currentDay,
       openedDays: serverState.openedDays || {},
@@ -223,6 +232,18 @@ window.addEventListener("product-routines-state-updated", event => {
 
       if ((serverState.completedDays || []).includes(day)) {
         localStorage.setItem(key, "1");
+
+        const completedAt =
+          completedAtByDay[String(day)] ??
+          completedAtByDay[day];
+
+        const completedAtNumber = Number(completedAt);
+        if (Number.isFinite(completedAtNumber)) {
+          localStorage.setItem(
+            completedAtKey,
+            String(completedAtNumber)
+          );
+        }
       } else {
         localStorage.removeItem(key);
         localStorage.removeItem(completedAtKey);

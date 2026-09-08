@@ -8,10 +8,10 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const source = fs.readFileSync(path.join(root, "daily-view.js"), "utf8");
-const marker = "// NU APP · CONFIRMACIÓN DE PROGRESO COLLAGEN V170";
+const marker = "// NU APP · CONFIRMACIÓN DE PROGRESO V171";
 const start = source.indexOf(marker);
 const end = source.indexOf("function createCompactMediaItem", start);
-assert.ok(start >= 0, "Falta el controlador de confirmación V170");
+assert.ok(start >= 0, "Falta el controlador de confirmación V171");
 const code = source.slice(start, end >= 0 ? end : undefined);
 
 class Element {
@@ -66,6 +66,20 @@ function harness({ backend = true, routineId = "collagen-30", initial = [] } = {
   let api = null;
 
   function state(completedDays, currentDay = 3) {
+    if (activeRoutine !== "collagen-30") {
+      return {
+        userId,
+        routines: {
+          [activeRoutine]: {
+            initialized: true,
+            currentDay,
+            completedDays,
+            nextUnlockAt: null
+          }
+        }
+      };
+    }
+
     return { userId, currentDay, completedDays, nextUnlockAt: null };
   }
   function persist(day, value) {
@@ -94,6 +108,14 @@ function harness({ backend = true, routineId = "collagen-30", initial = [] } = {
         return complete(day);
       },
       async getState() {
+        calls.getState++;
+        return getState();
+      },
+      async completeProductRoutineDay(routineId, day) {
+        calls.complete.push(day);
+        return complete(day);
+      },
+      async getProductRoutineStatesV136() {
         calls.getState++;
         return getState();
       }
@@ -272,18 +294,38 @@ test("cambio de cuenta: no aplica una respuesta de otro usuario", async () => {
   assert.equal(h.isComplete(3), false);
 });
 
-test("las rutinas de producto conservan su flujo anterior", async () => {
+test("las rutinas de producto ya no confirman antes del servidor", async () => {
   const h = harness({ routineId: "lumispa-10" });
+  const wait = deferred();
+
+  h.calls.completeProduct = [];
+  h.setComplete(() => wait.promise);
+
   const card = h.card();
-  await button(card).onclick();
+  const task = button(card).onclick();
+
+  assertPending(h, card);
+  assert.equal(h.isComplete(3), false);
+
+  wait.resolve({
+    userId: "test-user",
+    routines: {
+      "lumispa-10": {
+        initialized: true,
+        currentDay: 3,
+        completedDays: [1, 2, 3]
+      }
+    }
+  });
+
+  await task;
   assert.equal(h.isComplete(3), true);
   assert.match(card.innerHTML, /Registrado\./);
-  assert.equal(h.calls.complete.length, 0);
 });
 
 test("la confirmación no calcula ni adelanta días localmente", () => {
   assert.doesNotMatch(code, /setInterval\s*\(/);
   assert.doesNotMatch(code, /nextUnlockTimestampFromProfile\s*\(/);
   assert.doesNotMatch(code, /advanceRoutineIfEligible\s*\(/);
-  assert.match(code, /await confirmCollagenDayV170\(day\)/);
+  assert.match(code, /await confirmRoutineDayV171\(day, routineId\)/);
 });

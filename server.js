@@ -1043,6 +1043,7 @@ async function getState(
 
   const openedDays = {};
   const completedDays = [];
+  const completedAtByDay = {};
 
   for (
     const row of progressResult.rows
@@ -1055,9 +1056,19 @@ async function getState(
     }
 
     if (row.completed_at) {
+      const completedAt =
+        new Date(
+          row.completed_at
+        ).getTime();
+
       completedDays.push(
         row.day
       );
+
+      if (Number.isFinite(completedAt)) {
+        completedAtByDay[row.day] =
+          completedAt;
+      }
     }
   }
 
@@ -1075,6 +1086,7 @@ async function getState(
         : null,
     openedDays,
     completedDays,
+    completedAtByDay,
     profile: {
       name: user.name,
       country: user.country,
@@ -2672,8 +2684,8 @@ app.post(
 
             for (const rawDay of completedDays) {
               const day = parseRoutineDay(rawDay);
+              if (!isNew) continue;
               if (day > canonicalCurrentDay) continue;
-              if (!isNew && day !== canonicalCurrentDay) continue;
 
               const rawCompletedAt =
                 completedAtByDay[String(day)];
@@ -3427,7 +3439,8 @@ async function getProductRoutineStatesV98(client, userId) {
       currentDay: 1,
       nextUnlockAt: null,
       openedDays: {},
-      completedDays: []
+      completedDays: [],
+      completedAtByDay: {}
     };
   }
   for (const row of states.rows) {
@@ -3443,7 +3456,11 @@ async function getProductRoutineStatesV98(client, userId) {
     const routine = routines[row.routine_id];
     if (!routine) continue;
     if (row.opened_at) routine.openedDays[row.day] = new Date(row.opened_at).getTime();
-    if (row.completed_at) routine.completedDays.push(Number(row.day));
+    if (row.completed_at) {
+      const completedAt = new Date(row.completed_at).getTime();
+      routine.completedDays.push(Number(row.day));
+      if (Number.isFinite(completedAt)) routine.completedAtByDay[row.day] = completedAt;
+    }
   }
   return { userId, routines };
 }
@@ -3513,8 +3530,8 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
 
         for (const rawDay of Array.isArray(local.completedDays) ? local.completedDays : []) {
           const day = parseProductRoutineDayV98(rawDay);
+          if (!isNewProductState) continue;
           if (day > canonicalCurrentDay) continue;
-          if (!isNewProductState && day !== canonicalCurrentDay) continue;
 
           const rawCompletedAt = completedAtByDay[String(day)];
           const completedAt = normalizeClientCompletedAt(
