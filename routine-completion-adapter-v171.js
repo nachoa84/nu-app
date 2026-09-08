@@ -67,8 +67,11 @@
     const profile = getProfile();
     const safeRoutineId = String(routineId || getActiveRoutineId());
     const state = getRoutineState();
+    const localCycle = Number(state.cycle || 0);
+    const gateCycle =
+      Number(window.NuRoutineStateGateV171?.currentCycle?.(profile?.userId) || 0);
     const cycle = safeRoutineId === "collagen-30"
-      ? Number(window.NuRoutineStateGateV171?.currentCycle?.(profile?.userId) || 1)
+      ? Math.max(1, localCycle, gateCycle)
       : 1;
 
     return {

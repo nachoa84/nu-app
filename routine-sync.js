@@ -27,6 +27,13 @@ function applyBackendRoutineState(serverState) {
       1
     );
 
+  localState.cycle =
+    Number(
+      serverState.cycle ||
+      localState.cycle ||
+      1
+    );
+
   localState.openedDays =
     openedDays;
 

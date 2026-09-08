@@ -12,7 +12,8 @@ function getRoutineState() {
     openedDays: {},
     nextUnlockAt: null,
     pendingNextDay: null,
-    scheduleProfileSignature: null
+    scheduleProfileSignature: null,
+    cycle: 1
   };
 
   try {
@@ -28,7 +29,8 @@ function getRoutineState() {
       nextUnlockAt: saved.nextUnlockAt || null,
       pendingNextDay: saved.pendingNextDay || null,
       scheduleProfileSignature:
-        saved.scheduleProfileSignature || null
+        saved.scheduleProfileSignature || null,
+      cycle: Number(saved.cycle || 1)
     });
   } catch (e) {
     return fallback;

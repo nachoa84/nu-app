@@ -259,8 +259,7 @@ function createBlock(block) {
     const day = Number(selectedDay);
     const routineId = getActiveRoutineId();
     const userId = String(getRoutineProfile()?.userId || "");
-    const backendManaged = isBackendManagedRoutine();
-    const completionKey = `${userId}:${day}`;
+    const completionKey = getRoutineCompletionKeyV171(day, routineId);
     const done = isDayComplete(day);
 
     const renderDoneState = ({ animate = false } = {}) => {
@@ -357,9 +356,9 @@ function createBlock(block) {
     };
 
     card.append(btn, helper);
-    if (backendManaged && isCollagenCompletionPendingV170(day)) {
+    if (isRoutineCompletionPendingV171(day, routineId)) {
       renderPendingState();
-    } else if (backendManaged && collagenCompletionFailedV170.has(completionKey)) {
+    } else if (isRoutineCompletionFailedV171(day, routineId)) {
       renderRetryState();
     }
     return card;
