@@ -28,7 +28,11 @@ function validatePdfBytes(pdfBytes) {
   return pdfBytes;
 }
 
-function normalizePageItems(items) {
+function finiteNumberOrNull(value) {
+  return Number.isFinite(value) ? value : null;
+}
+
+function normalizePageSpans(items) {
   if (!Array.isArray(items)) {
     throw new IrisPrototypePdfError(
       "No se pudo leer el contenido de una página.",
@@ -36,16 +40,48 @@ function normalizePageItems(items) {
     );
   }
 
-  const parts = [];
-  for (const item of items) {
+  const spans = [];
+
+  for (let sourceIndex = 0; sourceIndex < items.length; sourceIndex += 1) {
+    const item = items[sourceIndex];
     if (!item || typeof item !== "object" || typeof item.str !== "string") {
       continue;
     }
 
-    const value = item.str.normalize("NFC");
-    if (value) parts.push(value);
-    if (item.hasEOL === true) parts.push("\n");
-    else if (value) parts.push(" ");
+    const text = item.str.normalize("NFC");
+    if (!text) continue;
+
+    const transform = Array.isArray(item.transform) ? item.transform : [];
+
+    spans.push(Object.freeze({
+      sourceIndex,
+      text,
+      hasEOL: item.hasEOL === true,
+      x: finiteNumberOrNull(transform[4]),
+      y: finiteNumberOrNull(transform[5]),
+      width: finiteNumberOrNull(item.width),
+      height: finiteNumberOrNull(item.height),
+      fontName: typeof item.fontName === "string" && item.fontName ? item.fontName : null
+    }));
+  }
+
+  return Object.freeze(spans);
+}
+
+function textFromPageSpans(spans) {
+  if (!Array.isArray(spans)) {
+    throw new IrisPrototypePdfError(
+      "Los fragmentos de página no tienen un formato válido.",
+      "IRIS_PROTOTYPE_PDF_EXTRACTION_FAILED"
+    );
+  }
+
+  const parts = [];
+  for (const span of spans) {
+    if (!span || typeof span.text !== "string" || !span.text) continue;
+    parts.push(span.text);
+    if (span.hasEOL === true) parts.push("\n");
+    else parts.push(" ");
   }
 
   return parts
@@ -54,6 +90,19 @@ function normalizePageItems(items) {
     .replace(/ *\n */gu, "\n")
     .replace(/\n{3,}/gu, "\n\n")
     .trim();
+}
+
+function normalizePageItems(items) {
+  return textFromPageSpans(normalizePageSpans(items));
+}
+
+function layoutDiagnostics(spans) {
+  const positioned = spans.filter(span => span.x !== null && span.y !== null).length;
+  return Object.freeze({
+    spanCount: spans.length,
+    positionedSpanCount: positioned,
+    positionedSpanRatio: spans.length === 0 ? 0 : positioned / spans.length
+  });
 }
 
 function pdfJsAssetPath(directoryName) {
@@ -145,7 +194,8 @@ function createPrototypePdfExtractor({ loadPdfJs = defaultLoadPdfJs } = {}) {
             includeMarkedContent: false,
             disableNormalization: false
           });
-          const text = normalizePageItems(textContent?.items);
+          const spans = normalizePageSpans(textContent?.items);
+          const text = textFromPageSpans(spans);
           extractedCharacters += text.length;
 
           if (extractedCharacters > MAX_EXTRACTED_CHARS) {
@@ -155,7 +205,10 @@ function createPrototypePdfExtractor({ loadPdfJs = defaultLoadPdfJs } = {}) {
           pages.push(Object.freeze({
             pageNumber,
             text,
-            textSha256: sha256Hex(text)
+            textSha256: sha256Hex(text),
+            spansSha256: sha256Hex(JSON.stringify(spans)),
+            layout: layoutDiagnostics(spans),
+            spans
           }));
         } finally {
           if (page && typeof page.cleanup === "function") {
@@ -192,6 +245,9 @@ module.exports = {
   IrisPrototypePdfError,
   createPrototypePdfExtractor,
   defaultLoadPdfJs,
+  layoutDiagnostics,
   normalizePageItems,
+  normalizePageSpans,
+  textFromPageSpans,
   validatePdfBytes
 };
