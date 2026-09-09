@@ -64,7 +64,7 @@ async function waitForServer() {
     } catch (_) {
       // El servidor todavía puede estar inicializando.
     }
-    await sleep(200);
+    await sleep(100);
   }
   throw new Error(
     `server.js no quedó listo dentro del tiempo esperado.\n${serverOutput}`
@@ -92,13 +92,9 @@ async function api(path, options = {}) {
   return body;
 }
 
-function jsonBody(value) {
-  return JSON.stringify(value);
-}
-
-function syntheticUserId(label) {
-  return `v172-recovery-${label}-${crypto.randomUUID()}`;
-}
+const jsonBody = value => JSON.stringify(value);
+const syntheticUserId = label =>
+  `v172-recovery-${label}-${crypto.randomUUID()}`;
 
 async function bootstrapUser(label) {
   const userId = syntheticUserId(label);
@@ -244,9 +240,7 @@ function createRecoveryClient(userId, options = {}) {
         canonicalFailures -= 1;
         throw new Error("synthetic network failure");
       }
-      if (options.fetchCanonical) {
-        return options.fetchCanonical();
-      }
+      if (options.fetchCanonical) return options.fetchCanonical();
       return (await getCollagenState(userId)).state;
     },
     fetchProducts: async () => {
@@ -255,9 +249,7 @@ function createRecoveryClient(userId, options = {}) {
         productFailures -= 1;
         throw new Error("synthetic product network failure");
       }
-      if (options.fetchProducts) {
-        return options.fetchProducts();
-      }
+      if (options.fetchProducts) return options.fetchProducts();
       return (await getProductState(userId)).state;
     },
     publishCanonical: state => {
@@ -274,11 +266,13 @@ function createRecoveryClient(userId, options = {}) {
     requestTimeoutMs: 5000
   });
 
-  async function settle() {
-    for (let i = 0; i < 200; i += 1) {
-      await new Promise(resolve => setImmediate(resolve));
-      if (!controller.inspect().running) break;
+  async function waitIdle(timeoutMs = 5000) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (!controller.inspect().running) return;
+      await sleep(10);
     }
+    throw new Error("El coordinador V172 no quedó idle dentro del tiempo esperado.");
   }
 
   async function advance(ms) {
@@ -290,16 +284,16 @@ function createRecoveryClient(userId, options = {}) {
       timers.delete(next[0]);
       now = next[1].at;
       next[1].fn();
-      await settle();
+      await waitIdle();
     }
     now = end;
-    await settle();
+    await waitIdle();
   }
 
   return {
     controller,
     advance,
-    settle,
+    waitIdle,
     canonicalPublished,
     productsPublished,
     calls: () => ({ canonical: canonicalCalls, products: productCalls }),
@@ -327,14 +321,12 @@ before(async () => {
       stdio: ["ignore", "pipe", "pipe"]
     }
   );
-
   serverProcess.stdout.on("data", chunk => {
     serverOutput += chunk.toString();
   });
   serverProcess.stderr.on("data", chunk => {
     serverOutput += chunk.toString();
   });
-
   await waitForServer();
 });
 
@@ -345,9 +337,7 @@ after(async () => {
       new Promise(resolve => serverProcess.once("exit", resolve)),
       sleep(3000)
     ]);
-    if (serverProcess.exitCode === null) {
-      serverProcess.kill("SIGKILL");
-    }
+    if (serverProcess.exitCode === null) serverProcess.kill("SIGKILL");
   }
   await pool.end();
 });
@@ -386,9 +376,11 @@ test(
 
     await client.advance(3000);
     assert.equal(client.calls().canonical, 1);
-    assert.equal((await collagenDbState(userId)).current_day, 1);
+    assert.equal(Number((await collagenDbState(userId)).current_day), 1);
 
-    await client.advance(2000);
+    const retryAt = client.controller.inspect().timerAt;
+    assert.ok(retryAt !== null && retryAt > client.now());
+    await client.advance(retryAt - client.now());
 
     const finalState = await collagenDbState(userId);
     const jobs = await pool.query(
@@ -403,7 +395,7 @@ test(
 
     assert.equal(Number(finalState.current_day), 2);
     assert.equal(client.calls().canonical, 2);
-    assert.equal(client.canonicalPublished.at(-1).currentDay, 2);
+    assert.equal(client.canonicalPublished.at(-1)?.currentDay, 2);
     assert.equal(jobs.rows[0].count, 1);
   }
 );
@@ -446,12 +438,12 @@ test(
     client.setVisible(true);
     client.setOnline(false);
     client.controller.onResume("visibilitychange");
-    await client.settle();
+    await client.waitIdle();
     assert.equal(client.calls().canonical, 0);
 
     client.setOnline(true);
     client.controller.onResume("online");
-    await client.settle();
+    await client.waitIdle();
 
     const finalState = await collagenDbState(userId);
     const jobs = await pool.query(
@@ -466,18 +458,27 @@ test(
 
     assert.equal(Number(finalState.current_day), 2);
     assert.equal(client.calls().canonical, 1);
-    assert.equal(client.canonicalPublished.at(-1).currentDay, 2);
+    assert.equal(client.canonicalPublished.at(-1)?.currentDay, 2);
     assert.equal(jobs.rows[0].count, 1);
   }
 );
 
 test(
-  "reapertura fresca 48 h después no pierde un desbloqueo vencido",
+  "reapertura fresca 48 h después usa bootstrap y no pierde el desbloqueo vencido",
   async () => {
     const { userId } = await bootstrapUser("fresh-reopen");
     await openCollagen(userId, 1);
     const completed = await completeCollagen(userId, 1);
 
+    // Simula tiempo real del servidor, no sólo el reloj virtual del cliente.
+    await pool.query(
+      `UPDATE day_progress
+       SET completed_at = NOW() - INTERVAL '72 hours'
+       WHERE user_id = $1
+         AND cycle = 1
+         AND day = 1`,
+      [userId]
+    );
     await pool.query(
       `UPDATE users
        SET next_unlock_at = NOW() - INTERVAL '48 hours'
@@ -509,8 +510,9 @@ test(
       [userId]
     );
 
+    assert.equal(bootstrap.state.currentDay, 2);
     assert.equal(Number(finalState.current_day), 2);
-    assert.equal(client.canonicalPublished.at(-1).currentDay, 2);
+    assert.equal(client.calls().canonical, 0);
     assert.equal(jobs.rows[0].count, 1);
   }
 );
@@ -572,7 +574,7 @@ test(
     client.setVisible(true);
     client.setOnline(true);
     client.controller.onResume("visibilitychange");
-    await client.settle();
+    await client.waitIdle();
 
     const finalStates = await productDbStates(userId);
     const jobs = await pool.query(
@@ -597,6 +599,10 @@ test(
       ]
     );
     assert.equal(client.calls().products, 1);
+    assert.equal(
+      client.productsPublished.at(-1)?.routines?.["lumispa-10"]?.currentDay,
+      2
+    );
     assert.deepEqual(
       jobs.rows.map(row => ({
         routineId: row.routine_id,
