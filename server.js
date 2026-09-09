@@ -917,10 +917,23 @@ async function advanceIfEligible(
   const userResult =
     await client.query(
       `
-      SELECT *
-      FROM users
-      WHERE id = $1
-      FOR UPDATE
+      SELECT
+        user_row.*,
+        EXISTS (
+          SELECT 1
+          FROM day_progress AS progress
+          WHERE progress.user_id = user_row.id
+            AND progress.cycle = user_row.cycle
+            AND progress.day = user_row.current_day
+            AND progress.completed_at IS NOT NULL
+        ) AS current_day_completed,
+        (
+          user_row.next_unlock_at IS NOT NULL
+          AND user_row.next_unlock_at <= NOW()
+        ) AS unlock_due
+      FROM users AS user_row
+      WHERE user_row.id = $1
+      FOR UPDATE OF user_row
       `,
       [userId]
     );
@@ -941,10 +954,8 @@ async function advanceIfEligible(
 
   if (
     user.current_day < MAX_DAY &&
-    user.next_unlock_at &&
-    new Date(
-      user.next_unlock_at
-    ).getTime() <= Date.now()
+    user.current_day_completed === true &&
+    user.unlock_due === true
   ) {
     const nextDay =
       Number(user.current_day) + 1;
@@ -3303,6 +3314,14 @@ async function advanceProductRoutinesIfEligible(client, userId = null) {
        WHERE state.current_day < 10
          AND state.next_unlock_at IS NOT NULL
          AND state.next_unlock_at <= NOW()
+         AND EXISTS (
+           SELECT 1
+           FROM product_routine_day_progress AS progress
+           WHERE progress.user_id = state.user_id
+             AND progress.routine_id = state.routine_id
+             AND progress.day = state.current_day
+             AND progress.completed_at IS NOT NULL
+         )
          ${userFilter}
        FOR UPDATE
      ),
