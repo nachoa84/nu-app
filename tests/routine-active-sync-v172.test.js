@@ -65,6 +65,36 @@ test("initial reconciliation does not require a cached due time or product state
   assert.equal(h.controller.inspect().timerAt,null);
 });
 
+test("integration can reuse bootstrap without duplicate initial reads", async () => {
+  const h = harness();
+  h.controller.start({ initial: false });
+  await h.flush();
+  assert.equal(count(h,"canonical"),0);
+  assert.equal(count(h,"products"),0);
+  assert.equal(h.timers.size,0);
+  h.controller.onResume("pageshow");
+  await h.advance(3000);
+  assert.equal(count(h,"canonical"),1);
+  assert.equal(count(h,"products"),1);
+});
+
+test("integration can discard initial passive noise after bootstrap", async () => {
+  const h = harness();
+  h.controller.start({
+    initial: false,
+    deferInitialPassive: false
+  });
+  h.controller.onResume("pageshow");
+  await h.advance(3000);
+  assert.equal(count(h,"canonical"),0);
+  assert.equal(count(h,"products"),0);
+
+  h.controller.onResume("focus");
+  await h.flush();
+  assert.equal(count(h,"canonical"),1);
+  assert.equal(count(h,"products"),1);
+});
+
 test("due-time failure retries within a finite budget and resolves after success", async () => {
   const h = harness(); h.controller.start(); await h.flush();
   const due = h.now()+1000;

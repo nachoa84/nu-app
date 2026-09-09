@@ -1,4 +1,4 @@
-const CACHE="nuapp-v168-shell-precache-aligned";
+const CACHE="nuapp-v172-progress-stabilization";
 
 const CORE=[
   "./",
@@ -49,7 +49,8 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
-  "./backend-client.js?v=136-unified-daily-unlock",
+  "./routine-active-sync-v172.js?v=172-progress-stabilization",
+  "./backend-client.js?v=172-progress-stabilization",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",
   "./onboarding.css?v=88-onboarding-legibility",

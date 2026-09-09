@@ -34,6 +34,7 @@
     let identity = null;
     let epoch = 0;
     let readyAt = null;
+    let deferInitialPassive = true;
     let started = false;
     let running = null;
     let timer = null;
@@ -242,6 +243,10 @@
         schedule();
         return;
       }
+      if (isDue()) {
+        forced = true;
+        pendingReason = "unlock-due";
+      }
       const grace = readyAt === null ? time : readyAt + INITIAL_GRACE_MS;
       const earliest = forced ? time : Math.max(time, grace, lastStartedAt + PASSIVE_MIN_MS);
       const permitted = Math.max(earliest, retryAt || 0);
@@ -276,6 +281,14 @@
     function request(reason = "active", options = {}) {
       resetIdentity();
       if (!identity) return Promise.resolve(null);
+      if (
+        !options.force &&
+        !deferInitialPassive &&
+        readyAt !== null &&
+        now() < readyAt + INITIAL_GRACE_MS
+      ) {
+        return Promise.resolve(null);
+      }
       pending = true;
       pendingReason = reason;
       if (options.force) {
@@ -292,19 +305,32 @@
       pump();
       return running || Promise.resolve(null);
     }
-    function start() {
+    function start(options = {}) {
       if (started) return;
       started = true;
       readyAt = now();
+      deferInitialPassive =
+        options.deferInitialPassive !== false;
       resetIdentity();
-      if (identity) request("initial", { force: true });
+      if (identity && options.initial !== false) {
+        request("initial", { force: true });
+      } else {
+        pending = false;
+        forced = false;
+        schedule();
+      }
     }
     function onResume(reason = "active") {
       resetIdentity();
       if (!identity) return;
       if (!visible() || !online()) { cancelTimer(); return; }
       // A new foreground/network episode is recoverable after exhausted retries.
-      request(reason, { force: exhausted || isDue() });
+      request(reason, {
+        force:
+          reason === "online" ||
+          exhausted ||
+          isDue()
+      });
     }
     function suspend() { cancelTimer(); }
     function invalidate() {
