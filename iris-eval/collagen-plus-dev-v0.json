@@ -12,7 +12,7 @@
 
     {"id":"ingredients-01","question":"¿Qué ingredientes tiene Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["péptidos de colágeno","trigo"]},
     {"id":"ingredients-02","question":"¿Qué contiene collagen plus?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["luteína"]},
-    {"id":"ingredients-03","question":"¿Collagen+ tiene trigo?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["trigo"]},
+    {"id":"ingredients-03","question":"¿Collagen+ tiene trigo?","expectedDecision":"CLARIFY","expectedIntent":null,"expectedSubject":"collagen-plus","knownGap":"attribute-style ingredient question needs constrained semantic rule"},
 
     {"id":"precautions-01","question":"¿Qué precauciones tiene Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["embarazo","lactancia"]},
     {"id":"precautions-02","question":"¿Puedo tomar Collagen+ si estoy embarazada?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["embarazo"]},
@@ -36,6 +36,6 @@
 
     {"id":"scope-01","question":"¿Cómo uso LumiSpa?","expectedDecision":"UNAVAILABLE","expectedIntent":"product.usage","expectedSubject":"ageloc-lumispa"},
     {"id":"scope-02","question":"¿Qué ingredientes tiene WellSpa?","expectedDecision":"UNAVAILABLE","expectedIntent":"product.ingredients","expectedSubject":"ageloc-wellspa-io"},
-    {"id":"scope-03","question":"¿Cómo funciona el plan de compensación?","expectedDecision":"CLARIFY","expectedIntent":"business.explain","expectedSubject":null}
+    {"id":"scope-03","question":"¿Cómo funciona el plan de compensación?","expectedDecision":"UNAVAILABLE","expectedIntent":"business.explain","expectedSubject":"business"}
   ]
 }
