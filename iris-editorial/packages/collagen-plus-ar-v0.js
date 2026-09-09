@@ -41,7 +41,7 @@ const evidence = Object.freeze({
   consumption: pdfEvidence({
     pageNumber: 4,
     section: "INSTRUCCIONES DE CONSUMO",
-    spanIndexes: [90, 91, 92, 93],
+    spanIndexes: [96, 97, 98, 99],
     content: "Disolver una medida de Collagen+ en 200 ml de agua y disfruta una vez al día."
   }),
   ingredients: pdfEvidence({
@@ -54,7 +54,7 @@ const evidence = Object.freeze({
   precautions: pdfEvidence({
     pageNumber: 4,
     section: "ADVERTENCIA",
-    spanIndexes: [95, 96, 97, 98, 99, 100],
+    spanIndexes: [101, 102, 103, 104, 105, 106, 107, 108, 109],
     content: "No utilizar en caso de embarazo, mujeres en período de lactancia ni en niños. Mantener fuera del alcance de los niños. Consumir de acuerdo con las recomendaciones del rótulo. El consumo de suplementos dietarios no reemplaza una dieta variada y equilibrada. Consulte a su médico.",
     sensitive: true
   }),
