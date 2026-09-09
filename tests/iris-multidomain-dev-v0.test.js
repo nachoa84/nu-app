@@ -6,10 +6,12 @@ const path = require("node:path");
 const test = require("node:test");
 const { routeQuestion } = require("../iris-core/question-router");
 const { resolveQuestion } = require("../iris-core/resolve-question");
-const { evidence, units } = require("../iris-editorial/packages/collagen-plus-ar-v0");
+const collagen = require("../iris-editorial/packages/collagen-plus-ar-v0");
+const lumispa = require("../iris-editorial/packages/lumispa-ar-v0");
 
 const benchmark = JSON.parse(fs.readFileSync(path.join(__dirname, "../iris-eval/multidomain-dev-v0.json"), "utf8"));
-const evidenceList = Object.values(evidence);
+const units = [...collagen.units, ...lumispa.units];
+const evidence = [...Object.values(collagen.evidence), ...Object.values(lumispa.evidence)];
 
 for (const entry of benchmark.cases) {
   test(`multidomain ${entry.id}: ${entry.question}`, () => {
@@ -20,7 +22,7 @@ for (const entry of benchmark.cases) {
     const result = resolveQuestion({
       question: entry.question,
       units,
-      evidence: evidenceList,
+      evidence,
       market: benchmark.market,
       language: benchmark.language
     });
@@ -48,8 +50,7 @@ test("multidomain benchmark includes product, business and office virtual covera
   assert.ok(subjects.has("office-virtual"));
 });
 
-test("only Collagen+ is answerable until other domains receive approved packages", () => {
-  const directCases = benchmark.cases.filter(item => item.expectedDecision === "DIRECT");
-  assert.ok(directCases.length > 0);
-  assert.ok(directCases.every(item => item.expectedSubject === "collagen-plus"));
+test("only products with real prototype packages are answerable", () => {
+  const directSubjects = new Set(benchmark.cases.filter(item => item.expectedDecision === "DIRECT").map(item => item.expectedSubject));
+  assert.deepEqual(directSubjects, new Set(["collagen-plus", "ageloc-lumispa"]));
 });
