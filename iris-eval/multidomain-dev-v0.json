@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "iris-eval-v0",
+  "name": "multidomain-dev-v0",
+  "market": "AR",
+  "language": "es",
+  "purpose": "Validate routing across products, business and Office Virtual without inventing unavailable knowledge.",
+  "cases": [
+    {"id":"md01","question":"¿Cómo tomo Collagen+?","expectedSubject":"collagen-plus","expectedIntent":"product.usage","expectedDecision":"DIRECT"},
+    {"id":"md02","question":"¿Qué ingredientes tiene Collagen+?","expectedSubject":"collagen-plus","expectedIntent":"product.ingredients","expectedDecision":"DIRECT"},
+    {"id":"md03","question":"¿Para qué sirve LumiSpa?","expectedSubject":"ageloc-lumispa","expectedIntent":"product.describe","expectedDecision":"UNAVAILABLE"},
+    {"id":"md04","question":"¿Cómo se usa ageLOC LumiSpa?","expectedSubject":"ageloc-lumispa","expectedIntent":"product.usage","expectedDecision":"UNAVAILABLE"},
+    {"id":"md05","question":"¿Qué hace WellSpa iO?","expectedSubject":"ageloc-wellspa-io","expectedIntent":"product.describe","expectedDecision":"UNAVAILABLE"},
+    {"id":"md06","question":"¿Cómo uso WellSpa?","expectedSubject":"ageloc-wellspa-io","expectedIntent":"product.usage","expectedDecision":"UNAVAILABLE"},
+    {"id":"md07","question":"¿Para qué sirve Galvanic Spa?","expectedSubject":"ageloc-galvanic-spa","expectedIntent":"product.describe","expectedDecision":"UNAVAILABLE"},
+    {"id":"md08","question":"¿Cómo se usa ageLOC Galvanic Spa?","expectedSubject":"ageloc-galvanic-spa","expectedIntent":"product.usage","expectedDecision":"UNAVAILABLE"},
+    {"id":"md09","question":"¿Qué es un Representante de Marca?","expectedSubject":"business","expectedIntent":"business.explain","expectedDecision":"UNAVAILABLE"},
+    {"id":"md10","question":"¿Qué es un Brand Affiliate?","expectedSubject":"business","expectedIntent":"business.explain","expectedDecision":"UNAVAILABLE"},
+    {"id":"md11","question":"¿Cómo funciona el negocio?","expectedSubject":"business","expectedIntent":"business.explain","expectedDecision":"UNAVAILABLE"},
+    {"id":"md12","question":"¿Cómo funciona la compensación?","expectedSubject":"business","expectedIntent":"business.explain","expectedDecision":"UNAVAILABLE"},
+    {"id":"md13","question":"¿Dónde encuentro clientes en Oficina Virtual?","expectedSubject":"office-virtual","expectedIntent":"resource.find","expectedDecision":"UNAVAILABLE"},
+    {"id":"md14","question":"¿Dónde entro en Oficina Virtual para ver clientes?","expectedSubject":"office-virtual","expectedIntent":"app.navigate","expectedDecision":"UNAVAILABLE"},
+    {"id":"md15","question":"¿Cómo llego al menú de clientes en Office Virtual?","expectedSubject":"office-virtual","expectedIntent":"app.navigate","expectedDecision":"UNAVAILABLE"},
+    {"id":"md16","question":"¿Cómo se usa?","expectedSubject":null,"expectedIntent":"product.usage","expectedDecision":"CLARIFY"},
+    {"id":"md17","question":"¿Qué es esto?","expectedSubject":null,"expectedIntent":"product.describe","expectedDecision":"CLARIFY"},
+    {"id":"md18","question":"¿Cuál es la diferencia entre LumiSpa y Galvanic Spa?","expectedSubject":"ageloc-lumispa","expectedIntent":"product.compare","expectedDecision":"UNAVAILABLE","knownGap":"multi-subject comparison still needs explicit two-entity routing"}
+  ]
+}
