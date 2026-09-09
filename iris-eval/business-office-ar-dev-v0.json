@@ -1,0 +1,107 @@
+{
+  "evalId": "business-office-ar-dev-v0",
+  "market": "AR",
+  "language": "es",
+  "scope": "prototype-only",
+  "cases": [
+    {
+      "id": "business-commissions-requirements-1",
+      "question": "¿Qué necesito para cobrar comisiones en Argentina?",
+      "expected": {
+        "subject": "business-commissions",
+        "intent": "procedure.guide",
+        "decision": "DIRECT",
+        "mustMention": ["Acuerdo de Afiliado de Marca", "información bancaria"]
+      }
+    },
+    {
+      "id": "business-commissions-requirements-2",
+      "question": "¿Cómo recibo mis comisiones?",
+      "expected": {
+        "subject": "business-commissions",
+        "intent": "procedure.guide",
+        "decision": "DIRECT"
+      }
+    },
+    {
+      "id": "business-commissions-invoice-1",
+      "question": "¿Después tengo que enviar factura electrónica para cobrar comisiones?",
+      "expected": {
+        "subject": "business-commissions",
+        "intent": "procedure.guide",
+        "decision": "DIRECT",
+        "mustMention": ["factura electrónica"]
+      }
+    },
+    {
+      "id": "business-enrollment-options-1",
+      "question": "¿Dónde me inscribo como Afiliado de Marca?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "app.navigate",
+        "decision": "DIRECT",
+        "mustMention": ["Inscripciones"]
+      }
+    },
+    {
+      "id": "business-enrollment-brand-affiliate-1",
+      "question": "¿Qué es la opción Afiliado de Marca en inscripciones?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "business.explain",
+        "decision": "DIRECT",
+        "mustMention": ["Afiliado de Marca", "adquirir productos"]
+      }
+    },
+    {
+      "id": "business-enrollment-client-1",
+      "question": "¿Qué es la opción Cliente?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "business.explain",
+        "decision": "DIRECT",
+        "mustMention": ["Cliente", "adquirir productos"]
+      }
+    },
+    {
+      "id": "business-enrollment-member-1",
+      "question": "¿Qué es una Cuenta de Miembro?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "business.explain",
+        "decision": "DIRECT",
+        "mustMention": ["Cuenta de Miembro", "ADR"]
+      }
+    },
+    {
+      "id": "business-enrollment-difference-1",
+      "question": "¿Qué diferencia hay entre Cliente, Miembro y Afiliado de Marca?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "business.explain",
+        "decision": "DIRECT",
+        "mustMention": ["Cliente", "Miembro", "Afiliado de Marca"]
+      }
+    },
+    {
+      "id": "business-letter-intent-1",
+      "question": "¿Qué es la Carta de Intención?",
+      "expected": {
+        "subject": "business-enrollment",
+        "intent": "business.explain",
+        "decision": "DIRECT",
+        "mustMention": ["Carta de Intención", "Ejecutivo"]
+      }
+    },
+    {
+      "id": "business-market-isolation-1",
+      "question": "¿Qué necesito para cobrar comisiones en México?",
+      "market": "MX",
+      "expected": {
+        "subject": "business-commissions",
+        "intent": "procedure.guide",
+        "decision": "UNAVAILABLE"
+      }
+    }
+  ]
+}
