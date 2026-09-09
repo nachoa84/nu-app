@@ -39,9 +39,7 @@ const TREATMENT_CLAIM_SIGNALS = Object.freeze([
   "curar ",
   "trata ",
   "tratar ",
-  "sirve para la ",
-  "sirve para el ",
-  "sirve para tratar",
+  "sirve para ",
   "mejora la enfermedad",
   "mejora el diagnostico"
 ]);
