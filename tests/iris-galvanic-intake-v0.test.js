@@ -4,12 +4,16 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const intake = require("../iris-editorial/intake/galvanic-spa-ar-v0");
 
-test("Galvanic Spa P1-10 queda pendiente hasta extracción real", () => {
+test("Galvanic Spa P1-10 registra extracción real aceptada y paquete de prototipo creado", () => {
   assert.equal(intake.productSlug, "ageloc-galvanic-spa");
   assert.equal(intake.market, "AR");
   assert.equal(intake.language, "es");
-  assert.equal(intake.status, "awaiting-real-extraction");
+  assert.equal(intake.status, "extraction-accepted-prototype-package-created");
   assert.equal(intake.productionApproved, false);
+  assert.equal(intake.sourceContentSha256, "7e8a5b1ae76e29ce93f4f7fd30fb76d386cf755fe94e745c73a60df648f77596");
+  assert.equal(intake.extractionAudit.acceptedForEvidenceSegmentation, true);
+  assert.equal(intake.extractionAudit.positionedSpanRatio, 1);
+  assert.deepEqual(intake.extractionAudit.structuredPages, []);
 });
 
 test("Galvanic Spa exige evidencia por página y spans posicionados", () => {
