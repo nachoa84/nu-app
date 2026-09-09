@@ -11,8 +11,8 @@ test("LumiSpa P1-08 registra extracción real aceptada y paquete de prototipo cr
   assert.equal(intake.status, "extraction-accepted-prototype-package-created");
   assert.equal(intake.productionApproved, false);
   assert.equal(intake.sourceContentSha256, "467cd69fa03639f658b65705d9502ce03b42a6798df010bd0be840412476f538");
-  assert.equal(intake.audit.acceptedForEvidenceSegmentation, true);
-  assert.equal(intake.audit.positionedSpanRatio, 1);
+  assert.equal(intake.extractionAudit.acceptedForEvidenceSegmentation, true);
+  assert.equal(intake.extractionAudit.positionedSpanRatio, 1);
 });
 
 test("LumiSpa exige evidencia por página y spans posicionados", () => {
