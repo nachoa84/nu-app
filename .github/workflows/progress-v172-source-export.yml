@@ -1,4 +1,4 @@
-name: V172 isolated source export
+name: V172 isolated source verification
 on:
   push:
     branches:
@@ -8,20 +8,23 @@ on:
 permissions:
   contents: read
 jobs:
-  export:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Verify exact source and package
+      - name: Compare source sections without artifacts
         run: |
           test "$(git hash-object backend-client.js)" = "fe5745f7f28b85632f3ad523be5c467acc65f5f9"
-          git rev-parse HEAD > v172-source-sha.txt
-          zip -q v172-source.zip backend-client.js index.html service-worker.js tests/routine-active-sync-v169.test.js v172-source-sha.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: v172-source
-          path: v172-source.zip
-          retention-days: 1
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          s = Path('backend-client.js').read_text()
+          a = s.index('  // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V169')
+          b = s.index('  window.BackendAPI = {', a)
+          for name, part in [('prefix', s[:a]), ('legacy', s[a:b]), ('suffix', s[b:])]:
+              print(name, len(part), hashlib.sha256(part.encode()).hexdigest())
+          print('source_lines', len(s.splitlines()))
+          PY
