@@ -7,6 +7,7 @@ const galvanic = require("../iris-editorial/packages/galvanic-spa-ar-v0");
 
 const units = [...galvanic.units];
 const evidence = [...Object.values(galvanic.evidence)];
+const evidenceById = new Map(evidence.map(item => [item.evidenceId, item]));
 
 test("Galvanic Spa package remains prototype-only", () => {
   assert.equal(galvanic.packageMetadata.productSlug, "ageloc-galvanic-spa");
@@ -21,8 +22,11 @@ test("all Galvanic Spa units are backed by approved PDF evidence", () => {
     assert.equal(unit.subject, "ageloc-galvanic-spa");
     assert.equal(unit.market, "AR");
     assert.equal(unit.state, "approved");
-    assert.ok(unit.evidence.length > 0);
-    for (const item of unit.evidence) {
+    assert.ok(unit.evidenceIds.length > 0);
+
+    for (const evidenceId of unit.evidenceIds) {
+      const item = evidenceById.get(evidenceId);
+      assert.ok(item, `missing evidence for ${evidenceId}`);
       assert.equal(item.sourceType, "pdf");
       assert.equal(item.approvedForKnowledge, true);
       assert.equal(item.reconstructionRequired, false);
