@@ -74,11 +74,12 @@ test("resolver produce respuesta con evidencia para uso", () => {
     language: "es"
   });
 
-  assert.equal(result.decision, "DIRECT");
-  assert.match(result.answer, /una medida/i);
-  assert.equal(result.knowledgeUnitIds.length, 1);
-  assert.ok(result.evidence.length >= 1);
-  assert.ok(result.evidence.every(item => item.sourceType === "pdf"));
+  assert.equal(result.decision.decision, "DIRECT");
+  assert.equal(result.response.status, "DIRECT");
+  assert.match(result.response.answer, /una medida/i);
+  assert.equal(result.response.knowledgeUnitIds.length, 1);
+  assert.ok(result.response.evidence.length >= 1);
+  assert.ok(result.response.evidence.every(item => item.sourceType === "pdf"));
 });
 
 test("mercado distinto no reutiliza el paquete AR", () => {
