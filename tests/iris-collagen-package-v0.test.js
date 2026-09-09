@@ -32,10 +32,18 @@ test("todas las unidades del paquete están trazadas a evidencia aprobada", () =
   }
 });
 
-test("pregunta de uso recupera conocimiento real del paquete", () => {
+test("pregunta de uso recupera solo la unidad general de uso", () => {
   const route = routeQuestion("¿Cómo tomo Collagen+?");
   const matches = searchKnowledge(units, route);
-  assert.ok(matches.some(unit => unit.topic === "usage"));
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].topic, "usage");
+});
+
+test("pregunta descriptiva no arrastra FAQ tópica", () => {
+  const route = routeQuestion("¿Qué es Collagen+?");
+  const matches = searchKnowledge(units, route);
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].topic, "description");
 });
 
 test("pregunta de ingredientes recupera unidad sensible con trigo", () => {
@@ -68,6 +76,7 @@ test("resolver produce respuesta con evidencia para uso", () => {
 
   assert.equal(result.decision, "DIRECT");
   assert.match(result.answer, /una medida/i);
+  assert.equal(result.knowledgeUnitIds.length, 1);
   assert.ok(result.evidence.length >= 1);
   assert.ok(result.evidence.every(item => item.sourceType === "pdf"));
 });
