@@ -30,6 +30,21 @@ const pool = new Pool({
   max: 20
 });
 
+const TEST_SERVER_BOOTSTRAP = `
+const storagePath = require.resolve("@replit/object-storage");
+const storageModule = require(storagePath);
+class TestObjectStorageClient {
+  async getBucket() {
+    throw new Error("Object Storage disabled in V172 PostgreSQL integration test.");
+  }
+}
+require.cache[storagePath].exports = {
+  ...storageModule,
+  Client: TestObjectStorageClient
+};
+require("./server.js");
+`;
+
 let serverProcess = null;
 let serverOutput = "";
 
@@ -192,7 +207,7 @@ function concurrent(count, fn) {
 before(async () => {
   serverProcess = spawn(
     process.execPath,
-    ["server.js"],
+    ["-e", TEST_SERVER_BOOTSTRAP],
     {
       cwd: process.cwd(),
       env: {
