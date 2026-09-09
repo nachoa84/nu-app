@@ -9,13 +9,15 @@ const { resolveQuestion } = require("../iris-core/resolve-question");
 const collagen = require("../iris-editorial/packages/collagen-plus-ar-v0");
 const lumispa = require("../iris-editorial/packages/lumispa-ar-v0");
 const wellspa = require("../iris-editorial/packages/wellspa-io-ar-v0");
+const galvanic = require("../iris-editorial/packages/galvanic-spa-ar-v0");
 
 const benchmark = JSON.parse(fs.readFileSync(path.join(__dirname, "../iris-eval/multidomain-dev-v0.json"), "utf8"));
-const units = [...collagen.units, ...lumispa.units, ...wellspa.units];
+const units = [...collagen.units, ...lumispa.units, ...wellspa.units, ...galvanic.units];
 const evidence = [
   ...Object.values(collagen.evidence),
   ...Object.values(lumispa.evidence),
-  ...Object.values(wellspa.evidence)
+  ...Object.values(wellspa.evidence),
+  ...Object.values(galvanic.evidence)
 ];
 
 for (const entry of benchmark.cases) {
@@ -57,5 +59,5 @@ test("multidomain benchmark includes product, business and office virtual covera
 
 test("only products with real prototype packages are answerable", () => {
   const directSubjects = new Set(benchmark.cases.filter(item => item.expectedDecision === "DIRECT").map(item => item.expectedSubject));
-  assert.deepEqual(directSubjects, new Set(["collagen-plus", "ageloc-lumispa", "ageloc-wellspa-io"]));
+  assert.deepEqual(directSubjects, new Set(["collagen-plus", "ageloc-lumispa", "ageloc-wellspa-io", "ageloc-galvanic-spa"]));
 });
