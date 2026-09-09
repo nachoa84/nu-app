@@ -10,7 +10,27 @@ const PRODUCT_ALIASES = Object.freeze({
 });
 
 const DOMAIN_ALIASES = Object.freeze({
-  business: ["negocio", "brand affiliate", "representante de marca", "compensacion", "plan de compensacion"],
+  "business-commissions": [
+    "recibir comisiones",
+    "cobrar comisiones",
+    "cobro de comisiones",
+    "pago de comisiones",
+    "factura de comisiones",
+    "comisiones"
+  ],
+  "business-enrollment": [
+    "inscripciones",
+    "inscripcion",
+    "inscribirme",
+    "inscribir",
+    "afiliado de marca",
+    "brand affiliate",
+    "cuenta de miembro",
+    "miembro",
+    "cliente",
+    "carta de intencion"
+  ],
+  business: ["negocio", "representante de marca", "compensacion", "plan de compensacion"],
   "office-virtual": ["oficina virtual", "office virtual"]
 });
 
@@ -23,12 +43,35 @@ const INTENT_RULES = Object.freeze([
   ["product.usage", ["como usar", "como uso", "como se usa", "como tomar", "como tomo", "como lo tomo", "como se toma", "cuanto tomar", "cuanto tengo que tomar", "dosis", "medida al dia"]],
   ["product.ingredients", ["ingrediente", "ingredientes", "contiene", "que tiene"]],
   ["product.precautions", ["advertencia", "advertencias", "precaucion", "precauciones", "embarazo", "embarazada", "lactancia", "ninos", "contraindicacion"]],
-  ["business.explain", ["negocio", "brand affiliate", "representante de marca", "compensacion", "plan de compensacion"]],
+  ["procedure.guide", [
+    "como hago",
+    "pasos",
+    "procedimiento",
+    "que necesito para cobrar",
+    "que necesito para recibir",
+    "como recibo comisiones",
+    "como cobro comisiones",
+    "recibir comisiones",
+    "cobrar comisiones",
+    "factura electronica"
+  ]],
+  ["app.navigate", ["donde entro", "como llego", "menu", "navegar", "donde me inscribo", "donde inscribo", "donde esta inscripciones"]],
+  ["business.explain", [
+    "negocio",
+    "brand affiliate",
+    "representante de marca",
+    "afiliado de marca",
+    "cuenta de miembro",
+    "cliente",
+    "miembro",
+    "carta de intencion",
+    "compensacion",
+    "plan de compensacion",
+    "diferencia"
+  ]],
   ["product.describe", ["que es", "para que sirve", "beneficios", "que hace"]],
   ["product.compare", ["comparar", "diferencia", "versus", " vs "]],
-  ["resource.find", ["donde encuentro", "donde esta", "recurso"]],
-  ["procedure.guide", ["como hago", "pasos", "procedimiento"]],
-  ["app.navigate", ["donde entro", "como llego", "menu", "navegar"]]
+  ["resource.find", ["donde encuentro", "donde esta", "recurso"]]
 ]);
 
 function detectSubject(normalized) {
