@@ -10,7 +10,7 @@ const PRODUCT_ALIASES = Object.freeze({
 });
 
 const INTENT_RULES = Object.freeze([
-  ["product.usage", ["como usar", "como se usa", "como tomar", "como se toma", "cuanto tomar", "dosis", "medida al dia"]],
+  ["product.usage", ["como usar", "como uso", "como se usa", "como tomar", "como tomo", "como se toma", "cuanto tomar", "dosis", "medida al dia"]],
   ["product.ingredients", ["ingrediente", "ingredientes", "contiene", "que tiene"]],
   ["product.precautions", ["advertencia", "advertencias", "precaucion", "precauciones", "embarazo", "lactancia", "ninos", "contraindicacion"]],
   ["product.describe", ["que es", "para que sirve", "beneficios", "que hace"]],
