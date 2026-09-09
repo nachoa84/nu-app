@@ -1,12 +1,14 @@
 /*
- * Iris Office Virtual Deep Collector v0
+ * Iris Office Virtual Deep Collector v1
  *
  * Objetivo:
  * - capturar la mayor cantidad de información visible posible de la pantalla actual;
  * - descubrir documentos y recursos potencialmente descargables;
- * - registrar procedencia, tipo, tamaño estimado y origen;
+ * - registrar procedencia y origen;
  * - NO leer cookies, localStorage, sessionStorage, valores de formularios,
- *   contraseñas, encabezados de autenticación ni tokens.
+ *   contraseñas, encabezados de autenticación ni tokens;
+ * - REDACTAR parámetros sensibles que puedan aparecer incidentalmente en URLs
+ *   observadas por Performance API.
  *
  * Uso:
  *   irisOfficeDeepCapture()
@@ -18,10 +20,25 @@
 (() => {
   "use strict";
 
-  const VERSION = "iris-office-deep-collector-v0";
+  const VERSION = "iris-office-deep-collector-v1";
   const DOCUMENT_EXTENSIONS = [
     ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
     ".csv", ".txt", ".rtf", ".zip", ".jpg", ".jpeg", ".png", ".webp"
+  ];
+
+  const SENSITIVE_QUERY_KEYS = new Set([
+    "ticket", "auth", "authorization", "token", "access_token", "id_token",
+    "refresh_token", "session", "sessionid", "sid", "jwt", "code", "secret",
+    "api_key", "apikey", "key", "sig", "signature", "credential", "credentials"
+  ]);
+
+  const TELEMETRY_HOST_PATTERNS = [
+    /(^|\.)google-analytics\.com$/i,
+    /(^|\.)googletagmanager\.com$/i,
+    /(^|\.)hotjar\.com$/i,
+    /(^|\.)qualtrics\.com$/i,
+    /(^|\.)signalfx\.com$/i,
+    /(^|\.)trustarc\.com$/i
   ];
 
   function normalizeSpace(value) {
@@ -32,15 +49,46 @@
       .trim();
   }
 
-  function safeUrl(raw, base = window.location.href) {
+  function redactNestedSensitiveValue(value) {
+    const raw = String(value || "");
+    if (!raw) return raw;
+    try {
+      const decoded = decodeURIComponent(raw);
+      if (/([?&])(ticket|auth|authorization|token|access_token|id_token|refresh_token|session|sessionid|sid|jwt|code|secret|api_key|apikey|key|sig|signature|credential|credentials)=/i.test(decoded)) {
+        return "[REDACTED_NESTED_URL]";
+      }
+    } catch {}
+    return raw;
+  }
+
+  function sanitizeUrl(raw, base = window.location.href) {
     if (!raw) return null;
     try {
       const u = new URL(raw, base);
       u.username = "";
       u.password = "";
+      for (const key of [...u.searchParams.keys()]) {
+        const lower = key.toLowerCase();
+        if (SENSITIVE_QUERY_KEYS.has(lower)) {
+          u.searchParams.set(key, "[REDACTED]");
+          continue;
+        }
+        const current = u.searchParams.get(key);
+        const cleaned = redactNestedSensitiveValue(current);
+        if (cleaned !== current) u.searchParams.set(key, cleaned);
+      }
       return u.href;
     } catch {
       return null;
+    }
+  }
+
+  function isTelemetryUrl(raw) {
+    try {
+      const u = new URL(raw, window.location.href);
+      return TELEMETRY_HOST_PATTERNS.some(pattern => pattern.test(u.hostname));
+    } catch {
+      return false;
     }
   }
 
@@ -107,6 +155,7 @@
   function captureDocument(doc, context) {
     const win = doc.defaultView || window;
     const bodyText = normalizeSpace(doc.body?.innerText || "");
+    const base = doc.location?.href || window.location.href;
 
     const textSelectors = [
       "main", "article", "section", "h1", "h2", "h3", "h4", "h5", "h6",
@@ -135,22 +184,22 @@
       .filter(el => isVisible(el, win))
       .map(a => ({
         text: normalizeSpace(a.innerText || a.textContent || a.getAttribute("aria-label")),
-        href: safeUrl(a.getAttribute("href"), doc.location?.href || window.location.href),
+        href: sanitizeUrl(a.getAttribute("href"), base),
         path: domPath(a),
         context
       }))
       .filter(x => x.href);
 
-    const interactive = [...doc.querySelectorAll("button,[role='button'],[role='link'],[data-href],[data-url],[data-src],[data-download],[onclick]")]
+    const interactive = [...doc.querySelectorAll("button,[role='button'],[role='link'],[data-href],[data-url],[data-src],[data-download]")]
       .filter(el => isVisible(el, win))
       .map(el => ({
         text: normalizeSpace(el.innerText || el.textContent || el.getAttribute("aria-label")),
         tag: el.tagName.toLowerCase(),
         path: domPath(el),
-        href: safeUrl(el.getAttribute("href"), doc.location?.href || window.location.href),
-        dataHref: safeUrl(el.getAttribute("data-href"), doc.location?.href || window.location.href),
-        dataUrl: safeUrl(el.getAttribute("data-url"), doc.location?.href || window.location.href),
-        dataSrc: safeUrl(el.getAttribute("data-src"), doc.location?.href || window.location.href),
+        href: sanitizeUrl(el.getAttribute("href"), base),
+        dataHref: sanitizeUrl(el.getAttribute("data-href"), base),
+        dataUrl: sanitizeUrl(el.getAttribute("data-url"), base),
+        dataSrc: sanitizeUrl(el.getAttribute("data-src"), base),
         dataDownload: normalizeSpace(el.getAttribute("data-download")) || null,
         context
       }))
@@ -158,7 +207,7 @@
 
     return {
       context,
-      url: safeUrl(doc.location?.href || window.location.href),
+      url: sanitizeUrl(base),
       title: normalizeSpace(doc.title),
       bodyText,
       blocks: unique(blocks, x => `${x.context}|${x.path}|${x.text}`),
@@ -171,7 +220,7 @@
     const frames = [];
     const captures = [];
     [...doc.querySelectorAll("iframe,frame")].forEach((frame, index) => {
-      const src = safeUrl(frame.getAttribute("src"), doc.location?.href || window.location.href);
+      const src = sanitizeUrl(frame.getAttribute("src"), doc.location?.href || window.location.href);
       const meta = {
         index,
         context: `${prefix}.frame${index}`,
@@ -224,7 +273,10 @@
     try {
       return unique(
         performance.getEntriesByType("resource")
-          .map(entry => safeUrl(entry.name))
+          .map(entry => entry.name)
+          .filter(Boolean)
+          .filter(url => !isTelemetryUrl(url))
+          .map(url => sanitizeUrl(url))
           .filter(Boolean)
           .map(url => ({ url, initiatorType: null })),
         x => x.url
@@ -289,7 +341,7 @@
       market: "AR",
       language: "es",
       page: {
-        url: safeUrl(window.location.href),
+        url: sanitizeUrl(window.location.href),
         title: normalizeSpace(document.title),
         pathname: window.location.pathname,
         hash: window.location.hash || null
@@ -319,7 +371,9 @@
         formValuesRead: false,
         credentialsRead: false,
         authHeadersRead: false,
-        tokensRead: false
+        tokensReadDirectly: false,
+        sensitiveUrlParametersRedacted: true,
+        telemetryResourcesExcluded: true
       }
     };
   }
@@ -356,7 +410,7 @@
   function documentManifest() {
     const payload = buildPayload();
     const manifest = {
-      schemaVersion: "iris-office-document-manifest-v0",
+      schemaVersion: "iris-office-document-manifest-v1",
       capturedAt: payload.capturedAt,
       page: payload.page,
       candidates: payload.documentCandidates,
@@ -374,6 +428,6 @@
   window.irisOfficeDeepCollectorVersion = VERSION;
 
   console.log(`[Iris] ${VERSION} cargado.`);
-  console.log("[Iris] Ejecutá irisOfficeDeepCapture() para captura máxima de la pantalla actual.");
+  console.log("[Iris] Ejecutá irisOfficeDeepCapture() para captura máxima saneada de la pantalla actual.");
   console.log("[Iris] Ejecutá irisOfficeDocumentManifest() para inventariar documentos/recursos detectables.");
 })();
