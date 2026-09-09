@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "iris-dev-eval-v0",
+  "datasetId": "collagen-plus-ar-dev-v0",
+  "market": "AR",
+  "language": "es",
+  "purpose": "development-only",
+  "cases": [
+    {"id":"usage-01","question":"¿Cómo tomo Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.usage","expectedSubject":"collagen-plus","mustInclude":["una medida"]},
+    {"id":"usage-02","question":"¿Cómo se toma collagen plus?","expectedDecision":"DIRECT","expectedIntent":"product.usage","expectedSubject":"collagen-plus","mustInclude":["una medida"]},
+    {"id":"usage-03","question":"¿Cuánto tengo que tomar de Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.usage","expectedSubject":"collagen-plus","mustInclude":["una medida"]},
+    {"id":"usage-04","question":"¿Cuál es la dosis de Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.usage","expectedSubject":"collagen-plus","mustInclude":["una medida"]},
+
+    {"id":"ingredients-01","question":"¿Qué ingredientes tiene Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["péptidos de colágeno","trigo"]},
+    {"id":"ingredients-02","question":"¿Qué contiene collagen plus?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["luteína"]},
+    {"id":"ingredients-03","question":"¿Collagen+ tiene trigo?","expectedDecision":"DIRECT","expectedIntent":"product.ingredients","expectedSubject":"collagen-plus","mustInclude":["trigo"]},
+
+    {"id":"precautions-01","question":"¿Qué precauciones tiene Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["embarazo","lactancia"]},
+    {"id":"precautions-02","question":"¿Puedo tomar Collagen+ si estoy embarazada?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["embarazo"]},
+    {"id":"precautions-03","question":"¿Se puede usar Collagen+ durante la lactancia?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["lactancia"]},
+    {"id":"precautions-04","question":"¿Collagen+ es para niños?","expectedDecision":"DIRECT","expectedIntent":"product.precautions","expectedSubject":"collagen-plus","mustInclude":["niños"]},
+
+    {"id":"describe-01","question":"¿Qué es Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.describe","expectedSubject":"collagen-plus","mustInclude":["suplemento"]},
+    {"id":"describe-02","question":"¿Para qué sirve collagen plus?","expectedDecision":"DIRECT","expectedIntent":"product.describe","expectedSubject":"collagen-plus","mustInclude":["colágeno","hidratación"]},
+    {"id":"describe-03","question":"¿Qué beneficios tiene Collagen+?","expectedDecision":"DIRECT","expectedIntent":"product.describe","expectedSubject":"collagen-plus","mustInclude":["luminosidad"]},
+
+    {"id":"clarify-01","question":"¿Cómo lo tomo?","expectedDecision":"CLARIFY","expectedIntent":"product.usage","expectedSubject":null},
+    {"id":"clarify-02","question":"Collagen+","expectedDecision":"CLARIFY","expectedIntent":null,"expectedSubject":"collagen-plus"},
+    {"id":"clarify-03","question":"¿Qué ingredientes tiene?","expectedDecision":"CLARIFY","expectedIntent":"product.ingredients","expectedSubject":null},
+
+    {"id":"unavailable-01","question":"¿Cuál es el precio de Collagen+?","expectedDecision":"CLARIFY","expectedIntent":null,"expectedSubject":"collagen-plus"},
+    {"id":"unavailable-02","question":"¿Dónde compro Collagen+?","expectedDecision":"CLARIFY","expectedIntent":null,"expectedSubject":"collagen-plus"},
+
+    {"id":"typo-01","question":"¿Como tomo colagen plus?","expectedDecision":"CLARIFY","expectedIntent":"product.usage","expectedSubject":null,"knownGap":"product alias typo"},
+    {"id":"typo-02","question":"¿Que ingredintes tiene Collagen+?","expectedDecision":"CLARIFY","expectedIntent":null,"expectedSubject":"collagen-plus","knownGap":"intent typo"},
+    {"id":"typo-03","question":"¿Puedo tomar colagen+ embarazada?","expectedDecision":"CLARIFY","expectedIntent":"product.precautions","expectedSubject":null,"knownGap":"product alias typo"},
+
+    {"id":"scope-01","question":"¿Cómo uso LumiSpa?","expectedDecision":"UNAVAILABLE","expectedIntent":"product.usage","expectedSubject":"ageloc-lumispa"},
+    {"id":"scope-02","question":"¿Qué ingredientes tiene WellSpa?","expectedDecision":"UNAVAILABLE","expectedIntent":"product.ingredients","expectedSubject":"ageloc-wellspa-io"},
+    {"id":"scope-03","question":"¿Cómo funciona el plan de compensación?","expectedDecision":"CLARIFY","expectedIntent":"business.explain","expectedSubject":null}
+  ]
+}
