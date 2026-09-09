@@ -6,10 +6,12 @@ on:
       - work/progress-stabilization-v172
     paths:
       - server.js
+      - routine-active-sync-v172.js
       - tests/routine-active-sync-v169.test.js
       - tests/routine-active-sync-v172.test.js
       - tests/routine-transition-guard-v172.test.js
       - tests/routine-transition-postgres-v172.integration.test.js
+      - tests/routine-recovery-flow-v172.integration.test.js
       - .github/workflows/progress-v172-postgres-concurrency.yml
   workflow_dispatch:
 
@@ -65,6 +67,7 @@ jobs:
           node --check routine-active-sync-v172.js
           node --check tests/routine-transition-guard-v172.test.js
           node --check tests/routine-transition-postgres-v172.integration.test.js
+          node --check tests/routine-recovery-flow-v172.integration.test.js
 
       - name: Run V169 and V172 client regressions
         run: |
@@ -75,3 +78,6 @@ jobs:
 
       - name: Run real PostgreSQL concurrency integration
         run: node --test tests/routine-transition-postgres-v172.integration.test.js
+
+      - name: Run Noe/Yami-style recovery flows
+        run: node --test tests/routine-recovery-flow-v172.integration.test.js
