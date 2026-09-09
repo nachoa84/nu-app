@@ -13,7 +13,8 @@ const KNOWLEDGE_TYPES = Object.freeze([
   "study",
   "resource",
   "navigation",
-  "policy"
+  "policy",
+  "testimonial"
 ]);
 
 const KNOWLEDGE_STATES = Object.freeze([
