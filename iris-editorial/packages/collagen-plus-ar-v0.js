@@ -122,7 +122,7 @@ const units = Object.freeze([
   createKnowledgeUnit({
     type: "faq",
     subject: "collagen-plus",
-    topic: "usage",
+    topic: "faq.hot-drink",
     market: MARKET,
     language: LANGUAGE,
     content: "Sí. La ficha indica que Collagen+ puede mezclarse con bebidas frías o calientes, hasta 80 °C, sin afectar la eficacia de los Péptidos de Colágeno Bioactivos®.",
@@ -133,7 +133,7 @@ const units = Object.freeze([
   createKnowledgeUnit({
     type: "faq",
     subject: "collagen-plus",
-    topic: "description",
+    topic: "faq.topical-use",
     market: MARKET,
     language: LANGUAGE,
     content: "No es necesario usar Collagen+ con productos tópicos para que la ficha le atribuya eficacia; también puede combinarse con regímenes tópicos de Nu Skin para beneficios complementarios.",
