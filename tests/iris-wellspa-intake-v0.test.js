@@ -4,12 +4,16 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const intake = require("../iris-editorial/intake/wellspa-io-ar-v0");
 
-test("WellSpa iO P1-09 queda pendiente hasta extracción real", () => {
+test("WellSpa iO P1-09 registra extracción real aceptada y paquete de prototipo creado", () => {
   assert.equal(intake.productSlug, "ageloc-wellspa-io");
   assert.equal(intake.market, "AR");
   assert.equal(intake.language, "es");
-  assert.equal(intake.status, "awaiting-real-extraction");
+  assert.equal(intake.status, "extraction-accepted-prototype-package-created");
   assert.equal(intake.productionApproved, false);
+  assert.equal(intake.sourceContentSha256, "0d6a6d512d7ffa472908a92a5a81006461ec752d24174c39689bf526242fcf48");
+  assert.equal(intake.extractionAudit.acceptedForEvidenceSegmentation, true);
+  assert.equal(intake.extractionAudit.positionedSpanRatio, 1);
+  assert.deepEqual(intake.extractionAudit.structuredPages, [2]);
 });
 
 test("WellSpa iO exige evidencia por página y spans posicionados", () => {
