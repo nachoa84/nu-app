@@ -25,17 +25,17 @@ function evaluateCase(item) {
     language: dataset.language
   });
 
-  const answerNormalized = normalizeSearchText(result.answer || "");
+  const answerNormalized = normalizeSearchText(result.response.answer || "");
   const missingTerms = (item.mustInclude || []).filter(term => !answerNormalized.includes(normalizeSearchText(term)));
 
   return {
     id: item.id,
-    decision: result.decision,
+    decision: result.response.status,
     intent: route.intent,
     subject: route.subject,
     missingTerms,
     matchesExpected:
-      result.decision === item.expectedDecision &&
+      result.response.status === item.expectedDecision &&
       route.intent === item.expectedIntent &&
       route.subject === item.expectedSubject &&
       missingTerms.length === 0
@@ -82,6 +82,6 @@ test("ninguna respuesta DIRECT del benchmark queda sin evidencia", () => {
       market: dataset.market,
       language: dataset.language
     });
-    if (result.decision === "DIRECT") assert.ok(result.evidence.length >= 1, item.id);
+    if (result.response.status === "DIRECT") assert.ok(result.response.evidence.length >= 1, item.id);
   }
 });
