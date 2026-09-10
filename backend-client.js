@@ -444,46 +444,10 @@
   }
 
 
-  // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V169
+  // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V172
   // PostgreSQL sigue siendo la única autoridad para avanzar días.
-  // El cliente solo vuelve a consultar el estado oficial en momentos
-  // naturales de uso y exactamente cuando vence un nextUnlockAt confirmado.
-  // No hay polling ni cálculo local de currentDay.
-  const ACTIVE_SYNC_PASSIVE_MIN_MS = 4000;
-  const ACTIVE_SYNC_INITIAL_GRACE_MS = 3000;
-  const ACTIVE_SYNC_UNLOCK_GRACE_MS = 750;
-
-  let activeSyncPromise = null;
-  let activeSyncLastStartedAt = 0;
-  let activeSyncReadyAt = 0;
-  let canonicalNextUnlockAt = null;
-  let productNextUnlockAt = null;
-  let unlockRefreshTimer = null;
-  let unlockRefreshTarget = null;
-  let lastDueUnlockAttempt = null;
-
-  function parseUnlockTimestamp(value) {
-    if (value === null || value === undefined || value === "") {
-      return null;
-    }
-
-    const numeric = Number(value);
-    if (Number.isFinite(numeric) && numeric > 0) {
-      return numeric;
-    }
-
-    const parsed = Date.parse(String(value));
-    return Number.isFinite(parsed) && parsed > 0
-      ? parsed
-      : null;
-  }
-
-  function hasStoredProfileWithId() {
-    const profile = getProfile();
-    return Boolean(profile?.userId);
-  }
-
-  function hasLocalProductRoutineState() {
+  // Un único coordinador reconcilia Collagen y rutinas de producto sin polling.
+  function hasLocalProductRoutineStateV172() {
     return PRODUCT_ROUTINE_IDS_V98.some(
       routineId =>
         Boolean(
@@ -494,244 +458,178 @@
     );
   }
 
-  function isDocumentVisible() {
+  function currentUserIdV172() {
+    return getProfile()?.userId || null;
+  }
+
+  function isDocumentVisibleV172() {
     return (
       typeof document === "undefined" ||
       document.visibilityState !== "hidden"
     );
   }
 
-  function clearUnlockRefreshTimer() {
-    if (unlockRefreshTimer !== null) {
-      clearTimeout(unlockRefreshTimer);
-      unlockRefreshTimer = null;
+  function retryAfterMsV172(response) {
+    const value = response.headers?.get?.("Retry-After");
+    if (!value) return 0;
+
+    const seconds = Number(value);
+    if (Number.isFinite(seconds) && seconds >= 0) {
+      return seconds * 1000;
     }
-    unlockRefreshTarget = null;
+
+    const at = Date.parse(value);
+    return Number.isFinite(at)
+      ? Math.max(0, at - Date.now())
+      : 0;
   }
 
-  function nextKnownUnlockAt() {
-    const candidates = [
-      canonicalNextUnlockAt,
-      productNextUnlockAt
-    ].filter(value =>
-      Number.isFinite(value) && value > 0
-    );
-
-    return candidates.length
-      ? Math.min(...candidates)
-      : null;
-  }
-
-  function scheduleKnownUnlockRefresh() {
-    clearUnlockRefreshTimer();
-
-    const target = nextKnownUnlockAt();
-    if (!target) {
-      lastDueUnlockAttempt = null;
-      return;
-    }
-
-    if (
-      lastDueUnlockAttempt !== null &&
-      lastDueUnlockAttempt !== target
-    ) {
-      lastDueUnlockAttempt = null;
-    }
-
-    const now = Date.now();
-    if (
-      target <= now &&
-      lastDueUnlockAttempt === target
-    ) {
-      return;
-    }
-
-    const delay = Math.max(
-      target - now + ACTIVE_SYNC_UNLOCK_GRACE_MS,
-      0
-    );
-
-    unlockRefreshTarget = target;
-    unlockRefreshTimer = setTimeout(() => {
-      unlockRefreshTimer = null;
-      unlockRefreshTarget = null;
-      lastDueUnlockAttempt = target;
-
-      if (
-        !isDocumentVisible() ||
-        (typeof navigator !== "undefined" && navigator.onLine === false)
-      ) {
-        return;
+  async function requestActiveStateV172(
+    path,
+    { signal } = {}
+  ) {
+    const response = await fetch(path, {
+      method: "GET",
+      cache: "no-store",
+      signal,
+      headers: {
+        "Content-Type": "application/json"
       }
+    });
 
-      refreshActiveState(
-        "unlock-due",
-        { force: true }
-      ).catch(error => {
-        console.warn(
-          "No se pudo refrescar el estado al vencer el desbloqueo.",
-          error
-        );
-      });
-    }, delay);
-  }
+    const payload = await response
+      .json()
+      .catch(() => ({}));
 
-  function rememberCanonicalUnlock(state) {
-    canonicalNextUnlockAt =
-      parseUnlockTimestamp(
-        state?.nextUnlockAt
+    if (!response.ok) {
+      const error = new Error(
+        payload.error ||
+        `Error HTTP ${response.status}`
       );
+      error.status = response.status;
+      error.retryAfterMs =
+        retryAfterMsV172(response);
+      throw error;
+    }
 
-    scheduleKnownUnlockRefresh();
+    return payload.state;
   }
 
-  function rememberProductUnlocks(state) {
-    const routines =
-      state?.routines || {};
-
-    const candidates =
-      PRODUCT_ROUTINE_IDS_V98
-        .map(routineId =>
-          parseUnlockTimestamp(
-            routines[routineId]?.nextUnlockAt
-          )
-        )
-        .filter(value =>
-          Number.isFinite(value) && value > 0
-        );
-
-    productNextUnlockAt =
-      candidates.length
-        ? Math.min(...candidates)
-        : null;
-
-    scheduleKnownUnlockRefresh();
+  async function fetchCanonicalStateV172(
+    userId,
+    options
+  ) {
+    return requestActiveStateV172(
+      `/api/state/${encodeURIComponent(userId)}`,
+      options
+    );
   }
 
-  async function refreshActiveState(
+  async function fetchProductStatesV172(
+    userId,
+    options
+  ) {
+    if (!hasLocalProductRoutineStateV172()) {
+      return {
+        userId,
+        routines: {}
+      };
+    }
+
+    const state = await requestActiveStateV172(
+      `/api/product-routines/state/${encodeURIComponent(userId)}`,
+      options
+    );
+
+    return state && !state.userId
+      ? { ...state, userId }
+      : state;
+  }
+
+  const activeSyncFactoryV172 =
+    window.NuRoutineActiveSyncV172
+      ?.createRoutineActiveSyncV172;
+
+  const activeSyncControllerV172 =
+    typeof activeSyncFactoryV172 === "function"
+      ? activeSyncFactoryV172({
+          getIdentity:
+            currentUserIdV172,
+          isVisible:
+            isDocumentVisibleV172,
+          isOnline: () =>
+            typeof navigator === "undefined" ||
+            navigator.onLine !== false,
+          fetchCanonical:
+            fetchCanonicalStateV172,
+          fetchProducts:
+            fetchProductStatesV172,
+          publishCanonical: state => {
+            publishState(state);
+            return state;
+          },
+          publishProducts: state => {
+            if (hasLocalProductRoutineStateV172()) {
+              publishProductRoutineStatesV98(state);
+            }
+            return state;
+          },
+          onStatus: status => {
+            emit(
+              "backend-status",
+              status
+            );
+          },
+          warn: error => {
+            console.warn(
+              "No se pudo reconciliar el estado activo de la rutina.",
+              error
+            );
+          }
+        })
+      : null;
+
+  if (!activeSyncControllerV172) {
+    console.warn(
+      "El coordinador de sincronización V172 no está disponible."
+    );
+  }
+
+  function refreshActiveState(
     reason = "active",
     { force = false } = {}
   ) {
-    if (!hasStoredProfileWithId()) {
-      return null;
+    if (!activeSyncControllerV172) {
+      return Promise.resolve(null);
     }
 
-    if (
-      typeof navigator !== "undefined" &&
-      navigator.onLine === false
-    ) {
-      return null;
-    }
-
-    if (activeSyncPromise) {
-      return activeSyncPromise;
-    }
-
-    const now = Date.now();
-    if (
-      !force &&
-      now - activeSyncLastStartedAt <
-        ACTIVE_SYNC_PASSIVE_MIN_MS
-    ) {
-      return null;
-    }
-
-    activeSyncLastStartedAt = now;
-
-    activeSyncPromise = (async () => {
-      const canonicalState =
-        await getState();
-
-      let productState = null;
-      if (hasLocalProductRoutineState()) {
-        try {
-          productState =
-            await getProductRoutineStatesV136();
-        } catch (error) {
-          console.warn(
-            "No se pudo refrescar el estado activo de las rutinas de producto.",
-            error
-          );
-        }
-      }
-
-      emit(
-        "backend-status",
-        {
-          connected: true,
-          reason
-        }
-      );
-
-      return {
-        canonicalState,
-        productState,
-        reason
-      };
-    })();
-
-    try {
-      return await activeSyncPromise;
-    } catch (error) {
-      emit(
-        "backend-status",
-        {
-          connected: false,
-          reason,
-          error: error.message
-        }
-      );
-      throw error;
-    } finally {
-      activeSyncPromise = null;
-    }
+    return activeSyncControllerV172.request(
+      reason,
+      { force }
+    );
   }
 
-  function requestPassiveActiveSync(reason) {
-    if (
-      !activeSyncReadyAt ||
-      !isDocumentVisible()
-    ) {
-      return;
-    }
-
-    if (
-      Date.now() - activeSyncReadyAt <
-      ACTIVE_SYNC_INITIAL_GRACE_MS
-    ) {
-      return;
-    }
-
-    refreshActiveState(reason)
-      .catch(error => {
-        console.warn(
-          "No se pudo reconciliar el estado activo de la rutina.",
-          error
-        );
-      });
-  }
-
-  function markActiveSyncReady() {
-    if (!activeSyncReadyAt) {
-      activeSyncReadyAt = Date.now();
-    }
+  function startActiveSyncV172() {
+    // bootstrapFromLocal ya obtiene el estado inicial. Evitamos GET duplicados.
+    activeSyncControllerV172?.start({
+      initial: false,
+      deferInitialPassive: false
+    });
   }
 
   window.addEventListener(
     "backend-state-updated",
     event => {
-      rememberCanonicalUnlock(
-        event.detail
-      );
+      activeSyncControllerV172
+        ?.rememberCanonical(event.detail);
     }
   );
 
   window.addEventListener(
     "product-routines-state-updated",
     event => {
-      rememberProductUnlocks(
-        event.detail
-      );
+      activeSyncControllerV172
+        ?.rememberProducts(event.detail);
     }
   );
 
@@ -739,11 +637,11 @@
     typeof document !== "undefined" &&
     document.readyState !== "loading"
   ) {
-    markActiveSyncReady();
+    startActiveSyncV172();
   } else {
     window.addEventListener(
       "DOMContentLoaded",
-      markActiveSyncReady
+      startActiveSyncV172
     );
   }
 
@@ -752,9 +650,11 @@
       "visibilitychange",
       () => {
         if (document.visibilityState === "visible") {
-          requestPassiveActiveSync(
-            "visibilitychange"
-          );
+          activeSyncControllerV172
+            ?.onResume("visibilitychange");
+        } else {
+          activeSyncControllerV172
+            ?.suspend();
         }
       }
     );
@@ -763,35 +663,24 @@
   window.addEventListener(
     "pageshow",
     () => {
-      requestPassiveActiveSync(
-        "pageshow"
-      );
+      activeSyncControllerV172
+        ?.onResume("pageshow");
     }
   );
 
   window.addEventListener(
     "focus",
     () => {
-      requestPassiveActiveSync(
-        "focus"
-      );
+      activeSyncControllerV172
+        ?.onResume("focus");
     }
   );
 
   window.addEventListener(
     "online",
     () => {
-      if (!isDocumentVisible()) return;
-
-      refreshActiveState(
-        "online",
-        { force: true }
-      ).catch(error => {
-        console.warn(
-          "No se pudo reconciliar el estado después de recuperar conexión.",
-          error
-        );
-      });
+      activeSyncControllerV172
+        ?.onResume("online");
     }
   );
 
