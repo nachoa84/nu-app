@@ -10,11 +10,12 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   physical-device-preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
 
     services:
       postgres:
@@ -89,6 +90,8 @@ jobs:
 
       - name: Open temporary HTTPS tunnel
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /tmp/cloudflared
           chmod +x /tmp/cloudflared
@@ -118,16 +121,55 @@ jobs:
           done
 
           echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
-          echo "::notice title=V172 Device Preview::$PREVIEW_URL"
           echo "V172_DEVICE_PREVIEW_URL=$PREVIEW_URL"
+
+          jq -nc \
+            --arg state "pending" \
+            --arg target_url "$PREVIEW_URL" \
+            --arg description "Physical-device preview ready" \
+            --arg context "v172/device-preview" \
+            '{state:$state,target_url:$target_url,description:$description,context:$context}' \
+            >/tmp/device-preview-status.json
+
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/device-preview-status.json >/dev/null
 
       - name: Arm delayed 48-hour overdue simulation
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           node - <<'NODE' > /tmp/nu-device-watcher.log 2>&1 &
           const { Pool } = require('pg');
           const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 2 });
           const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+          async function postStatus(description) {
+            const response = await fetch(
+              `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/statuses/${process.env.GITHUB_SHA}`,
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${process.env.GH_TOKEN}`,
+                  Accept: 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  state: 'pending',
+                  description: String(description).slice(0, 140),
+                  context: 'v172/device-test'
+                })
+              }
+            );
+            if (!response.ok) {
+              throw new Error(`GitHub status ${response.status}: ${await response.text()}`);
+            }
+          }
 
           (async () => {
             try {
@@ -151,6 +193,7 @@ jobs:
                 }
 
                 console.log(`DAY1_COMPLETED ${userId}`);
+                await postStatus('Day 1 completed; disable phone internet within 90 seconds');
                 await sleep(90000);
 
                 const aged = await pool.query(`
@@ -163,8 +206,10 @@ jobs:
 
                 if (aged.rowCount === 1) {
                   console.log(`DUE_AGED ${userId} ${aged.rows[0].next_unlock_at.toISOString()}`);
+                  await postStatus('48h overdue armed; reopen the installed PWA while phone is offline');
                 } else {
                   console.log(`DUE_NOT_AGED ${userId}`);
+                  await postStatus('Due simulation skipped because current day already changed');
                 }
                 break;
               }
@@ -177,14 +222,13 @@ jobs:
           })();
           NODE
           echo $! > /tmp/nu-device-watcher.pid
-          echo "::notice title=V172 Device Test::After tapping Hoy lo hice, close the PWA and disable phone internet within 90 seconds."
 
       - name: Keep preview alive for physical-device test
         shell: bash
         run: |
           echo "Preview: $PREVIEW_URL"
-          echo "The isolated preview will stay online for 20 minutes."
-          for minute in $(seq 1 20); do
+          echo "The isolated preview will stay online for 15 minutes."
+          for minute in $(seq 1 15); do
             if ! kill -0 "$(cat /tmp/nu-device-server.pid)" 2>/dev/null; then
               echo "Nu App server stopped unexpectedly"
               cat /tmp/nu-device-server.log
@@ -195,16 +239,6 @@ jobs:
               cat /tmp/cloudflared.log
               exit 1
             fi
-
-            if grep -q '^DAY1_COMPLETED ' /tmp/nu-device-watcher.log 2>/dev/null; then
-              USER_ID=$(awk '/^DAY1_COMPLETED / {print $2; exit}' /tmp/nu-device-watcher.log)
-              echo "::notice title=V172 Day 1 completed::Synthetic user $USER_ID completed Day 1."
-            fi
-            if grep -q '^DUE_AGED ' /tmp/nu-device-watcher.log 2>/dev/null; then
-              USER_ID=$(awk '/^DUE_AGED / {print $2; exit}' /tmp/nu-device-watcher.log)
-              echo "::notice title=V172 48h overdue armed::Synthetic user $USER_ID now has next_unlock_at 48 hours overdue."
-            fi
-
             sleep 60
           done
 
