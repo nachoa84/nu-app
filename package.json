@@ -11,7 +11,11 @@
     "test:v113": "node --test tests/runtime-hardening-v113.test.js",
     "test:v114": "node --test tests/http-cache-v114.test.js",
     "test:v115": "node --test tests/shared-rate-limit-v115.test.js",
-    "test:v116": "node --test tests/distributed-scheduler-v116.test.js"
+    "test:v116": "node --test tests/distributed-scheduler-v116.test.js",
+    "worker:notifications:audit": "node notification-worker.js audit",
+    "worker:notifications:consume": "node notification-worker.js consume",
+    "test:notification-worker-v1": "node --test tests/notification-worker-v1.test.js",
+    "test:notification-worker-postgres-v1": "node --test tests/notification-worker-postgres-v1.integration.test.js"
   },
   "engines": {
     "node": ">=20"

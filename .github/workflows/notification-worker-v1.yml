@@ -1,0 +1,53 @@
+name: Notification worker V1 verification
+
+on:
+  push:
+    branches:
+      - work/notification-worker-v1
+  workflow_dispatch:
+
+jobs:
+  worker-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nu_worker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d nu_worker_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/nu_worker_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Normalize Replit registry references in runner copy
+        run: sed -i 's#https://package-proxy.replit.com/npm/#https://registry.npmjs.org/#g' package-lock.json
+      - run: npm ci
+      - name: Syntax
+        run: >-
+          node --check notification-worker.js &&
+          node --check notification-worker-config-v1.js &&
+          node --check notification-eligibility-v1.js &&
+          node --check notification-worker-core-v1.js &&
+          node --check notification-worker-store-v1.js &&
+          node --check web-push-transport-v1.js
+      - name: Unit tests
+        run: node --test tests/notification-worker-v1.test.js
+      - name: PostgreSQL integration
+        run: node --test tests/notification-worker-postgres-v1.integration.test.js
+      - name: Existing notification and scheduler regressions
+        run: >-
+          node --test tests/notification-delivery-v111.test.js &&
+          node --test tests/distributed-scheduler-v116.test.js &&
+          node --test tests/release-entrypoint.test.js
