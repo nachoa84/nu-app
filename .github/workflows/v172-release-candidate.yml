@@ -11,6 +11,7 @@ on:
       - server.js
       - service-worker.js
       - tests/pwa-browser-recovery-v172.e2e.js
+      - tests/pwa-upgrade-v172.e2e.js
       - tests/routine-active-sync-v169.test.js
       - tests/routine-active-sync-v172.test.js
       - tests/routine-recovery-flow-v172.integration.test.js
@@ -132,3 +133,54 @@ jobs:
           node --check tests/pwa-browser-recovery-v172.e2e.js
       - name: Run browser PWA recovery verification
         run: node tests/pwa-browser-recovery-v172.e2e.js
+
+  browser-pwa-upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nu_test
+          POSTGRES_PASSWORD: nu_test
+          POSTGRES_DB: nu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U nu_test -d nu_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      TEST_DATABASE_URL: postgresql://nu_test:nu_test@127.0.0.1:5432/nu_test
+      DATABASE_URL: postgresql://nu_test:nu_test@127.0.0.1:5432/nu_test
+      V172_BASE_MAIN_SHA: 4059a9e22a8d45cbcdb45bf4b9fb69d5f380646a
+      TEST_BROWSER_UPGRADE_PORT: "43176"
+      LEGACY_SCHEDULER_ENABLED: "false"
+      DISABLE_QSTASH: "true"
+      ENABLE_ADMIN_TEST_ROUTES: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      IRIS_AI_USER_ROUTE_ENABLED: "false"
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Verify release candidate base
+        run: test "$(git merge-base HEAD $V172_BASE_MAIN_SHA)" = "$V172_BASE_MAIN_SHA"
+      - name: Normalize Replit registry references in runner copy
+        run: sed -i 's#http://package-firewall.replit.local/npm/#https://registry.npmjs.org/#g' package-lock.json
+      - name: Install exact app dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefer-online --progress=false
+      - name: Install browser test dependency without changing repository
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.55.0
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - name: Check upgrade test syntax
+        run: node --check tests/pwa-upgrade-v172.e2e.js
+      - name: Run installed-PWA upgrade verification
+        run: node tests/pwa-upgrade-v172.e2e.js
