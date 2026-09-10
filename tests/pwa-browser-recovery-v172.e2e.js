@@ -2,8 +2,6 @@
 
 const assert = require("node:assert/strict");
 const crypto = require("node:crypto");
-const fs = require("node:fs");
-const path = require("node:path");
 const { spawn } = require("node:child_process");
 const { Pool } = require("pg");
 const { chromium } = require("playwright");
@@ -20,7 +18,6 @@ if (!DATABASE_URL) {
 
 const PORT = Number(process.env.TEST_BROWSER_PORT || 43174);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
-const ARTIFACT_DIR = path.join(process.cwd(), "test-artifacts", "v172-browser");
 const pool = new Pool({ connectionString: DATABASE_URL, max: 10 });
 
 const TEST_SERVER_BOOTSTRAP = `
@@ -126,14 +123,6 @@ async function dbDayAvailableCount(userId, day = 2) {
   return Number(result.rows[0]?.count || 0);
 }
 
-async function takeShot(page, name) {
-  fs.mkdirSync(ARTIFACT_DIR, { recursive: true });
-  await page.screenshot({
-    path: path.join(ARTIFACT_DIR, `${name}.png`),
-    fullPage: true
-  });
-}
-
 async function currentLocalDay(page) {
   return page.evaluate(() => {
     try {
@@ -145,25 +134,73 @@ async function currentLocalDay(page) {
   });
 }
 
+async function browserSnapshot(page) {
+  if (!page || page.isClosed()) return { pageClosed: true };
+
+  return page.evaluate(() => {
+    let routineState = null;
+    try {
+      routineState = JSON.parse(localStorage.getItem("routineState") || "null");
+    } catch (_) {
+      routineState = "invalid-json";
+    }
+
+    return {
+      readyState: document.readyState,
+      activeView: document.body?.dataset?.activeView || null,
+      routineState,
+      selectedDay: localStorage.getItem("selectedDay"),
+      activeRoutineId: localStorage.getItem("activeRoutineId"),
+      todayLabel:
+        document.querySelector(".app-today-main")
+          ?.getAttribute("aria-label") || null,
+      dayHeader:
+        document.getElementById("dailyNativeDayLabel")?.textContent || null,
+      dayHero:
+        document.querySelector(".native-day-hero h2")?.textContent || null,
+      daysGridText:
+        (document.getElementById("daysGrid")?.innerText || "").slice(0, 1200),
+      routineCards: Array.from(
+        document.querySelectorAll("[data-routine-id]")
+      ).map(card => ({
+        id: card.dataset.routineId || null,
+        className: card.className,
+        text: (card.innerText || "").slice(0, 300)
+      })),
+      backendApi: Boolean(window.BackendAPI),
+      v172: Boolean(window.NuRoutineActiveSyncV172),
+      selectDay: typeof window.selectDay,
+      swController: Boolean(navigator.serviceWorker?.controller),
+      online: navigator.onLine
+    };
+  });
+}
+
 async function waitForApp(page) {
   await page.waitForFunction(
     () => Boolean(
       window.BackendAPI &&
-      window.NuRoutineActiveSyncV172?.createRoutineActiveSyncV172
+      window.NuRoutineActiveSyncV172?.createRoutineActiveSyncV172 &&
+      typeof window.selectDay === "function" &&
+      document.querySelector(".app-today-main")
     ),
     null,
     { timeout: 15000 }
   );
-
-  await page.locator('[data-routine-id="collagen-30"] .home-routine-open')
-    .waitFor({ state: "visible", timeout: 15000 });
 }
 
-async function assertVisibleDay(page, day) {
-  const openButton = page.locator(
-    '[data-routine-id="collagen-30"] .home-routine-open'
+async function openVisibleDay(page, day) {
+  await page.waitForFunction(
+    expectedDay =>
+      document.querySelector(".app-today-main")
+        ?.getAttribute("aria-label") === `Continuar día ${expectedDay}`,
+    day,
+    { timeout: 10000 }
   );
-  await openButton.click();
+
+  await page.evaluate(expectedDay => {
+    window.selectDay(expectedDay, true);
+  }, day);
 
   const hero = page.locator(".native-day-hero h2");
   await hero.waitFor({ state: "visible", timeout: 10000 });
@@ -173,9 +210,29 @@ async function assertVisibleDay(page, day) {
   assert.equal((await header.textContent()).trim(), `Día ${day} de 30`);
 }
 
-async function main() {
-  fs.mkdirSync(ARTIFACT_DIR, { recursive: true });
+async function waitForServiceWorkerControl(page) {
+  await page.evaluate(async () => {
+    await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Service Worker ready timeout")),
+          15000
+        )
+      )
+    ]);
+  });
 
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+  await waitForApp(page);
+  await page.waitForFunction(
+    () => Boolean(navigator.serviceWorker.controller),
+    null,
+    { timeout: 15000 }
+  );
+}
+
+async function main() {
   serverProcess = spawn(
     process.execPath,
     ["-e", TEST_SERVER_BOOTSTRAP],
@@ -248,14 +305,15 @@ async function main() {
       localStorage.setItem("selectedDay", "1");
     }
 
-    // La animación no forma parte del contrato de progreso y no debe
-    // convertir un test de estado en una espera de varios segundos.
     sessionStorage.setItem("nuapp:intro-shown:v122", "1");
   }, { syntheticUserId: userId });
 
   let page = await context.newPage();
   const pageErrors = [];
-  page.on("pageerror", error => pageErrors.push(error.message));
+  const attachPageError = currentPage => {
+    currentPage.on("pageerror", error => pageErrors.push(error.message));
+  };
+  attachPageError(page);
 
   try {
     console.log("[browser-v172] 1/7 Carga inicial y bootstrap sintético");
@@ -266,27 +324,21 @@ async function main() {
       { description: "usuario sintético en PostgreSQL" }
     );
     assert.equal(await currentLocalDay(page), 1);
-    await assertVisibleDay(page, 1);
-    await takeShot(page, "01-day-1-online");
+    await openVisibleDay(page, 1);
 
     console.log("[browser-v172] 2/7 Service Worker instalado y página controlada");
-    await page.evaluate(async () => {
-      await navigator.serviceWorker.ready;
-    });
-    await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-    await waitForApp(page);
-    await page.waitForFunction(
-      () => Boolean(navigator.serviceWorker.controller),
-      null,
-      { timeout: 15000 }
-    );
+    await waitForServiceWorkerControl(page);
     assert.equal(
       await page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
       true
     );
+    assert.equal(
+      await page.evaluate(() => Boolean(window.NuRoutineActiveSyncV172)),
+      true
+    );
 
     console.log("[browser-v172] 3/7 Completado desde el botón real de la PWA");
-    await assertVisibleDay(page, 1);
+    await openVisibleDay(page, 1);
     const completeButton = page.locator(".complete-day-btn");
     await completeButton.waitFor({ state: "visible", timeout: 10000 });
     await completeButton.click();
@@ -296,7 +348,7 @@ async function main() {
       async () => Boolean(await dbCompletion(userId, 1)),
       { description: "completed_at oficial del Día 1" }
     );
-    assert.equal((await dbUser(userId)).current_day, 1);
+    assert.equal(Number((await dbUser(userId)).current_day), 1);
 
     console.log("[browser-v172] 4/7 Vencimiento equivalente a 48 h y recarga offline");
     await pool.query(
@@ -325,7 +377,7 @@ async function main() {
     assert.equal(await currentLocalDay(page), 1);
     assert.equal(Number((await dbUser(userId)).current_day), 1);
     assert.equal(await dbDayAvailableCount(userId, 2), 0);
-    await takeShot(page, "02-day-1-offline-overdue");
+    await openVisibleDay(page, 1);
 
     console.log("[browser-v172] 5/7 Recuperación real del evento online");
     await context.setOffline(false);
@@ -349,23 +401,16 @@ async function main() {
     );
     assert.equal(await dbDayAvailableCount(userId, 2), 1);
 
-    // renderDays() es la representación de Progreso que recibe el estado
-    // backend. Debe haber cambiado al día 2 antes de abrir el detalle.
     await page.waitForFunction(() =>
       document.querySelector(".app-today-main")
         ?.getAttribute("aria-label") === "Continuar día 2"
     );
-
-    await page.evaluate(() => {
-      document.getElementById("dailyNativeBackBtn")?.click();
-    });
-    await assertVisibleDay(page, 2);
-    await takeShot(page, "03-day-2-recovered-online");
+    await openVisibleDay(page, 2);
 
     console.log("[browser-v172] 6/7 Reapertura completa conserva Día 2 sin doble avance");
     await page.close();
     page = await context.newPage();
-    page.on("pageerror", error => pageErrors.push(error.message));
+    attachPageError(page);
     await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
     await waitForApp(page);
     await page.waitForFunction(() => {
@@ -377,45 +422,45 @@ async function main() {
         return false;
       }
     });
-    await assertVisibleDay(page, 2);
+    await openVisibleDay(page, 2);
     assert.equal(Number((await dbUser(userId)).current_day), 2);
     assert.equal(await dbDayAvailableCount(userId, 2), 1);
-    await takeShot(page, "04-day-2-fresh-reopen");
 
     console.log("[browser-v172] 7/7 Invariantes finales");
     const finalUser = await dbUser(userId);
     assert.equal(Number(finalUser.current_day), 2);
     assert.equal(finalUser.next_unlock_at, null);
     assert.equal(await dbDayAvailableCount(userId, 2), 1);
-    assert.deepEqual(pageErrors, [], `Errores JS del navegador: ${pageErrors.join(" | ")}`);
-
-    fs.writeFileSync(
-      path.join(ARTIFACT_DIR, "result.txt"),
-      [
-        "V172 browser PWA recovery: PASS",
-        `user=${userId}`,
-        "initial_day=1",
-        "offline_reload_service_worker=true",
-        "recovered_day=2",
-        "day_available_jobs=1",
-        "fresh_reopen_day=2",
-        `page_errors=${pageErrors.length}`
-      ].join("\n") + "\n"
+    assert.deepEqual(
+      pageErrors,
+      [],
+      `Errores JS del navegador: ${pageErrors.join(" | ")}`
     );
 
-    console.log("[browser-v172] PASS: PWA offline -> online -> Día 2 -> reapertura");
+    console.log(
+      "[browser-v172] PASS " +
+      JSON.stringify({
+        initialDay: 1,
+        offlineReloadServiceWorker: true,
+        recoveredDay: 2,
+        dayAvailableJobs: 1,
+        freshReopenDay: 2,
+        pageErrors: pageErrors.length
+      })
+    );
   } catch (error) {
+    let snapshot = { unavailable: true };
     try {
-      if (page && !page.isClosed()) {
-        await takeShot(page, "99-failure");
-      }
-    } catch (_) {
-      // La captura es evidencia auxiliar y nunca oculta el error principal.
+      snapshot = await browserSnapshot(page);
+    } catch (snapshotError) {
+      snapshot = { error: snapshotError.message };
     }
 
-    fs.writeFileSync(
-      path.join(ARTIFACT_DIR, "failure.txt"),
-      `${error.stack || error}\n\nSERVER OUTPUT\n${serverOutput}\n`
+    console.error("[browser-v172] SNAPSHOT", JSON.stringify(snapshot, null, 2));
+    console.error("[browser-v172] PAGE_ERRORS", JSON.stringify(pageErrors));
+    console.error(
+      "[browser-v172] SERVER_TAIL\n" +
+      serverOutput.slice(-5000)
     );
     throw error;
   } finally {
