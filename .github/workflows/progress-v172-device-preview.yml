@@ -1,0 +1,248 @@
+name: V172 physical-device preview
+
+on:
+  push:
+    branches:
+      - work/progress-stabilization-v172
+    paths:
+      - .github/workflows/progress-v172-device-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  physical-device-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nu_device
+          POSTGRES_PASSWORD: nu_device
+          POSTGRES_DB: nu_device
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U nu_device -d nu_device"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: postgresql://nu_device:nu_device@127.0.0.1:5432/nu_device
+      PORT: "43175"
+      LEGACY_SCHEDULER_ENABLED: "false"
+      DISABLE_QSTASH: "true"
+      ENABLE_ADMIN_TEST_ROUTES: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      IRIS_AI_USER_ROUTE_ENABLED: "false"
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Normalize Replit registry references in runner copy
+        run: sed -i 's#http://package-firewall.replit.local/npm/#https://registry.npmjs.org/#g' package-lock.json
+
+      - name: Install exact app dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefer-online --progress=false
+
+      - name: Start Nu App against isolated PostgreSQL
+        shell: bash
+        run: |
+          node - <<'NODE' > /tmp/nu-device-server.log 2>&1 &
+          const storagePath = require.resolve('@replit/object-storage');
+          const storageModule = require(storagePath);
+          class TestObjectStorageClient {
+            async getBucket() {
+              throw new Error('Object Storage disabled in V172 physical-device preview.');
+            }
+          }
+          require.cache[storagePath].exports = {
+            ...storageModule,
+            Client: TestObjectStorageClient
+          };
+          require('./server.js');
+          NODE
+          echo $! > /tmp/nu-device-server.pid
+
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:43175/api/health >/tmp/nu-device-health.json 2>/dev/null; then
+              cat /tmp/nu-device-health.json
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Nu App did not become healthy"
+          cat /tmp/nu-device-server.log
+          exit 1
+
+      - name: Open temporary HTTPS tunnel
+        shell: bash
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /tmp/cloudflared
+          chmod +x /tmp/cloudflared
+          /tmp/cloudflared tunnel --no-autoupdate --url http://127.0.0.1:43175 >/tmp/cloudflared.log 2>&1 &
+          echo $! > /tmp/cloudflared.pid
+
+          PREVIEW_URL=""
+          for i in $(seq 1 60); do
+            PREVIEW_URL=$(grep -Eo 'https://[-a-z0-9]+\.trycloudflare\.com' /tmp/cloudflared.log | head -n 1 || true)
+            if [ -n "$PREVIEW_URL" ]; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "Cloudflare quick tunnel URL not found"
+            cat /tmp/cloudflared.log
+            exit 1
+          fi
+
+          for i in $(seq 1 30); do
+            if curl -fsS "$PREVIEW_URL/api/health" >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+
+          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
+          echo "::notice title=V172 Device Preview::$PREVIEW_URL"
+          echo "V172_DEVICE_PREVIEW_URL=$PREVIEW_URL"
+
+      - name: Arm delayed 48-hour overdue simulation
+        shell: bash
+        run: |
+          node - <<'NODE' > /tmp/nu-device-watcher.log 2>&1 &
+          const { Pool } = require('pg');
+          const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 2 });
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+          (async () => {
+            try {
+              for (;;) {
+                const result = await pool.query(`
+                  SELECT u.id
+                  FROM users u
+                  JOIN day_progress dp
+                    ON dp.user_id = u.id
+                   AND dp.cycle = u.cycle
+                   AND dp.day = 1
+                  WHERE u.current_day = 1
+                  ORDER BY dp.completed_at ASC
+                  LIMIT 1
+                `);
+
+                const userId = result.rows[0]?.id;
+                if (!userId) {
+                  await sleep(1000);
+                  continue;
+                }
+
+                console.log(`DAY1_COMPLETED ${userId}`);
+                await sleep(90000);
+
+                const aged = await pool.query(`
+                  UPDATE users
+                  SET next_unlock_at = NOW() - INTERVAL '48 hours'
+                  WHERE id = $1
+                    AND current_day = 1
+                  RETURNING id, current_day, next_unlock_at
+                `, [userId]);
+
+                if (aged.rowCount === 1) {
+                  console.log(`DUE_AGED ${userId} ${aged.rows[0].next_unlock_at.toISOString()}`);
+                } else {
+                  console.log(`DUE_NOT_AGED ${userId}`);
+                }
+                break;
+              }
+            } catch (error) {
+              console.error(error);
+              process.exitCode = 1;
+            } finally {
+              await pool.end();
+            }
+          })();
+          NODE
+          echo $! > /tmp/nu-device-watcher.pid
+          echo "::notice title=V172 Device Test::After tapping Hoy lo hice, close the PWA and disable phone internet within 90 seconds."
+
+      - name: Keep preview alive for physical-device test
+        shell: bash
+        run: |
+          echo "Preview: $PREVIEW_URL"
+          echo "The isolated preview will stay online for 20 minutes."
+          for minute in $(seq 1 20); do
+            if ! kill -0 "$(cat /tmp/nu-device-server.pid)" 2>/dev/null; then
+              echo "Nu App server stopped unexpectedly"
+              cat /tmp/nu-device-server.log
+              exit 1
+            fi
+            if ! kill -0 "$(cat /tmp/cloudflared.pid)" 2>/dev/null; then
+              echo "Cloudflare tunnel stopped unexpectedly"
+              cat /tmp/cloudflared.log
+              exit 1
+            fi
+
+            if grep -q '^DAY1_COMPLETED ' /tmp/nu-device-watcher.log 2>/dev/null; then
+              USER_ID=$(awk '/^DAY1_COMPLETED / {print $2; exit}' /tmp/nu-device-watcher.log)
+              echo "::notice title=V172 Day 1 completed::Synthetic user $USER_ID completed Day 1."
+            fi
+            if grep -q '^DUE_AGED ' /tmp/nu-device-watcher.log 2>/dev/null; then
+              USER_ID=$(awk '/^DUE_AGED / {print $2; exit}' /tmp/nu-device-watcher.log)
+              echo "::notice title=V172 48h overdue armed::Synthetic user $USER_ID now has next_unlock_at 48 hours overdue."
+            fi
+
+            sleep 60
+          done
+
+      - name: Final isolated-state report
+        if: always()
+        shell: bash
+        run: |
+          echo "--- watcher ---"
+          cat /tmp/nu-device-watcher.log 2>/dev/null || true
+          echo "--- server tail ---"
+          tail -n 80 /tmp/nu-device-server.log 2>/dev/null || true
+          echo "--- database state ---"
+          node - <<'NODE'
+          const { Pool } = require('pg');
+          const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+          (async () => {
+            try {
+              const users = await pool.query(`
+                SELECT id, current_day, cycle, next_unlock_at
+                FROM users
+                ORDER BY created_at ASC
+              `);
+              const progress = await pool.query(`
+                SELECT user_id, cycle, day, completed_at
+                FROM day_progress
+                ORDER BY completed_at ASC
+              `);
+              const jobs = await pool.query(`
+                SELECT user_id, cycle, day, kind, status, attempts
+                FROM notification_jobs
+                ORDER BY created_at ASC
+              `);
+              console.log(JSON.stringify({ users: users.rows, progress: progress.rows, jobs: jobs.rows }, null, 2));
+            } finally {
+              await pool.end();
+            }
+          })().catch(error => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
