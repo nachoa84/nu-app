@@ -182,6 +182,7 @@ jobs:
                    AND dp.cycle = u.cycle
                    AND dp.day = 1
                   WHERE u.current_day = 1
+                    AND dp.completed_at IS NOT NULL
                   ORDER BY dp.completed_at ASC
                   LIMIT 1
                 `);
