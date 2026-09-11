@@ -9,6 +9,7 @@ if (!DATABASE_URL) {
   test("PostgreSQL aislado requerido", { skip: true }, () => {});
 } else {
   const { Pool } = require("pg");
+  const { buildNotificationPoolOptionsV1 } = require("../notification-worker-config-v1");
   const { runNotificationWorkerV1 } = require("../notification-worker-core-v1");
   const { createNotificationWorkerStoreV1 } = require("../notification-worker-store-v1");
 
@@ -151,6 +152,27 @@ if (!DATABASE_URL) {
     ]);
     const ledger = await pool.query("SELECT COUNT(*)::integer AS count FROM notification_deliveries");
     assert.equal(ledger.rows[0].count, 0);
+  });
+
+  test("audit usa una sesión PostgreSQL que rechaza escrituras", async () => {
+    const auditPool = new Pool(buildNotificationPoolOptionsV1({
+      databaseUrl: DATABASE_URL,
+      dryRun: true
+    }));
+    try {
+      const setting = await auditPool.query("SHOW default_transaction_read_only");
+      assert.equal(setting.rows[0].default_transaction_read_only, "on");
+      await assert.rejects(
+        auditPool.query("INSERT INTO users (id) VALUES ('must-not-write')"),
+        /read-only transaction/
+      );
+      const count = await pool.query(
+        "SELECT COUNT(*)::integer AS count FROM users WHERE id = 'must-not-write'"
+      );
+      assert.equal(count.rows[0].count, 0);
+    } finally {
+      await auditPool.end();
+    }
   });
 
   test("consume crea ledger y confirma exactamente una entrega", async () => {
