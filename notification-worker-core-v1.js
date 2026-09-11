@@ -72,7 +72,7 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
       };
     }
 
-    await store.recoverStaleWork();
+    await store.recoverStaleWork(config.canaryUserId || null);
     const { decisions, classification } = await inspect();
 
     const terminal = decisions.filter(decision =>

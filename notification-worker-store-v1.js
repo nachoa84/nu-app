@@ -286,7 +286,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
     return [...groups.values()];
   }
 
-  async function recoverStaleWork() {
+  async function recoverStaleWork(canaryUserId = null) {
     const seconds = Math.ceil(config.staleMs / 1000);
     return transaction(async client => {
       let recoveredSources = 0;
@@ -297,19 +297,29 @@ function createNotificationWorkerStoreV1({ pool, config }) {
                attempts = LEAST(attempts, $2),
                last_error = 'worker_v1:stale_processing', updated_at = NOW()
            WHERE status = 'processing'
-             AND updated_at <= NOW() - make_interval(secs => $1)`,
-          [seconds, config.maxAttempts]
+             AND updated_at <= NOW() - make_interval(secs => $1)
+             AND ($3::text IS NULL OR user_id = $3)`,
+          [seconds, config.maxAttempts, canaryUserId]
         );
         recoveredSources += result.rowCount;
       }
       const deliveries = await client.query(
-        `UPDATE notification_deliveries
+        `UPDATE notification_deliveries AS delivery
          SET status = CASE WHEN attempts < $2 THEN 'retryable' ELSE 'permanent' END,
              last_error = 'worker_v1:stale_processing', processing_at = NULL,
              next_attempt_at = NOW(), updated_at = NOW()
-         WHERE status = 'processing'
-           AND processing_at <= NOW() - make_interval(secs => $1)`,
-        [seconds, config.maxAttempts]
+         WHERE delivery.status = 'processing'
+           AND delivery.processing_at <= NOW() - make_interval(secs => $1)
+           AND (
+             $3::text IS NULL
+             OR EXISTS (
+               SELECT 1
+               FROM notification_delivery_batches AS batch
+               WHERE batch.logical_key = delivery.logical_key
+                 AND batch.user_id = $3
+             )
+           )`,
+        [seconds, config.maxAttempts, canaryUserId]
       );
       return { sources: recoveredSources, deliveries: deliveries.rowCount };
     });

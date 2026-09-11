@@ -265,7 +265,7 @@ test("consume persiste descarte antes de reclamar y procesa una vez", async () =
   const store = {
     async listOpenRoutineJobs() { calls.push(["read"]); return [old, current]; },
     async withRunLock(callback) { return callback(true); },
-    async recoverStaleWork() { calls.push(["recover"]); },
+    async recoverStaleWork(canaryUserId) { calls.push(["recover", canaryUserId]); },
     async persistTerminalDecisions(items) { calls.push(["terminal", items.map(x => x.outcome)]); },
     async claimSourceBatch(batch) { calls.push(["claim", batch.userId]); return batch; },
     async processClaimedBatch() { calls.push(["process"]); return { outcome: "sent", pushAttempts: 1 }; }
@@ -277,7 +277,7 @@ test("consume persiste descarte antes de reclamar y procesa una vez", async () =
     now: () => NOW
   });
   assert.deepEqual(calls, [
-    ["recover"],
+    ["recover", null],
     ["read"],
     ["terminal", ["expired"]],
     ["claim", "user-a"],
@@ -285,6 +285,32 @@ test("consume persiste descarte antes de reclamar y procesa una vez", async () =
   ]);
   assert.equal(summary.sentBatches, 1);
   assert.equal(summary.pushAttempts, 1);
+});
+
+test("consume propaga el alcance canario a la recuperación stale", async () => {
+  const calls = [];
+  const store = {
+    async listOpenRoutineJobs(_limit, canaryUserId) {
+      calls.push(["read", canaryUserId]);
+      return [];
+    },
+    async withRunLock(callback) { return callback(true); },
+    async recoverStaleWork(canaryUserId) { calls.push(["recover", canaryUserId]); },
+    async persistTerminalDecisions() { calls.push(["terminal"]); }
+  };
+  const summary = await runNotificationWorkerV1({
+    store,
+    transport: { async send() { throw new Error("sin trabajos no envía"); } },
+    config: baseConfig({ dryRun: false, canaryUserId: "user-canary" }),
+    now: () => NOW
+  });
+  assert.deepEqual(calls, [
+    ["recover", "user-canary"],
+    ["read", "user-canary"],
+    ["terminal"]
+  ]);
+  assert.equal(summary.scope, "canary");
+  assert.equal(summary.pushAttempts, 0);
 });
 
 test("payload conserva navegación y no incorpora secretos", () => {

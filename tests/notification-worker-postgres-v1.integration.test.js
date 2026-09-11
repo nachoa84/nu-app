@@ -225,6 +225,93 @@ if (!DATABASE_URL) {
     ]);
   });
 
+  test("recuperación canaria aísla ambas colas y el ledger por usuario", async () => {
+    await seedUser("canary-user");
+    await seedUser("untouched-user");
+    await pool.query(
+      `INSERT INTO notification_jobs (
+         user_id, day, status, attempts, created_at, updated_at
+       ) VALUES
+         ('canary-user', 7, 'processing', 1, NOW() - INTERVAL '3 minutes', NOW() - INTERVAL '2 minutes'),
+         ('untouched-user', 7, 'processing', 1, NOW() - INTERVAL '3 minutes', NOW() - INTERVAL '2 minutes')`
+    );
+    await pool.query(
+      `INSERT INTO routine_notification_jobs (
+         user_id, routine_id, day, scheduled_for,
+         status, attempts, created_at, updated_at
+       ) VALUES
+         ('canary-user', 'lumispa-10', 3, NOW() - INTERVAL '3 minutes',
+          'processing', 1, NOW() - INTERVAL '3 minutes', NOW() - INTERVAL '2 minutes'),
+         ('untouched-user', 'lumispa-10', 3, NOW() - INTERVAL '3 minutes',
+          'processing', 1, NOW() - INTERVAL '3 minutes', NOW() - INTERVAL '2 minutes')`
+    );
+    await pool.query(
+      `INSERT INTO notification_delivery_batches (logical_key, user_id, payload, status)
+       VALUES
+         ('canary-stale', 'canary-user', '{}'::jsonb, 'pending'),
+         ('untouched-stale', 'untouched-user', '{}'::jsonb, 'pending')`
+    );
+    await pool.query(
+      `INSERT INTO notification_deliveries (
+         logical_key, subscription_id, endpoint_hash, subscription_snapshot,
+         status, attempts, next_attempt_at, processing_at, updated_at
+       )
+       SELECT
+         CASE WHEN user_id = 'canary-user' THEN 'canary-stale' ELSE 'untouched-stale' END,
+         id,
+         CASE WHEN user_id = 'canary-user' THEN 'canary-hash' ELSE 'untouched-hash' END,
+         subscription,
+         'processing', 1, NOW() - INTERVAL '3 minutes',
+         NOW() - INTERVAL '2 minutes', NOW() - INTERVAL '2 minutes'
+       FROM push_subscriptions`
+    );
+
+    const store = createNotificationWorkerStoreV1({ pool, config });
+    const recovered = await store.recoverStaleWork("canary-user");
+    assert.deepEqual(recovered, { sources: 2, deliveries: 1 });
+
+    const collagen = await pool.query(
+      `SELECT user_id, status, attempts, last_error
+       FROM notification_jobs ORDER BY user_id`
+    );
+    assert.deepEqual(collagen.rows, [
+      { user_id: "canary-user", status: "pending", attempts: 1, last_error: "worker_v1:stale_processing" },
+      { user_id: "untouched-user", status: "processing", attempts: 1, last_error: null }
+    ]);
+    const routines = await pool.query(
+      `SELECT user_id, status, attempts, last_error
+       FROM routine_notification_jobs ORDER BY user_id`
+    );
+    assert.deepEqual(routines.rows, [
+      { user_id: "canary-user", status: "pending", attempts: 1, last_error: "worker_v1:stale_processing" },
+      { user_id: "untouched-user", status: "processing", attempts: 1, last_error: null }
+    ]);
+    const deliveries = await pool.query(
+      `SELECT batch.user_id, delivery.status, delivery.attempts,
+              delivery.processing_at, delivery.last_error
+       FROM notification_deliveries AS delivery
+       JOIN notification_delivery_batches AS batch USING (logical_key)
+       ORDER BY batch.user_id`
+    );
+    assert.deepEqual(deliveries.rows, [
+      {
+        user_id: "canary-user",
+        status: "retryable",
+        attempts: 1,
+        processing_at: null,
+        last_error: "worker_v1:stale_processing"
+      },
+      {
+        user_id: "untouched-user",
+        status: "processing",
+        attempts: 1,
+        processing_at: deliveries.rows[1].processing_at,
+        last_error: null
+      }
+    ]);
+    assert.ok(deliveries.rows[1].processing_at instanceof Date);
+  });
+
   test("consume recupera y entrega una fuente stale que quedó processing", async () => {
     await seedUser();
     await pool.query(
