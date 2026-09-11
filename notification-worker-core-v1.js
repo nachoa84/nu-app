@@ -38,7 +38,10 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
   const startedAt = now();
   const deadline = startedAt + config.runBudgetMs;
   async function inspect() {
-    const rows = await store.listOpenRoutineJobs(config.maxPerRun);
+    const rows = await store.listOpenRoutineJobs(
+      config.maxPerRun,
+      config.canaryUserId || null
+    );
     const decisions = classifyRoutineJobsV1(rows, {
       now: startedAt,
       ttlHours: config.ttlHours
@@ -50,6 +53,7 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
     const { classification } = await inspect();
     return {
       mode: "dry-run",
+      scope: config.canaryUserId ? "canary" : "all",
       classification,
       writes: 0,
       pushAttempts: 0
@@ -60,6 +64,7 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
     if (!locked) {
       return {
         mode: "consume",
+        scope: config.canaryUserId ? "canary" : "all",
         locked: false,
         classification: null,
         writes: 0,
@@ -96,6 +101,7 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
 
     return {
       mode: "consume",
+      scope: config.canaryUserId ? "canary" : "all",
       locked: true,
       classification,
       processedBatches: results.length,

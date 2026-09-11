@@ -23,7 +23,8 @@ if (!DATABASE_URL) {
     maxAttempts: 5,
     retryBaseMs: 30000,
     staleMs: 60000,
-    pushTimeoutMs: 10000
+    pushTimeoutMs: 10000,
+    canaryUserId: null
   };
 
   async function schema() {
@@ -194,6 +195,34 @@ if (!DATABASE_URL) {
     assert.deepEqual(source.rows, [{ status: "sent", attempts: 1 }]);
     const delivery = await pool.query("SELECT status, attempts FROM notification_deliveries");
     assert.deepEqual(delivery.rows, [{ status: "sent", attempts: 1 }]);
+  });
+
+  test("consume canario entrega sólo al usuario indicado", async () => {
+    await seedUser("canary-user");
+    await seedUser("untouched-user");
+    await pool.query(
+      `INSERT INTO notification_jobs (user_id, day, created_at, updated_at)
+       VALUES ('canary-user', 6, NOW() - INTERVAL '1 minute', NOW() - INTERVAL '1 minute'),
+              ('untouched-user', 6, NOW() - INTERVAL '1 minute', NOW() - INTERVAL '1 minute')`
+    );
+    const endpoints = [];
+    const store = createNotificationWorkerStoreV1({ pool, config });
+    const summary = await runNotificationWorkerV1({
+      store,
+      transport: {
+        async send(subscription) { endpoints.push(subscription.endpoint); }
+      },
+      config: { ...config, canaryUserId: "canary-user" }
+    });
+    assert.equal(summary.scope, "canary");
+    assert.deepEqual(endpoints, ["https://push.example/canary-user"]);
+    const sources = await pool.query(
+      "SELECT user_id, status FROM notification_jobs ORDER BY user_id"
+    );
+    assert.deepEqual(sources.rows, [
+      { user_id: "canary-user", status: "sent" },
+      { user_id: "untouched-user", status: "pending" }
+    ]);
   });
 
   test("consume recupera y entrega una fuente stale que quedó processing", async () => {

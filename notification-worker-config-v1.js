@@ -48,6 +48,7 @@ function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.s
     retryBaseMs: boundedInteger(env, "NOTIFICATION_RETRY_BASE_MS", 60000, 30000, 3600000),
     staleMs: boundedInteger(env, "NOTIFICATION_DELIVERY_STALE_MS", 300000, 60000, 1800000),
     pushTimeoutMs: boundedInteger(env, "NOTIFICATION_PUSH_TIMEOUT_MS", 10000, 1000, 30000),
+    canaryUserId: String(env.NOTIFICATION_CANARY_USER_ID || "").trim() || null,
     vapidPublicKey: String(env.VAPID_PUBLIC_KEY || "").trim(),
     vapidPrivateKey: String(env.VAPID_PRIVATE_KEY || "").trim(),
     vapidSubject: String(env.VAPID_SUBJECT || "").trim()
@@ -58,6 +59,11 @@ function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.s
   }
   if (config.pushTimeoutMs >= config.staleMs) {
     throw new Error("NOTIFICATION_PUSH_TIMEOUT_MS debe ser menor que NOTIFICATION_DELIVERY_STALE_MS.");
+  }
+  if (config.canaryUserId && (
+    config.canaryUserId.length > 128 || /[\u0000-\u001f\u007f]/.test(config.canaryUserId)
+  )) {
+    throw new Error("NOTIFICATION_CANARY_USER_ID inválido.");
   }
 
   if (!dryRun) {

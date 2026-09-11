@@ -31,6 +31,7 @@ function baseConfig(overrides = {}) {
     concurrency: 5,
     maxAttempts: 5,
     retryBaseMs: 60000,
+    canaryUserId: null,
     ...overrides
   };
 }
@@ -91,6 +92,21 @@ test("un flag dry-run prevalece incluso sobre consume", () => {
     ["consume"]
   );
   assert.equal(config.dryRun, true);
+});
+
+test("acepta un usuario canario explícito y rechaza identificadores inseguros", () => {
+  const config = readNotificationWorkerConfigV1({
+    DATABASE_URL: "postgres://isolated/test",
+    NOTIFICATION_CANARY_USER_ID: "user-canary"
+  }, ["audit"]);
+  assert.equal(config.canaryUserId, "user-canary");
+  assert.throws(
+    () => readNotificationWorkerConfigV1({
+      DATABASE_URL: "postgres://isolated/test",
+      NOTIFICATION_CANARY_USER_ID: "bad\nuser"
+    }, ["audit"]),
+    /CANARY_USER_ID inválido/
+  );
 });
 
 test("el timeout Web Push debe vencer antes que la recuperación stale", () => {
@@ -194,6 +210,26 @@ test("dry-run solo lee y jamás toma lock, escribe o envía", async () => {
   assert.equal(summary.classification.eligible, 1);
   assert.equal(summary.writes, 0);
   assert.equal(summary.pushAttempts, 0);
+});
+
+test("el modo canario limita la lectura al usuario configurado", async () => {
+  let receivedUserId;
+  const store = {
+    async listOpenRoutineJobs(_limit, canaryUserId) {
+      receivedUserId = canaryUserId;
+      return [row({ user_id: canaryUserId })];
+    },
+    async withRunLock() { throw new Error("dry-run no toma lock"); }
+  };
+  const summary = await runNotificationWorkerV1({
+    store,
+    transport: { async send() { throw new Error("dry-run no envía"); } },
+    config: baseConfig({ canaryUserId: "user-canary" }),
+    now: () => NOW
+  });
+  assert.equal(receivedUserId, "user-canary");
+  assert.equal(summary.scope, "canary");
+  assert.equal(summary.classification.eligible, 1);
 });
 
 test("un segundo worker sin advisory lock sale sin reclamar", async () => {

@@ -94,7 +94,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
     }
   }
 
-  async function listOpenRoutineJobs(limit) {
+  async function listOpenRoutineJobs(limit, canaryUserId = null) {
     const result = await pool.query(
       `SELECT *
        FROM (
@@ -105,6 +105,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
            created_at AS due_at, updated_at
          FROM notification_jobs
          WHERE attempts < $1
+           AND ($4::text IS NULL OR user_id = $4)
            AND (
              status = 'pending'
              OR (
@@ -121,6 +122,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
            scheduled_for AS due_at, updated_at
          FROM routine_notification_jobs
          WHERE attempts < $1
+           AND ($4::text IS NULL OR user_id = $4)
            AND scheduled_for <= NOW()
            AND (
              status = 'pending'
@@ -133,7 +135,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
        ) AS open_jobs
        ORDER BY due_at, source_table, id
        LIMIT $3`,
-      [config.maxAttempts, config.retryBaseMs, limit]
+      [config.maxAttempts, config.retryBaseMs, limit, canaryUserId]
     );
     return result.rows;
   }
