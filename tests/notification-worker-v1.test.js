@@ -163,6 +163,14 @@ test("un segundo worker sin advisory lock sale sin reclamar", async () => {
   assert.deepEqual(calls, []);
 });
 
+test("el contrato de lock cubre el callback asíncrono completo", async () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "notification-worker-store-v1.js"),
+    "utf8"
+  );
+  assert.match(source, /return await callback\(locked\)/);
+});
+
 test("consume persiste descarte antes de reclamar y procesa una vez", async () => {
   const calls = [];
   const current = row({ id: 2 });

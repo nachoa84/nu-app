@@ -83,7 +83,9 @@ function createNotificationWorkerStoreV1({ pool, config }) {
         [WORKER_ADVISORY_LOCK_V1]
       );
       locked = result.rows[0]?.locked === true;
-      return callback(locked);
+      // El await es deliberado: mantiene la misma sesión PostgreSQL y su
+      // advisory lock durante toda la ejecución asíncrona del worker.
+      return await callback(locked);
     } finally {
       if (locked) {
         await client.query("SELECT pg_advisory_unlock($1)", [WORKER_ADVISORY_LOCK_V1]);
