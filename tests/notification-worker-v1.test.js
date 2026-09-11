@@ -5,7 +5,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const { readNotificationWorkerConfigV1 } = require("../notification-worker-config-v1");
+const {
+  buildNotificationPoolOptionsV1,
+  readNotificationWorkerConfigV1
+} = require("../notification-worker-config-v1");
 const {
   classifyRoutineJobsV1,
   summarizeDecisionsV1
@@ -122,6 +125,19 @@ test("el transporte aplica el timeout configurado a Web Push", async () => {
   });
   await transport.send({ endpoint: "https://push.example" }, { title: "test" });
   assert.deepEqual(options, { timeout: 12345 });
+});
+
+test("audit obliga a PostgreSQL a rechazar cualquier escritura", () => {
+  const audit = buildNotificationPoolOptionsV1({
+    databaseUrl: "postgres://isolated/test",
+    dryRun: true
+  });
+  const consume = buildNotificationPoolOptionsV1({
+    databaseUrl: "postgres://isolated/test",
+    dryRun: false
+  });
+  assert.equal(audit.options, "-c default_transaction_read_only=on");
+  assert.equal(Object.hasOwn(consume, "options"), false);
 });
 
 test("clasifica backlog viejo, futuros y filas inválidas sin volverlos elegibles", () => {

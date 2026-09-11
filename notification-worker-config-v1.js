@@ -13,6 +13,19 @@ function boundedInteger(env, name, fallback, minimum, maximum) {
   return parsed;
 }
 
+function buildNotificationPoolOptionsV1(config) {
+  return {
+    connectionString: config.databaseUrl,
+    max: 3,
+    idleTimeoutMillis: 5000,
+    connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
+    ...(config.dryRun
+      ? { options: "-c default_transaction_read_only=on" }
+      : {})
+  };
+}
+
 function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.slice(2)) {
   const command = String(argv[0] || "audit").trim().toLowerCase();
   if (!new Set(["audit", "consume"]).has(command)) {
@@ -64,6 +77,7 @@ function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.s
 
 module.exports = {
   boundedInteger,
+  buildNotificationPoolOptionsV1,
   readNotificationWorkerConfigV1,
   trueFlag
 };

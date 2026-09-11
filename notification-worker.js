@@ -3,20 +3,17 @@
 
 const { Pool } = require("pg");
 const webpush = require("web-push");
-const { readNotificationWorkerConfigV1 } = require("./notification-worker-config-v1");
+const {
+  buildNotificationPoolOptionsV1,
+  readNotificationWorkerConfigV1
+} = require("./notification-worker-config-v1");
 const { runNotificationWorkerV1 } = require("./notification-worker-core-v1");
 const { createNotificationWorkerStoreV1 } = require("./notification-worker-store-v1");
 const { createWebPushTransportV1 } = require("./web-push-transport-v1");
 
 async function main({ env = process.env, argv = process.argv.slice(2) } = {}) {
   const config = readNotificationWorkerConfigV1(env, argv);
-  const pool = new Pool({
-    connectionString: config.databaseUrl,
-    max: 3,
-    idleTimeoutMillis: 5000,
-    connectionTimeoutMillis: 10000,
-    allowExitOnIdle: true
-  });
+  const pool = new Pool(buildNotificationPoolOptionsV1(config));
   try {
     const store = createNotificationWorkerStoreV1({ pool, config });
     const transport = config.dryRun
