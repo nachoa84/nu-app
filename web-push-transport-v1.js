@@ -11,7 +11,9 @@ function createWebPushTransportV1({ webpush, config }) {
   );
   return Object.freeze({
     async send(subscription, payload) {
-      return webpush.sendNotification(subscription, JSON.stringify(payload));
+      return webpush.sendNotification(subscription, JSON.stringify(payload), {
+        timeout: config.pushTimeoutMs
+      });
     }
   });
 }

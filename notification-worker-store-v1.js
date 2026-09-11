@@ -284,17 +284,33 @@ function createNotificationWorkerStoreV1({ pool, config }) {
     return [...groups.values()];
   }
 
-  async function recoverStaleDeliveries() {
+  async function recoverStaleWork() {
     const seconds = Math.ceil(config.staleMs / 1000);
-    await pool.query(
-      `UPDATE notification_deliveries
-       SET status = CASE WHEN attempts < $2 THEN 'retryable' ELSE 'permanent' END,
-           last_error = 'worker_v1:stale_processing', processing_at = NULL,
-           next_attempt_at = NOW(), updated_at = NOW()
-       WHERE status = 'processing'
-         AND processing_at <= NOW() - make_interval(secs => $1)`,
-      [seconds, config.maxAttempts]
-    );
+    return transaction(async client => {
+      let recoveredSources = 0;
+      for (const table of ["notification_jobs", "routine_notification_jobs"]) {
+        const result = await client.query(
+          `UPDATE ${table}
+           SET status = CASE WHEN attempts < $2 THEN 'pending' ELSE 'failed' END,
+               attempts = LEAST(attempts, $2),
+               last_error = 'worker_v1:stale_processing', updated_at = NOW()
+           WHERE status = 'processing'
+             AND updated_at <= NOW() - make_interval(secs => $1)`,
+          [seconds, config.maxAttempts]
+        );
+        recoveredSources += result.rowCount;
+      }
+      const deliveries = await client.query(
+        `UPDATE notification_deliveries
+         SET status = CASE WHEN attempts < $2 THEN 'retryable' ELSE 'permanent' END,
+             last_error = 'worker_v1:stale_processing', processing_at = NULL,
+             next_attempt_at = NOW(), updated_at = NOW()
+         WHERE status = 'processing'
+           AND processing_at <= NOW() - make_interval(secs => $1)`,
+        [seconds, config.maxAttempts]
+      );
+      return { sources: recoveredSources, deliveries: deliveries.rowCount };
+    });
   }
 
   async function claimDeliveries(logicalKey) {
@@ -472,7 +488,7 @@ function createNotificationWorkerStoreV1({ pool, config }) {
     listOpenRoutineJobs,
     persistTerminalDecisions,
     processClaimedBatch,
-    recoverStaleDeliveries,
+    recoverStaleWork,
     withRunLock
   });
 }

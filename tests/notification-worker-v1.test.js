@@ -15,6 +15,7 @@ const {
   runNotificationWorkerV1
 } = require("../notification-worker-core-v1");
 const { buildRoutinePayloadV1 } = require("../notification-worker-store-v1");
+const { createWebPushTransportV1 } = require("../web-push-transport-v1");
 
 const NOW = Date.parse("2026-09-10T19:00:00.000Z");
 
@@ -89,6 +90,40 @@ test("un flag dry-run prevalece incluso sobre consume", () => {
   assert.equal(config.dryRun, true);
 });
 
+test("el timeout Web Push debe vencer antes que la recuperación stale", () => {
+  const config = readNotificationWorkerConfigV1(
+    { DATABASE_URL: "postgres://isolated/test" },
+    ["audit"]
+  );
+  assert.ok(config.pushTimeoutMs < config.staleMs);
+  assert.throws(
+    () => readNotificationWorkerConfigV1({
+      DATABASE_URL: "postgres://isolated/test",
+      NOTIFICATION_PUSH_TIMEOUT_MS: "30001"
+    }, ["audit"]),
+    /entre 1000 y 30000/
+  );
+});
+
+test("el transporte aplica el timeout configurado a Web Push", async () => {
+  let options;
+  const webpush = {
+    setVapidDetails() {},
+    async sendNotification(_subscription, _payload, received) { options = received; }
+  };
+  const transport = createWebPushTransportV1({
+    webpush,
+    config: {
+      vapidSubject: "mailto:ops@example.com",
+      vapidPublicKey: "public",
+      vapidPrivateKey: "private",
+      pushTimeoutMs: 12345
+    }
+  });
+  await transport.send({ endpoint: "https://push.example" }, { title: "test" });
+  assert.deepEqual(options, { timeout: 12345 });
+});
+
 test("clasifica backlog viejo, futuros y filas inválidas sin volverlos elegibles", () => {
   const decisions = classifyRoutineJobsV1([
     row({ id: 1, created_at: "2026-09-08T18:00:00.000Z", due_at: "2026-09-08T18:00:00.000Z" }),
@@ -148,7 +183,7 @@ test("dry-run solo lee y jamás toma lock, escribe o envía", async () => {
 test("un segundo worker sin advisory lock sale sin reclamar", async () => {
   const calls = [];
   const store = {
-    async listOpenRoutineJobs() { return [row()]; },
+    async listOpenRoutineJobs() { calls.push("read"); return [row()]; },
     async withRunLock(callback) { return callback(false); },
     async persistTerminalDecisions() { calls.push("terminal"); },
     async claimSourceBatch() { calls.push("claim"); }
@@ -176,9 +211,9 @@ test("consume persiste descarte antes de reclamar y procesa una vez", async () =
   const current = row({ id: 2 });
   const old = row({ id: 1, created_at: "2026-09-08T18:00:00.000Z", due_at: "2026-09-08T18:00:00.000Z" });
   const store = {
-    async listOpenRoutineJobs() { return [old, current]; },
+    async listOpenRoutineJobs() { calls.push(["read"]); return [old, current]; },
     async withRunLock(callback) { return callback(true); },
-    async recoverStaleDeliveries() { calls.push(["recover"]); },
+    async recoverStaleWork() { calls.push(["recover"]); },
     async persistTerminalDecisions(items) { calls.push(["terminal", items.map(x => x.outcome)]); },
     async claimSourceBatch(batch) { calls.push(["claim", batch.userId]); return batch; },
     async processClaimedBatch() { calls.push(["process"]); return { outcome: "sent", pushAttempts: 1 }; }
@@ -191,6 +226,7 @@ test("consume persiste descarte antes de reclamar y procesa una vez", async () =
   });
   assert.deepEqual(calls, [
     ["recover"],
+    ["read"],
     ["terminal", ["expired"]],
     ["claim", "user-a"],
     ["process"]

@@ -37,14 +37,17 @@ async function mapLimited(items, concurrency, worker) {
 async function runNotificationWorkerV1({ store, transport, config, now = Date.now }) {
   const startedAt = now();
   const deadline = startedAt + config.runBudgetMs;
-  const rows = await store.listOpenRoutineJobs(config.maxPerRun);
-  const decisions = classifyRoutineJobsV1(rows, {
-    now: startedAt,
-    ttlHours: config.ttlHours
-  });
-  const classification = summarizeDecisionsV1(decisions);
+  async function inspect() {
+    const rows = await store.listOpenRoutineJobs(config.maxPerRun);
+    const decisions = classifyRoutineJobsV1(rows, {
+      now: startedAt,
+      ttlHours: config.ttlHours
+    });
+    return { decisions, classification: summarizeDecisionsV1(decisions) };
+  }
 
   if (config.dryRun) {
+    const { classification } = await inspect();
     return {
       mode: "dry-run",
       classification,
@@ -58,13 +61,14 @@ async function runNotificationWorkerV1({ store, transport, config, now = Date.no
       return {
         mode: "consume",
         locked: false,
-        classification,
+        classification: null,
         writes: 0,
         pushAttempts: 0
       };
     }
 
-    await store.recoverStaleDeliveries();
+    await store.recoverStaleWork();
+    const { decisions, classification } = await inspect();
 
     const terminal = decisions.filter(decision =>
       new Set(["expired", "superseded", "manual_review"]).has(decision.outcome)

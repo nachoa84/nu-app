@@ -34,6 +34,7 @@ function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.s
     ttlHours: boundedInteger(env, "ROUTINE_NOTIFICATION_TTL_HOURS", 24, 1, 72),
     retryBaseMs: boundedInteger(env, "NOTIFICATION_RETRY_BASE_MS", 60000, 30000, 3600000),
     staleMs: boundedInteger(env, "NOTIFICATION_DELIVERY_STALE_MS", 300000, 60000, 1800000),
+    pushTimeoutMs: boundedInteger(env, "NOTIFICATION_PUSH_TIMEOUT_MS", 10000, 1000, 30000),
     vapidPublicKey: String(env.VAPID_PUBLIC_KEY || "").trim(),
     vapidPrivateKey: String(env.VAPID_PRIVATE_KEY || "").trim(),
     vapidSubject: String(env.VAPID_SUBJECT || "").trim()
@@ -41,6 +42,9 @@ function readNotificationWorkerConfigV1(env = process.env, argv = process.argv.s
 
   if (!config.databaseUrl) {
     throw new Error("DATABASE_URL es obligatorio para ejecutar el worker.");
+  }
+  if (config.pushTimeoutMs >= config.staleMs) {
+    throw new Error("NOTIFICATION_PUSH_TIMEOUT_MS debe ser menor que NOTIFICATION_DELIVERY_STALE_MS.");
   }
 
   if (!dryRun) {

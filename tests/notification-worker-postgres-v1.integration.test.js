@@ -21,7 +21,8 @@ if (!DATABASE_URL) {
     concurrency: 5,
     maxAttempts: 5,
     retryBaseMs: 30000,
-    staleMs: 60000
+    staleMs: 60000,
+    pushTimeoutMs: 10000
   };
 
   async function schema() {
@@ -171,6 +172,29 @@ if (!DATABASE_URL) {
     assert.deepEqual(source.rows, [{ status: "sent", attempts: 1 }]);
     const delivery = await pool.query("SELECT status, attempts FROM notification_deliveries");
     assert.deepEqual(delivery.rows, [{ status: "sent", attempts: 1 }]);
+  });
+
+  test("consume recupera y entrega una fuente stale que quedó processing", async () => {
+    await seedUser();
+    await pool.query(
+      `INSERT INTO notification_jobs (
+         user_id, day, status, attempts, created_at, updated_at
+       ) VALUES (
+         'worker-user', 8, 'processing', 1,
+         NOW() - INTERVAL '3 minutes', NOW() - INTERVAL '2 minutes'
+       )`
+    );
+    let sends = 0;
+    const store = createNotificationWorkerStoreV1({ pool, config });
+    const summary = await runNotificationWorkerV1({
+      store,
+      transport: { async send() { sends += 1; } },
+      config
+    });
+    assert.equal(sends, 1);
+    assert.equal(summary.sentBatches, 1);
+    const source = await pool.query("SELECT status, attempts, last_error FROM notification_jobs");
+    assert.deepEqual(source.rows, [{ status: "sent", attempts: 2, last_error: null }]);
   });
 
   test("dos workers simultáneos no duplican el push", async () => {
