@@ -59,11 +59,17 @@ jobs:
           node --check backend-client.js
           node --check routine-active-sync-v172.js
 
-      - name: Run synchronization unit tests
+      - name: Run routine synchronization unit tests
         run: |
           node --test \
+            tests/routine-active-sync-v169.test.js \
             tests/routine-active-sync-v172.test.js \
-            tests/routine-low-cost-startup-recovery-v173.test.js
+            tests/routine-transition-guard-v172.test.js \
+            tests/routine-low-cost-startup-recovery-v173.test.js \
+            tests/routine-startup-reconciliation-v174.test.js
 
-      - name: Run recovery integration test
-        run: node --test tests/routine-recovery-flow-v172.integration.test.js
+      - name: Run routine PostgreSQL integrations
+        run: |
+          node --test \
+            tests/routine-recovery-flow-v172.integration.test.js \
+            tests/routine-transition-postgres-v172.integration.test.js
