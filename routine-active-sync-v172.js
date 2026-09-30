@@ -287,6 +287,11 @@
         readyAt !== null &&
         now() < readyAt + INITIAL_GRACE_MS
       ) {
+        if (!known.size) {
+          pending = true;
+          pendingReason = reason;
+          schedule();
+        }
         return Promise.resolve(null);
       }
       pending = true;
