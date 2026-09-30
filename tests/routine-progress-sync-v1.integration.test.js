@@ -284,7 +284,8 @@ test("future-day operation is deferred rather than lost", async () => {
 
 test("client completedAt is preserved when valid", async () => {
   const { id } = await bootstrap("timestamp");
-  const completedAt = Date.now() - 120000;
+  await sleep(20);
+  const completedAt = Date.now();
 
   await api("/api/progress/sync", {
     method: "POST",
