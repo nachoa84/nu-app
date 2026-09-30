@@ -129,6 +129,39 @@
     return payload;
   }
 
+  async function requestWithTimeoutV1(
+    path,
+    options = {},
+    timeoutMs = 15000
+  ) {
+    if (typeof AbortController === "undefined") {
+      return request(path, options);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
+
+    try {
+      return await request(path, {
+        ...options,
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (controller.signal.aborted) {
+        const timeoutError =
+          new Error("Tiempo de espera de sincronización agotado.");
+        timeoutError.name = "TimeoutError";
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   function syncProfileFromState(state) {
     if (
       !state?.profile ||
@@ -187,7 +220,7 @@
 
     profile = ensureUserId(profile);
 
-    const payload = await request(
+    const payload = await requestWithTimeoutV1(
       "/api/bootstrap",
       {
         method: "POST",
@@ -204,15 +237,30 @@
     );
 
     publishState(payload.state);
-    await bootstrapProductRoutinesV98().catch(error => {
-      console.warn("Las rutinas de producto continúan en modo local.", error);
+
+    let productBootstrapRecovered = true;
+
+    await bootstrapProductRoutinesV98().catch(async error => {
+      console.warn(
+        "Bootstrap de productos no disponible. Se inicia reconciliación durable.",
+        error
+      );
+
+      const recovery =
+        await progressSyncControllerV1
+          ?.reconcile("product-bootstrap-failed");
+
+      productBootstrapRecovered =
+        !recovery?.error;
+
       return null;
     });
 
     emit(
       "backend-status",
       {
-        connected: true
+        connected: true,
+        partial: !productBootstrapRecovered
       }
     );
 
@@ -398,7 +446,7 @@
   async function bootstrapProductRoutinesV98() {
     const profile = ensureUserId();
     if (!profile?.userId) return null;
-    const payload = await request("/api/product-routines/bootstrap", {
+    const payload = await requestWithTimeoutV1("/api/product-routines/bootstrap", {
       method: "POST",
       body: JSON.stringify({
         userId: profile.userId,
@@ -441,6 +489,135 @@
     });
     publishProductRoutineStatesV98(payload.state);
     return payload.state;
+  }
+
+
+  // NU APP · SINCRONIZACIÓN DURABLE DE PROGRESO V1
+  async function transportProgressSyncV1(payload) {
+    return requestWithTimeoutV1(
+      "/api/progress/sync",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          userId: payload.userId,
+          operations: payload.operations
+        })
+      }
+    );
+  }
+
+  const progressSyncFactoryV1 =
+    window.NuRoutineProgressSyncV1
+      ?.createRoutineProgressSyncV1;
+
+  const progressSyncControllerV1 =
+    typeof progressSyncFactoryV1 === "function"
+      ? progressSyncFactoryV1({
+          storage: localStorage,
+          getUserId: () => getProfile()?.userId || null,
+          isVisible: () =>
+            typeof document === "undefined" ||
+            document.visibilityState !== "hidden",
+          isOnline: () =>
+            typeof navigator === "undefined" ||
+            navigator.onLine !== false,
+          transport: transportProgressSyncV1,
+          publishCanonical: publishState,
+          publishProducts: publishProductRoutineStatesV98,
+          warn: error => {
+            console.warn(
+              "No se pudo sincronizar el progreso pendiente.",
+              error
+            );
+          }
+        })
+      : null;
+
+  function migrateLegacyPendingProgressV1() {
+    const profile = ensureUserId();
+    const collect =
+      window.NuRoutineProgressSyncV1
+        ?.collectLegacyCurrentCompletionsV1;
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1 ||
+      typeof collect !== "function"
+    ) {
+      return 0;
+    }
+
+    const operations =
+      collect(
+        localStorage,
+        profile.userId
+      );
+
+    for (const operation of operations) {
+      progressSyncControllerV1
+        .recordCompletion(operation);
+    }
+
+    return operations.length;
+  }
+
+
+  function queueRoutineCompletion(
+    routineId,
+    day,
+    completedAt = Date.now()
+  ) {
+    const profile = ensureUserId();
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1
+    ) {
+      return null;
+    }
+
+    const operation =
+      progressSyncControllerV1
+        .recordCompletion({
+          routineId,
+          day,
+          completedAt
+        });
+
+    progressSyncControllerV1
+      .flush("completion")
+      .catch(error => {
+        console.warn(
+          "No se pudo iniciar la sincronización del progreso.",
+          error
+        );
+      });
+
+    return operation;
+  }
+
+  function isRoutineCompletionPending(
+    routineId,
+    day
+  ) {
+    return Boolean(
+      progressSyncControllerV1
+        ?.isCompletionPending(
+          routineId,
+          day
+        )
+    );
+  }
+
+  function flushRoutineProgress(
+    reason = "active"
+  ) {
+    if (!progressSyncControllerV1) {
+      return Promise.resolve(null);
+    }
+
+    return progressSyncControllerV1
+      .onResume(reason);
   }
 
 
@@ -652,8 +829,12 @@
         if (document.visibilityState === "visible") {
           activeSyncControllerV172
             ?.onResume("visibilitychange");
+          progressSyncControllerV1
+            ?.onResume("visibilitychange");
         } else {
           activeSyncControllerV172
+            ?.suspend();
+          progressSyncControllerV1
             ?.suspend();
         }
       }
@@ -665,6 +846,8 @@
     () => {
       activeSyncControllerV172
         ?.onResume("pageshow");
+      progressSyncControllerV1
+        ?.onResume("pageshow");
     }
   );
 
@@ -673,6 +856,8 @@
     () => {
       activeSyncControllerV172
         ?.onResume("focus");
+      progressSyncControllerV1
+        ?.onResume("focus");
     }
   );
 
@@ -680,6 +865,8 @@
     "online",
     () => {
       activeSyncControllerV172
+        ?.onResume("online");
+      progressSyncControllerV1
         ?.onResume("online");
     }
   );
@@ -698,6 +885,9 @@
     demoAdvance,
     health,
     refreshActiveState,
+    queueRoutineCompletion,
+    isRoutineCompletionPending,
+    flushRoutineProgress,
     ensureUserId,
     getProfile
   };
@@ -727,10 +917,16 @@
     () => {
       if (!getProfile()) return;
 
+      migrateLegacyPendingProgressV1();
+
       bootstrapFromLocal()
+        .then(() => {
+          return progressSyncControllerV1
+            ?.flush("startup-pending");
+        })
         .catch(error => {
           console.warn(
-            "Backend no disponible. La PWA continúa en modo local.",
+            "Bootstrap no disponible. Se inicia reconciliación durable.",
             error
           );
 
@@ -741,6 +937,9 @@
               error: error.message
             }
           );
+
+          return progressSyncControllerV1
+            ?.reconcile("bootstrap-failed");
         });
     }
   );
