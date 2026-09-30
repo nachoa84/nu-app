@@ -302,3 +302,94 @@ test("legacy migration isolates malformed operations instead of aborting startup
     /catch \(error\)[\s\S]*?migración legacy/
   );
 });
+
+
+test("V2 unresolved overdue state stops after bounded retries instead of polling forever", async () => {
+  const h = harness({
+    transport: async payload => ({
+      ackedIds: payload.operations.map(op => op.id),
+      canonicalState: {
+        userId: "A",
+        currentDay: 2,
+        nextUnlockAt: h.now() - 1000,
+        completedDays: [1]
+      },
+      productState: {
+        userId: "A",
+        routines: {}
+      }
+    })
+  });
+
+  h.controller.rememberCanonical({
+    userId: "A",
+    currentDay: 2,
+    nextUnlockAt: h.now() - 1000
+  });
+
+  await h.advance(120000);
+
+  assert.equal(h.calls.length, 5);
+  assert.equal(h.controller.inspect().exhausted, true);
+  assert.equal(h.timers.size, 0);
+});
+
+test("V2 late response from old identity cannot ACK or publish into the new account", async () => {
+  let userId = "A";
+  let release;
+
+  const storage = memoryStorage();
+  const published = [];
+
+  const controller = createRoutineProgressSyncV1({
+    storage,
+    getUserId: () => userId,
+    isOnline: () => true,
+    isVisible: () => true,
+    transport: async () =>
+      new Promise(resolve => {
+        release = resolve;
+      }),
+    publishCanonical(state) {
+      published.push(state);
+    },
+    publishProducts() {},
+    warn() {}
+  });
+
+  controller.recordCompletion({
+    routineId: "collagen-30",
+    day: 1,
+    completedAt: Date.now()
+  });
+
+  const running = controller.flush("completion");
+
+  userId = "B";
+  controller.inspect();
+
+  release({
+    ackedIds: controller
+      .inspectOutbox()
+      .filter(op => op.userId === "A")
+      .map(op => op.id),
+    canonicalState: {
+      userId: "A",
+      currentDay: 2,
+      nextUnlockAt: null
+    },
+    productState: {
+      userId: "A",
+      routines: {}
+    }
+  });
+
+  await running;
+
+  assert.equal(published.length, 0);
+  assert.equal(
+    controller.inspectOutbox().some(op => op.userId === "A"),
+    true
+  );
+  assert.equal(controller.inspect().identity, "B");
+});
