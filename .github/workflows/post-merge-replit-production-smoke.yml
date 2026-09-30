@@ -31,9 +31,16 @@ jobs:
         run: |
           set -euo pipefail
           curl --fail --show-error --silent "$BASE_URL/" > /tmp/index.html
-          curl --fail --show-error --silent \
-            "$BASE_URL/routine-progress-sync-v1.js?v=1-durable-progress-sync" \
-            > /tmp/progress.js
+
+          PROGRESS_HTTP="$(
+            curl --show-error --silent \
+              -o /tmp/progress.js \
+              -w '%{http_code}' \
+              "$BASE_URL/routine-progress-sync-v1.js?v=1-durable-progress-sync" \
+              || true
+          )"
+
+          echo "PROGRESS_HTTP=$PROGRESS_HTTP"
 
           INDEX_PROGRESS=0
           INDEX_BACKEND=0
@@ -45,9 +52,11 @@ jobs:
           grep -q 'routine-progress-sync-v1.js?v=1-durable-progress-sync' /tmp/index.html && INDEX_PROGRESS=1 || true
           grep -q 'backend-client.js?v=progress-sync-v1' /tmp/index.html && INDEX_BACKEND=1 || true
           grep -q 'routine-active-sync-v172.js' /tmp/index.html && INDEX_V172=1 || true
-          grep -q 'nuapp:routine-progress-pending:v2:' /tmp/progress.js && ENGINE_PREFIX=1 || true
-          grep -q 'operationStorageKey' /tmp/progress.js && ENGINE_KEY_FN=1 || true
-          grep -q 'nuapp:routine-progress-outbox:v1' /tmp/progress.js && ENGINE_LEGACY_JSON=1 || true
+          if [[ "$PROGRESS_HTTP" == "200" ]]; then
+            grep -q 'nuapp:routine-progress-pending:v2:' /tmp/progress.js && ENGINE_PREFIX=1 || true
+            grep -q 'operationStorageKey' /tmp/progress.js && ENGINE_KEY_FN=1 || true
+            grep -q 'nuapp:routine-progress-outbox:v1' /tmp/progress.js && ENGINE_LEGACY_JSON=1 || true
+          fi
 
           echo "INDEX_PROGRESS=$INDEX_PROGRESS"
           echo "INDEX_BACKEND=$INDEX_BACKEND"
@@ -61,7 +70,7 @@ jobs:
           echo "--- progress engine markers ---"
           grep -nE 'OUTBOX|routine-progress-pending|operationStorageKey' /tmp/progress.js | head -30 || true
 
-          if [[ "$INDEX_PROGRESS" == "1" && "$INDEX_BACKEND" == "1" && "$INDEX_V172" == "0" && "$ENGINE_PREFIX" == "1" && "$ENGINE_KEY_FN" == "1" ]]; then
+          if [[ "$INDEX_PROGRESS" == "1" && "$INDEX_BACKEND" == "1" && "$INDEX_V172" == "0" && "$PROGRESS_HTTP" == "200" && "$ENGINE_PREFIX" == "1" && "$ENGINE_KEY_FN" == "1" ]]; then
             echo "ASSETS_V3=1" >> "$GITHUB_ENV"
           else
             echo "ASSETS_V3=0" >> "$GITHUB_ENV"
