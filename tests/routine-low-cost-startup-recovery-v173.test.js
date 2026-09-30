@@ -466,3 +466,100 @@ test(
     );
   }
 );
+
+
+test(
+  "characterization: si bootstrap falla y backend despierta después, no hay recuperación sin un nuevo evento",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    // Simula la única reapertura temprana disponible.
+    h.controller.onResume("pageshow");
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 0);
+    assert.equal(h.controller.inspect().pending, false);
+    assert.equal(h.controller.inspect().timerAt, null);
+
+    // El backend podría terminar de despertar 8 segundos después,
+    // pero el coordinador no recibe ningún nuevo focus/pageshow/online.
+    await h.advance(8000);
+
+    assert.equal(
+      count(h, "canonical"),
+      0,
+      "hoy no existe recuperación autónoma después de un bootstrap fallido"
+    );
+    assert.equal(count(h, "products"), 0);
+    assert.equal(h.controller.inspect().timerAt, null);
+  }
+);
+
+test(
+  "low-cost startup: una app visible debe recuperar dentro de la misma apertura aunque no haya segundo evento",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    h.controller.onResume("pageshow");
+    await h.flush();
+
+    // Contrato deseado: sin polling permanente, pero sí debe existir
+    // un intento acotado de recuperación durante esta apertura.
+    await h.advance(10_000);
+
+    assert.ok(
+      count(h, "canonical") >= 1,
+      "la app quedó visible 10 s y nunca consultó el estado canónico"
+    );
+    assert.ok(
+      count(h, "products") >= 1,
+      "la app quedó visible 10 s y nunca consultó las rutinas de producto"
+    );
+  }
+);
+
+test(
+  "characterization: tras perder el evento temprano, el coordinador queda completamente inerte",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    h.controller.onResume("pageshow");
+    await h.flush();
+
+    const snapshot = h.controller.inspect();
+
+    assert.deepEqual(
+      {
+        pending: snapshot.pending,
+        running: snapshot.running,
+        exhausted: snapshot.exhausted,
+        retryAt: snapshot.retryAt,
+        dueAt: snapshot.dueAt,
+        timerAt: snapshot.timerAt
+      },
+      {
+        pending: false,
+        running: false,
+        exhausted: false,
+        retryAt: null,
+        dueAt: null,
+        timerAt: null
+      }
+    );
+  }
+);
