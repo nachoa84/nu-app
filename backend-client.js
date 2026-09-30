@@ -523,7 +523,12 @@
     day,
     completedAt = Date.now()
   ) {
-    if (!progressSyncControllerV1) {
+    const profile = ensureUserId();
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1
+    ) {
       return null;
     }
 
