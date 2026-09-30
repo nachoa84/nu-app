@@ -49,7 +49,6 @@ const CORE=[
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",
-  "./routine-active-sync-v172.js?v=172-progress-stabilization",
   "./routine-progress-sync-v1.js?v=1-durable-progress-sync",
   "./backend-client.js?v=progress-sync-v1",
   "./push-client.js?v=61b-progress-canonical",
