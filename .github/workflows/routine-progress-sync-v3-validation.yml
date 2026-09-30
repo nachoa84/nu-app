@@ -1,0 +1,76 @@
+name: Routine progress sync v3 atomic outbox
+
+on:
+  pull_request:
+    branches:
+      - test/routine-progress-sync-v1-validation-base
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nu_test
+          POSTGRES_PASSWORD: nu_test
+          POSTGRES_DB: nu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U nu_test -d nu_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      NODE_ENV: development
+      TEST_DATABASE_URL: postgresql://nu_test:nu_test@127.0.0.1:5432/nu_test
+      DATABASE_URL: postgresql://nu_test:nu_test@127.0.0.1:5432/nu_test
+      TEST_PROGRESS_SYNC_PORT: "43181"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sed -i 's#http://package-firewall.replit.local/npm/#https://registry.npmjs.org/#g' package-lock.json
+          npm ci --ignore-scripts --no-audit --no-fund --prefer-online
+
+      - name: Syntax
+        run: |
+          node --check routine-progress-sync-v1.js
+          node --check backend-client.js
+          node --check routine-state.js
+          node --check routine-sync.js
+          node --check server.js
+
+      - name: Progress sync unit tests
+        run: |
+          node --test \
+            tests/routine-progress-sync-v1.test.js \
+            tests/routine-progress-sync-v2.test.js \
+            tests/routine-progress-sync-v3.test.js \
+            tests/routine-active-sync-v169.test.js \
+            tests/routine-active-sync-v172.test.js \
+            tests/routine-transition-guard-v172.test.js
+
+      - name: PostgreSQL integrations
+        run: |
+          node --test \
+            tests/routine-progress-sync-v1.integration.test.js \
+            tests/routine-recovery-flow-v172.integration.test.js \
+            tests/routine-transition-postgres-v172.integration.test.js
+
+      - name: Static release audit
+        run: node scripts/release-static-audit.js
