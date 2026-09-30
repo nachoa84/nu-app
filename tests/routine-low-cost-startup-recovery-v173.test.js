@@ -189,7 +189,7 @@ test(
 
 
 test(
-  "characterization: pageshow temprano se descarta y no deja retry pendiente",
+  "pageshow temprano queda diferido cuando bootstrap no sembró estado",
   async () => {
     const h = harness();
 
@@ -203,19 +203,18 @@ test(
 
     assert.equal(count(h, "canonical"), 0);
     assert.equal(count(h, "products"), 0);
-    assert.equal(h.controller.inspect().pending, false);
-    assert.equal(h.controller.inspect().timerAt, null);
+    assert.equal(h.controller.inspect().pending, true);
+    assert.ok(h.controller.inspect().timerAt !== null);
 
-    // Aunque transcurra mucho más que INITIAL_GRACE_MS, nada vuelve a dispararse.
-    await h.advance(60_000);
+    await h.advance(3000);
 
-    assert.equal(count(h, "canonical"), 0);
-    assert.equal(count(h, "products"), 0);
+    assert.equal(count(h, "canonical"), 1);
+    assert.equal(count(h, "products"), 1);
   }
 );
 
 test(
-  "characterization: focus temprano también puede perderse si no hubo bootstrap exitoso",
+  "focus temprano queda diferido si bootstrap todavía no publicó estado",
   async () => {
     const h = harness();
 
@@ -228,16 +227,13 @@ test(
     await h.flush();
 
     assert.equal(count(h, "canonical"), 0);
-    assert.equal(h.controller.inspect().pending, false);
-    assert.equal(h.controller.inspect().timerAt, null);
+    assert.equal(h.controller.inspect().pending, true);
+    assert.ok(h.controller.inspect().timerAt !== null);
 
-    await h.advance(10_000);
+    await h.advance(3000);
 
-    assert.equal(
-      count(h, "canonical"),
-      0,
-      "el focus temprano debería haber quedado diferido, pero hoy se pierde"
-    );
+    assert.equal(count(h, "canonical"), 1);
+    assert.equal(count(h, "products"), 1);
   }
 );
 
@@ -469,7 +465,7 @@ test(
 
 
 test(
-  "characterization: si bootstrap falla y backend despierta después, no hay recuperación sin un nuevo evento",
+  "si bootstrap falla, la misma apertura conserva una reconciliación pendiente",
   async () => {
     const h = harness();
 
@@ -478,25 +474,17 @@ test(
       deferInitialPassive: false
     });
 
-    // Simula la única reapertura temprana disponible.
     h.controller.onResume("pageshow");
     await h.flush();
 
     assert.equal(count(h, "canonical"), 0);
-    assert.equal(h.controller.inspect().pending, false);
-    assert.equal(h.controller.inspect().timerAt, null);
+    assert.equal(h.controller.inspect().pending, true);
+    assert.ok(h.controller.inspect().timerAt !== null);
 
-    // El backend podría terminar de despertar 8 segundos después,
-    // pero el coordinador no recibe ningún nuevo focus/pageshow/online.
     await h.advance(8000);
 
-    assert.equal(
-      count(h, "canonical"),
-      0,
-      "hoy no existe recuperación autónoma después de un bootstrap fallido"
-    );
-    assert.equal(count(h, "products"), 0);
-    assert.equal(h.controller.inspect().timerAt, null);
+    assert.ok(count(h, "canonical") >= 1);
+    assert.ok(count(h, "products") >= 1);
   }
 );
 
@@ -529,7 +517,7 @@ test(
 );
 
 test(
-  "characterization: tras perder el evento temprano, el coordinador queda completamente inerte",
+  "evento temprano sin bootstrap deja trabajo pendiente y timer acotado",
   async () => {
     const h = harness();
 
@@ -543,23 +531,11 @@ test(
 
     const snapshot = h.controller.inspect();
 
-    assert.deepEqual(
-      {
-        pending: snapshot.pending,
-        running: snapshot.running,
-        exhausted: snapshot.exhausted,
-        retryAt: snapshot.retryAt,
-        dueAt: snapshot.dueAt,
-        timerAt: snapshot.timerAt
-      },
-      {
-        pending: false,
-        running: false,
-        exhausted: false,
-        retryAt: null,
-        dueAt: null,
-        timerAt: null
-      }
-    );
+    assert.equal(snapshot.pending, true);
+    assert.equal(snapshot.running, false);
+    assert.equal(snapshot.exhausted, false);
+    assert.equal(snapshot.retryAt, null);
+    assert.equal(snapshot.dueAt, null);
+    assert.ok(snapshot.timerAt !== null);
   }
 );
