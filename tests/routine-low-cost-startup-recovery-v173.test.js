@@ -186,3 +186,82 @@ test(
     );
   }
 );
+
+
+test(
+  "characterization: pageshow temprano se descarta y no deja retry pendiente",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    h.controller.onResume("pageshow");
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 0);
+    assert.equal(count(h, "products"), 0);
+    assert.equal(h.controller.inspect().pending, false);
+    assert.equal(h.controller.inspect().timerAt, null);
+
+    // Aunque transcurra mucho más que INITIAL_GRACE_MS, nada vuelve a dispararse.
+    await h.advance(60_000);
+
+    assert.equal(count(h, "canonical"), 0);
+    assert.equal(count(h, "products"), 0);
+  }
+);
+
+test(
+  "characterization: focus temprano también puede perderse si no hubo bootstrap exitoso",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    h.controller.onResume("focus");
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 0);
+    assert.equal(h.controller.inspect().pending, false);
+    assert.equal(h.controller.inspect().timerAt, null);
+
+    await h.advance(10_000);
+
+    assert.equal(
+      count(h, "canonical"),
+      0,
+      "el focus temprano debería haber quedado diferido, pero hoy se pierde"
+    );
+  }
+);
+
+test(
+  "characterization: un segundo evento después de la gracia sí reconcilia",
+  async () => {
+    const h = harness();
+
+    h.controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    h.controller.onResume("pageshow");
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 0);
+
+    await h.advance(3001);
+
+    h.controller.onResume("focus");
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 1);
+    assert.equal(count(h, "products"), 1);
+  }
+);
