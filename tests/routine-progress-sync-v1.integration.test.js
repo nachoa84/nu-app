@@ -316,3 +316,69 @@ test("client completedAt is preserved when valid", async () => {
     ) < 1500
   );
 });
+
+
+test("empty sync advances overdue Collagen state on startup recovery", async () => {
+  const { id } = await bootstrap("empty-collagen");
+
+  await api("/api/routine/complete", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: id,
+      day: 1
+    })
+  });
+
+  await pool.query(
+    `UPDATE users
+     SET next_unlock_at = NOW() - INTERVAL '1 minute'
+     WHERE id = $1`,
+    [id]
+  );
+
+  const result = await api("/api/progress/sync", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: id,
+      operations: []
+    })
+  });
+
+  assert.equal(result.canonicalState.currentDay, 2);
+  assert.deepEqual(result.ackedIds, []);
+});
+
+test("empty sync advances overdue product routines on startup recovery", async () => {
+  const { id } = await bootstrap("empty-product");
+
+  await api("/api/product-routines/complete", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: id,
+      routineId: "wellspa-10",
+      day: 1
+    })
+  });
+
+  await pool.query(
+    `UPDATE product_routine_states
+     SET next_unlock_at = NOW() - INTERVAL '1 minute'
+     WHERE user_id = $1
+       AND routine_id = 'wellspa-10'`,
+    [id]
+  );
+
+  const result = await api("/api/progress/sync", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: id,
+      operations: []
+    })
+  });
+
+  assert.equal(
+    result.productState.routines["wellspa-10"].currentDay,
+    2
+  );
+  assert.deepEqual(result.ackedIds, []);
+});
