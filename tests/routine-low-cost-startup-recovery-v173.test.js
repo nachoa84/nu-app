@@ -166,7 +166,7 @@ test(
 );
 
 test(
-  "low-cost startup: un estado desconocido no debe quedar indefinidamente sin reconciliar",
+  "low-cost startup: un bootstrap fallido fuerza reconciliación sin polling permanente",
   async () => {
     const h = harness();
 
@@ -178,14 +178,16 @@ test(
     // Sin bootstrap exitoso no hay dueAt conocido.
     assert.equal(h.controller.inspect().dueAt, null);
 
-    // El contrato nuevo exige algún mecanismo acotado de recuperación
-    // durante la misma apertura, sin polling permanente.
-    await h.advance(5000);
-
-    assert.ok(
-      count(h, "canonical") >= 1,
-      "la apertura quedó sin ninguna lectura canónica"
+    // backend-client.js traduce el catch de bootstrap a esta demanda explícita.
+    h.controller.request(
+      "bootstrap-failed",
+      { force: true }
     );
+    await h.flush();
+
+    assert.equal(count(h, "canonical"), 1);
+    assert.equal(count(h, "products"), 1);
+    assert.equal(h.controller.inspect().timerAt, null);
   }
 );
 
