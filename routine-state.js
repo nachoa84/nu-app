@@ -83,31 +83,35 @@ function isDayComplete(day) {
 
 function setDayComplete(day, complete = true) {
   const key = getDayCompleteStorageKey(day);
+  const completedAtKey =
+    getDayCompletedAtStorageKey(day);
 
   if (complete) {
-    localStorage.setItem(key, "1");
-  } else {
-    localStorage.removeItem(key);
-  }
-
-  rememberDayCompletionTimestamp(day, complete);
-
-  if (
-    complete &&
-    window.BackendAPI?.queueRoutineCompletion
-  ) {
     const completedAt =
       Number(
-        localStorage.getItem(
-          getDayCompletedAtStorageKey(day)
-        )
+        localStorage.getItem(completedAtKey)
       ) || Date.now();
 
-    window.BackendAPI.queueRoutineCompletion(
-      getActiveRoutineId(),
-      Number(day),
-      completedAt
-    );
+    if (
+      window.BackendAPI?.queueRoutineCompletion
+    ) {
+      window.BackendAPI.queueRoutineCompletion(
+        getActiveRoutineId(),
+        Number(day),
+        completedAt
+      );
+    }
+
+    localStorage.setItem(key, "1");
+    if (!localStorage.getItem(completedAtKey)) {
+      localStorage.setItem(
+        completedAtKey,
+        String(completedAt)
+      );
+    }
+  } else {
+    localStorage.removeItem(key);
+    localStorage.removeItem(completedAtKey);
   }
 }
 
@@ -355,30 +359,36 @@ function getNextPendingProductRoutineDayV100(routineId, totalDays = 10) {
 setDayComplete = function setDayCompleteV100(day, complete = true) {
   const safeDay = Number(day);
   const key = getDayCompleteStorageKey(safeDay);
-
-  if (complete) localStorage.setItem(key, "1");
-  else localStorage.removeItem(key);
-
-  rememberDayCompletionTimestamp(safeDay, complete);
-
+  const completedAtKey =
+    getDayCompletedAtStorageKey(safeDay);
   const routineId = getActiveRoutineId();
 
-  if (
-    complete &&
-    window.BackendAPI?.queueRoutineCompletion
-  ) {
+  if (complete) {
     const completedAt =
       Number(
-        localStorage.getItem(
-          getDayCompletedAtStorageKey(safeDay)
-        )
+        localStorage.getItem(completedAtKey)
       ) || Date.now();
 
-    window.BackendAPI.queueRoutineCompletion(
-      routineId,
-      safeDay,
-      completedAt
-    );
+    if (
+      window.BackendAPI?.queueRoutineCompletion
+    ) {
+      window.BackendAPI.queueRoutineCompletion(
+        routineId,
+        safeDay,
+        completedAt
+      );
+    }
+
+    localStorage.setItem(key, "1");
+    if (!localStorage.getItem(completedAtKey)) {
+      localStorage.setItem(
+        completedAtKey,
+        String(completedAt)
+      );
+    }
+  } else {
+    localStorage.removeItem(key);
+    localStorage.removeItem(completedAtKey);
   }
 
   if (isBackendManagedRoutine()) return;
