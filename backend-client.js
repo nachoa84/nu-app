@@ -206,6 +206,17 @@
     publishState(payload.state);
     await bootstrapProductRoutinesV98().catch(error => {
       console.warn("Las rutinas de producto continúan en modo local.", error);
+
+      refreshActiveState(
+        "product-bootstrap-failed",
+        { force: true }
+      ).catch(syncError => {
+        console.warn(
+          "La reconciliación posterior al bootstrap fallido de productos no pudo completarse.",
+          syncError
+        );
+      });
+
       return null;
     });
 
