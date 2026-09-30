@@ -3,6 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  collectLegacyCurrentCompletionsV1,
   createRoutineProgressSyncV1
 } = require("../routine-progress-sync-v1");
 
@@ -320,4 +321,52 @@ test("failed empty reconciliation retries without requiring an outbox item", asy
 
   assert.equal(h.sent.length, 2);
   assert.equal(h.sync.inspect().reconcileRequested, false);
+});
+
+
+test("legacy migration collects only current-day completion evidence", () => {
+  const storage = memoryStorage({
+    routineState: JSON.stringify({ currentDay: 4 }),
+    day3Complete: "1",
+    day3CompletedAt: "1700000000000",
+    day4Complete: "1",
+    day4CompletedAt: "1800000000000",
+    "routineState:lumispa-10": JSON.stringify({ currentDay: 3 }),
+    "day:lumispa-10:2:complete": "1",
+    "day:lumispa-10:2:completedAt": "1700000000000",
+    "day:lumispa-10:3:complete": "1",
+    "day:lumispa-10:3:completedAt": "1800000000100"
+  });
+
+  const operations =
+    collectLegacyCurrentCompletionsV1(
+      storage,
+      "legacy-user"
+    );
+
+  assert.deepEqual(
+    operations.map(operation => ({
+      routineId: operation.routineId,
+      day: operation.day
+    })),
+    [
+      { routineId: "collagen-30", day: 4 },
+      { routineId: "lumispa-10", day: 3 }
+    ]
+  );
+});
+
+test("legacy migration ignores completion flags without a timestamp", () => {
+  const storage = memoryStorage({
+    routineState: JSON.stringify({ currentDay: 2 }),
+    day2Complete: "1"
+  });
+
+  assert.deepEqual(
+    collectLegacyCurrentCompletionsV1(
+      storage,
+      "legacy-user"
+    ),
+    []
+  );
 });
