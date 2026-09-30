@@ -79,10 +79,10 @@ test("AUDIT rollback: bootstrap still serializes local completion evidence", () 
 
   assert.match(
     backend,
-    /completedDays:\s*local\.completedDays/
+    /completedDays:\s*getCompletedDays\(\)/
   );
   assert.match(
     backend,
-    /completedAtByDay:\s*local\.completedAtByDay/
+    /completedAtByDay:\s*getCompletedAtByDay\(\)/
   );
 });
