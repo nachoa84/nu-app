@@ -220,7 +220,7 @@
 
     profile = ensureUserId(profile);
 
-    const payload = await request(
+    const payload = await requestWithTimeoutV1(
       "/api/bootstrap",
       {
         method: "POST",
@@ -431,7 +431,7 @@
   async function bootstrapProductRoutinesV98() {
     const profile = ensureUserId();
     if (!profile?.userId) return null;
-    const payload = await request("/api/product-routines/bootstrap", {
+    const payload = await requestWithTimeoutV1("/api/product-routines/bootstrap", {
       method: "POST",
       body: JSON.stringify({
         userId: profile.userId,
@@ -874,9 +874,13 @@
       if (!getProfile()) return;
 
       bootstrapFromLocal()
+        .then(() => {
+          return progressSyncControllerV1
+            ?.flush("startup-pending");
+        })
         .catch(error => {
           console.warn(
-            "Backend no disponible. La PWA continúa en modo local.",
+            "Bootstrap no disponible. Se inicia reconciliación durable.",
             error
           );
 
@@ -888,11 +892,8 @@
             }
           );
 
-          return null;
-        })
-        .finally(() => {
-          progressSyncControllerV1
-            ?.onResume("startup");
+          return progressSyncControllerV1
+            ?.reconcile("bootstrap-failed");
         });
     }
   );
