@@ -237,15 +237,30 @@
     );
 
     publishState(payload.state);
-    await bootstrapProductRoutinesV98().catch(error => {
-      console.warn("Las rutinas de producto continúan en modo local.", error);
+
+    let productBootstrapRecovered = true;
+
+    await bootstrapProductRoutinesV98().catch(async error => {
+      console.warn(
+        "Bootstrap de productos no disponible. Se inicia reconciliación durable.",
+        error
+      );
+
+      const recovery =
+        await progressSyncControllerV1
+          ?.reconcile("product-bootstrap-failed");
+
+      productBootstrapRecovered =
+        !recovery?.error;
+
       return null;
     });
 
     emit(
       "backend-status",
       {
-        connected: true
+        connected: true,
+        partial: !productBootstrapRecovered
       }
     );
 
