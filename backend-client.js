@@ -518,6 +518,35 @@
         })
       : null;
 
+  function migrateLegacyPendingProgressV1() {
+    const profile = ensureUserId();
+    const collect =
+      window.NuRoutineProgressSyncV1
+        ?.collectLegacyCurrentCompletionsV1;
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1 ||
+      typeof collect !== "function"
+    ) {
+      return 0;
+    }
+
+    const operations =
+      collect(
+        localStorage,
+        profile.userId
+      );
+
+    for (const operation of operations) {
+      progressSyncControllerV1
+        .recordCompletion(operation);
+    }
+
+    return operations.length;
+  }
+
+
   function queueRoutineCompletion(
     routineId,
     day,
@@ -872,6 +901,8 @@
     "DOMContentLoaded",
     () => {
       if (!getProfile()) return;
+
+      migrateLegacyPendingProgressV1();
 
       bootstrapFromLocal()
         .then(() => {
