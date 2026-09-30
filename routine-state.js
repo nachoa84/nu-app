@@ -92,9 +92,22 @@ function setDayComplete(day, complete = true) {
 
   rememberDayCompletionTimestamp(day, complete);
 
-  if (complete && !isBackendManagedRoutine() && window.BackendAPI) {
-    window.BackendAPI.completeProductRoutineDay(getActiveRoutineId(), Number(day))
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
+  if (
+    complete &&
+    window.BackendAPI?.queueRoutineCompletion
+  ) {
+    const completedAt =
+      Number(
+        localStorage.getItem(
+          getDayCompletedAtStorageKey(day)
+        )
+      ) || Date.now();
+
+    window.BackendAPI.queueRoutineCompletion(
+      getActiveRoutineId(),
+      Number(day),
+      completedAt
+    );
   }
 }
 
@@ -348,9 +361,28 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
 
   rememberDayCompletionTimestamp(safeDay, complete);
 
+  const routineId = getActiveRoutineId();
+
+  if (
+    complete &&
+    window.BackendAPI?.queueRoutineCompletion
+  ) {
+    const completedAt =
+      Number(
+        localStorage.getItem(
+          getDayCompletedAtStorageKey(safeDay)
+        )
+      ) || Date.now();
+
+    window.BackendAPI.queueRoutineCompletion(
+      routineId,
+      safeDay,
+      completedAt
+    );
+  }
+
   if (isBackendManagedRoutine()) return;
 
-  const routineId = getActiveRoutineId();
   const state = getRoutineState();
 
   if (!complete) {
@@ -360,10 +392,4 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
   }
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
-
-  if (complete && window.BackendAPI) {
-    window.BackendAPI
-      .completeProductRoutineDay(routineId, safeDay)
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
-  }
 };
