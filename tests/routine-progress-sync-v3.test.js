@@ -368,3 +368,6 @@ test("V3 same routine/day remains deduplicated across tabs", () => {
     1800000000000
   );
 });
+
+
+require("./routine-progress-sync-v3-rollback.audit.test.js");
