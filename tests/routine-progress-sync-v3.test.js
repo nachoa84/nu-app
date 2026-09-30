@@ -258,6 +258,8 @@ test("V3 ACK removes only confirmed operation keys", async () => {
     sync.isCompletionPending("galvanicspa-10", 1),
     true
   );
+
+  sync.suspend();
 });
 
 test("V3 automatically migrates the legacy JSON outbox without losing IDs or timestamps", () => {
