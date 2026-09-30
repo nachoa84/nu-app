@@ -141,16 +141,6 @@ function createBlock(block) {
       renderDoneState({ animate: true });
       renderDays();
 
-      if (window.BackendAPI && isBackendManagedRoutine()) {
-        window.BackendAPI
-          .completeDay(selectedDay)
-          .catch(error => {
-            console.warn(
-              "No se pudo sincronizar el completado con el backend.",
-              error
-            );
-          });
-      }
     };
 
     card.append(btn, helper);

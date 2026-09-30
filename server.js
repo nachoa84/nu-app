@@ -3713,6 +3713,197 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
 });
 
 
+// NU APP · SINCRONIZACIÓN DURABLE DE PROGRESO V1
+// El cliente conserva una outbox local y sólo elimina operaciones
+// después de que esta transacción las confirma.
+app.post("/api/progress/sync", async (req, res, next) => {
+  try {
+    const userId = String(req.body.userId || "").trim();
+    const rawOperations = Array.isArray(req.body.operations)
+      ? req.body.operations
+      : [];
+
+    if (!userId) {
+      const error = new Error("Usuario requerido.");
+      error.status = 400;
+      throw error;
+    }
+
+    if (rawOperations.length > 100) {
+      const error = new Error("Demasiadas operaciones de progreso.");
+      error.status = 400;
+      throw error;
+    }
+
+    const result = await withTransaction(async client => {
+      await advanceIfEligible(client, userId);
+      await advanceProductRoutinesIfEligible(client, userId);
+
+      const userResult = await client.query(
+        `SELECT id, cycle, current_day, created_at
+         FROM users
+         WHERE id = $1
+         FOR UPDATE`,
+        [userId]
+      );
+
+      if (!userResult.rowCount) {
+        const error = new Error("Usuario no encontrado.");
+        error.status = 404;
+        throw error;
+      }
+
+      const user = userResult.rows[0];
+      const ackedIds = [];
+      const deferredIds = [];
+      const seenIds = new Set();
+      let collagenTouched = false;
+      const productTouched = new Set();
+
+      for (const raw of rawOperations) {
+        const id = String(raw?.id || "").trim();
+        const routineId = String(raw?.routineId || "").trim();
+        const day = Number(raw?.day);
+        const completedAtRaw = raw?.completedAt;
+
+        if (!id || seenIds.has(id)) continue;
+        seenIds.add(id);
+
+        if (routineId === "collagen-30") {
+          if (!Number.isInteger(day) || day < 1 || day > MAX_DAY) {
+            continue;
+          }
+
+          const currentDay = Number(user.current_day);
+          if (day > currentDay) {
+            deferredIds.push(id);
+            continue;
+          }
+
+          const completedAt = normalizeClientCompletedAt(
+            completedAtRaw,
+            { minAt: user.created_at }
+          );
+
+          await client.query(
+            `INSERT INTO day_progress (
+               user_id,
+               cycle,
+               day,
+               completed_at
+             )
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (user_id, cycle, day)
+             DO UPDATE SET
+               completed_at = COALESCE(
+                 day_progress.completed_at,
+                 EXCLUDED.completed_at
+               )`,
+            [userId, user.cycle, day, completedAt]
+          );
+
+          collagenTouched = true;
+          ackedIds.push(id);
+          continue;
+        }
+
+        if (!PRODUCT_ROUTINE_IDS_V98.has(routineId)) {
+          continue;
+        }
+
+        if (!Number.isInteger(day) || day < 1 || day > 10) {
+          continue;
+        }
+
+        await client.query(
+          `INSERT INTO product_routine_states (
+             user_id,
+             routine_id,
+             current_day
+           )
+           VALUES ($1, $2, 1)
+           ON CONFLICT (user_id, routine_id)
+           DO NOTHING`,
+          [userId, routineId]
+        );
+
+        const stateResult = await client.query(
+          `SELECT current_day
+           FROM product_routine_states
+           WHERE user_id = $1
+             AND routine_id = $2
+           FOR UPDATE`,
+          [userId, routineId]
+        );
+
+        const currentDay =
+          Number(stateResult.rows[0]?.current_day || 1);
+
+        if (day > currentDay) {
+          deferredIds.push(id);
+          continue;
+        }
+
+        const completedAt = normalizeClientCompletedAt(
+          completedAtRaw,
+          { minAt: user.created_at }
+        );
+
+        await client.query(
+          `INSERT INTO product_routine_day_progress (
+             user_id,
+             routine_id,
+             day,
+             completed_at
+           )
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (user_id, routine_id, day)
+           DO UPDATE SET
+             completed_at = COALESCE(
+               product_routine_day_progress.completed_at,
+               EXCLUDED.completed_at
+             ),
+             updated_at = NOW()`,
+          [userId, routineId, day, completedAt]
+        );
+
+        productTouched.add(routineId);
+        ackedIds.push(id);
+      }
+
+      if (collagenTouched) {
+        await recalculatePendingUnlock(client, userId);
+      }
+
+      for (const routineId of productTouched) {
+        await recalculateProductRoutinePendingUnlock(
+          client,
+          userId,
+          routineId
+        );
+      }
+
+      await advanceIfEligible(client, userId);
+      await advanceProductRoutinesIfEligible(client, userId);
+
+      return {
+        ackedIds,
+        deferredIds,
+        canonicalState: await getState(client, userId),
+        productState: await getProductRoutineStatesV98(client, userId)
+      };
+    });
+
+    res.json({
+      ok: true,
+      ...result
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 app.get(
   "/api/push/public-key",
   (req, res, next) => {
