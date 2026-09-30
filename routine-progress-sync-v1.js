@@ -5,7 +5,8 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   if (root) root.NuRoutineProgressSyncV1 = api;
 })(typeof window !== "undefined" ? window : null, function () {
-  const OUTBOX_KEY = "nuapp:routine-progress-outbox:v1";
+  const LEGACY_OUTBOX_KEY = "nuapp:routine-progress-outbox:v1";
+  const OUTBOX_PREFIX = "nuapp:routine-progress-pending:v2:";
   const RETRY_DELAYS = [2000, 5000, 15000, 30000];
   const PASSIVE_MIN_MS = 4000;
   const DUE_GRACE_MS = 750;
@@ -23,6 +24,56 @@
     } catch (_) {
       return [];
     }
+  }
+
+  function operationStorageKey(
+    userId,
+    routineId,
+    day
+  ) {
+    return [
+      OUTBOX_PREFIX,
+      encodeURIComponent(String(userId || "")),
+      ":",
+      String(routineId || ""),
+      ":",
+      Number(day)
+    ].join("");
+  }
+
+  function operationCandidatesForUser(userId) {
+    const safeUserId = String(userId || "").trim();
+    if (!safeUserId) return [];
+
+    const keys = [];
+
+    for (let day = 1; day <= 30; day += 1) {
+      keys.push(
+        operationStorageKey(
+          safeUserId,
+          "collagen-30",
+          day
+        )
+      );
+    }
+
+    for (const routineId of [
+      "lumispa-10",
+      "wellspa-10",
+      "galvanicspa-10"
+    ]) {
+      for (let day = 1; day <= 10; day += 1) {
+        keys.push(
+          operationStorageKey(
+            safeUserId,
+            routineId,
+            day
+          )
+        );
+      }
+    }
+
+    return keys;
   }
 
   function normalizeOperation(input) {
@@ -168,22 +219,162 @@
     let lastFreshAt = -Infinity;
     let lastTransportAt = -Infinity;
 
-    function readOutbox() {
-      return safeParse(storage.getItem(OUTBOX_KEY))
-        .map(normalizeOperation)
+    const knownOperationKeys = new Set();
+
+    function readOperationKey(key) {
+      if (!key) return null;
+
+      knownOperationKeys.add(key);
+
+      try {
+        const parsed =
+          JSON.parse(
+            storage.getItem(key) || "null"
+          );
+
+        return normalizeOperation(parsed);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function writeOperation(operation) {
+      const normalized =
+        normalizeOperation(operation);
+
+      if (!normalized) {
+        return null;
+      }
+
+      const key =
+        operationStorageKey(
+          normalized.userId,
+          normalized.routineId,
+          normalized.day
+        );
+
+      knownOperationKeys.add(key);
+
+      storage.setItem(
+        key,
+        JSON.stringify(normalized)
+      );
+
+      return normalized;
+    }
+
+    function removeOperation(operation) {
+      const normalized =
+        normalizeOperation(operation);
+
+      if (!normalized) return;
+
+      const key =
+        operationStorageKey(
+          normalized.userId,
+          normalized.routineId,
+          normalized.day
+        );
+
+      storage.removeItem(key);
+      knownOperationKeys.delete(key);
+    }
+
+    function readUserOperations(userId) {
+      const operations = [];
+
+      for (
+        const key of
+        operationCandidatesForUser(userId)
+      ) {
+        const operation =
+          readOperationKey(key);
+
+        if (operation) {
+          operations.push(operation);
+        }
+      }
+
+      return operations;
+    }
+
+    function enumeratePersistedOperationKeys() {
+      const keys =
+        new Set(knownOperationKeys);
+
+      if (
+        typeof storage.key === "function" &&
+        Number.isInteger(Number(storage.length))
+      ) {
+        const length =
+          Number(storage.length);
+
+        for (let index = 0; index < length; index += 1) {
+          const key =
+            storage.key(index);
+
+          if (
+            typeof key === "string" &&
+            key.startsWith(OUTBOX_PREFIX)
+          ) {
+            keys.add(key);
+          }
+        }
+      }
+
+      return [...keys];
+    }
+
+    function inspectPersistedOperations() {
+      return enumeratePersistedOperationKeys()
+        .map(readOperationKey)
         .filter(Boolean);
     }
 
-    function writeOutbox(operations) {
-      storage.setItem(
-        OUTBOX_KEY,
-        JSON.stringify(
-          operations
-            .map(normalizeOperation)
-            .filter(Boolean)
+    function migrateLegacyOutboxV1() {
+      const legacy =
+        safeParse(
+          storage.getItem(
+            LEGACY_OUTBOX_KEY
+          )
         )
+          .map(normalizeOperation)
+          .filter(Boolean);
+
+      if (!legacy.length) {
+        storage.removeItem(
+          LEGACY_OUTBOX_KEY
+        );
+        return 0;
+      }
+
+      let migrated = 0;
+
+      for (const operation of legacy) {
+        const key =
+          operationStorageKey(
+            operation.userId,
+            operation.routineId,
+            operation.day
+          );
+
+        const existing =
+          readOperationKey(key);
+
+        if (!existing) {
+          writeOperation(operation);
+          migrated += 1;
+        }
+      }
+
+      storage.removeItem(
+        LEGACY_OUTBOX_KEY
       );
+
+      return migrated;
     }
+
+    migrateLegacyOutboxV1();
 
     function currentUserId() {
       const value = getUserId();
@@ -338,13 +529,13 @@
     }
 
     function inspectOutbox() {
-      return readOutbox();
+      return inspectPersistedOperations();
     }
 
     function pendingForCurrentUser() {
       const userId = currentUserId();
       if (!userId) return [];
-      return readOutbox().filter(operation => operation.userId === userId);
+      return readUserOperations(userId);
     }
 
     function recordCompletion({
@@ -372,12 +563,15 @@
         throw new Error("completedAt inválido.");
       }
 
-      const outbox = readOutbox();
-      const existing = outbox.find(operation =>
-        operation.userId === userId &&
-        operation.routineId === safeRoutineId &&
-        operation.day === safeDay
-      );
+      const key =
+        operationStorageKey(
+          userId,
+          safeRoutineId,
+          safeDay
+        );
+
+      const existing =
+        readOperationKey(key);
 
       if (existing) return existing;
 
@@ -394,8 +588,7 @@
         completedAt: safeCompletedAt
       };
 
-      outbox.push(operation);
-      writeOutbox(outbox);
+      writeOperation(operation);
 
       exhausted = false;
       retryIndex = 0;
@@ -406,13 +599,25 @@
 
     function acknowledge(ids) {
       const acknowledged = new Set(
-        Array.isArray(ids) ? ids.map(String) : []
+        Array.isArray(ids)
+          ? ids.map(String)
+          : []
       );
+
       if (!acknowledged.size) return;
 
-      writeOutbox(
-        readOutbox().filter(operation => !acknowledged.has(operation.id))
-      );
+      for (
+        const operation of
+        pendingForCurrentUser()
+      ) {
+        if (
+          acknowledged.has(
+            operation.id
+          )
+        ) {
+          removeOperation(operation);
+        }
+      }
     }
 
     function isCompletionPending(routineId, day) {
@@ -420,10 +625,14 @@
       if (!userId) return false;
       const safeRoutineId = String(routineId || "");
       const safeDay = Number(day);
-      return readOutbox().some(operation =>
-        operation.userId === userId &&
-        operation.routineId === safeRoutineId &&
-        operation.day === safeDay
+      return Boolean(
+        readOperationKey(
+          operationStorageKey(
+            userId,
+            safeRoutineId,
+            safeDay
+          )
+        )
       );
     }
 
@@ -633,7 +842,9 @@
   }
 
   return {
-    OUTBOX_KEY,
+    LEGACY_OUTBOX_KEY,
+    OUTBOX_PREFIX,
+    operationStorageKey,
     collectLegacyCurrentCompletionsV1,
     createRoutineProgressSyncV1
   };
