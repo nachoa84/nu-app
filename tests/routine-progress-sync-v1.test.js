@@ -287,3 +287,37 @@ test("offline queue survives until an online resume requests a flush", async () 
   assert.equal(h.sent.length, 1);
   assert.equal(h.sync.pendingForCurrentUser().length, 0);
 });
+
+
+test("explicit reconcile sends an empty batch and publishes canonical state", async () => {
+  const h = harness();
+
+  await h.sync.reconcile("bootstrap-failed");
+
+  assert.equal(h.sent.length, 1);
+  assert.deepEqual(h.sent[0].operations, []);
+  assert.equal(
+    h.published.some(([type]) => type === "canonical"),
+    true
+  );
+  assert.equal(h.sync.inspect().reconcileRequested, false);
+});
+
+test("failed empty reconciliation retries without requiring an outbox item", async () => {
+  const h = harness({
+    responses: [
+      new Error("cold start"),
+      null
+    ]
+  });
+
+  await h.sync.reconcile("bootstrap-failed");
+
+  assert.equal(h.sync.inspect().reconcileRequested, true);
+  assert.ok(h.sync.inspect().retryAt !== null);
+
+  await h.advance(2000);
+
+  assert.equal(h.sent.length, 2);
+  assert.equal(h.sync.inspect().reconcileRequested, false);
+});
