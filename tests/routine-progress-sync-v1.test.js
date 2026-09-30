@@ -2,6 +2,8 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const {
   collectLegacyCurrentCompletionsV1,
   createRoutineProgressSyncV1
@@ -368,5 +370,70 @@ test("legacy migration ignores completion flags without a timestamp", () => {
       "legacy-user"
     ),
     []
+  );
+});
+
+
+test("outbox survives controller recreation with the same storage", () => {
+  const storage = memoryStorage();
+
+  const first = createRoutineProgressSyncV1({
+    storage,
+    getUserId: () => "reload-user",
+    transport: async () => ({
+      ackedIds: [],
+      canonicalState: null,
+      productState: null
+    })
+  });
+
+  first.recordCompletion({
+    routineId: "collagen-30",
+    day: 7,
+    completedAt: 1_800_000_000_000
+  });
+
+  const second = createRoutineProgressSyncV1({
+    storage,
+    getUserId: () => "reload-user",
+    transport: async () => ({
+      ackedIds: [],
+      canonicalState: null,
+      productState: null
+    })
+  });
+
+  assert.equal(second.pendingForCurrentUser().length, 1);
+  assert.equal(second.pendingForCurrentUser()[0].day, 7);
+});
+
+test("UI no longer uses fire-and-forget completion endpoints", () => {
+  const daily = fs.readFileSync(
+    path.join(__dirname, "..", "daily-view.js"),
+    "utf8"
+  );
+  const state = fs.readFileSync(
+    path.join(__dirname, "..", "routine-state.js"),
+    "utf8"
+  );
+
+  assert.doesNotMatch(daily, /\.completeDay\s*\(/);
+  assert.doesNotMatch(state, /completeProductRoutineDay\s*\(/);
+  assert.match(state, /queueRoutineCompletion\s*\(/);
+});
+
+test("canonical merge protects explicitly pending outbox operations", () => {
+  const sync = fs.readFileSync(
+    path.join(__dirname, "..", "routine-sync.js"),
+    "utf8"
+  );
+
+  assert.match(
+    sync,
+    /isRoutineCompletionPending[\s\S]*?collagen-30/
+  );
+  assert.match(
+    sync,
+    /isRoutineCompletionPending[\s\S]*?routineId/
   );
 });
