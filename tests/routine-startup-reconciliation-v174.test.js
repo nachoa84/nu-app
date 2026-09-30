@@ -118,7 +118,13 @@ test(
       localStorage,
       Number,
       Set,
-      TOTAL_PROGRAM_DAYS: 30
+      TOTAL_PROGRAM_DAYS: 30,
+      getDayCompleteStorageKey(day) {
+        return `day${Number(day)}Complete`;
+      },
+      getDayCompletedAtStorageKey(day) {
+        return `day${Number(day)}CompletedAt`;
+      }
     };
 
     vm.runInNewContext(
