@@ -1,9 +1,9 @@
 name: Routine startup reconciliation validation
 
 on:
-  push:
+  pull_request:
     branches:
-      - audit/routine-startup-reconciliation-v173
+      - fix/routine-startup-reconciliation-v173
     paths:
       - "backend-client.js"
       - "routine-active-sync-v172.js"
