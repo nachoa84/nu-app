@@ -247,14 +247,20 @@ test("V169 fue reemplazado por una única instancia del coordinador V172", () =>
   );
 });
 
-test("index y service worker cargan una sola versión V172 antes del adaptador", () => {
+test("index y service worker cargan coordinadores antes del adaptador", () => {
   const controllerAsset =
     "routine-active-sync-v172.js?v=172-progress-stabilization";
+  const progressAsset =
+    "routine-progress-sync-v1.js?v=1-durable-progress-sync";
   const backendAsset =
-    "backend-client.js?v=172-progress-stabilization";
+    "backend-client.js?v=progress-sync-v1";
 
   assert.ok(
     indexSource.indexOf(controllerAsset) <
+      indexSource.indexOf(progressAsset)
+  );
+  assert.ok(
+    indexSource.indexOf(progressAsset) <
       indexSource.indexOf(backendAsset)
   );
   assert.equal(
@@ -262,15 +268,24 @@ test("index y service worker cargan una sola versión V172 antes del adaptador",
     1
   );
   assert.equal(
+    indexSource.match(/routine-progress-sync-v1\.js/g)?.length,
+    1
+  );
+  assert.equal(
     serviceWorkerSource.match(/routine-active-sync-v172\.js/g)?.length,
+    1
+  );
+  assert.equal(
+    serviceWorkerSource.match(/routine-progress-sync-v1\.js/g)?.length,
     1
   );
   assert.match(
     serviceWorkerSource,
     /const CACHE="nuapp-v172-progress-stabilization"/
   );
-  assert.match(serviceWorkerSource, new RegExp(controllerAsset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  assert.match(serviceWorkerSource, new RegExp(backendAsset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const asset of [controllerAsset, progressAsset, backendAsset]) {
+    assert.equal(serviceWorkerSource.includes(asset), true);
+  }
 });
 
 test("DOMContentLoaded conserva el bootstrap y no agrega lecturas iniciales duplicadas", async () => {

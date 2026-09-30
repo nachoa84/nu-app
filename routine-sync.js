@@ -44,8 +44,23 @@ function applyBackendRoutineState(serverState) {
 
   // PostgreSQL es la fuente de verdad del progreso.
   // La persistencia local de completados vive en routine-state.js.
+  const pendingCollagenDays = [];
+  for (let day = 1; day <= TOTAL_PROGRAM_DAYS; day++) {
+    if (
+      window.BackendAPI?.isRoutineCompletionPending?.(
+        "collagen-30",
+        day
+      )
+    ) {
+      pendingCollagenDays.push(day);
+    }
+  }
+
   replaceCompletedDays(
-    serverState.completedDays || [],
+    [
+      ...(serverState.completedDays || []),
+      ...pendingCollagenDays
+    ],
     TOTAL_PROGRAM_DAYS
   );
 
@@ -221,7 +236,13 @@ window.addEventListener("product-routines-state-updated", event => {
       const key = `day:${routineId}:${day}:complete`;
       const completedAtKey = `day:${routineId}:${day}:completedAt`;
 
-      if ((serverState.completedDays || []).includes(day)) {
+      if (
+        (serverState.completedDays || []).includes(day) ||
+        window.BackendAPI?.isRoutineCompletionPending?.(
+          routineId,
+          day
+        )
+      ) {
         localStorage.setItem(key, "1");
       } else {
         localStorage.removeItem(key);
