@@ -741,6 +741,17 @@
               error: error.message
             }
           );
+
+          return refreshActiveState(
+            "bootstrap-failed",
+            { force: true }
+          );
+        })
+        .catch(error => {
+          console.warn(
+            "La reconciliación posterior al bootstrap fallido no pudo completarse.",
+            error
+          );
         });
     }
   );
