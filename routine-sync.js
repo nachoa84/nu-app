@@ -46,7 +46,8 @@ function applyBackendRoutineState(serverState) {
   // La persistencia local de completados vive en routine-state.js.
   replaceCompletedDays(
     serverState.completedDays || [],
-    TOTAL_PROGRAM_DAYS
+    TOTAL_PROGRAM_DAYS,
+    Number(serverState.currentDay || localState.currentDay || 1)
   );
 
   if (!isPreviewMode) {
@@ -223,6 +224,15 @@ window.addEventListener("product-routines-state-updated", event => {
 
       if ((serverState.completedDays || []).includes(day)) {
         localStorage.setItem(key, "1");
+      } else if (
+        shouldPreserveLocalCompletionV174(
+          day,
+          currentDay,
+          key,
+          completedAtKey
+        )
+      ) {
+        continue;
       } else {
         localStorage.removeItem(key);
         localStorage.removeItem(completedAtKey);

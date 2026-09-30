@@ -78,12 +78,20 @@ test("integration can reuse bootstrap without duplicate initial reads", async ()
   assert.equal(count(h,"products"),1);
 });
 
-test("integration can discard initial passive noise after bootstrap", async () => {
+test("integration can discard initial passive noise after successful bootstrap", async () => {
   const h = harness();
   h.controller.start({
     initial: false,
     deferInitialPassive: false
   });
+
+  // Simula que bootstrapFromLocal ya publicó el snapshot canónico.
+  h.controller.rememberCanonical({
+    userId: "A",
+    currentDay: 2,
+    nextUnlockAt: null
+  });
+
   h.controller.onResume("pageshow");
   await h.advance(3000);
   assert.equal(count(h,"canonical"),0);
