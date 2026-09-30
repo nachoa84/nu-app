@@ -55,7 +55,7 @@ function harness(options = {}) {
       if (responses.length) {
         const next = responses.shift();
         if (next instanceof Error) throw next;
-        return next;
+        if (next !== null) return next;
       }
       return {
         ackedIds: payload.operations.map(operation => operation.id),
