@@ -287,6 +287,9 @@
         readyAt !== null &&
         now() < readyAt + INITIAL_GRACE_MS
       ) {
+        pending = true;
+        pendingReason = reason;
+        schedule();
         return Promise.resolve(null);
       }
       pending = true;
