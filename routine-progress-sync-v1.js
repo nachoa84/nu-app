@@ -239,7 +239,14 @@
     function scheduleDue() {
       clearDueTimer();
       ensureIdentity();
-      if (!identity || !isOnline() || !isVisible()) return;
+      if (
+        !identity ||
+        !isOnline() ||
+        !isVisible() ||
+        exhausted
+      ) {
+        return;
+      }
 
       const target = dueAt();
       if (target === null) return;
@@ -264,11 +271,29 @@
 
     function rememberOne(routineId, state) {
       if (!state || state.initialized === false) return;
+
+      const previous =
+        knownUnlocks.get(routineId) ?? null;
+      const next =
+        timestamp(state.nextUnlockAt);
+
       knownUnlocks.set(
         routineId,
-        timestamp(state.nextUnlockAt)
+        next
       );
-      scheduleDue();
+
+      if (
+        next !== previous &&
+        next !== null
+      ) {
+        exhausted = false;
+        retryIndex = 0;
+        retryAt = null;
+      }
+
+      if (!running) {
+        scheduleDue();
+      }
     }
 
     function rememberCanonical(state) {
@@ -411,7 +436,13 @@
     function scheduleRetry() {
       clearScheduledRetry();
       if (exhausted || !isOnline() || !isVisible()) return;
-      if (!pendingForCurrentUser().length && !reconcileRequested) return;
+      if (
+        !pendingForCurrentUser().length &&
+        !reconcileRequested &&
+        !isDue()
+      ) {
+        return;
+      }
 
       if (retryIndex >= RETRY_DELAYS.length) {
         exhausted = true;
@@ -435,7 +466,11 @@
       if (!userId || !isOnline() || !isVisible()) return null;
 
       const operations = pendingForCurrentUser();
-      if (!operations.length && !reconcileRequested) {
+      if (
+        !operations.length &&
+        !reconcileRequested &&
+        !isDue()
+      ) {
         clearScheduledRetry();
         retryIndex = 0;
         exhausted = false;
@@ -443,7 +478,8 @@
         return null;
       }
 
-      const requestReconcile = reconcileRequested;
+      const requestReconcile =
+        reconcileRequested || isDue();
       reconcileRequested = false;
       clearScheduledRetry();
       lastTransportAt = now();
@@ -481,7 +517,8 @@
 
           if (
             pendingForCurrentUser().length ||
-            reconcileRequested
+            reconcileRequested ||
+            isDue()
           ) {
             scheduleRetry();
           } else {
@@ -493,6 +530,14 @@
           return response;
         })
         .catch(error => {
+          if (currentUserId() !== userId) {
+            return {
+              stale: true,
+              error,
+              reason
+            };
+          }
+
           if (requestReconcile) {
             reconcileRequested = true;
           }
