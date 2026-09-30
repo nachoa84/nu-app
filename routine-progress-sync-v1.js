@@ -7,6 +7,8 @@
 })(typeof window !== "undefined" ? window : null, function () {
   const OUTBOX_KEY = "nuapp:routine-progress-outbox:v1";
   const RETRY_DELAYS = [2000, 5000, 15000, 30000];
+  const PASSIVE_MIN_MS = 4000;
+  const DUE_GRACE_MS = 750;
   const ROUTINE_IDS = new Set([
     "collagen-30",
     "lumispa-10",
@@ -68,7 +70,8 @@
       routineId,
       day,
       completeKey,
-      completedAtKey
+      completedAtKey,
+      maxDay
     ) {
       const safeDay = Number(day);
       const completedAt =
@@ -78,6 +81,7 @@
         storage.getItem(completeKey) !== "1" ||
         !Number.isInteger(safeDay) ||
         safeDay < 1 ||
+        safeDay > Number(maxDay) ||
         !Number.isFinite(completedAt) ||
         completedAt <= 0
       ) {
@@ -101,7 +105,8 @@
       "collagen-30",
       collagenDay,
       `day${collagenDay}Complete`,
-      `day${collagenDay}CompletedAt`
+      `day${collagenDay}CompletedAt`,
+      30
     );
 
     for (const routineId of [
@@ -121,7 +126,8 @@
         routineId,
         day,
         `day:${routineId}:${day}:complete`,
-        `day:${routineId}:${day}:completedAt`
+        `day:${routineId}:${day}:completedAt`,
+        10
       );
     }
 
@@ -150,11 +156,17 @@
     }
 
     let running = null;
-    let timer = null;
+    let retryTimer = null;
     let retryIndex = 0;
     let retryAt = null;
+    let dueTimer = null;
+    let dueTimerAt = null;
     let exhausted = false;
     let reconcileRequested = false;
+    let identity = null;
+    let knownUnlocks = new Map();
+    let lastFreshAt = -Infinity;
+    let lastTransportAt = -Infinity;
 
     function readOutbox() {
       return safeParse(storage.getItem(OUTBOX_KEY))
@@ -178,6 +190,126 @@
       return value === null || value === undefined || value === ""
         ? null
         : String(value);
+    }
+
+    function timestamp(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const number = Number(value);
+      if (Number.isFinite(number) && number > 0) return number;
+      const parsed = Date.parse(String(value));
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    function clearDueTimer() {
+      if (dueTimer !== null) clearTimer(dueTimer);
+      dueTimer = null;
+      dueTimerAt = null;
+    }
+
+    function ensureIdentity() {
+      const next = currentUserId();
+      if (next === identity) return next;
+
+      identity = next;
+      knownUnlocks = new Map();
+      reconcileRequested = false;
+      exhausted = false;
+      retryIndex = 0;
+      retryAt = null;
+      lastFreshAt = -Infinity;
+      lastTransportAt = -Infinity;
+      clearScheduledRetry();
+      clearDueTimer();
+
+      return identity;
+    }
+
+    function dueAt() {
+      const values = [...knownUnlocks.values()]
+        .filter(value => value !== null);
+      if (!values.length) return null;
+      return Math.min(...values);
+    }
+
+    function isDue() {
+      const target = dueAt();
+      return target !== null && target <= now();
+    }
+
+    function scheduleDue() {
+      clearDueTimer();
+      ensureIdentity();
+      if (!identity || !isOnline() || !isVisible()) return;
+
+      const target = dueAt();
+      if (target === null) return;
+
+      if (target <= now()) {
+        dueTimerAt = now();
+        dueTimer = setTimer(() => {
+          dueTimer = null;
+          dueTimerAt = null;
+          reconcile("unlock-due").catch(warn);
+        }, 0);
+        return;
+      }
+
+      dueTimerAt = target + DUE_GRACE_MS;
+      dueTimer = setTimer(() => {
+        dueTimer = null;
+        dueTimerAt = null;
+        reconcile("unlock-due").catch(warn);
+      }, Math.max(0, dueTimerAt - now()));
+    }
+
+    function rememberOne(routineId, state) {
+      if (!state || state.initialized === false) return;
+      knownUnlocks.set(
+        routineId,
+        timestamp(state.nextUnlockAt)
+      );
+      scheduleDue();
+    }
+
+    function rememberCanonical(state) {
+      const userId = ensureIdentity();
+      if (
+        !userId ||
+        !state ||
+        String(state.userId || "") !== userId
+      ) {
+        return false;
+      }
+
+      rememberOne("collagen-30", state);
+      lastFreshAt = now();
+      return true;
+    }
+
+    function rememberProducts(state) {
+      const userId = ensureIdentity();
+      if (
+        !userId ||
+        !state ||
+        (state.userId && String(state.userId) !== userId)
+      ) {
+        return false;
+      }
+
+      for (const routineId of [
+        "lumispa-10",
+        "wellspa-10",
+        "galvanicspa-10"
+      ]) {
+        if (state.routines?.[routineId]) {
+          rememberOne(
+            routineId,
+            state.routines[routineId]
+          );
+        }
+      }
+
+      return true;
     }
 
     function inspectOutbox() {
@@ -271,8 +403,8 @@
     }
 
     function clearScheduledRetry() {
-      if (timer !== null) clearTimer(timer);
-      timer = null;
+      if (retryTimer !== null) clearTimer(retryTimer);
+      retryTimer = null;
       retryAt = null;
     }
 
@@ -288,17 +420,18 @@
 
       const delay = RETRY_DELAYS[retryIndex++];
       retryAt = now() + delay;
-      timer = setTimer(() => {
-        timer = null;
+      retryTimer = setTimer(() => {
+        retryTimer = null;
         retryAt = null;
         flush("retry").catch(warn);
       }, delay);
     }
 
     async function flush(reason = "active") {
+      ensureIdentity();
       if (running) return running;
 
-      const userId = currentUserId();
+      const userId = identity;
       if (!userId || !isOnline() || !isVisible()) return null;
 
       const operations = pendingForCurrentUser();
@@ -306,10 +439,14 @@
         clearScheduledRetry();
         retryIndex = 0;
         exhausted = false;
+        scheduleDue();
         return null;
       }
 
+      const requestReconcile = reconcileRequested;
+      reconcileRequested = false;
       clearScheduledRetry();
+      lastTransportAt = now();
 
       running = Promise.resolve()
         .then(() => transport({
@@ -322,26 +459,43 @@
             throw new Error("Respuesta inválida de sincronización de progreso.");
           }
 
+          if (
+            currentUserId() !== userId
+          ) {
+            return {
+              stale: true,
+              reason
+            };
+          }
+
           acknowledge(response.ackedIds);
-          reconcileRequested = false;
 
           if (response.canonicalState) {
+            rememberCanonical(response.canonicalState);
             publishCanonical(response.canonicalState);
           }
           if (response.productState) {
+            rememberProducts(response.productState);
             publishProducts(response.productState);
           }
 
-          if (pendingForCurrentUser().length || reconcileRequested) {
+          if (
+            pendingForCurrentUser().length ||
+            reconcileRequested
+          ) {
             scheduleRetry();
           } else {
             retryIndex = 0;
             exhausted = false;
+            scheduleDue();
           }
 
           return response;
         })
         .catch(error => {
+          if (requestReconcile) {
+            reconcileRequested = true;
+          }
           scheduleRetry();
           warn(error);
           return { error, reason };
@@ -354,14 +508,40 @@
     }
 
     async function onResume(reason = "resume") {
+      ensureIdentity();
       exhausted = false;
       retryIndex = 0;
       retryAt = null;
       clearScheduledRetry();
-      return flush(reason);
+
+      if (!identity || !isOnline() || !isVisible()) {
+        clearDueTimer();
+        return null;
+      }
+
+      if (pendingForCurrentUser().length) {
+        return flush(reason);
+      }
+
+      if (isDue() || reason === "online") {
+        return reconcile(
+          isDue() ? "unlock-due" : reason
+        );
+      }
+
+      if (
+        now() - lastFreshAt >= PASSIVE_MIN_MS &&
+        now() - lastTransportAt >= PASSIVE_MIN_MS
+      ) {
+        return reconcile(reason);
+      }
+
+      scheduleDue();
+      return null;
     }
 
     async function reconcile(reason = "reconcile") {
+      ensureIdentity();
       reconcileRequested = true;
       exhausted = false;
       retryIndex = 0;
@@ -372,16 +552,23 @@
 
     function suspend() {
       clearScheduledRetry();
+      clearDueTimer();
     }
 
     function inspect() {
+      ensureIdentity();
       return {
+        identity,
         running: Boolean(running),
         retryAt,
         retryIndex,
         exhausted,
         reconcileRequested,
-        pending: pendingForCurrentUser().length
+        pending: pendingForCurrentUser().length,
+        dueAt: dueAt(),
+        dueTimerAt,
+        lastFreshAt,
+        lastTransportAt
       };
     }
 
@@ -394,6 +581,8 @@
       onResume,
       reconcile,
       suspend,
+      rememberCanonical,
+      rememberProducts,
       inspect
     };
   }
