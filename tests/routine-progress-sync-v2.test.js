@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const {
+  OUTBOX_KEY,
   collectLegacyCurrentCompletionsV1,
   createRoutineProgressSyncV1
 } = require("../routine-progress-sync-v1");
@@ -398,4 +399,91 @@ test("V2 late response from old identity cannot ACK or publish into the new acco
     true
   );
   assert.equal(controller.inspect().identity, "B");
+});
+
+
+test("AUDIT: dos pestañas pueden perder una operación por read-modify-write del outbox JSON", () => {
+  const shared = new Map();
+  let controllerB = null;
+  let injectConcurrentWrite = true;
+
+  const storageB = {
+    getItem(key) {
+      return shared.has(key) ? shared.get(key) : null;
+    },
+    setItem(key, value) {
+      shared.set(key, String(value));
+    },
+    removeItem(key) {
+      shared.delete(key);
+    }
+  };
+
+  const storageA = {
+    getItem(key) {
+      const snapshot =
+        shared.has(key) ? shared.get(key) : null;
+
+      if (
+        key === OUTBOX_KEY &&
+        injectConcurrentWrite &&
+        controllerB
+      ) {
+        injectConcurrentWrite = false;
+
+        controllerB.recordCompletion({
+          routineId: "lumispa-10",
+          day: 2,
+          completedAt: 1800000000100
+        });
+      }
+
+      return snapshot;
+    },
+    setItem(key, value) {
+      shared.set(key, String(value));
+    },
+    removeItem(key) {
+      shared.delete(key);
+    }
+  };
+
+  controllerB = createRoutineProgressSyncV1({
+    storage: storageB,
+    getUserId: () => "same-user",
+    transport: async () => ({
+      ackedIds: [],
+      canonicalState: null,
+      productState: null
+    })
+  });
+
+  const controllerA = createRoutineProgressSyncV1({
+    storage: storageA,
+    getUserId: () => "same-user",
+    transport: async () => ({
+      ackedIds: [],
+      canonicalState: null,
+      productState: null
+    })
+  });
+
+  controllerA.recordCompletion({
+    routineId: "collagen-30",
+    day: 4,
+    completedAt: 1800000000000
+  });
+
+  const persisted =
+    JSON.parse(shared.get(OUTBOX_KEY) || "[]");
+
+  assert.equal(
+    persisted.some(op => op.routineId === "collagen-30" && op.day === 4),
+    true
+  );
+  assert.equal(
+    persisted.some(op => op.routineId === "lumispa-10" && op.day === 2),
+    false,
+    "la escritura de la segunda pestaña fue sobrescrita por la primera"
+  );
 });
