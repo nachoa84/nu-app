@@ -83,18 +83,35 @@ function isDayComplete(day) {
 
 function setDayComplete(day, complete = true) {
   const key = getDayCompleteStorageKey(day);
+  const completedAtKey =
+    getDayCompletedAtStorageKey(day);
 
   if (complete) {
+    const completedAt =
+      Number(
+        localStorage.getItem(completedAtKey)
+      ) || Date.now();
+
+    if (
+      window.BackendAPI?.queueRoutineCompletion
+    ) {
+      window.BackendAPI.queueRoutineCompletion(
+        getActiveRoutineId(),
+        Number(day),
+        completedAt
+      );
+    }
+
     localStorage.setItem(key, "1");
+    if (!localStorage.getItem(completedAtKey)) {
+      localStorage.setItem(
+        completedAtKey,
+        String(completedAt)
+      );
+    }
   } else {
     localStorage.removeItem(key);
-  }
-
-  rememberDayCompletionTimestamp(day, complete);
-
-  if (complete && !isBackendManagedRoutine() && window.BackendAPI) {
-    window.BackendAPI.completeProductRoutineDay(getActiveRoutineId(), Number(day))
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
+    localStorage.removeItem(completedAtKey);
   }
 }
 
@@ -342,15 +359,40 @@ function getNextPendingProductRoutineDayV100(routineId, totalDays = 10) {
 setDayComplete = function setDayCompleteV100(day, complete = true) {
   const safeDay = Number(day);
   const key = getDayCompleteStorageKey(safeDay);
+  const completedAtKey =
+    getDayCompletedAtStorageKey(safeDay);
+  const routineId = getActiveRoutineId();
 
-  if (complete) localStorage.setItem(key, "1");
-  else localStorage.removeItem(key);
+  if (complete) {
+    const completedAt =
+      Number(
+        localStorage.getItem(completedAtKey)
+      ) || Date.now();
 
-  rememberDayCompletionTimestamp(safeDay, complete);
+    if (
+      window.BackendAPI?.queueRoutineCompletion
+    ) {
+      window.BackendAPI.queueRoutineCompletion(
+        routineId,
+        safeDay,
+        completedAt
+      );
+    }
+
+    localStorage.setItem(key, "1");
+    if (!localStorage.getItem(completedAtKey)) {
+      localStorage.setItem(
+        completedAtKey,
+        String(completedAt)
+      );
+    }
+  } else {
+    localStorage.removeItem(key);
+    localStorage.removeItem(completedAtKey);
+  }
 
   if (isBackendManagedRoutine()) return;
 
-  const routineId = getActiveRoutineId();
   const state = getRoutineState();
 
   if (!complete) {
@@ -360,10 +402,4 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
   }
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();
-
-  if (complete && window.BackendAPI) {
-    window.BackendAPI
-      .completeProductRoutineDay(routineId, safeDay)
-      .catch(error => console.warn("No se pudo sincronizar el día completado.", error));
-  }
 };
