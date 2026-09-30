@@ -1,9 +1,16 @@
 name: Routine startup reconciliation validation
 
 on:
-  push:
+  pull_request:
     branches:
-      - fix/routine-startup-reconciliation-v173
+      - test/routine-startup-reconciliation
+    paths:
+      - "backend-client.js"
+      - "routine-active-sync-v172.js"
+      - "tests/routine-active-sync-v172.test.js"
+      - "tests/routine-low-cost-startup-recovery-v173.test.js"
+      - "tests/routine-recovery-flow-v172.integration.test.js"
+      - ".github/workflows/routine-startup-reconciliation-validation.yml"
 
 permissions:
   contents: read
@@ -54,7 +61,9 @@ jobs:
 
       - name: Run synchronization unit tests
         run: |
-          node --test             tests/routine-active-sync-v172.test.js             tests/routine-low-cost-startup-recovery-v173.test.js
+          node --test \
+            tests/routine-active-sync-v172.test.js \
+            tests/routine-low-cost-startup-recovery-v173.test.js
 
       - name: Run recovery integration test
         run: node --test tests/routine-recovery-flow-v172.integration.test.js
