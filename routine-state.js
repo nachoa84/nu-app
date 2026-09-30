@@ -63,6 +63,23 @@ function getDayCompletedAtStorageKey(day) {
     : `day:${getActiveRoutineId()}:${Number(day)}:completedAt`;
 }
 
+function shouldPreserveLocalCompletionV174(
+  day,
+  currentDay,
+  completeKey,
+  completedAtKey
+) {
+  if (Number(day) !== Number(currentDay)) return false;
+  if (localStorage.getItem(completeKey) !== "1") return false;
+
+  const completedAt =
+    Number(
+      localStorage.getItem(completedAtKey)
+    );
+
+  return Number.isFinite(completedAt) && completedAt > 0;
+}
+
 function rememberDayCompletionTimestamp(day, complete = true) {
   const key = getDayCompletedAtStorageKey(day);
 
@@ -106,7 +123,8 @@ function clearCompletedDays(maxDays = TOTAL_PROGRAM_DAYS) {
 
 function replaceCompletedDays(
   completedDays = [],
-  maxDays = TOTAL_PROGRAM_DAYS
+  maxDays = TOTAL_PROGRAM_DAYS,
+  preserveLocalCurrentDay = null
 ) {
   const completedSet =
     new Set(
@@ -125,6 +143,15 @@ function replaceCompletedDays(
 
     if (completedSet.has(day)) {
       localStorage.setItem(completeKey, "1");
+    } else if (
+      shouldPreserveLocalCompletionV174(
+        day,
+        preserveLocalCurrentDay,
+        completeKey,
+        completedAtKey
+      )
+    ) {
+      continue;
     } else {
       localStorage.removeItem(completeKey);
       localStorage.removeItem(completedAtKey);
