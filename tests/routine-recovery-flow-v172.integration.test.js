@@ -617,3 +617,89 @@ test(
     );
   }
 );
+
+
+test(
+  "bootstrap recupera un completado de Collagen que quedó sólo en el dispositivo",
+  async () => {
+    const { userId, state } = await bootstrapUser("local-collagen-completion");
+
+    // Simula UI optimista: el teléfono marcó Día 1 como hecho,
+    // pero POST /api/routine/complete nunca llegó al servidor.
+    const completedAt = Date.now() - 60_000;
+
+    const recovered = await reopenBootstrap(userId, {
+      ...state,
+      currentDay: 1,
+      completedDays: [1],
+      completedAtByDay: {
+        1: completedAt
+      }
+    });
+
+    assert.equal(
+      recovered.state.completedDays.includes(1),
+      true
+    );
+
+    const progress = await pool.query(
+      `SELECT completed_at
+       FROM day_progress
+       WHERE user_id = $1
+         AND cycle = 1
+         AND day = 1`,
+      [userId]
+    );
+
+    assert.ok(
+      progress.rows[0]?.completed_at,
+      "bootstrap no recuperó completed_at desde evidencia local"
+    );
+  }
+);
+
+test(
+  "bootstrap recupera un completado de producto que quedó sólo en el dispositivo",
+  async () => {
+    const { userId } = await bootstrapUser("local-product-completion");
+    await initializeProducts(userId);
+
+    const completedAt = Date.now() - 60_000;
+
+    const response = await api("/api/product-routines/bootstrap", {
+      method: "POST",
+      body: jsonBody({
+        userId,
+        routines: {
+          "lumispa-10": {
+            currentDay: 1,
+            openedDays: {},
+            completedDays: [1],
+            completedAtByDay: {
+              1: completedAt
+            }
+          }
+        }
+      })
+    });
+
+    assert.equal(
+      response.state.routines["lumispa-10"].completedDays.includes(1),
+      true
+    );
+
+    const progress = await pool.query(
+      `SELECT completed_at
+       FROM product_routine_day_progress
+       WHERE user_id = $1
+         AND routine_id = 'lumispa-10'
+         AND day = 1`,
+      [userId]
+    );
+
+    assert.ok(
+      progress.rows[0]?.completed_at,
+      "bootstrap de productos no recuperó completed_at desde evidencia local"
+    );
+  }
+);
