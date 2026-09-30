@@ -129,6 +129,39 @@
     return payload;
   }
 
+  async function requestWithTimeoutV1(
+    path,
+    options = {},
+    timeoutMs = 15000
+  ) {
+    if (typeof AbortController === "undefined") {
+      return request(path, options);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
+
+    try {
+      return await request(path, {
+        ...options,
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (controller.signal.aborted) {
+        const timeoutError =
+          new Error("Tiempo de espera de sincronización agotado.");
+        timeoutError.name = "TimeoutError";
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   function syncProfileFromState(state) {
     if (
       !state?.profile ||
@@ -187,7 +220,7 @@
 
     profile = ensureUserId(profile);
 
-    const payload = await request(
+    const payload = await requestWithTimeoutV1(
       "/api/bootstrap",
       {
         method: "POST",
@@ -204,15 +237,30 @@
     );
 
     publishState(payload.state);
-    await bootstrapProductRoutinesV98().catch(error => {
-      console.warn("Las rutinas de producto continúan en modo local.", error);
+
+    let productBootstrapRecovered = true;
+
+    await bootstrapProductRoutinesV98().catch(async error => {
+      console.warn(
+        "Bootstrap de productos no disponible. Se inicia reconciliación durable.",
+        error
+      );
+
+      const recovery =
+        await progressSyncControllerV1
+          ?.reconcile("product-bootstrap-failed");
+
+      productBootstrapRecovered =
+        !recovery?.error;
+
       return null;
     });
 
     emit(
       "backend-status",
       {
-        connected: true
+        connected: true,
+        partial: !productBootstrapRecovered
       }
     );
 
@@ -398,7 +446,7 @@
   async function bootstrapProductRoutinesV98() {
     const profile = ensureUserId();
     if (!profile?.userId) return null;
-    const payload = await request("/api/product-routines/bootstrap", {
+    const payload = await requestWithTimeoutV1("/api/product-routines/bootstrap", {
       method: "POST",
       body: JSON.stringify({
         userId: profile.userId,
@@ -444,183 +492,189 @@
   }
 
 
-  // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V172
-  // PostgreSQL sigue siendo la única autoridad para avanzar días.
-  // Un único coordinador reconcilia Collagen y rutinas de producto sin polling.
-  function hasLocalProductRoutineStateV172() {
-    return PRODUCT_ROUTINE_IDS_V98.some(
-      routineId =>
-        Boolean(
-          localStorage.getItem(
-            `routineState:${routineId}`
-          )
-        )
-    );
-  }
-
-  function currentUserIdV172() {
-    return getProfile()?.userId || null;
-  }
-
-  function isDocumentVisibleV172() {
-    return (
-      typeof document === "undefined" ||
-      document.visibilityState !== "hidden"
-    );
-  }
-
-  function retryAfterMsV172(response) {
-    const value = response.headers?.get?.("Retry-After");
-    if (!value) return 0;
-
-    const seconds = Number(value);
-    if (Number.isFinite(seconds) && seconds >= 0) {
-      return seconds * 1000;
-    }
-
-    const at = Date.parse(value);
-    return Number.isFinite(at)
-      ? Math.max(0, at - Date.now())
-      : 0;
-  }
-
-  async function requestActiveStateV172(
-    path,
-    { signal } = {}
-  ) {
-    const response = await fetch(path, {
-      method: "GET",
-      cache: "no-store",
-      signal,
-      headers: {
-        "Content-Type": "application/json"
+  // NU APP · SINCRONIZACIÓN DURABLE DE PROGRESO V1
+  async function transportProgressSyncV1(payload) {
+    return requestWithTimeoutV1(
+      "/api/progress/sync",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          userId: payload.userId,
+          operations: payload.operations
+        })
       }
-    });
-
-    const payload = await response
-      .json()
-      .catch(() => ({}));
-
-    if (!response.ok) {
-      const error = new Error(
-        payload.error ||
-        `Error HTTP ${response.status}`
-      );
-      error.status = response.status;
-      error.retryAfterMs =
-        retryAfterMsV172(response);
-      throw error;
-    }
-
-    return payload.state;
-  }
-
-  async function fetchCanonicalStateV172(
-    userId,
-    options
-  ) {
-    return requestActiveStateV172(
-      `/api/state/${encodeURIComponent(userId)}`,
-      options
     );
   }
 
-  async function fetchProductStatesV172(
-    userId,
-    options
-  ) {
-    if (!hasLocalProductRoutineStateV172()) {
-      return {
-        userId,
-        routines: {}
-      };
-    }
+  const progressSyncFactoryV1 =
+    window.NuRoutineProgressSyncV1
+      ?.createRoutineProgressSyncV1;
 
-    const state = await requestActiveStateV172(
-      `/api/product-routines/state/${encodeURIComponent(userId)}`,
-      options
-    );
-
-    return state && !state.userId
-      ? { ...state, userId }
-      : state;
-  }
-
-  const activeSyncFactoryV172 =
-    window.NuRoutineActiveSyncV172
-      ?.createRoutineActiveSyncV172;
-
-  const activeSyncControllerV172 =
-    typeof activeSyncFactoryV172 === "function"
-      ? activeSyncFactoryV172({
-          getIdentity:
-            currentUserIdV172,
-          isVisible:
-            isDocumentVisibleV172,
+  const progressSyncControllerV1 =
+    typeof progressSyncFactoryV1 === "function"
+      ? progressSyncFactoryV1({
+          storage: localStorage,
+          getUserId: () => getProfile()?.userId || null,
+          isVisible: () =>
+            typeof document === "undefined" ||
+            document.visibilityState !== "hidden",
           isOnline: () =>
             typeof navigator === "undefined" ||
             navigator.onLine !== false,
-          fetchCanonical:
-            fetchCanonicalStateV172,
-          fetchProducts:
-            fetchProductStatesV172,
-          publishCanonical: state => {
-            publishState(state);
-            return state;
-          },
-          publishProducts: state => {
-            if (hasLocalProductRoutineStateV172()) {
-              publishProductRoutineStatesV98(state);
-            }
-            return state;
-          },
-          onStatus: status => {
-            emit(
-              "backend-status",
-              status
-            );
-          },
+          transport: transportProgressSyncV1,
+          publishCanonical: publishState,
+          publishProducts: publishProductRoutineStatesV98,
           warn: error => {
             console.warn(
-              "No se pudo reconciliar el estado activo de la rutina.",
+              "No se pudo sincronizar el progreso pendiente.",
               error
             );
           }
         })
       : null;
 
-  if (!activeSyncControllerV172) {
-    console.warn(
-      "El coordinador de sincronización V172 no está disponible."
+  function migrateLegacyPendingProgressV1() {
+    const profile = ensureUserId();
+    const collect =
+      window.NuRoutineProgressSyncV1
+        ?.collectLegacyCurrentCompletionsV1;
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1 ||
+      typeof collect !== "function"
+    ) {
+      return 0;
+    }
+
+    const migrationKey =
+      `nuapp:routine-progress-legacy-migrated:v1:${profile.userId}`;
+
+    if (
+      localStorage.getItem(migrationKey) === "1"
+    ) {
+      return 0;
+    }
+
+    let migrated = 0;
+
+    try {
+      const operations =
+        collect(
+          localStorage,
+          profile.userId
+        );
+
+      for (const operation of operations) {
+        try {
+          progressSyncControllerV1
+            .recordCompletion(operation);
+          migrated += 1;
+        } catch (error) {
+          console.warn(
+            "Se ignoró evidencia inválida durante la migración legacy.",
+            error
+          );
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "No se pudo leer la evidencia para la migración legacy.",
+        error
+      );
+    } finally {
+      localStorage.setItem(
+        migrationKey,
+        "1"
+      );
+    }
+
+    return migrated;
+  }
+
+
+  function queueRoutineCompletion(
+    routineId,
+    day,
+    completedAt = Date.now()
+  ) {
+    const profile = ensureUserId();
+
+    if (
+      !profile?.userId ||
+      !progressSyncControllerV1
+    ) {
+      return null;
+    }
+
+    const operation =
+      progressSyncControllerV1
+        .recordCompletion({
+          routineId,
+          day,
+          completedAt
+        });
+
+    progressSyncControllerV1
+      .flush("completion")
+      .catch(error => {
+        console.warn(
+          "No se pudo iniciar la sincronización del progreso.",
+          error
+        );
+      });
+
+    return operation;
+  }
+
+  function isRoutineCompletionPending(
+    routineId,
+    day
+  ) {
+    return Boolean(
+      progressSyncControllerV1
+        ?.isCompletionPending(
+          routineId,
+          day
+        )
     );
   }
 
+  function flushRoutineProgress(
+    reason = "active"
+  ) {
+    if (!progressSyncControllerV1) {
+      return Promise.resolve(null);
+    }
+
+    return progressSyncControllerV1
+      .onResume(reason);
+  }
+
+
+  // NU APP · COORDINADOR ÚNICO DE PROGRESO V2
+  // Toda reconciliación de rutinas pasa por /api/progress/sync.
   function refreshActiveState(
     reason = "active",
     { force = false } = {}
   ) {
-    if (!activeSyncControllerV172) {
+    if (!progressSyncControllerV1) {
       return Promise.resolve(null);
     }
 
-    return activeSyncControllerV172.request(
-      reason,
-      { force }
-    );
-  }
+    if (force) {
+      return progressSyncControllerV1
+        .reconcile(reason);
+    }
 
-  function startActiveSyncV172() {
-    // bootstrapFromLocal ya obtiene el estado inicial. Evitamos GET duplicados.
-    activeSyncControllerV172?.start({
-      initial: false,
-      deferInitialPassive: false
-    });
+    return progressSyncControllerV1
+      .onResume(reason);
   }
 
   window.addEventListener(
     "backend-state-updated",
     event => {
-      activeSyncControllerV172
+      progressSyncControllerV1
         ?.rememberCanonical(event.detail);
     }
   );
@@ -628,32 +682,20 @@
   window.addEventListener(
     "product-routines-state-updated",
     event => {
-      activeSyncControllerV172
+      progressSyncControllerV1
         ?.rememberProducts(event.detail);
     }
   );
-
-  if (
-    typeof document !== "undefined" &&
-    document.readyState !== "loading"
-  ) {
-    startActiveSyncV172();
-  } else {
-    window.addEventListener(
-      "DOMContentLoaded",
-      startActiveSyncV172
-    );
-  }
 
   if (typeof document !== "undefined") {
     document.addEventListener(
       "visibilitychange",
       () => {
         if (document.visibilityState === "visible") {
-          activeSyncControllerV172
+          progressSyncControllerV1
             ?.onResume("visibilitychange");
         } else {
-          activeSyncControllerV172
+          progressSyncControllerV1
             ?.suspend();
         }
       }
@@ -663,7 +705,7 @@
   window.addEventListener(
     "pageshow",
     () => {
-      activeSyncControllerV172
+      progressSyncControllerV1
         ?.onResume("pageshow");
     }
   );
@@ -671,7 +713,7 @@
   window.addEventListener(
     "focus",
     () => {
-      activeSyncControllerV172
+      progressSyncControllerV1
         ?.onResume("focus");
     }
   );
@@ -679,7 +721,7 @@
   window.addEventListener(
     "online",
     () => {
-      activeSyncControllerV172
+      progressSyncControllerV1
         ?.onResume("online");
     }
   );
@@ -698,6 +740,9 @@
     demoAdvance,
     health,
     refreshActiveState,
+    queueRoutineCompletion,
+    isRoutineCompletionPending,
+    flushRoutineProgress,
     ensureUserId,
     getProfile
   };
@@ -727,10 +772,16 @@
     () => {
       if (!getProfile()) return;
 
+      migrateLegacyPendingProgressV1();
+
       bootstrapFromLocal()
+        .then(() => {
+          return progressSyncControllerV1
+            ?.flush("startup-pending");
+        })
         .catch(error => {
           console.warn(
-            "Backend no disponible. La PWA continúa en modo local.",
+            "Bootstrap no disponible. Se inicia reconciliación durable.",
             error
           );
 
@@ -741,6 +792,9 @@
               error: error.message
             }
           );
+
+          return progressSyncControllerV1
+            ?.reconcile("bootstrap-failed");
         });
     }
   );
