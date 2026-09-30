@@ -81,6 +81,64 @@ test(
   }
 );
 
+
+test(
+  "V174 replaceCompletedDays conserva el completado local actual y limpia evidencia ajena",
+  () => {
+    const stateSource = source("routine-state.js");
+    const preserveSource = extractFunction(
+      stateSource,
+      "shouldPreserveLocalCompletionV174"
+    );
+    const replaceSource = extractFunction(
+      stateSource,
+      "replaceCompletedDays"
+    );
+
+    const storage = new Map([
+      ["day3Complete", "1"],
+      ["day3CompletedAt", "1770000000000"],
+      ["day4Complete", "1"],
+      ["day4CompletedAt", "1780000000000"]
+    ]);
+
+    const localStorage = {
+      getItem(key) {
+        return storage.has(key) ? storage.get(key) : null;
+      },
+      setItem(key, value) {
+        storage.set(key, String(value));
+      },
+      removeItem(key) {
+        storage.delete(key);
+      }
+    };
+
+    const context = {
+      localStorage,
+      Number,
+      Set,
+      TOTAL_PROGRAM_DAYS: 30
+    };
+
+    vm.runInNewContext(
+      `${preserveSource}\n${replaceSource}\nthis.replaceCompletedDays = replaceCompletedDays;`,
+      context
+    );
+
+    context.replaceCompletedDays(
+      [1, 2],
+      30,
+      4
+    );
+
+    assert.equal(storage.get("day4Complete"), "1");
+    assert.equal(storage.get("day4CompletedAt"), "1780000000000");
+    assert.equal(storage.has("day3Complete"), false);
+    assert.equal(storage.has("day3CompletedAt"), false);
+  }
+);
+
 test(
   "V174 Collagen merge pasa currentDay para preservar evidencia local pendiente",
   () => {
