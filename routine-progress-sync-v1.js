@@ -47,6 +47,87 @@
     };
   }
 
+  function collectLegacyCurrentCompletionsV1(
+    storage,
+    userId
+  ) {
+    const safeUserId = String(userId || "").trim();
+    if (!safeUserId || !storage?.getItem) return [];
+
+    const operations = [];
+
+    function readState(key) {
+      try {
+        return JSON.parse(storage.getItem(key) || "null");
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function maybeCollect(
+      routineId,
+      day,
+      completeKey,
+      completedAtKey
+    ) {
+      const safeDay = Number(day);
+      const completedAt =
+        Number(storage.getItem(completedAtKey));
+
+      if (
+        storage.getItem(completeKey) !== "1" ||
+        !Number.isInteger(safeDay) ||
+        safeDay < 1 ||
+        !Number.isFinite(completedAt) ||
+        completedAt <= 0
+      ) {
+        return;
+      }
+
+      operations.push({
+        userId: safeUserId,
+        routineId,
+        day: safeDay,
+        completedAt
+      });
+    }
+
+    const collagen =
+      readState("routineState");
+    const collagenDay =
+      Number(collagen?.currentDay || 1);
+
+    maybeCollect(
+      "collagen-30",
+      collagenDay,
+      `day${collagenDay}Complete`,
+      `day${collagenDay}CompletedAt`
+    );
+
+    for (const routineId of [
+      "lumispa-10",
+      "wellspa-10",
+      "galvanicspa-10"
+    ]) {
+      const state =
+        readState(`routineState:${routineId}`);
+
+      if (!state) continue;
+
+      const day =
+        Number(state.currentDay || 1);
+
+      maybeCollect(
+        routineId,
+        day,
+        `day:${routineId}:${day}:complete`,
+        `day:${routineId}:${day}:completedAt`
+      );
+    }
+
+    return operations;
+  }
+
   function createRoutineProgressSyncV1(adapter = {}) {
     const storage = adapter.storage;
     if (!storage?.getItem || !storage?.setItem) {
@@ -319,6 +400,7 @@
 
   return {
     OUTBOX_KEY,
+    collectLegacyCurrentCompletionsV1,
     createRoutineProgressSyncV1
   };
 });
