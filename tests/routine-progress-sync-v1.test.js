@@ -437,3 +437,28 @@ test("canonical merge protects explicitly pending outbox operations", () => {
     /isRoutineCompletionPending[\s\S]*?routineId/
   );
 });
+
+
+test("startup and product bootstrap failures route through durable reconciliation", () => {
+  const backend = fs.readFileSync(
+    path.join(__dirname, "..", "backend-client.js"),
+    "utf8"
+  );
+
+  assert.match(
+    backend,
+    /requestWithTimeoutV1\(\s*"\/api\/bootstrap"/
+  );
+  assert.match(
+    backend,
+    /requestWithTimeoutV1\(\s*"\/api\/product-routines\/bootstrap"/
+  );
+  assert.match(
+    backend,
+    /reconcile\(\s*"bootstrap-failed"\s*\)/
+  );
+  assert.match(
+    backend,
+    /reconcile\(\s*"product-bootstrap-failed"\s*\)/
+  );
+});
