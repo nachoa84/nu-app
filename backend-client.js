@@ -129,6 +129,39 @@
     return payload;
   }
 
+  async function requestWithTimeoutV1(
+    path,
+    options = {},
+    timeoutMs = 15000
+  ) {
+    if (typeof AbortController === "undefined") {
+      return request(path, options);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
+
+    try {
+      return await request(path, {
+        ...options,
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (controller.signal.aborted) {
+        const timeoutError =
+          new Error("Tiempo de espera de sincronización agotado.");
+        timeoutError.name = "TimeoutError";
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   function syncProfileFromState(state) {
     if (
       !state?.profile ||
@@ -444,6 +477,101 @@
   }
 
 
+  // NU APP · SINCRONIZACIÓN DURABLE DE PROGRESO V1
+  async function transportProgressSyncV1(payload) {
+    return requestWithTimeoutV1(
+      "/api/progress/sync",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          userId: payload.userId,
+          operations: payload.operations
+        })
+      }
+    );
+  }
+
+  const progressSyncFactoryV1 =
+    window.NuRoutineProgressSyncV1
+      ?.createRoutineProgressSyncV1;
+
+  const progressSyncControllerV1 =
+    typeof progressSyncFactoryV1 === "function"
+      ? progressSyncFactoryV1({
+          storage: localStorage,
+          getUserId: () => getProfile()?.userId || null,
+          isVisible: () =>
+            typeof document === "undefined" ||
+            document.visibilityState !== "hidden",
+          isOnline: () =>
+            typeof navigator === "undefined" ||
+            navigator.onLine !== false,
+          transport: transportProgressSyncV1,
+          publishCanonical: publishState,
+          publishProducts: publishProductRoutineStatesV98,
+          warn: error => {
+            console.warn(
+              "No se pudo sincronizar el progreso pendiente.",
+              error
+            );
+          }
+        })
+      : null;
+
+  function queueRoutineCompletion(
+    routineId,
+    day,
+    completedAt = Date.now()
+  ) {
+    if (!progressSyncControllerV1) {
+      return null;
+    }
+
+    const operation =
+      progressSyncControllerV1
+        .recordCompletion({
+          routineId,
+          day,
+          completedAt
+        });
+
+    progressSyncControllerV1
+      .flush("completion")
+      .catch(error => {
+        console.warn(
+          "No se pudo iniciar la sincronización del progreso.",
+          error
+        );
+      });
+
+    return operation;
+  }
+
+  function isRoutineCompletionPending(
+    routineId,
+    day
+  ) {
+    return Boolean(
+      progressSyncControllerV1
+        ?.isCompletionPending(
+          routineId,
+          day
+        )
+    );
+  }
+
+  function flushRoutineProgress(
+    reason = "active"
+  ) {
+    if (!progressSyncControllerV1) {
+      return Promise.resolve(null);
+    }
+
+    return progressSyncControllerV1
+      .onResume(reason);
+  }
+
+
   // NU APP · SINCRONIZACIÓN ACTIVA DE ESTADO V172
   // PostgreSQL sigue siendo la única autoridad para avanzar días.
   // Un único coordinador reconcilia Collagen y rutinas de producto sin polling.
@@ -652,8 +780,12 @@
         if (document.visibilityState === "visible") {
           activeSyncControllerV172
             ?.onResume("visibilitychange");
+          progressSyncControllerV1
+            ?.onResume("visibilitychange");
         } else {
           activeSyncControllerV172
+            ?.suspend();
+          progressSyncControllerV1
             ?.suspend();
         }
       }
@@ -665,6 +797,8 @@
     () => {
       activeSyncControllerV172
         ?.onResume("pageshow");
+      progressSyncControllerV1
+        ?.onResume("pageshow");
     }
   );
 
@@ -673,6 +807,8 @@
     () => {
       activeSyncControllerV172
         ?.onResume("focus");
+      progressSyncControllerV1
+        ?.onResume("focus");
     }
   );
 
@@ -680,6 +816,8 @@
     "online",
     () => {
       activeSyncControllerV172
+        ?.onResume("online");
+      progressSyncControllerV1
         ?.onResume("online");
     }
   );
@@ -698,6 +836,9 @@
     demoAdvance,
     health,
     refreshActiveState,
+    queueRoutineCompletion,
+    isRoutineCompletionPending,
+    flushRoutineProgress,
     ensureUserId,
     getProfile
   };
@@ -741,6 +882,12 @@
               error: error.message
             }
           );
+
+          return null;
+        })
+        .finally(() => {
+          progressSyncControllerV1
+            ?.onResume("startup");
         });
     }
   );
