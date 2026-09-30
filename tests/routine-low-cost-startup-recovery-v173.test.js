@@ -2,6 +2,8 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { createRoutineActiveSyncV172 } = require("../routine-active-sync-v172");
 
 function harness() {
@@ -537,5 +539,36 @@ test(
     assert.equal(snapshot.retryAt, null);
     assert.equal(snapshot.dueAt, null);
     assert.ok(snapshot.timerAt !== null);
+  }
+);
+
+
+test(
+  "backend-client fuerza reconciliación si falla bootstrap general",
+  () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, "..", "backend-client.js"),
+      "utf8"
+    );
+
+    assert.match(
+      source,
+      /refreshActiveState\(\s*"bootstrap-failed",\s*\{ force: true \}\s*\)/
+    );
+  }
+);
+
+test(
+  "backend-client fuerza reconciliación si falla bootstrap de productos",
+  () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, "..", "backend-client.js"),
+      "utf8"
+    );
+
+    assert.match(
+      source,
+      /refreshActiveState\(\s*"product-bootstrap-failed",\s*\{ force: true \}\s*\)/
+    );
   }
 );
