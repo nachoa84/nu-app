@@ -73,6 +73,7 @@
     let retryIndex = 0;
     let retryAt = null;
     let exhausted = false;
+    let reconcileRequested = false;
 
     function readOutbox() {
       return safeParse(storage.getItem(OUTBOX_KEY))
@@ -197,7 +198,7 @@
     function scheduleRetry() {
       clearScheduledRetry();
       if (exhausted || !isOnline() || !isVisible()) return;
-      if (!pendingForCurrentUser().length) return;
+      if (!pendingForCurrentUser().length && !reconcileRequested) return;
 
       if (retryIndex >= RETRY_DELAYS.length) {
         exhausted = true;
@@ -220,7 +221,7 @@
       if (!userId || !isOnline() || !isVisible()) return null;
 
       const operations = pendingForCurrentUser();
-      if (!operations.length) {
+      if (!operations.length && !reconcileRequested) {
         clearScheduledRetry();
         retryIndex = 0;
         exhausted = false;
@@ -241,6 +242,7 @@
           }
 
           acknowledge(response.ackedIds);
+          reconcileRequested = false;
 
           if (response.canonicalState) {
             publishCanonical(response.canonicalState);
@@ -249,7 +251,7 @@
             publishProducts(response.productState);
           }
 
-          if (pendingForCurrentUser().length) {
+          if (pendingForCurrentUser().length || reconcileRequested) {
             scheduleRetry();
           } else {
             retryIndex = 0;
@@ -278,6 +280,15 @@
       return flush(reason);
     }
 
+    async function reconcile(reason = "reconcile") {
+      reconcileRequested = true;
+      exhausted = false;
+      retryIndex = 0;
+      retryAt = null;
+      clearScheduledRetry();
+      return flush(reason);
+    }
+
     function suspend() {
       clearScheduledRetry();
     }
@@ -288,6 +299,7 @@
         retryAt,
         retryIndex,
         exhausted,
+        reconcileRequested,
         pending: pendingForCurrentUser().length
       };
     }
@@ -299,6 +311,7 @@
       isCompletionPending,
       flush,
       onResume,
+      reconcile,
       suspend,
       inspect
     };
