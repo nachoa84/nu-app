@@ -1,0 +1,205 @@
+name: Post-merge Replit production smoke
+
+on:
+  pull_request:
+    branches:
+      - test/routine-progress-sync-v1-validation-base
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: "https://4d2c3a61-843a-4bcb-a128-6f861a2ddc66-00-3ibmuqgv4nsz5.riker.replit.dev"
+
+    steps:
+      - name: Health
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent --retry 3 --retry-delay 2 \
+            "$BASE_URL/api/health" > /tmp/health.json
+          cat /tmp/health.json
+          jq -e '.ok == true and .database == true and .maxDay == 30' \
+            /tmp/health.json >/dev/null
+
+      - name: Runtime assets are V3
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent "$BASE_URL/" > /tmp/index.html
+          grep -q 'routine-progress-sync-v1.js?v=1-durable-progress-sync' /tmp/index.html
+          grep -q 'backend-client.js?v=progress-sync-v1' /tmp/index.html
+          if grep -q 'routine-active-sync-v172.js' /tmp/index.html; then
+            echo "Legacy V172 coordinator is still loaded by production index." >&2
+            exit 1
+          fi
+
+          curl --fail --show-error --silent \
+            "$BASE_URL/routine-progress-sync-v1.js?v=1-durable-progress-sync" \
+            > /tmp/progress.js
+          grep -q 'nuapp:routine-progress-pending:v2:' /tmp/progress.js
+          grep -q 'operationStorageKey' /tmp/progress.js
+
+      - name: Bootstrap synthetic user
+        shell: bash
+        run: |
+          set -euo pipefail
+          USER_ID="smoke-v3-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "USER_ID=$USER_ID" >> "$GITHUB_ENV"
+          NOW_MS="$(date +%s%3N)"
+          echo "NOW_MS=$NOW_MS" >> "$GITHUB_ENV"
+
+          jq -n \
+            --arg userId "$USER_ID" \
+            '{
+              profile: {
+                userId: $userId,
+                name: "__NU_APP_SMOKE_V3__",
+                country: "TEST",
+                timezone: "UTC",
+                notificationTime: "09:00"
+              },
+              localState: {
+                currentDay: 1,
+                openedDays: {}
+              },
+              completedDays: [],
+              completedAtByDay: {}
+            }' > /tmp/bootstrap-request.json
+
+          curl --fail --show-error --silent \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $BASE_URL" \
+            -X POST \
+            --data-binary @/tmp/bootstrap-request.json \
+            "$BASE_URL/api/bootstrap" > /tmp/bootstrap-response.json
+
+          cat /tmp/bootstrap-response.json
+          jq -e \
+            --arg userId "$USER_ID" \
+            '.ok == true and .state.userId == $userId and .state.currentDay == 1' \
+            /tmp/bootstrap-response.json >/dev/null
+
+      - name: Complete day 1 through durable progress sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          OP_ID="$USER_ID:collagen-30:1:$NOW_MS"
+          echo "OP_ID=$OP_ID" >> "$GITHUB_ENV"
+
+          jq -n \
+            --arg userId "$USER_ID" \
+            --arg id "$OP_ID" \
+            --argjson completedAt "$NOW_MS" \
+            '{
+              userId: $userId,
+              operations: [{
+                id: $id,
+                routineId: "collagen-30",
+                day: 1,
+                completedAt: $completedAt
+              }]
+            }' > /tmp/sync-request.json
+
+          curl --fail --show-error --silent \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $BASE_URL" \
+            -X POST \
+            --data-binary @/tmp/sync-request.json \
+            "$BASE_URL/api/progress/sync" > /tmp/sync-response.json
+
+          cat /tmp/sync-response.json
+          jq -e \
+            --arg id "$OP_ID" \
+            --arg userId "$USER_ID" \
+            '.ok == true
+             and (.ackedIds | index($id)) != null
+             and (.deferredIds | index($id)) == null
+             and .canonicalState.userId == $userId
+             and (.canonicalState.completedDays | index(1)) != null
+             and .canonicalState.currentDay == 1
+             and (.canonicalState.nextUnlockAt != null)' \
+            /tmp/sync-response.json >/dev/null
+
+      - name: Replay is idempotent
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $BASE_URL" \
+            -X POST \
+            --data-binary @/tmp/sync-request.json \
+            "$BASE_URL/api/progress/sync" > /tmp/replay-response.json
+
+          cat /tmp/replay-response.json
+          jq -e \
+            --arg id "$OP_ID" \
+            '.ok == true
+             and (.ackedIds | index($id)) != null
+             and (.canonicalState.completedDays | index(1)) != null' \
+            /tmp/replay-response.json >/dev/null
+
+      - name: Future completion is deferred
+        shell: bash
+        run: |
+          set -euo pipefail
+          FUTURE_ID="$USER_ID:collagen-30:2:$NOW_MS"
+
+          jq -n \
+            --arg userId "$USER_ID" \
+            --arg id "$FUTURE_ID" \
+            --argjson completedAt "$NOW_MS" \
+            '{
+              userId: $userId,
+              operations: [{
+                id: $id,
+                routineId: "collagen-30",
+                day: 2,
+                completedAt: $completedAt
+              }]
+            }' > /tmp/future-request.json
+
+          curl --fail --show-error --silent \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $BASE_URL" \
+            -X POST \
+            --data-binary @/tmp/future-request.json \
+            "$BASE_URL/api/progress/sync" > /tmp/future-response.json
+
+          cat /tmp/future-response.json
+          jq -e \
+            --arg id "$FUTURE_ID" \
+            '.ok == true
+             and (.deferredIds | index($id)) != null
+             and (.ackedIds | index($id)) == null
+             and .canonicalState.currentDay == 1' \
+            /tmp/future-response.json >/dev/null
+
+      - name: Empty reconciliation preserves canonical state
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg userId "$USER_ID" \
+            '{userId: $userId, operations: []}' > /tmp/reconcile-request.json
+
+          curl --fail --show-error --silent \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $BASE_URL" \
+            -X POST \
+            --data-binary @/tmp/reconcile-request.json \
+            "$BASE_URL/api/progress/sync" > /tmp/reconcile-response.json
+
+          cat /tmp/reconcile-response.json
+          jq -e \
+            --arg userId "$USER_ID" \
+            '.ok == true
+             and .canonicalState.userId == $userId
+             and (.canonicalState.completedDays | index(1)) != null
+             and .canonicalState.currentDay == 1' \
+            /tmp/reconcile-response.json >/dev/null
