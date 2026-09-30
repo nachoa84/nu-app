@@ -1,5 +1,6 @@
 (() => {
   const PROFILE_KEY = "routineUserProfile";
+  const BOOTSTRAP_REQUEST_TIMEOUT_MS_V174 = 15000;
 
   function emit(name, detail) {
     window.dispatchEvent(
@@ -129,6 +130,53 @@
     return payload;
   }
 
+  async function requestWithTimeoutV174(
+    path,
+    options = {},
+    timeoutMs = BOOTSTRAP_REQUEST_TIMEOUT_MS_V174
+  ) {
+    if (
+      typeof AbortController === "undefined" ||
+      !Number.isFinite(Number(timeoutMs)) ||
+      Number(timeoutMs) <= 0
+    ) {
+      return request(path, options);
+    }
+
+    const controller =
+      new AbortController();
+
+    const timeout =
+      setTimeout(
+        () => controller.abort(),
+        Number(timeoutMs)
+      );
+
+    try {
+      return await request(
+        path,
+        {
+          ...options,
+          signal: controller.signal
+        }
+      );
+    } catch (error) {
+      if (controller.signal.aborted) {
+        const timeoutError =
+          new Error(
+            "Tiempo de espera de bootstrap agotado."
+          );
+        timeoutError.name =
+          "TimeoutError";
+        throw timeoutError;
+      }
+
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   function syncProfileFromState(state) {
     if (
       !state?.profile ||
@@ -187,7 +235,7 @@
 
     profile = ensureUserId(profile);
 
-    const payload = await request(
+    const payload = await requestWithTimeoutV174(
       "/api/bootstrap",
       {
         method: "POST",
@@ -409,7 +457,7 @@
   async function bootstrapProductRoutinesV98() {
     const profile = ensureUserId();
     if (!profile?.userId) return null;
-    const payload = await request("/api/product-routines/bootstrap", {
+    const payload = await requestWithTimeoutV174("/api/product-routines/bootstrap", {
       method: "POST",
       body: JSON.stringify({
         userId: profile.userId,
