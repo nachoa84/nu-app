@@ -265,3 +265,204 @@ test(
     assert.equal(count(h, "products"), 1);
   }
 );
+
+
+test(
+  "low-cost startup: un backend que tarda en despertar no debe dejar la apertura sin reconciliar",
+  async () => {
+    const h = harness();
+    let releaseCanonical;
+    let releaseProducts;
+
+    const delayedCanonical = new Promise(resolve => {
+      releaseCanonical = resolve;
+    });
+    const delayedProducts = new Promise(resolve => {
+      releaseProducts = resolve;
+    });
+
+    // Sustituimos temporalmente los fetchers mediante un controlador nuevo
+    // para simular un cold start del backend que tarda varios segundos.
+    let now = 1_000_000;
+    let id = 0;
+    const timers = new Map();
+    const calls = [];
+    const controller = createRoutineActiveSyncV172({
+      now: () => now,
+      setTimeout(fn, ms) {
+        const key = ++id;
+        timers.set(key, { fn, at: now + ms });
+        return key;
+      },
+      clearTimeout(key) {
+        timers.delete(key);
+      },
+      getIdentity: () => "A",
+      isVisible: () => true,
+      isOnline: () => true,
+      fetchCanonical: async identity => {
+        calls.push(["canonical", identity]);
+        return delayedCanonical;
+      },
+      fetchProducts: async identity => {
+        calls.push(["products", identity]);
+        return delayedProducts;
+      },
+      publishCanonical: state => state,
+      publishProducts: state => state,
+      onStatus() {},
+      warn() {},
+      jitter: () => 0
+    });
+
+    async function flush() {
+      for (let i = 0; i < 8; i++) {
+        await new Promise(resolve => setImmediate(resolve));
+      }
+    }
+
+    async function advance(ms) {
+      const end = now + ms;
+      for (let n = 0; n < 1000; n++) {
+        const entries = [...timers.entries()]
+          .sort((a, b) => a[1].at - b[1].at);
+        if (!entries.length || entries[0][1].at > end) break;
+        const [key, timer] = entries[0];
+        timers.delete(key);
+        now = timer.at;
+        timer.fn();
+        await flush();
+      }
+      now = end;
+      await flush();
+    }
+
+    controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    // Simula reapertura; el backend todavía está despertando.
+    controller.onResume("pageshow");
+    await advance(3001);
+
+    // En el diseño deseado debería existir una request viva o programada.
+    assert.ok(
+      calls.length > 0 || controller.inspect().timerAt !== null,
+      "la reapertura quedó sin ningún intento de reconciliación mientras backend despertaba"
+    );
+
+    releaseCanonical({
+      userId: "A",
+      currentDay: 3,
+      cycle: 1,
+      nextUnlockAt: null
+    });
+    releaseProducts({
+      userId: "A",
+      routines: {}
+    });
+    await flush();
+  }
+);
+
+test(
+  "low-cost startup: un timeout inicial debe reintentarse sin intervención del usuario",
+  async () => {
+    let now = 1_000_000;
+    let id = 0;
+    const timers = new Map();
+    let canonicalCalls = 0;
+    let productCalls = 0;
+
+    const controller = createRoutineActiveSyncV172({
+      now: () => now,
+      setTimeout(fn, ms) {
+        const key = ++id;
+        timers.set(key, { fn, at: now + ms });
+        return key;
+      },
+      clearTimeout(key) {
+        timers.delete(key);
+      },
+      getIdentity: () => "A",
+      isVisible: () => true,
+      isOnline: () => true,
+      requestTimeoutMs: 1000,
+      fetchCanonical: async identity => {
+        canonicalCalls += 1;
+
+        if (canonicalCalls === 1) {
+          return new Promise(() => {});
+        }
+
+        return {
+          userId: identity,
+          currentDay: 3,
+          cycle: 1,
+          nextUnlockAt: null
+        };
+      },
+      fetchProducts: async identity => {
+        productCalls += 1;
+
+        if (productCalls === 1) {
+          return new Promise(() => {});
+        }
+
+        return {
+          userId: identity,
+          routines: {}
+        };
+      },
+      publishCanonical: state => state,
+      publishProducts: state => state,
+      onStatus() {},
+      warn() {},
+      jitter: () => 0
+    });
+
+    async function flush() {
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setImmediate(resolve));
+      }
+    }
+
+    async function advance(ms) {
+      const end = now + ms;
+      for (let n = 0; n < 1000; n++) {
+        const entries = [...timers.entries()]
+          .sort((a, b) => a[1].at - b[1].at);
+        if (!entries.length || entries[0][1].at > end) break;
+        const [key, timer] = entries[0];
+        timers.delete(key);
+        now = timer.at;
+        timer.fn();
+        await flush();
+      }
+      now = end;
+      await flush();
+    }
+
+    controller.start({
+      initial: false,
+      deferInitialPassive: false
+    });
+
+    controller.onResume("pageshow");
+    await advance(3001);
+
+    // Contrato deseado: la primera tentativa puede fallar/timeout,
+    // pero la misma apertura debe reintentar automáticamente.
+    await advance(5000);
+
+    assert.ok(
+      canonicalCalls >= 2,
+      "no hubo segundo intento canónico después del timeout inicial"
+    );
+    assert.ok(
+      productCalls >= 2,
+      "no hubo segundo intento de productos después del timeout inicial"
+    );
+  }
+);
