@@ -6,8 +6,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-const controllerSource = fs.readFileSync(
-  path.join(__dirname, "..", "routine-active-sync-v172.js"),
+const progressSource = fs.readFileSync(
+  path.join(__dirname, "..", "routine-progress-sync-v1.js"),
   "utf8"
 );
 
@@ -156,18 +156,37 @@ function createHarness({
 
     let payload = statePayload();
 
-    if (requestUrl.startsWith("/api/product-routines/state/")) {
+    if (requestUrl === "/api/progress/sync") {
       payload = {
-        state: {
-          routines: {
-            "wellspa-10": {
-              initialized: true,
-              currentDay: 2,
-              nextUnlockAt: null,
-              openedDays: {},
-              completedDays: [1]
-            }
+        ok: true,
+        ackedIds: [],
+        deferredIds: [],
+        canonicalState: {
+          userId: "user-test",
+          currentDay: 3,
+          nextUnlockAt: null,
+          openedDays: {},
+          completedDays: [1, 2],
+          profile: {
+            name: "Test",
+            country: "España",
+            timezone: "Europe/Madrid",
+            notificationTime: "09:00"
           }
+        },
+        productState: {
+          userId: "user-test",
+          routines: withProductState
+            ? {
+                "wellspa-10": {
+                  initialized: true,
+                  currentDay: 2,
+                  nextUnlockAt: null,
+                  openedDays: {},
+                  completedDays: [1]
+                }
+              }
+            : {}
         }
       };
     }
@@ -211,7 +230,7 @@ function createHarness({
       encodeURIComponent
     });
 
-  vm.runInContext(controllerSource, context);
+  vm.runInContext(progressSource, context);
   vm.runInContext(source, context);
 
   return {
@@ -236,56 +255,45 @@ test("la sincronización activa no usa polling", () => {
   );
 });
 
-test("V169 fue reemplazado por una única instancia del coordinador V172", () => {
+test("el runtime usa Progress Sync como único coordinador de rutinas", () => {
   assert.doesNotMatch(
     source,
-    /SINCRONIZACIÓN ACTIVA DE ESTADO V169|ACTIVE_SYNC_PASSIVE_MIN_MS/
+    /activeSyncControllerV172|activeSyncFactoryV172|requestActiveStateV172/
   );
-  assert.equal(
-    source.match(/activeSyncFactoryV172\(\{/g)?.length,
-    1
+  assert.match(
+    source,
+    /progressSyncControllerV1/
   );
 });
 
-test("index y service worker cargan coordinadores antes del adaptador", () => {
-  const controllerAsset =
-    "routine-active-sync-v172.js?v=172-progress-stabilization";
+test("index y service worker cargan sólo Progress Sync antes del adaptador", () => {
   const progressAsset =
     "routine-progress-sync-v1.js?v=1-durable-progress-sync";
   const backendAsset =
     "backend-client.js?v=progress-sync-v1";
 
-  assert.ok(
-    indexSource.indexOf(controllerAsset) <
-      indexSource.indexOf(progressAsset)
+  assert.equal(
+    indexSource.includes("routine-active-sync-v172.js"),
+    false
+  );
+  assert.equal(
+    serviceWorkerSource.includes("routine-active-sync-v172.js"),
+    false
   );
   assert.ok(
     indexSource.indexOf(progressAsset) <
       indexSource.indexOf(backendAsset)
   );
   assert.equal(
-    indexSource.match(/routine-active-sync-v172\.js/g)?.length,
-    1
-  );
-  assert.equal(
     indexSource.match(/routine-progress-sync-v1\.js/g)?.length,
-    1
-  );
-  assert.equal(
-    serviceWorkerSource.match(/routine-active-sync-v172\.js/g)?.length,
     1
   );
   assert.equal(
     serviceWorkerSource.match(/routine-progress-sync-v1\.js/g)?.length,
     1
   );
-  assert.match(
-    serviceWorkerSource,
-    /const CACHE="nuapp-v172-progress-stabilization"/
-  );
-  for (const asset of [controllerAsset, progressAsset, backendAsset]) {
-    assert.equal(serviceWorkerSource.includes(asset), true);
-  }
+  assert.equal(serviceWorkerSource.includes(progressAsset), true);
+  assert.equal(serviceWorkerSource.includes(backendAsset), true);
 });
 
 test("DOMContentLoaded conserva el bootstrap y no agrega lecturas iniciales duplicadas", async () => {
@@ -319,8 +327,7 @@ test("DOMContentLoaded conserva el bootstrap y no agrega lecturas iniciales dupl
   );
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/") ||
-      call.path.startsWith("/api/product-routines/state/")
+      call.path === "/api/progress/sync"
     ).length,
     0
   );
@@ -341,14 +348,8 @@ test("pageshow reconcilia el estado y evita llamadas duplicadas inmediatas", asy
 
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/")
-    ).length,
-    1
-  );
-
-  assert.equal(
-    harness.calls.filter(call =>
-      call.path.startsWith("/api/product-routines/state/")
+      call.path === "/api/progress/sync" &&
+      call.method === "POST"
     ).length,
     1
   );
@@ -361,7 +362,8 @@ test("pageshow reconcilia el estado y evita llamadas duplicadas inmediatas", asy
 
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/")
+      call.path === "/api/progress/sync" &&
+      call.method === "POST"
     ).length,
     1
   );
@@ -388,7 +390,8 @@ test("visibilitychange refresca al volver a primer plano, no mientras está ocul
 
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/")
+      call.path === "/api/progress/sync" &&
+      call.method === "POST"
     ).length,
     1
   );
@@ -419,7 +422,8 @@ test("un nextUnlockAt confirmado programa una única reconciliación al vencer",
 
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/")
+      call.path === "/api/progress/sync" &&
+      call.method === "POST"
     ).length,
     1
   );
@@ -441,7 +445,8 @@ test("al recuperar conexión se fuerza una reconciliación aunque haya una recie
 
   assert.equal(
     harness.calls.filter(call =>
-      call.path.startsWith("/api/state/")
+      call.path === "/api/progress/sync" &&
+      call.method === "POST"
     ).length,
     2
   );
