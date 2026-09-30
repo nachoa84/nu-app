@@ -161,7 +161,31 @@
     function rememberCanonical(state) {
       resetIdentity();
       if (!identity || !state || String(state.userId || "") !== identity) return;
+
+      const passiveReason = pendingReason;
+      const cancelInitialPassive =
+        !running &&
+        !forced &&
+        pending &&
+        readyAt !== null &&
+        now() < readyAt + INITIAL_GRACE_MS &&
+        (
+          passiveReason === "pageshow" ||
+          passiveReason === "focus" ||
+          passiveReason === "visibilitychange"
+        );
+
       rememberOne("collagen-30", state);
+
+      if (
+        cancelInitialPassive &&
+        pendingReason === passiveReason &&
+        !isDue()
+      ) {
+        pending = false;
+        cancelTimer();
+        schedule();
+      }
     }
     function rememberProducts(state) {
       resetIdentity();
