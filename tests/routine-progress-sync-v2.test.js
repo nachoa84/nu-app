@@ -305,13 +305,14 @@ test("legacy migration isolates malformed operations instead of aborting startup
 
 
 test("V2 unresolved overdue state stops after bounded retries instead of polling forever", async () => {
+  let overdueAt = null;
   const h = harness({
     transport: async payload => ({
       ackedIds: payload.operations.map(op => op.id),
       canonicalState: {
         userId: "A",
         currentDay: 2,
-        nextUnlockAt: h.now() - 1000,
+        nextUnlockAt: overdueAt,
         completedDays: [1]
       },
       productState: {
@@ -321,10 +322,12 @@ test("V2 unresolved overdue state stops after bounded retries instead of polling
     })
   });
 
+  overdueAt = h.now() - 1000;
+
   h.controller.rememberCanonical({
     userId: "A",
     currentDay: 2,
-    nextUnlockAt: h.now() - 1000
+    nextUnlockAt: overdueAt
   });
 
   await h.advance(120000);
@@ -364,6 +367,9 @@ test("V2 late response from old identity cannot ACK or publish into the new acco
   });
 
   const running = controller.flush("completion");
+
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(typeof release, "function");
 
   userId = "B";
   controller.inspect();
