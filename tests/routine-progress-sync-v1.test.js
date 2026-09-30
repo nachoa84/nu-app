@@ -8,6 +8,9 @@ const {
   collectLegacyCurrentCompletionsV1,
   createRoutineProgressSyncV1
 } = require("../routine-progress-sync-v1");
+const {
+  createRoutineActiveSyncV172
+} = require("../routine-active-sync-v172");
 
 function memoryStorage(initial = {}) {
   const map = new Map(Object.entries(initial));
@@ -460,5 +463,185 @@ test("startup and product bootstrap failures route through durable reconciliatio
   assert.match(
     backend,
     /reconcile\(\s*"product-bootstrap-failed"\s*\)/
+  );
+});
+
+
+test("AUDIT: una respuesta V172 vieja puede publicarse después del ACK durable", async () => {
+  const storage = memoryStorage();
+  const published = [];
+  let resolveStale;
+
+  const progress = createRoutineProgressSyncV1({
+    storage,
+    getUserId: () => "race-user",
+    isOnline: () => true,
+    isVisible: () => true,
+    transport: async payload => ({
+      ackedIds: payload.operations.map(operation => operation.id),
+      canonicalState: {
+        userId: "race-user",
+        currentDay: 2,
+        nextUnlockAt: null,
+        completedDays: [1]
+      },
+      productState: {
+        userId: "race-user",
+        routines: {}
+      }
+    }),
+    publishCanonical: state => {
+      published.push(["progress", state]);
+    },
+    publishProducts() {},
+    warn() {}
+  });
+
+  const active = createRoutineActiveSyncV172({
+    getIdentity: () => "race-user",
+    isVisible: () => true,
+    isOnline: () => true,
+    fetchCanonical: async () =>
+      new Promise(resolve => {
+        resolveStale = resolve;
+      }),
+    fetchProducts: async () => ({
+      userId: "race-user",
+      routines: {}
+    }),
+    publishCanonical: state => {
+      published.push(["active", state]);
+      return state;
+    },
+    publishProducts: state => state,
+    onStatus() {},
+    warn() {},
+    jitter: () => 0,
+    requestTimeoutMs: 5000
+  });
+
+  active.start({ initial: false, deferInitialPassive: false });
+
+  const activeRequest =
+    active.request("audit-race", { force: true });
+
+  progress.recordCompletion({
+    routineId: "collagen-30",
+    day: 1,
+    completedAt: Date.now()
+  });
+
+  await progress.flush("completion");
+
+  assert.equal(progress.pendingForCurrentUser().length, 0);
+  assert.equal(published.at(-1)?.[0], "progress");
+  assert.equal(published.at(-1)?.[1]?.currentDay, 2);
+
+  resolveStale({
+    userId: "race-user",
+    currentDay: 1,
+    nextUnlockAt: null,
+    completedDays: []
+  });
+
+  await activeRequest;
+
+  assert.equal(
+    published.at(-1)?.[0],
+    "active",
+    "el snapshot GET viejo terminó publicándose después del estado confirmado"
+  );
+  assert.equal(published.at(-1)?.[1]?.currentDay, 1);
+  assert.equal(
+    progress.pendingForCurrentUser().length,
+    0,
+    "el ACK ya eliminó la protección de la outbox antes del snapshot viejo"
+  );
+});
+
+test("AUDIT: la migración legacy vuelve a encolar un día ya confirmado en otra apertura", async () => {
+  const storage = memoryStorage({
+    routineState: JSON.stringify({ currentDay: 4 }),
+    day4Complete: "1",
+    day4CompletedAt: "1800000000000"
+  });
+
+  const makeController = () =>
+    createRoutineProgressSyncV1({
+      storage,
+      getUserId: () => "legacy-repeat-user",
+      isOnline: () => true,
+      isVisible: () => true,
+      transport: async payload => ({
+        ackedIds: payload.operations.map(operation => operation.id),
+        canonicalState: {
+          userId: "legacy-repeat-user",
+          currentDay: 4,
+          completedDays: [4]
+        },
+        productState: {
+          userId: "legacy-repeat-user",
+          routines: {}
+        }
+      }),
+      publishCanonical() {},
+      publishProducts() {},
+      warn() {}
+    });
+
+  const first = makeController();
+  for (const operation of collectLegacyCurrentCompletionsV1(
+    storage,
+    "legacy-repeat-user"
+  )) {
+    first.recordCompletion(operation);
+  }
+  await first.flush("first-open");
+
+  assert.equal(first.pendingForCurrentUser().length, 0);
+
+  const second = makeController();
+  for (const operation of collectLegacyCurrentCompletionsV1(
+    storage,
+    "legacy-repeat-user"
+  )) {
+    second.recordCompletion(operation);
+  }
+
+  assert.equal(
+    second.pendingForCurrentUser().length,
+    1,
+    "una nueva apertura vuelve a crear la misma operación ya confirmada"
+  );
+});
+
+test("AUDIT: un currentDay legacy fuera de rango puede abortar la migración al encolar", () => {
+  const storage = memoryStorage({
+    routineState: JSON.stringify({ currentDay: 999 }),
+    day999Complete: "1",
+    day999CompletedAt: "1800000000000"
+  });
+
+  const controller = createRoutineProgressSyncV1({
+    storage,
+    getUserId: () => "corrupt-user",
+    transport: async () => ({
+      ackedIds: [],
+      canonicalState: null,
+      productState: null
+    })
+  });
+
+  const operations =
+    collectLegacyCurrentCompletionsV1(
+      storage,
+      "corrupt-user"
+    );
+
+  assert.equal(operations.length, 1);
+
+  assert.throws(
+    () => controller.recordCompletion(operations[0]),
+    /Día no válido/
   );
 });
