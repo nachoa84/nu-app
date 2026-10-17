@@ -9,7 +9,7 @@
   --home-line: #e9ebef;
   --home-progress: #5149b8;
   --home-progress-soft: #eeeffb;
-  padding-top: calc(34px + var(--safe-top));
+  padding-top: calc(48px + var(--safe-top));
 }
 
 .home-page-header {
@@ -233,7 +233,7 @@
 
 @media (max-width: 370px) {
   #view-hoy {
-    padding-top: calc(30px + var(--safe-top));
+    padding-top: calc(44px + var(--safe-top));
   }
 
   .home-routine-card {
@@ -253,5 +253,146 @@
 
 /* NU APP · MARGEN SEGURO DE CABECERA MÓVIL V126 */
 #view-hoy .home-page-header {
-  margin-inline: 2px;
+  margin: -4px 0 0;
+}
+
+/* NU APP · Eje interno compartido de Inicio */
+#view-hoy .home-page-header > div,
+#view-hoy .home-routines-section > .home-section-heading {
+  padding-left: 13px;
+}
+
+/* NU APP · Tipografía controlada de Inicio */
+#view-hoy,
+#view-hoy button {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-page-header h1,
+#view-hoy .home-section-heading h2,
+#view-hoy .home-guide-feature h2,
+#view-hoy .home-routine-heading h2 {
+  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-page-header h1,
+#view-hoy .home-section-heading h2,
+#view-hoy .home-guide-feature h2 {
+  font-weight: 650;
+}
+
+#view-hoy .home-routine-heading h2 {
+  font-weight: 600;
+}
+
+#view-hoy .home-greeting,
+#view-hoy .home-guide-kicker,
+#view-hoy .home-guide-description,
+#view-hoy .home-guide-progress-copy,
+#view-hoy .home-routine-day,
+#view-hoy .home-routine-percent,
+#view-hoy .home-routine-continue,
+#view-hoy .home-routine-placeholder-label {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+#view-hoy .home-routine-continue {
+  font-weight: 600;
+}
+
+/* NU APP · Botones controlados de Inicio */
+#view-hoy #homeGuideSection .home-guide-action {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f59a1b 0%, #ef623f 100%);
+  color: #ffffff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: 0 6px 14px rgba(224, 103, 57, .18);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active {
+  transform: scale(.98);
+  box-shadow: 0 3px 9px rgba(224, 103, 57, .14);
+}
+
+#view-hoy .home-routine-continue {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: #fff1e8;
+  color: #c65334;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+}
+
+#view-hoy .home-routine-continue:active {
+  transform: scale(.98);
+  background: #ffe7d8;
+  color: #ad482d;
+}
+
+/* NU APP · Botones principales inspirados en referencia Claude */
+#view-hoy #homeGuideSection .home-guide-action {
+  min-height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #F47A20 0%, #D9573F 100%);
+  color: #FFFFFF;
+  font-weight: 650;
+  letter-spacing: .015em;
+  box-shadow: 0 8px 18px rgba(217, 87, 63, .22);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active {
+  transform: scale(.98);
+  box-shadow: 0 4px 10px rgba(217, 87, 63, .17);
+}
+
+#view-hoy .home-routine-continue {
+  min-height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #F47A20 0%, #D9573F 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 5px 12px rgba(217, 87, 63, .16);
+}
+
+#view-hoy .home-routine-continue:active {
+  transform: scale(.98);
+  background: linear-gradient(135deg, #E77A20 0%, #C94D3A 100%);
+  color: #FFFFFF;
+  box-shadow: 0 3px 8px rgba(217, 87, 63, .13);
+}
+
+/* NU APP · Degradé de marca reservado para CTA y estado Hecho */
+#view-hoy #homeGuideSection .home-guide-action,
+#view-hoy #homeGuideSection.home-guide-section.is-complete .home-guide-action {
+  background: linear-gradient(135deg, #E2542E 0%, #5A3E6B 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 18px rgba(90, 62, 107, .20);
+}
+
+#view-hoy #homeGuideSection .home-guide-action:active,
+#view-hoy #homeGuideSection.home-guide-section.is-complete .home-guide-action:active {
+  background: linear-gradient(135deg, #D94D2B 0%, #4F355F 100%);
+  box-shadow: 0 4px 10px rgba(90, 62, 107, .15);
+}
+
+#view-hoy .home-routine-continue {
+  background: #FFF1E8;
+  color: #C65334;
+  box-shadow: none;
+}
+
+#view-hoy .home-routine-continue:active {
+  background: #FFE7D8;
+  color: #AD482D;
+  box-shadow: none;
 }
