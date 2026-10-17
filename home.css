@@ -255,3 +255,69 @@
 #view-hoy .home-page-header {
   margin-inline: 2px;
 }
+
+/* =========================================================
+   REDISEÑO HOME · PASO 1
+   La Guía de inicio queda como pieza principal y las rutinas
+   se simplifican a accesos rápidos de continuidad.
+   ========================================================= */
+
+.home-section-heading > div > span {
+  display: none;
+}
+
+.home-routines {
+  gap: 10px;
+}
+
+.home-routine-card {
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 92px;
+  padding: 10px 12px;
+  border-radius: 18px;
+}
+
+.home-routine-cover {
+  width: 72px;
+  min-width: 72px;
+  height: 72px;
+  min-height: 72px;
+  border-radius: 14px;
+}
+
+.home-routine-cover img {
+  padding: 6px;
+}
+
+.home-routine-card-active .home-routine-heading {
+  margin-bottom: 10px;
+}
+
+.home-routine-card-active .home-routine-day,
+.home-routine-card-active .home-routine-progress-row {
+  display: none;
+}
+
+.home-routine-card-placeholder .home-routine-day {
+  margin: 7px 0 0;
+}
+
+.home-routine-card-placeholder .home-routine-placeholder-label {
+  display: none;
+}
+
+@media (max-width: 370px) {
+  .home-routine-card {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 86px;
+  }
+
+  .home-routine-cover {
+    width: 66px;
+    min-width: 66px;
+    height: 66px;
+    min-height: 66px;
+  }
+}
