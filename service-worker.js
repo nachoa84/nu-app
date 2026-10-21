@@ -1,10 +1,10 @@
-const CACHE="nuapp-supplements-pilot-1";
+const CACHE="nuapp-supplements-visual-2";
 
 const CORE=[
   "./product-routine-config.js?v=1",
   "./supplements-content.js?v=1",
-  "./supplements-view.js?v=1",
-  "./supplements.css?v=1",
+  "./supplements-view.js?v=2",
+  "./supplements.css?v=2",
   "./",
   "./index.html",
   "./tokens.css?v=61b-progress-canonical",
@@ -28,7 +28,7 @@ const CORE=[
   "./favorites.css?v=94-bot-folders",
   "./favorites-redesign-v1.css?v=146-wellspa-scale",
   "./bot-content.js?v=131-country-catalogs",
-  "./ui-core.js?v=supplements-pilot-1",
+  "./ui-core.js?v=supplements-visual-2",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=supplements-pilot-1",

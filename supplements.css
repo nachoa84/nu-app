@@ -1,17 +1,72 @@
-#view-suplementos { padding-bottom: 32px; }
-#view-suplementos .app-page-header { justify-content: flex-start; gap: 12px; }
+#view-suplementos, #view-suplementos-acciones { padding-bottom: 32px; }
+#view-suplementos .app-page-header,
+#view-suplementos-acciones .app-page-header { justify-content: flex-start; gap: 12px; }
+
 .supplement-general, .supplement-products { margin: 16px 0 24px; }
-.supplement-general > h2, .supplement-products > h2 { font-size: 21px; margin: 0 0 10px; }
-.supplement-general > p { color: #52605a; line-height: 1.6; }
-.supplement-general ol { padding: 0; list-style: none; counter-reset: supplement-action; display: grid; gap: 12px; }
-.supplement-general li { counter-increment: supplement-action; position: relative; padding: 18px 18px 18px 56px; background: #fff; border: 1px solid #e4ebe6; border-radius: 18px; }
-.supplement-general li::before { content: counter(supplement-action); position: absolute; left: 18px; top: 18px; color: #37684b; font-weight: 700; }
-.supplement-general h3 { margin: 0 0 7px; font-size: 16px; }
-.supplement-general li p { margin: 0; color: #52605a; line-height: 1.65; font-size: 14px; }
-.supplement-general a { display: inline-block; padding: 12px 0 0; color: #285e40; font-size: 14px; text-underline-offset: 3px; }
-.supplement-routines .home-routine-cover img { object-fit: cover; object-position: center 20%; }
-.supplement-routines .home-routine-card { min-width: 0; }
+.supplement-general-card {
+  width: 100%;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  border: 1px solid #e1e6ee;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(11, 32, 88, .05);
+  color: #17233f;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.supplement-general-card:focus-visible { outline: 2px solid #2854a1; outline-offset: 3px; }
+.supplement-general-card-title { font-size: 20px; font-weight: 650; line-height: 1.2; }
+.supplement-general-card-copy { font-size: 14px; line-height: 1.5; color: #596575; }
+.supplement-general-card-action { margin-top: 4px; color: #e45424; font-size: 13px; font-weight: 650; }
+.supplement-general-card-action span { margin-left: 3px; }
+.supplement-products > h2 { font-size: 21px; margin: 0 0 12px; }
 .supplement-routines { grid-template-columns: minmax(0, 1fr); }
+.supplement-routines .home-routine-card { min-width: 0; }
+.supplement-routines .home-routine-cover { background: #fff; }
+
+.supplement-actions { margin: 16px 0 24px; }
+.supplement-actions-intro {
+  max-width: 310px;
+  margin: 0 auto 18px;
+  color: #52605a;
+  line-height: 1.6;
+}
+.supplement-actions ol {
+  width: min(100%, 282px);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  counter-reset: supplement-action;
+  display: grid;
+  gap: 12px;
+}
+.supplement-actions li {
+  counter-increment: supplement-action;
+  position: relative;
+  padding: 18px 16px 18px 48px;
+  background: #fff;
+  border: 1px solid #e4ebe6;
+  border-radius: 18px;
+}
+.supplement-actions li::before {
+  content: counter(supplement-action);
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  color: #37684b;
+  font-weight: 700;
+}
+.supplement-actions h3 { margin: 0 0 7px; font-size: 16px; }
+.supplement-actions li p { margin: 0; color: #52605a; line-height: 1.65; font-size: 14px; }
+.supplement-actions a { display: inline-block; padding: 12px 0 0; color: #285e40; font-size: 14px; text-underline-offset: 3px; }
+
 #view-hoy.day-open .supplement-completion .complete-helper { display: block !important; margin: 10px 0; line-height: 1.5; }
 #view-hoy.day-open .supplement-completion.done { display: block !important; padding: 16px 20px !important; }
 #view-hoy.day-open .supplement-completion.done h3 { margin: 0 0 6px; }

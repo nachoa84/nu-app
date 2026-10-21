@@ -14,7 +14,46 @@ function renderSupplements() {
   root.replaceChildren();
   const general = document.createElement("section");
   general.className = "supplement-general";
-  general.innerHTML = '<h2>Acciones generales</h2><p>Prepará tu negocio para posicionar y compartir los suplementos.</p>';
+  const entry = document.createElement("button");
+  entry.type = "button";
+  entry.className = "supplement-general-card";
+  entry.innerHTML = '<span class="supplement-general-card-title">Acciones generales</span><span class="supplement-general-card-copy">Seis pasos para preparar tu negocio, organizar tu tiempo y compartir los suplementos.</span><span class="supplement-general-card-action">Ver acciones generales <span aria-hidden="true">›</span></span>';
+  entry.onclick = () => activateMainView("suplementos-acciones");
+  general.appendChild(entry);
+  const products = document.createElement("section");
+  products.className = "supplement-products";
+  products.innerHTML = '<h2>Elegí tu suplemento</h2>';
+  const cards = document.createElement("div");
+  cards.className = "home-routines supplement-routines";
+  Object.values(ROUTINE_CATALOG).filter(config => config.category === "supplements").forEach(config => {
+    const card = createFixedRoutineCardV92b(config);
+    // Keep the native card shape; a shared product cover will be added later.
+    card.querySelector(".home-routine-cover img")?.remove();
+    const state = getRoutineCardStateV92b(config);
+    let completed = 0;
+    for (let day = 1; day <= config.totalDays; day++) {
+      if (localStorage.getItem(window.NuProductStorage.completeKey(config.id, day)) === "1") completed++;
+    }
+    const percent = Math.round(completed / config.totalDays * 100);
+    card.querySelector(".home-routine-day").textContent = `${completed} de ${config.totalDays} días completados`;
+    card.querySelector(".home-routine-percent").textContent = `${percent}%`;
+    card.querySelector(".home-routine-progress span").style.width = `${percent}%`;
+    card.querySelector(".home-routine-continue span").textContent = completed === config.totalDays
+      ? "Ver programa completado" : `Ver día ${Math.min(Number(state.currentDay || 1), config.totalDays)}`;
+    cards.appendChild(card);
+  });
+  products.appendChild(cards);
+  root.append(general, products);
+  document.getElementById("supplementsBackBtn").onclick = () => activateMainView("hoy");
+}
+
+function renderSupplementActions() {
+  const root = document.getElementById("supplementActionsRoot");
+  if (!root) return;
+  root.replaceChildren();
+  const general = document.createElement("section");
+  general.className = "supplement-actions";
+  general.innerHTML = '<p class="supplement-actions-intro">Prepará tu negocio para posicionar y compartir los suplementos.</p>';
   const list = document.createElement("ol");
   SUPPLEMENT_GENERAL_ACTIONS.forEach(([title, copy], index) => {
     const item = document.createElement("li");
@@ -34,29 +73,8 @@ function renderSupplements() {
     list.appendChild(item);
   });
   general.appendChild(list);
-  const products = document.createElement("section");
-  products.className = "supplement-products";
-  products.innerHTML = '<h2>Elegí tu suplemento</h2>';
-  const cards = document.createElement("div");
-  cards.className = "home-routines supplement-routines";
-  Object.values(ROUTINE_CATALOG).filter(config => config.category === "supplements").forEach(config => {
-    const card = createFixedRoutineCardV92b(config);
-    const state = getRoutineCardStateV92b(config);
-    let completed = 0;
-    for (let day = 1; day <= config.totalDays; day++) {
-      if (localStorage.getItem(window.NuProductStorage.completeKey(config.id, day)) === "1") completed++;
-    }
-    const percent = Math.round(completed / config.totalDays * 100);
-    card.querySelector(".home-routine-day").textContent = `${completed} de ${config.totalDays} días completados`;
-    card.querySelector(".home-routine-percent").textContent = `${percent}%`;
-    card.querySelector(".home-routine-progress span").style.width = `${percent}%`;
-    card.querySelector(".home-routine-continue span").textContent = completed === config.totalDays
-      ? "Ver programa completado" : `Ver día ${Math.min(Number(state.currentDay || 1), config.totalDays)}`;
-    cards.appendChild(card);
-  });
-  products.appendChild(cards);
-  root.append(general, products);
-  document.getElementById("supplementsBackBtn").onclick = () => activateMainView("hoy");
+  root.appendChild(general);
+  document.getElementById("supplementActionsBackBtn").onclick = () => activateMainView("suplementos");
 }
 
 // The home placeholder becomes the entrance to the section, without moving existing programs.
@@ -65,11 +83,11 @@ createUpcomingPharmanexCardV123 = function createSupplementsEntry() {
   const card = createPharmanexCover();
   card.removeAttribute("aria-disabled");
   card.classList.remove("home-routine-card-placeholder");
-  card.querySelector(".home-routine-day").textContent = "Colágeno · LifePak";
+  card.querySelector(".home-routine-day").remove();
   const button = document.createElement("button");
   button.type = "button";
   button.className = "home-routine-continue";
-  button.textContent = "Ver suplementos";
+  button.textContent = "Comenzar rutina";
   button.onclick = () => activateMainView("suplementos");
   card.querySelector(".home-routine-placeholder-label").replaceWith(button);
   return card;

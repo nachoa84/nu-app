@@ -425,7 +425,7 @@ function currentMainViewName() {
 }
 
 function nativeViewDirection(fromView, toView) {
-  const homeChildViews = new Set(["rutina", "guia"]);
+  const homeChildViews = new Set(["rutina", "guia", "suplementos", "suplementos-acciones"]);
   const fromNav = homeChildViews.has(fromView) ? "hoy" : fromView;
   const toNav = homeChildViews.has(toView) ? "hoy" : toView;
   const fromIndex = MAIN_VIEW_ORDER.indexOf(fromNav);
@@ -525,7 +525,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   const previousTarget = document.getElementById(`view-${previousView}`);
   const changingView = previousView !== view;
   const direction = nativeViewDirection(previousView, view);
-  const navView = ["rutina", "guia", "suplementos"].includes(view) ? "hoy" : view;
+  const navView = ["rutina", "guia", "suplementos", "suplementos-acciones"].includes(view) ? "hoy" : view;
   const activeNav = document.querySelector(`.nav-btn[data-view="${navView}"]`);
   const navWasActive = activeNav?.classList.contains("active") === true;
 
@@ -559,6 +559,7 @@ function activateMainView(view, { vibrate = false } = {}) {
 
   if (view === "rutina") renderDays();
   if (view === "suplementos") renderSupplements();
+  if (view === "suplementos-acciones") renderSupplementActions();
   if (view === "favoritos") renderFavorites();
 
   if (view === "bot") {
