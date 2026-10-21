@@ -1233,7 +1233,7 @@ function renderFavorites() {
 
   if (filteredRoutine.length) {
     // NU APP · JERARQUÍA DE FAVORITOS V93B
-    const routineOrder = ["collagen-30", "lumispa-10", "wellspa-10", "galvanicspa-10"];
+    const routineOrder = ["collagen-30", ...Object.keys(window.NuProductRoutines)];
     const visibleRoutineIds = [...new Set(filteredRoutine.map(favorite => favorite.routineId))]
       .sort((a, b) => routineOrder.indexOf(a) - routineOrder.indexOf(b));
     const routineSection = document.createElement("section");

@@ -4,7 +4,7 @@
 
 const DEFAULT_UNLOCK_HOUR = 9;
 let TOTAL_PROGRAM_DAYS = getActiveRoutineConfig().totalDays;
-function getRoutineStateStorageKey() { return isBackendManagedRoutine() ? "routineState" : `routineState:${getActiveRoutineId()}`; }
+function getRoutineStateStorageKey() { return isBackendManagedRoutine() ? "routineState" : window.NuProductStorage.stateKey(getActiveRoutineId()); }
 
 function getRoutineState() {
   const fallback = {
@@ -54,13 +54,13 @@ function saveRoutineState(state) {
 }
 
 function getDayCompleteStorageKey(day) {
-  return isBackendManagedRoutine() ? `day${Number(day)}Complete` : `day:${getActiveRoutineId()}:${Number(day)}:complete`;
+  return isBackendManagedRoutine() ? `day${Number(day)}Complete` : window.NuProductStorage.completeKey(getActiveRoutineId(), Number(day));
 }
 
 function getDayCompletedAtStorageKey(day) {
   return isBackendManagedRoutine()
     ? `day${Number(day)}CompletedAt`
-    : `day:${getActiveRoutineId()}:${Number(day)}:completedAt`;
+    : window.NuProductStorage.completedAtKey(getActiveRoutineId(), Number(day));
 }
 
 function rememberDayCompletionTimestamp(day, complete = true) {
@@ -332,7 +332,7 @@ function advanceRoutineIfEligible() {
 // NU APP · AVANCE INMEDIATO MULTIRUTINA V100
 function getNextPendingProductRoutineDayV100(routineId, totalDays = 10) {
   for (let day = 1; day <= Number(totalDays); day++) {
-    if (localStorage.getItem(`day:${routineId}:${day}:complete`) !== "1") {
+    if (localStorage.getItem(window.NuProductStorage.completeKey(routineId, day)) !== "1") {
       return day;
     }
   }
@@ -356,7 +356,7 @@ setDayComplete = function setDayCompleteV100(day, complete = true) {
   if (!complete) {
     state.pendingNextDay = null;
     state.nextUnlockAt = null;
-    localStorage.setItem(`routineState:${routineId}`, JSON.stringify(state));
+    localStorage.setItem(window.NuProductStorage.stateKey(routineId), JSON.stringify(state));
   }
 
   if (typeof renderRoutineCardsV92a === "function") renderRoutineCardsV92a();

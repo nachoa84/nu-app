@@ -159,6 +159,12 @@ function createHarness({ withProductState = false } = {}) {
     };
   }
 
+  window.NuProductRoutines = require("../product-routine-config");
+  window.NuProductStorage = {
+    stateKey: id => `routineState:${id}`,
+    completeKey: (id, day) => `day:${id}:${day}:complete`,
+    completedAtKey: (id, day) => `day:${id}:${day}:completedAt`
+  };
   window.crypto = {
     randomUUID() {
       return "generated-user";

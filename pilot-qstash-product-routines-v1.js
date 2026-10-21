@@ -28,11 +28,10 @@ const COMPLETE_PATH = "/api/product-routines/complete";
 const BOOTSTRAP_PATH = "/api/product-routines/bootstrap";
 const PROFILE_PATH_PREFIX = "/api/profile/";
 
-const ROUTINES = Object.freeze({
-  "lumispa-10": "LumiSpa",
-  "wellspa-10": "WellSpa",
-  "galvanicspa-10": "Galvanic Spa"
-});
+const PRODUCT_ROUTINE_CONFIG = require("./product-routine-config");
+const ROUTINES = Object.freeze(Object.fromEntries(
+  Object.entries(PRODUCT_ROUTINE_CONFIG).map(([id, config]) => [id, config.title])
+));
 
 const QSTASH_API_BASE = String(
   process.env.QSTASH_URL || "https://qstash.upstash.io"
@@ -324,7 +323,7 @@ async function syncOneRoutine({
   if (
     !Number.isInteger(currentDay) ||
     currentDay < 1 ||
-    currentDay >= 10 ||
+    currentDay >= PRODUCT_ROUTINE_CONFIG[routineId].totalDays ||
     !scheduledAt
   ) {
     const cancelled = await cancelScheduledJobsForRoutine(
@@ -411,7 +410,9 @@ async function syncOneRoutine({
     subscription,
     payload: {
       title: `🔥 Tu Día ${nextDay} de ${name} está disponible`,
-      body: "Entrá y descubrí tu acción de hoy.",
+      body: PRODUCT_ROUTINE_CONFIG[routineId].category === "supplements"
+        ? "Entrá y descubrí tus materiales de hoy."
+        : "Entrá y descubrí tu acción de hoy.",
       url: `/?routine=${encodeURIComponent(routineId)}&day=${nextDay}&notification=1`,
       tag: `routine_daily_${userId}_${routineId}`
     }

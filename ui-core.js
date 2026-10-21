@@ -525,7 +525,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   const previousTarget = document.getElementById(`view-${previousView}`);
   const changingView = previousView !== view;
   const direction = nativeViewDirection(previousView, view);
-  const navView = ["rutina", "guia"].includes(view) ? "hoy" : view;
+  const navView = ["rutina", "guia", "suplementos"].includes(view) ? "hoy" : view;
   const activeNav = document.querySelector(`.nav-btn[data-view="${navView}"]`);
   const navWasActive = activeNav?.classList.contains("active") === true;
 
@@ -558,6 +558,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   if (changingView) animateNativeViewEnter(target, direction);
 
   if (view === "rutina") renderDays();
+  if (view === "suplementos") renderSupplements();
   if (view === "favoritos") renderFavorites();
 
   if (view === "bot") {
@@ -618,11 +619,14 @@ function setupMainNavigation() {
   if (openRoutineButton) openRoutineButton.onclick = () => activateMainView("rutina");
   if (routineBackButton) {
     routineBackButton.innerHTML = ICONS.back;
-    routineBackButton.onclick = () => activateMainView("hoy");
+    routineBackButton.onclick = () => activateMainView(getActiveRoutineConfig().category === "supplements" ? "suplementos" : "hoy");
   }
   if (dayBackButton) {
     dayBackButton.innerHTML = ICONS.back;
-    dayBackButton.onclick = closeNativeDayView;
+    dayBackButton.onclick = () => {
+      closeNativeDayView();
+      if (getActiveRoutineConfig().category === "supplements") activateMainView("suplementos");
+    };
   }
   if (dayProgressButton) {
     dayProgressButton.innerHTML = ICONS.calendar;

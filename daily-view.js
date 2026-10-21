@@ -65,6 +65,9 @@ function addLinks(container, links) {
 }
 
 function createBlock(block) {
+  if (block.type === "complete" && getActiveRoutineConfig().category === "supplements") {
+    return createSupplementCompletion();
+  }
   if (block.type === "action") {
     const card = document.createElement("section");
     card.className = "training-card";
@@ -732,7 +735,7 @@ function renderStructuredDayDetail() {
     <div class="native-day-hero">
       <div class="native-day-hero-copy">
         <h2>Día ${selectedDay}</h2>
-        <p>TU ACCIÓN DE HOY</p>
+        <p>${getActiveRoutineConfig().category === "supplements" ? "TUS MATERIALES DE HOY" : "TU ACCIÓN DE HOY"}</p>
       </div>
       <div class="native-day-hero-media" aria-hidden="true">
         <img src="${getRoutineHeroV92a()}" alt="" />
