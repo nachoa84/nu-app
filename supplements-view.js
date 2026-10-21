@@ -17,7 +17,7 @@ function renderSupplements() {
   const entry = document.createElement("button");
   entry.type = "button";
   entry.className = "supplement-general-card";
-  entry.innerHTML = '<span class="supplement-general-card-title">Acciones generales</span><span class="supplement-general-card-copy">Seis pasos para preparar tu negocio, organizar tu tiempo y compartir los suplementos.</span><span class="supplement-general-card-action">Ver acciones generales <span aria-hidden="true">›</span></span>';
+  entry.innerHTML = '<span class="supplement-general-card-title">Acciones generales</span><span class="supplement-general-card-copy">Seis pasos para preparar tu negocio, organizar tu tiempo y compartir los suplementos.</span><span class="supplement-general-card-action">Explorar <span aria-hidden="true">›</span></span>';
   entry.onclick = () => activateMainView("suplementos-acciones");
   general.appendChild(entry);
   const products = document.createElement("section");

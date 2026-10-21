@@ -1,10 +1,10 @@
-const CACHE="nuapp-supplements-visual-2";
+const CACHE="nuapp-supplements-visual-3";
 
 const CORE=[
   "./product-routine-config.js?v=1",
   "./supplements-content.js?v=1",
-  "./supplements-view.js?v=2",
-  "./supplements.css?v=2",
+  "./supplements-view.js?v=3",
+  "./supplements.css?v=3",
   "./",
   "./index.html",
   "./tokens.css?v=61b-progress-canonical",

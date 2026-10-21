@@ -3,6 +3,7 @@
 #view-suplementos-acciones .app-page-header { justify-content: flex-start; gap: 12px; }
 
 .supplement-general, .supplement-products { margin: 16px 0 24px; }
+.supplement-general { margin-top: 32px; }
 .supplement-general-card {
   width: 100%;
   min-height: 170px;
@@ -31,7 +32,7 @@
 .supplement-routines .home-routine-card { min-width: 0; }
 .supplement-routines .home-routine-cover { background: #fff; }
 
-.supplement-actions { margin: 16px 0 24px; }
+.supplement-actions { margin: 32px 0 24px; }
 .supplement-actions-intro {
   max-width: 310px;
   margin: 0 auto 18px;
@@ -39,8 +40,8 @@
   line-height: 1.6;
 }
 .supplement-actions ol {
-  width: min(100%, 282px);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0;
   list-style: none;
   counter-reset: supplement-action;
@@ -50,7 +51,7 @@
 .supplement-actions li {
   counter-increment: supplement-action;
   position: relative;
-  padding: 18px 16px 18px 48px;
+  padding: 18px 18px 18px 56px;
   background: #fff;
   border: 1px solid #e4ebe6;
   border-radius: 18px;
@@ -58,7 +59,7 @@
 .supplement-actions li::before {
   content: counter(supplement-action);
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 18px;
   color: #37684b;
   font-weight: 700;
