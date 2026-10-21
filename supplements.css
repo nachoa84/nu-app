@@ -115,6 +115,7 @@
 
 .supplement-completion-action { width: 100%; }
 .supplement-completion-feedback {
+  display: block;
   margin: 10px 4px 0;
   color: #58616d;
   font-size: 12px;

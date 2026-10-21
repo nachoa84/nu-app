@@ -121,7 +121,7 @@ function createSupplementCompletion() {
   button.type = "button";
   button.className = "primary complete-day-btn";
   button.textContent = "Marcar día completado";
-  const feedback = document.createElement("p");
+  const feedback = document.createElement("span");
   feedback.className = "supplement-completion-feedback";
   feedback.setAttribute("role", "status");
   button.onclick = async () => {

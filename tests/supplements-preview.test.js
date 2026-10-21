@@ -66,3 +66,17 @@ test("confirmed supplement completion shows the native visible done state", asyn
   assert.match(css, /supplement-completion-action/);
   assert.doesNotMatch(css, /!important/);
 });
+
+test("a rejected routine leaves the button enabled and shows a visible error", async () => {
+  const backend = { completeProductRoutineDay: async () => {
+    throw new Error("Rutina no válida.");
+  } };
+  const { card, cards } = completionFor(1, 1, backend);
+  await cards[1].onclick();
+  assert.equal(cards[1].disabled, false);
+  assert.equal(cards[2].className, "supplement-completion-feedback");
+  assert.match(cards[2].textContent, /Reiniciá Nu App/);
+  assert.equal(card.classList.contains("done"), false);
+  const css = fs.readFileSync(path.join(__dirname, "..", "supplements.css"), "utf8");
+  assert.match(css, /\.supplement-completion-feedback\s*\{\s*display: block;/);
+});
