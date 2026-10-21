@@ -26,19 +26,26 @@
 .supplement-general-card-title { font-size: 20px; font-weight: 650; line-height: 1.2; }
 .supplement-general-card-copy { font-size: 14px; line-height: 1.5; color: #596575; }
 .supplement-general-card-action {
-  min-height: 36px;
+  min-width: 160px;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 14px;
   margin-top: 4px;
-  padding: 7px 14px;
-  border: 1px solid #f4d5c6;
-  border-radius: 10px;
-  background: #fff0e8;
-  color: #d84f23;
-  font-size: 13px;
-  font-weight: 650;
+  padding: 0 19px;
+  border: 0;
+  border-radius: 999px;
+  background: #ff552a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
 }
-.supplement-general-card-action span { margin-left: 3px; }
+.supplement-general-card-action span { font-size: 23px; font-weight: 400; line-height: 1; }
+#view-hoy .home-routine-card[data-routine-id="pharmanex-upcoming"] .home-routine-continue {
+  margin-top: 10px;
+}
 .supplement-products > h2 { font-size: 21px; margin: 0 0 12px 12px; }
 .supplement-routines { grid-template-columns: minmax(0, 1fr); }
 .supplement-routines .home-routine-card {
