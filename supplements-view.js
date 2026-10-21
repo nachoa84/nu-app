@@ -109,10 +109,11 @@ function createSupplementCompletion() {
   card.setAttribute("aria-live", "polite");
   const showDone = () => {
     card.classList.add("done");
-    card.innerHTML = `<h3>${day === totalDays ? "Programa completado" : "Día completado"}</h3><p>Tu avance quedó registrado.</p>`;
+    card.innerHTML = `<div class="complete-done-copy"><h3><span class="complete-done-inline-check" aria-hidden="true">${ICONS.check}</span><span>${day === totalDays ? "Programa completado" : "Día completado"}</span></h3><p>Tu avance quedó registrado.</p></div>`;
   };
   if (isDayComplete(day)) { showDone(); return card; }
   if (isPreviewMode && day > Number(getRoutineState().currentDay || 1)) {
+    card.classList.add("is-preview");
     card.innerHTML = '<h3>Vista previa del día</h3><p>Podés recorrer estos materiales. El avance se habilita cuando llegue este día de la rutina.</p>';
     return card;
   }
