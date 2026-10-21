@@ -112,6 +112,10 @@ function createSupplementCompletion() {
     card.innerHTML = `<h3>${day === totalDays ? "Programa completado" : "Día completado"}</h3><p>Tu avance quedó registrado.</p>`;
   };
   if (isDayComplete(day)) { showDone(); return card; }
+  if (isPreviewMode && day > Number(getRoutineState().currentDay || 1)) {
+    card.innerHTML = '<h3>Vista previa del día</h3><p>Podés recorrer estos materiales. El avance se habilita cuando llegue este día de la rutina.</p>';
+    return card;
+  }
   card.innerHTML = '<h3>Registrá tu avance</h3><p>Marcá este día cuando hayas terminado de usar sus materiales.</p>';
   const button = document.createElement("button");
   button.type = "button";
@@ -134,7 +138,9 @@ function createSupplementCompletion() {
       renderSupplements();
       if (getActiveRoutineId() === routineId) renderDays();
     } catch (error) {
-      feedback.textContent = error.message || "No se pudo guardar. Intentá de nuevo.";
+      feedback.textContent = error.message === "Rutina no válida."
+        ? "El servidor todavía no reconoce este suplemento. Reiniciá Nu App y volvé a intentar."
+        : error.message || "No se pudo guardar. Intentá de nuevo.";
       button.disabled = false;
     }
   };
