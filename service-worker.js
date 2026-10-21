@@ -1,10 +1,10 @@
-const CACHE="nuapp-supplements-visual-4";
+const CACHE="nuapp-supplements-visual-5";
 
 const CORE=[
   "./product-routine-config.js?v=1",
   "./supplements-content.js?v=1",
   "./supplements-view.js?v=4",
-  "./supplements.css?v=4",
+  "./supplements.css?v=5",
   "./assets/supplements/covers/colageno-10.png",
   "./assets/supplements/covers/lifepak-5.png",
   "./",
