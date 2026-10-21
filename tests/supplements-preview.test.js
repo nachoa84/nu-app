@@ -14,7 +14,8 @@ function completionFor(day, currentDay, backend = null) {
     document: { getElementById: () => null, createElement: () => {
       const classes = new Set();
       const card = { classList: { add: name => classes.add(name), contains: name => classes.has(name) },
-        isConnected: true, setAttribute() {}, append(...children) { this.children = children; } };
+        isConnected: true, setAttribute() {}, append(...children) { this.children = children; },
+        appendChild(child) { this.children = [child]; } };
       cards.push(card);
       return card;
     } },
@@ -39,15 +40,16 @@ test("preview exposes future supplement material without recording completion", 
   const { card, cards } = completionFor(4, 1);
   assert.match(card.innerHTML, /Vista previa del día/);
   assert.match(card.innerHTML, /Podés recorrer estos materiales/);
-  assert.equal(card.classList.contains("is-preview"), true);
+  assert.equal(card.className, "supplement-preview-card");
   assert.equal(cards.length, 1, "future day has no completion button");
 });
 
 test("the current supplement day still offers the completion control", () => {
   const { card, cards } = completionFor(1, 1);
-  assert.equal(cards.length, 3);
+  assert.equal(cards.length, 4);
   assert.equal(cards[1].textContent, "Marcar día completado");
-  assert.equal(card.children[0], cards[1]);
+  assert.equal(card.children[0], cards[3]);
+  assert.equal(cards[3].children[0], cards[1]);
 });
 
 test("confirmed supplement completion shows the native visible done state", async () => {
@@ -61,5 +63,6 @@ test("confirmed supplement completion shows the native visible done state", asyn
   assert.match(card.innerHTML, /Día completado/);
   assert.deepEqual(calls, ["days"]);
   const css = fs.readFileSync(path.join(__dirname, "..", "supplements.css"), "utf8");
-  assert.match(css, /supplement-completion\.done/);
+  assert.match(css, /supplement-completion-action/);
+  assert.doesNotMatch(css, /!important/);
 });

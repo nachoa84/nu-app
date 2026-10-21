@@ -113,17 +113,17 @@ function createSupplementCompletion() {
   };
   if (isDayComplete(day)) { showDone(); return card; }
   if (isPreviewMode && day > Number(getRoutineState().currentDay || 1)) {
-    card.classList.add("is-preview");
+    card.className = "supplement-preview-card";
     card.innerHTML = '<h3>Vista previa del día</h3><p>Podés recorrer estos materiales. El avance se habilita cuando llegue este día de la rutina.</p>';
     return card;
   }
-  card.innerHTML = '<h3>Registrá tu avance</h3><p>Marcá este día cuando hayas terminado de usar sus materiales.</p>';
   const button = document.createElement("button");
   button.type = "button";
   button.className = "primary complete-day-btn";
   button.textContent = "Marcar día completado";
   const feedback = document.createElement("p");
-  feedback.className = "complete-helper";
+  feedback.className = "supplement-completion-feedback";
+  feedback.setAttribute("role", "status");
   button.onclick = async () => {
     button.disabled = true;
     feedback.textContent = "Guardando…";
@@ -145,7 +145,10 @@ function createSupplementCompletion() {
       button.disabled = false;
     }
   };
-  card.append(button, feedback);
+  const action = document.createElement("div");
+  action.className = "supplement-completion-action";
+  action.append(button, feedback);
+  card.appendChild(action);
   return card;
 }
 
