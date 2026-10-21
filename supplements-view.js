@@ -7,9 +7,10 @@ const SUPPLEMENT_GENERAL_ACTIONS = [
   ["Conversá y compartí", "Contactá al menos a 10 personas nuevas por día con entusiasmo. Publicá contenido en tus redes y estados de WhatsApp y revisá los tutoriales del producto."],
   ["Prepará tu energía", "Escuchá música, mové el cuerpo y prepará tu espacio de trabajo. Recordá que cada acción cuenta para alcanzar tus objetivos."]
 ];
-const SUPPLEMENT_PILOT_COVERS = {
+const SUPPLEMENT_COVERS = {
   "colageno-10": "assets/supplements/covers/colageno-10.png",
-  "lifepak-5": "assets/supplements/covers/lifepak-5.png"
+  "lifepak-5": "assets/supplements/covers/lifepak-5.png",
+  "lifepak-elements-5": "assets/supplements/covers/lifepak-elements-5.png"
 };
 
 function renderSupplements() {
@@ -31,7 +32,7 @@ function renderSupplements() {
   cards.className = "home-routines supplement-routines";
   Object.values(ROUTINE_CATALOG).filter(config => config.category === "supplements").forEach(config => {
     const card = createFixedRoutineCardV92b(config);
-    const cover = SUPPLEMENT_PILOT_COVERS[config.id];
+    const cover = SUPPLEMENT_COVERS[config.id];
     const image = card.querySelector(".home-routine-cover img");
     if (image && cover) image.src = cover;
     const state = getRoutineCardStateV92b(config);

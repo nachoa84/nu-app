@@ -1,4 +1,4 @@
-// Pilot materials from inventory 05, 2026-10-21; order preserved. No daily tasks.
+// Supplement materials from inventory 05, 2026-10-21; order preserved. Only Prysm has daily tasks.
 const SUPPLEMENT_ROUTINE_DAYS = {
   "colageno-10": {
     "id": "colageno-10",
@@ -552,5 +552,190 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         ]
       }
     }
+  },
+  "lifepak-elements-5": {
+    "id": "lifepak-elements-5",
+    "title": "LifePak Elements",
+    "totalDays": 5,
+    "days": {
+      "1": {
+        "title": "Día 1 · LifePak Elements",
+        "hero": "Tus materiales de hoy",
+        "description": "Guardá o compartí los materiales que necesites.",
+        "blocks": [
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-01-1.jpg",
+            "label": "LifePak Elements · Día 1 · Material 1",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-01-2.jpg",
+            "label": "LifePak Elements · Día 1 · Material 2",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "video",
+            "src": "assets/supplements/lifepak-elements-5/day-01-3.mp4",
+            "label": "LifePak Elements · Día 1 · Material 3",
+            "shareable": true,
+            "favorite": true,
+            "poster": "assets/supplements/lifepak-elements-5/day-01-3-poster.webp"
+          },
+          {
+            "type": "complete",
+            "label": "Marcar día completado"
+          }
+        ]
+      },
+      "2": {
+        "title": "Día 2 · LifePak Elements",
+        "hero": "Tus materiales de hoy",
+        "description": "Guardá o compartí los materiales que necesites.",
+        "blocks": [
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-02-1.jpg",
+            "label": "LifePak Elements · Día 2 · Material 1",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "video",
+            "src": "assets/supplements/lifepak-elements-5/day-02-2.mp4",
+            "label": "LifePak Elements · Día 2 · Material 2",
+            "shareable": true,
+            "favorite": true,
+            "poster": "assets/supplements/lifepak-elements-5/day-02-2-poster.webp"
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-02-3.jpg",
+            "label": "LifePak Elements · Día 2 · Material 3",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "complete",
+            "label": "Marcar día completado"
+          }
+        ]
+      },
+      "3": {
+        "title": "Día 3 · LifePak Elements",
+        "hero": "Tus materiales de hoy",
+        "description": "Guardá o compartí los materiales que necesites.",
+        "blocks": [
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-03-1.jpg",
+            "label": "LifePak Elements · Día 3 · Material 1",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-03-2.jpg",
+            "label": "LifePak Elements · Día 3 · Material 2",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-03-3.jpg",
+            "label": "LifePak Elements · Día 3 · Material 3",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "complete",
+            "label": "Marcar día completado"
+          }
+        ]
+      },
+      "4": {
+        "title": "Día 4 · LifePak Elements",
+        "hero": "Tus materiales de hoy",
+        "description": "Guardá o compartí los materiales que necesites.",
+        "blocks": [
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-04-1.jpg",
+            "label": "LifePak Elements · Día 4 · Material 1",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-04-2.jpg",
+            "label": "LifePak Elements · Día 4 · Material 2",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-04-3.jpg",
+            "label": "LifePak Elements · Día 4 · Material 3",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "complete",
+            "label": "Marcar día completado"
+          }
+        ]
+      },
+      "5": {
+        "title": "Día 5 · LifePak Elements",
+        "hero": "Tus materiales de hoy",
+        "description": "Guardá o compartí los materiales que necesites.",
+        "blocks": [
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-05-1.jpg",
+            "label": "LifePak Elements · Día 5 · Material 1",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-05-2.jpg",
+            "label": "LifePak Elements · Día 5 · Material 2",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "media",
+            "mediaType": "image",
+            "src": "assets/supplements/lifepak-elements-5/day-05-3.jpg",
+            "label": "LifePak Elements · Día 5 · Material 3",
+            "shareable": true,
+            "favorite": true
+          },
+          {
+            "type": "complete",
+            "label": "Marcar día completado"
+          }
+        ]
+      }
+    },
+    "cover": "assets/supplements/lifepak-elements-5/day-01-1.jpg"
   }
 };

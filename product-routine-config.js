@@ -6,7 +6,8 @@
     "wellspa-10": Object.freeze({ title: "WellSpa", totalDays: 10 }),
     "galvanicspa-10": Object.freeze({ title: "Galvanic Spa", totalDays: 10 }),
     "colageno-10": Object.freeze({ title: "Colágeno", totalDays: 10, category: "supplements" }),
-    "lifepak-5": Object.freeze({ title: "LifePak", totalDays: 5, category: "supplements" })
+    "lifepak-5": Object.freeze({ title: "LifePak", totalDays: 5, category: "supplements" }),
+    "lifepak-elements-5": Object.freeze({ title: "LifePak Elements", totalDays: 5, category: "supplements" })
   });
   if (typeof module === "object" && module.exports) module.exports = products;
   else {

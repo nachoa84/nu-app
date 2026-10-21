@@ -11,13 +11,31 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--inventory', type=pathlib.Path, required=True)
 parser.add_argument('--originals', type=pathlib.Path, required=True)
 parser.add_argument('--output-root', type=pathlib.Path, required=True)
+parser.add_argument('--routine-id', action='append',
+                    help='Build only this inventory routine; repeat for multiple routines. Defaults to the pilot.')
+parser.add_argument('--append', action='store_true',
+                    help='Add selected routines to existing content and media manifest without changing prior entries.')
 args = parser.parse_args()
 inventory = json.loads(args.inventory.read_text())
 assets = []
 programs = {}
+selected = set(args.routine_id or [])
+available = {routine['proposed_id'] for routine in inventory['routines']}
+if selected - available:
+    parser.error(f"Unknown routine ids: {', '.join(sorted(selected - available))}")
+if args.append:
+    prefix = 'const SUPPLEMENT_ROUTINE_DAYS = '
+    existing = (args.output_root / 'supplements-content.js').read_text()
+    start = existing.index(prefix) + len(prefix)
+    prior = json.loads(existing[start:].strip().removesuffix(';'))
+    overlap = set(prior) & (selected or {routine['proposed_id'] for routine in inventory['routines'] if routine['pilot']})
+    if overlap:
+        parser.error(f"Already registered: {', '.join(sorted(overlap))}")
 
 for routine in inventory['routines']:
-    if not routine['pilot']:
+    if selected and routine['proposed_id'] not in selected:
+        continue
+    if not selected and not routine['pilot']:
         continue
     rid = routine['proposed_id']
     program = dict(id=rid, title=routine['display_name'], totalDays=routine['duration_days'], days={})
@@ -62,8 +80,14 @@ for routine in inventory['routines']:
     programs[rid] = program
 
 (args.output_root / 'docs').mkdir(exist_ok=True)
-(args.output_root / 'docs/supplements-pilot-media.json').write_text(json.dumps(assets, indent=2) + '\n')
-(args.output_root / 'supplements-content.js').write_text(
-    '// Pilot materials from inventory 05, 2026-10-21; order preserved. No daily tasks.\nconst SUPPLEMENT_ROUTINE_DAYS = '
+content_path = args.output_root / 'supplements-content.js'
+manifest_path = args.output_root / 'docs/supplements-pilot-media.json'
+if args.append:
+    programs = {**prior, **programs}
+    assets = json.loads(manifest_path.read_text()) + assets
+manifest_path.write_text(json.dumps(assets, indent=2) + '\n')
+content_path.write_text(
+    '// Supplement materials from inventory 05, 2026-10-21; order preserved. Only Prysm has daily tasks.\n'
+    'const SUPPLEMENT_ROUTINE_DAYS = '
     + json.dumps(programs, ensure_ascii=False, indent=2) + ';\n')
 print(json.dumps(dict(materials=len(assets), optimized_bytes=sum(item['optimized_bytes'] for item in assets))))
