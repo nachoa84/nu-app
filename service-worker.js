@@ -1,13 +1,14 @@
-const CACHE="nuapp-supplements-completion-3";
+const CACHE="nuapp-supplements-nubi-1";
 
 const CORE=[
-  "./product-routine-config.js?v=2",
-  "./supplements-content.js?v=2",
-  "./supplements-view.js?v=9",
+  "./product-routine-config.js?v=3",
+  "./supplements-content.js?v=3",
+  "./supplements-view.js?v=10",
   "./supplements.css?v=9",
   "./assets/supplements/covers/colageno-10.png",
   "./assets/supplements/covers/lifepak-5.png",
   "./assets/supplements/covers/lifepak-elements-5.png",
+  "./assets/supplements/covers/nubi-10.png",
   "./",
   "./index.html",
   "./tokens.css?v=61b-progress-canonical",
