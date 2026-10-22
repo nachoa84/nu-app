@@ -715,6 +715,8 @@ function splitRoutineTextBlocks(blocks) {
 }
 
 function renderStructuredDayDetail() {
+  const dayView = document.getElementById("view-hoy");
+  if (dayView) dayView.dataset.routineId = getActiveRoutineId();
   const blocks = currentBlocks();
   const rawTextBlocks = blocks.filter(block => block.type === "text");
   const materialIntroBlocks = rawTextBlocks.filter(isMaterialTransitionBlock);
@@ -978,9 +980,9 @@ function selectDay(day, showImmediately = false) {
   selectedDay = day;
   renderSelectedDayHeader();
 
-  document
-    .querySelector('[data-view="hoy"]')
-    .click();
+  // Prepare the selected day before the browser paints the destination view.
+  // The nav click plus delayed open exposed the home screen for one frame.
+  activateMainView("hoy", { animate: false });
 
   chat.innerHTML = "";
   chat.className = "daily-detail continuous-day-detail";
@@ -988,8 +990,6 @@ function selectDay(day, showImmediately = false) {
   renderStructuredDayDetail();
 
   if (showImmediately) {
-    setTimeout(() => {
-      openNativeDayView({ markOpened: true });
-    }, 70);
+    openNativeDayView({ markOpened: true });
   }
 }

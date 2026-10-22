@@ -1481,17 +1481,20 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         "blocks": [
           {
             "type": "text",
-            "content": "Conocé Prysm iO\nLeé el material formativo antes de presentarlo. Prysm iO estima carotenoides en la piel y permite seguir un indicador en el tiempo; no es un dispositivo de diagnóstico.",
+            "content": "Conocé Prysm iO\nHoy te propongo dos acciones. La primera es conocer Prysm iO con este material formativo antes de compartirlo.",
+            "linkHeading": "Formación Prysm iO",
             "links": [
               {
-                "label": "Abrir material formativo de Prysm iO (PDF)",
+                "label": "Ver material formativo de Prysm iO",
+                "preferredLabel": true,
                 "url": "assets/supplements/prysm-5/Prysm-iO-formacion.pdf"
               }
             ]
           },
           {
             "type": "text",
-            "content": "Armá tu lista de contactos\nAnotá al menos 100 personas: profesionales de salud y bienestar, quienes se interesan por nutrición y autocuidado, y emprendedores o posibles aliados."
+            "content": "Armá tu lista de contactos\nAnotá al menos 100 personas. Sumá profesionales de la salud y el bienestar. También personas interesadas en nutrición y autocuidado, emprendedores y posibles aliados estratégicos.",
+            "cardAsWritten": true
           },
           {
             "type": "media",
@@ -1531,15 +1534,23 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         "blocks": [
           {
             "type": "text",
-            "content": "Iniciá 20 conversaciones\nEscribile a los primeros 20 contactos de tu lista. Adaptá el mensaje a cada persona y proponé un momento para mostrarle cómo funciona Prysm iO."
+            "content": "Iniciá nuevas conversaciones\nEscribile a los primeros 20 contactos de tu lista. Te dejo un ejemplo para empezar; sentite libre de ponerle tu impronta.",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Mensaje de ejemplo\nHola, ¿cómo estás? Pensé en vos para compartirte una tecnología que puede sumar a tu profesión o negocio. Prysm iO ofrece una medición óptica no invasiva de carotenoides en la piel en unos 15 segundos. ¿Tenés 20 minutos hoy o mañana para que te cuente más?"
+            "content": "Mensaje de ejemplo\nHola, ¿cómo estás? Pensé en vos para compartirte una tecnología que puede sumar a tu negocio o profesión.",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Prepará el enlace de compra\nSi todavía no lo hiciste, descargá Stela y generá tu enlace de cliente para compartirlo con quienes quieran adquirir Prysm iO."
+            "content": "Seguí la conversación\nSe llama Prysm iO. Se conecta con una app y te da una devolución en unos 15 segundos. Me gustaría mostrarte cómo funciona. ¿Tenés 20 minutos hoy o mañana para que te cuente más?",
+            "cardAsWritten": true
+          },
+          {
+            "type": "text",
+            "content": "Prepará tu enlace de cliente\nSi todavía no descargaste Stela, hacelo hoy. Generá tu enlace de cliente para tenerlo listo cuando alguien quiera adquirir Prysm iO.",
+            "cardAsWritten": true
           },
           {
             "type": "media",
@@ -1579,15 +1590,23 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         "blocks": [
           {
             "type": "text",
-            "content": "Prepará tu energía\nEscuchá música, mové el cuerpo y acomodá tu espacio de trabajo para empezar con foco."
+            "content": "Subí tu energía\nAntes de empezar, escuchá música y mové el cuerpo. Prepará tu espacio de trabajo con un aroma o una infusión. Ponete en modo: «Voy a lograr todo lo que me propuse».",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Redoblá los contactos\nSi venías contactando a 20 personas por día, intentá llegar a 40 por día hasta terminar el desafío."
+            "content": "Redoblá la apuesta\nSi contactabas a 20 personas por día, intentá llegar a 40 hasta terminar el desafío. Recordá que cada acción cuenta para alcanzar tus objetivos.",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Hacé preguntas de cierre\nDespués de explicar el producto y la oferta vigente, preguntá: ¿Qué te parece? ¿Te interesa? Si la respuesta es sí, continuá con: ¿Querés aprovechar la oferta? ¿Cómo preferís comprarlo? Pedí los datos necesarios para generar el enlace de compra."
+            "content": "Hack de venta: preguntas de cierre\nDespués de explicar el producto y la oferta, preguntá qué le parece y si le interesa. Si dice que sí, preguntá si quiere aprovechar la oferta.",
+            "cardAsWritten": true
+          },
+          {
+            "type": "text",
+            "content": "Avanzá con la compra\nConsultale cómo prefiere comprarlo y pedile los datos para generarle el enlace. Estas preguntas la ayudan a tomar una decisión.",
+            "cardAsWritten": true
           },
           {
             "type": "media",
@@ -1627,11 +1646,13 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         "blocks": [
           {
             "type": "text",
-            "content": "Revisá tu lista y hacé seguimiento\nContá cuántas personas contactaste, elegí a quiénes escribirás después y retomá las conversaciones pendientes. Personalizá el seguimiento de quienes mostraron interés."
+            "content": "Revisá tu lista de contactos\n¿A cuántas personas ya contactaste? Marcá a quiénes vas a escribir durante los próximos días para alcanzar tu objetivo.",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Conversá con quienes vieron tus publicaciones\nMirá quiénes vieron tus historias y estados de WhatsApp e iniciá una conversación con esas personas."
+            "content": "Hacé seguimiento personalizado\nRetomá las conversaciones pendientes con quienes mostraron interés. Mirá quiénes vieron tus historias y estados de WhatsApp; iniciá una conversación con esas personas.",
+            "cardAsWritten": true
           },
           {
             "type": "media",
@@ -1670,11 +1691,13 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         "blocks": [
           {
             "type": "text",
-            "content": "Último día: mantené el foco\nRetomá las conversaciones abiertas y avanzá con las personas interesadas para cerrar las ventas que estén listas."
+            "content": "Último día: no te rindas\nEs momento de accionar con todavía más entusiasmo para alcanzar tu objetivo. No pierdas el foco. Cuando actuamos con pasión y compromiso, muchas cosas empiezan a alinearse a nuestro favor.",
+            "cardAsWritten": true
           },
           {
             "type": "text",
-            "content": "Mové tu cuerpo\nCaminá unos minutos, bailá o estirá antes de empezar. Usá esa energía para completar las acciones de hoy."
+            "content": "Hack de productividad: mové tu cuerpo\nSalí a caminar unos minutos, bailá o estirá. Prepará tu energía para cerrar tus ventas y alcanzar tu objetivo de ganancias. ¡Que tus sueños sean más grandes que tus miedos!",
+            "cardAsWritten": true
           },
           {
             "type": "media",

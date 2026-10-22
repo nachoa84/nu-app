@@ -11,7 +11,7 @@
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";
-    link.href = "routine-layout-final-v1.css?v=20260901-layout-v4";
+    link.href = "routine-layout-final-v1.css?v=supplements-polish-1";
     document.head.appendChild(link);
   }
 
@@ -32,7 +32,7 @@
 
     const script = document.createElement("script");
     script.id = id;
-    script.src = "routine-hero-media-polish-v2.js?v=20260901-hero-v3";
+    script.src = "routine-hero-media-polish-v2.js?v=supplements-polish-1";
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -71,9 +71,9 @@
         .replace(/\bSi, de 2 años\b/g, "Sí, de 2 años")
         .replace(/\btu lo comercializas\b/gi, "tú lo comercializas")
         .replace(/\bpor esta nuevo comienzo\b/gi, "por este nuevo comienzo")
-        .replace(/\bQué te parece\?/g, "¿Qué te parece?")
-        .replace(/\bVas a aprovechar esta oferta\?/g, "¿Vas a aprovechar esta oferta?")
-        .replace(/\bComo quieres abonarlo\?/g, "¿Cómo quieres abonarlo?")
+        .replace(/(^|[^¿])Qué te parece\?/g, "$1¿Qué te parece?")
+        .replace(/(^|[^¿])Vas a aprovechar esta oferta\?/g, "$1¿Vas a aprovechar esta oferta?")
+        .replace(/(^|[^¿])Como quieres abonarlo\?/g, "$1¿Cómo quieres abonarlo?")
         .replace(/\bCHALLENGE\b/g, "Challenge")
         .replace(/\bIMPORTANTE\b/g, "Importante")
         .replace(/\bCOMENZAMOS\?/g, "¿Comenzamos?")

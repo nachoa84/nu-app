@@ -1,8 +1,8 @@
-const CACHE="nuapp-supplements-favorites-2";
+const CACHE="nuapp-supplements-polish-1";
 
 const CORE=[
   "./product-routine-config.js?v=5",
-  "./supplements-content.js?v=6",
+  "./supplements-content.js?v=7",
   "./supplements-view.js?v=13",
   "./supplements.css?v=9",
   "./assets/supplements/covers/colageno-10.png",
@@ -34,7 +34,7 @@ const CORE=[
   "./favorites.css?v=94-bot-folders",
   "./favorites-redesign-v1.css?v=146-wellspa-scale",
   "./bot-content.js?v=131-country-catalogs",
-  "./ui-core.js?v=supplements-visual-2",
+  "./ui-core.js?v=supplements-polish-1",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
   "./routine-products-v92.js?v=supplements-pilot-1",
@@ -53,9 +53,9 @@ const CORE=[
   "./notifications-redesign-v2.js?v=143-no-legacy-css",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
-  "./daily-view.js?v=supplements-pilot-1",
-  "./routine-content-quality-v2.js?v=20260831-quality-v2",
-  "./routine-ui-polish-v1.js?v=20260901-polish-v2",
+  "./daily-view.js?v=supplements-polish-1",
+  "./routine-content-quality-v2.js?v=supplements-polish-1",
+  "./routine-ui-polish-v1.js?v=supplements-polish-1",
   "./progress-view.js?v=63-collagen-30",
   "./media-preview.js?v=105-navigation-bot-fixes",
   "./app.js?v=143-single-sw",

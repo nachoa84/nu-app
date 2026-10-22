@@ -44,6 +44,30 @@ test("preview exposes future supplement material without recording completion", 
   assert.equal(cards.length, 1, "future day has no completion button");
 });
 
+test("selecting a calendar day opens its detail in the same turn", () => {
+  const events = [];
+  const context = vm.createContext({
+    days: { 4: { blocks: [] } },
+    isPreviewMode: true,
+    selectedDay: 1,
+    chat: { innerHTML: "", className: "" },
+    revealIndex: 0,
+    setTimeout: () => { throw new Error("Delayed day opening exposes the home screen"); }
+  });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "daily-view.js"), "utf8"), context);
+  context.renderSelectedDayHeader = () => events.push("header");
+  context.activateMainView = (view, options) => {
+    assert.equal(view, "hoy");
+    assert.equal(options.animate, false);
+    events.push("view");
+  };
+  context.renderStructuredDayDetail = () => events.push("content");
+  context.openNativeDayView = () => events.push("day");
+  vm.runInContext("selectDay(4, true); globalThis.openedDay = selectedDay", context);
+  assert.equal(context.openedDay, 4);
+  assert.deepEqual(events, ["header", "view", "content", "day"]);
+});
+
 test("the current supplement day still offers the completion control", () => {
   const { card, cards } = completionFor(1, 1);
   assert.equal(cards.length, 4);

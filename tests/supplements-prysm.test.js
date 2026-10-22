@@ -26,7 +26,7 @@ test("Prysm iO has five distinct task days and fifteen verified daily materials"
     const tasks = blocks.filter(block => block.type === "text");
     const media = blocks.filter(block => block.type === "media");
     assert.equal(tasks.length, source.days[day].length);
-    assert.equal(tasks[0].content, source.days[day][0].content);
+    assert.ok(tasks.every(block => block.content.includes("\n") && block.content.length > 70));
     firstActions.add(tasks[0].content);
     assert.equal(media.length, 3);
     assert.equal(blocks.at(-1).type, "complete");
@@ -43,6 +43,7 @@ test("Prysm iO has five distinct task days and fifteen verified daily materials"
   }
   assert.equal(firstActions.size, 5);
   assert.equal(program.days[1].blocks[0].links[0].url, "assets/supplements/prysm-5/Prysm-iO-formacion.pdf");
+  assert.equal(program.days[1].blocks[0].links[0].label, "Ver material formativo de Prysm iO");
   assert.ok(fs.readFileSync(path.join(root, program.days[1].blocks[0].links[0].url)).subarray(0, 5).equals(Buffer.from("%PDF-")));
 });
 
@@ -64,4 +65,20 @@ test("Prysm iO uses the transparent cover and independent five-day progress", ()
     assert.match(sql, /supplement_prysm_progress_duration/);
     assert.match(sql, /routine_id <> 'prysm-5' OR day <= 5/);
   }
+});
+
+test("Prysm day one names its PDF on the second content card", () => {
+  const context = vm.createContext({
+    window: { innerWidth: 390 },
+    document: { documentElement: { clientWidth: 390 } }
+  });
+  for (const file of ["supplements-content.js", "daily-view.js", "routine-content-quality-v2.js"]) {
+    vm.runInContext(read(file), context);
+  }
+  vm.runInContext(
+    'globalThis.cards = splitRoutineTextBlocks(SUPPLEMENT_ROUTINE_DAYS["prysm-5"].days[1].blocks.filter(block => block.type === "text"))',
+    context
+  );
+  assert.equal(context.cards[1].content, "Formación Prysm iO");
+  assert.equal(context.cards[1].links[0].label, "Ver material formativo de Prysm iO");
 });

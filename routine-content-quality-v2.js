@@ -227,7 +227,9 @@
       normalized.push({
         ...link,
         url,
-        label: labelForRoutineUrl(link?.label, url)
+        label: link?.preferredLabel && String(link.label || "").trim()
+          ? String(link.label).trim()
+          : labelForRoutineUrl(link?.label, url)
       });
     });
 
@@ -297,7 +299,8 @@
     };
   }
 
-  function linkCardHeading(links) {
+  function linkCardHeading(links, preferredHeading) {
+    if (preferredHeading) return preferredHeading;
     const sources = (links || []).map(link => String(link.url || "").toLowerCase());
     if (sources.some(url => /play\.google\.com|apps\.apple\.com|itunes\.apple\.com/.test(url))) {
       return "Links de descarga";
@@ -325,7 +328,7 @@
       ...groups,
       {
         ...block,
-        content: linkCardHeading(block.links),
+        content: linkCardHeading(block.links, block.linkHeading),
         links: block.links
       }
     ];
@@ -346,6 +349,12 @@
     (blocks || []).forEach(sourceBlock => {
       const block = enrichRoutineTextBlock(sourceBlock);
       if (!block.content && !block.links.length) return;
+
+      if (block.cardAsWritten) {
+        flushPool();
+        output.push(block);
+        return;
+      }
 
       const qa = isQuestionAnswerContent(block.content);
 

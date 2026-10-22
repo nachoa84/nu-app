@@ -517,7 +517,7 @@ function setupGlobalNativePressFeedback() {
   window.addEventListener("scroll", releaseNativePressFeedback, { passive: true });
 }
 
-function activateMainView(view, { vibrate = false } = {}) {
+function activateMainView(view, { vibrate = false, animate = true } = {}) {
   const target = document.getElementById(`view-${view}`);
   if (!target) return;
 
@@ -555,7 +555,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   document.documentElement.scrollTop = restoreTop;
   document.body.scrollTop = restoreTop;
 
-  if (changingView) animateNativeViewEnter(target, direction);
+  if (changingView && animate) animateNativeViewEnter(target, direction);
 
   if (view === "rutina") renderDays();
   if (view === "suplementos") renderSupplements();
