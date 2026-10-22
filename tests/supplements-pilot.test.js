@@ -7,14 +7,14 @@ const vm = require("node:vm");
 const config = require("../product-routine-config");
 const root = path.join(__dirname, "..");
 
-test("pilot has exactly three ordered, local materials per day, without specific daily tasks", () => {
+test("supplements have three ordered local materials per day; Prysm adds daily actions", () => {
   const context = vm.createContext({});
   vm.runInContext(fs.readFileSync(path.join(root, "supplements-content.js"), "utf8") + "\nglobalThis.routines = SUPPLEMENT_ROUTINE_DAYS", context);
   for (const [id, routine] of Object.entries(context.routines)) {
     assert.equal(Object.keys(routine.days).length, config[id].totalDays);
     for (const [day, content] of Object.entries(routine.days)) {
       assert.equal(content.blocks.filter(b => b.type === "media").length, 3);
-      assert.equal(content.blocks.filter(b => b.type === "text" || b.type === "task").length, 0);
+      if (id !== "prysm-5") assert.equal(content.blocks.filter(b => b.type === "text" || b.type === "task").length, 0);
       content.blocks.filter(b => b.type === "media").forEach((block, index) => {
         assert.ok(block.src.endsWith(`day-${day.padStart(2, "0")}-${index + 1}.${block.mediaType === "image" ? "jpg" : "mp4"}`));
         assert.ok(fs.statSync(path.join(root, block.src)).size > 1000);

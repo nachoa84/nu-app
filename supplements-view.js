@@ -12,7 +12,8 @@ const SUPPLEMENT_COVERS = {
   "lifepak-5": "assets/supplements/covers/lifepak-5.png",
   "lifepak-elements-5": "assets/supplements/covers/lifepak-elements-5.png",
   "nubi-10": "assets/supplements/covers/nubi-10.png",
-  "omega-10": "assets/supplements/covers/omega-10.png"
+  "omega-10": "assets/supplements/covers/omega-10.png",
+  "prysm-5": "assets/supplements/covers/prysm-5.png"
 };
 
 function renderSupplements() {

@@ -39,8 +39,15 @@ for routine in inventory['routines']:
         continue
     rid = routine['proposed_id']
     program = dict(id=rid, title=routine['display_name'], totalDays=routine['duration_days'], days={})
+    task_path = args.output_root / 'docs' / f'supplements-{rid}-tasks.json'
+    task_config = json.loads(task_path.read_text()) if task_path.exists() else None
+    if rid == 'prysm-5' and task_config is None:
+        parser.error('Prysm iO requires its daily task source')
+    if task_config:
+        assert set(task_config['days']) == {str(day['day']) for day in routine['days']}
+        program['cover'] = task_config['cover']
     for day in routine['days']:
-        blocks = []
+        blocks = [dict(type='text', **task) for task in task_config['days'][str(day['day'])]] if task_config else []
         assert len(day['assets']) == 3
         for asset in sorted(day['assets'], key=lambda item: item['position']):
             source = args.originals / asset['proposed_asset_filename']
