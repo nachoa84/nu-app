@@ -925,9 +925,16 @@ function createFavoriteDayTile(day, items, allDayItems, favoritesView, routineId
 
 
 
+function favoriteRoutineTitle(routineId, fallback = "Rutina") {
+  const title = ROUTINE_CATALOG[routineId]?.title || fallback;
+  return routineId === "collagen-30" || routineId === "colageno-10"
+    ? `${title} · ${ROUTINE_CATALOG[routineId].totalDays} días`
+    : title;
+}
+
 function createFavoriteRoutineTileV93b(routineId, visibleItems, allItems) {
   const config = ROUTINE_CATALOG[routineId] || {};
-  const title = config.title || allItems[0]?.routineTitle || "Rutina";
+  const title = favoriteRoutineTitle(routineId, allItems[0]?.routineTitle);
   const dayCount = new Set(allItems.map(item => Number(item.day) || 1)).size;
   const tile = document.createElement("button");
   tile.type = "button";
@@ -1061,7 +1068,7 @@ function renderFavorites() {
       </button>
       <div class="favorite-day-title">
         <small>De mis rutinas</small>
-        <h2>${config.title || rawRoutineItems[0]?.routineTitle || "Rutina"}</h2>
+        <h2>${favoriteRoutineTitle(routineId, rawRoutineItems[0]?.routineTitle)}</h2>
         <span>${rawRoutineItems.length} material${rawRoutineItems.length === 1 ? "" : "es"} guardado${rawRoutineItems.length === 1 ? "" : "s"}</span>
       </div>`;
     header.querySelector("button").onclick = () => {
@@ -1109,7 +1116,7 @@ function renderFavorites() {
       : { routineId: CURRENT_ROUTINE_ID, day: Number(favoriteOpenDay) };
     const day = Number(openFolder.day);
     const folderRoutineId = openFolder.routineId || CURRENT_ROUTINE_ID;
-    const folderRoutineTitle = ROUTINE_CATALOG[folderRoutineId]?.title || "Rutina";
+    const folderRoutineTitle = favoriteRoutineTitle(folderRoutineId);
     const rawDayItems = sortFavoritesForDay(
       routineFavs.filter(favorite =>
         favorite.routineId === folderRoutineId &&

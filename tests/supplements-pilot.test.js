@@ -12,6 +12,8 @@ test("supplements have three ordered local materials per day; Prysm adds daily a
   vm.runInContext(fs.readFileSync(path.join(root, "supplements-content.js"), "utf8") + "\nglobalThis.routines = SUPPLEMENT_ROUTINE_DAYS", context);
   for (const [id, routine] of Object.entries(context.routines)) {
     assert.equal(Object.keys(routine.days).length, config[id].totalDays);
+    assert.equal(routine.cover, `assets/supplements/covers/${id}.png`);
+    assert.ok(fs.existsSync(path.join(root, routine.cover)));
     for (const [day, content] of Object.entries(routine.days)) {
       assert.equal(content.blocks.filter(b => b.type === "media").length, 3);
       if (id !== "prysm-5") assert.equal(content.blocks.filter(b => b.type === "text" || b.type === "task").length, 0);

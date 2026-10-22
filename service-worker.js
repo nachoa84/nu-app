@@ -1,9 +1,9 @@
-const CACHE="nuapp-supplements-prysm-1";
+const CACHE="nuapp-supplements-favorites-2";
 
 const CORE=[
   "./product-routine-config.js?v=5",
-  "./supplements-content.js?v=5",
-  "./supplements-view.js?v=12",
+  "./supplements-content.js?v=6",
+  "./supplements-view.js?v=13",
   "./supplements.css?v=9",
   "./assets/supplements/covers/colageno-10.png",
   "./assets/supplements/covers/lifepak-5.png",
@@ -48,7 +48,7 @@ const CORE=[
   "./assets/custom/foco-live-card.png",
   "./assets/catalogos/catalogo-europa-02-2026.pdf",
   "./bot-sales-training-v102.js?v=102b-no-duplicate",
-  "./favorites.js?v=supplements-pilot-1",
+  "./favorites.js?v=supplements-favorites-2",
   "./notifications.js?v=143-single-sw",
   "./notifications-redesign-v2.js?v=143-no-legacy-css",
   "./foco-live.js?v=2",

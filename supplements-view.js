@@ -7,15 +7,6 @@ const SUPPLEMENT_GENERAL_ACTIONS = [
   ["Conversá y compartí", "Contactá al menos a 10 personas nuevas por día con entusiasmo. Publicá contenido en tus redes y estados de WhatsApp y revisá los tutoriales del producto."],
   ["Prepará tu energía", "Escuchá música, mové el cuerpo y prepará tu espacio de trabajo. Recordá que cada acción cuenta para alcanzar tus objetivos."]
 ];
-const SUPPLEMENT_COVERS = {
-  "colageno-10": "assets/supplements/covers/colageno-10.png",
-  "lifepak-5": "assets/supplements/covers/lifepak-5.png",
-  "lifepak-elements-5": "assets/supplements/covers/lifepak-elements-5.png",
-  "nubi-10": "assets/supplements/covers/nubi-10.png",
-  "omega-10": "assets/supplements/covers/omega-10.png",
-  "prysm-5": "assets/supplements/covers/prysm-5.png"
-};
-
 function renderSupplements() {
   const root = document.getElementById("supplementsRoot");
   if (!root) return;
@@ -35,9 +26,12 @@ function renderSupplements() {
   cards.className = "home-routines supplement-routines";
   Object.values(ROUTINE_CATALOG).filter(config => config.category === "supplements").forEach(config => {
     const card = createFixedRoutineCardV92b(config);
-    const cover = SUPPLEMENT_COVERS[config.id];
+    const cover = config.cover;
     const image = card.querySelector(".home-routine-cover img");
     if (image && cover) image.src = cover;
+    if (config.id === "colageno-10") {
+      card.querySelector(".home-routine-heading h2").textContent = "Colágeno · 10 días";
+    }
     const state = getRoutineCardStateV92b(config);
     let completed = 0;
     for (let day = 1; day <= config.totalDays; day++) {
@@ -123,7 +117,7 @@ function createSupplementCompletion() {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "primary complete-day-btn";
-  button.textContent = "Marcar día completado";
+  button.textContent = "Marcar como hecho";
   const feedback = document.createElement("span");
   feedback.className = "supplement-completion-feedback";
   feedback.setAttribute("role", "status");

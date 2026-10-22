@@ -41,10 +41,10 @@ test("LifePak Elements progress is separate from LifePak, Colágeno and other us
 });
 
 test("LifePak Elements has its own cover and five-day SQL boundaries", () => {
-  const view = fs.readFileSync(path.join(root, "supplements-view.js"), "utf8");
+  const content = fs.readFileSync(path.join(root, "supplements-content.js"), "utf8");
   const schema = fs.readFileSync(path.join(root, "schema.sql"), "utf8");
   const migration = fs.readFileSync(path.join(root, "migration-supplements-elements-v1.sql"), "utf8");
-  assert.match(view, /"lifepak-elements-5": "assets\/supplements\/covers\/lifepak-elements-5\.png"/);
+  assert.match(content, /"cover": "assets\/supplements\/covers\/lifepak-elements-5\.png"/);
   assert.ok(fs.existsSync(path.join(root, "assets/supplements/covers/lifepak-elements-5.png")));
   for (const sql of [schema, migration]) {
     assert.match(sql, /supplement_elements_state_duration/);

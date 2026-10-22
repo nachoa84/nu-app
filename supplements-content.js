@@ -4,7 +4,7 @@ const SUPPLEMENT_ROUTINE_DAYS = {
     "id": "colageno-10",
     "title": "Colágeno",
     "totalDays": 10,
-    "cover": "assets/supplements/colageno-10/day-01-1.jpg",
+    "cover": "assets/supplements/covers/colageno-10.png",
     "days": {
       "1": {
         "title": "Día 1 · Colágeno",
@@ -372,7 +372,7 @@ const SUPPLEMENT_ROUTINE_DAYS = {
     "id": "lifepak-5",
     "title": "LifePak",
     "totalDays": 5,
-    "cover": "assets/supplements/lifepak-5/day-01-3.jpg",
+    "cover": "assets/supplements/covers/lifepak-5.png",
     "days": {
       "1": {
         "title": "Día 1 · LifePak",
@@ -736,7 +736,7 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         ]
       }
     },
-    "cover": "assets/supplements/lifepak-elements-5/day-01-1.jpg"
+    "cover": "assets/supplements/covers/lifepak-elements-5.png"
   },
   "nubi-10": {
     "id": "nubi-10",
@@ -1098,7 +1098,7 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         ]
       }
     },
-    "cover": "assets/supplements/nubi-10/day-01-1.jpg"
+    "cover": "assets/supplements/covers/nubi-10.png"
   },
   "omega-10": {
     "id": "omega-10",
@@ -1467,7 +1467,7 @@ const SUPPLEMENT_ROUTINE_DAYS = {
         ]
       }
     },
-    "cover": "assets/supplements/omega-10/day-01-1.jpg"
+    "cover": "assets/supplements/covers/omega-10.png"
   },
   "prysm-5": {
     "id": "prysm-5",

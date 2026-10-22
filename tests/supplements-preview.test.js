@@ -47,7 +47,7 @@ test("preview exposes future supplement material without recording completion", 
 test("the current supplement day still offers the completion control", () => {
   const { card, cards } = completionFor(1, 1);
   assert.equal(cards.length, 4);
-  assert.equal(cards[1].textContent, "Marcar día completado");
+  assert.equal(cards[1].textContent, "Marcar como hecho");
   assert.equal(card.children[0], cards[3]);
   assert.equal(cards[3].children[0], cards[1]);
 });

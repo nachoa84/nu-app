@@ -31,6 +31,10 @@ if args.append:
     overlap = set(prior) & (selected or {routine['proposed_id'] for routine in inventory['routines'] if routine['pilot']})
     if overlap:
         parser.error(f"Already registered: {', '.join(sorted(overlap))}")
+    for rid, program in prior.items():
+        cover = args.output_root / 'assets/supplements/covers' / f'{rid}.png'
+        if cover.is_file():
+            program['cover'] = cover.relative_to(args.output_root).as_posix()
 
 for routine in inventory['routines']:
     if selected and routine['proposed_id'] not in selected:
@@ -39,6 +43,9 @@ for routine in inventory['routines']:
         continue
     rid = routine['proposed_id']
     program = dict(id=rid, title=routine['display_name'], totalDays=routine['duration_days'], days={})
+    cover = args.output_root / 'assets/supplements/covers' / f'{rid}.png'
+    if cover.is_file():
+        program['cover'] = cover.relative_to(args.output_root).as_posix()
     task_path = args.output_root / 'docs' / f'supplements-{rid}-tasks.json'
     task_config = json.loads(task_path.read_text()) if task_path.exists() else None
     if rid == 'prysm-5' and task_config is None:
