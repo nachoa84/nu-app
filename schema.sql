@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS routine_notification_jobs (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   sent_at TIMESTAMPTZ NULL,
   UNIQUE (user_id, routine_id, cycle, day, kind),
-  CHECK (routine_id IN ('collagen-30', 'lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10')),
+  CHECK (routine_id IN ('collagen-30', 'lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10', 'omega-10')),
   CHECK (day BETWEEN 1 AND 30),
   CHECK (status IN ('pending', 'processing', 'sent', 'failed', 'cancelled'))
 );
@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS qstash_product_routine_pilot_jobs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (user_id, routine_id, cycle, day),
-  CHECK (routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10')),
+  CHECK (routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10', 'omega-10')),
   CHECK (day BETWEEN 1 AND 10),
   CHECK (status IN ('scheduled', 'claimed', 'cancelled'))
 );
@@ -310,7 +310,7 @@ CREATE OR REPLACE FUNCTION suppress_legacy_product_routine_job_for_qstash_pilot(
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.kind = 'day_available'
-     AND NEW.routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10')
+     AND NEW.routine_id IN ('lumispa-10', 'wellspa-10', 'galvanicspa-10', 'colageno-10', 'lifepak-5', 'lifepak-elements-5', 'nubi-10', 'omega-10')
      AND EXISTS (
        SELECT 1
        FROM qstash_product_routine_pilot_jobs AS pilot
@@ -356,13 +356,13 @@ BEGIN
     IF NOT EXISTS (
       SELECT 1 FROM pg_constraint
       WHERE conrelid = target_table::regclass AND conname = check_name
-        AND pg_get_constraintdef(oid) LIKE '%nubi-10%'
+        AND pg_get_constraintdef(oid) LIKE '%omega-10%'
     ) THEN
       EXECUTE format('ALTER TABLE %I DROP CONSTRAINT IF EXISTS %I', target_table, check_name);
       IF target_table = 'routine_notification_jobs' THEN
-        EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id IN (''collagen-30'', ''lumispa-10'', ''wellspa-10'', ''galvanicspa-10'', ''colageno-10'', ''lifepak-5'', ''lifepak-elements-5'', ''nubi-10''))', target_table, check_name);
+        EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id IN (''collagen-30'', ''lumispa-10'', ''wellspa-10'', ''galvanicspa-10'', ''colageno-10'', ''lifepak-5'', ''lifepak-elements-5'', ''nubi-10'', ''omega-10''))', target_table, check_name);
       ELSE
-        EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id IN (''lumispa-10'', ''wellspa-10'', ''galvanicspa-10'', ''colageno-10'', ''lifepak-5'', ''lifepak-elements-5'', ''nubi-10''))', target_table, check_name);
+        EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id IN (''lumispa-10'', ''wellspa-10'', ''galvanicspa-10'', ''colageno-10'', ''lifepak-5'', ''lifepak-elements-5'', ''nubi-10'', ''omega-10''))', target_table, check_name);
       END IF;
     END IF;
   END LOOP;
@@ -390,6 +390,12 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'product_routine_day_progress'::regclass AND conname = 'supplement_nubi_progress_duration') THEN
     ALTER TABLE product_routine_day_progress ADD CONSTRAINT supplement_nubi_progress_duration CHECK (routine_id <> 'nubi-10' OR day <= 10);
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'product_routine_states'::regclass AND conname = 'supplement_omega_state_duration') THEN
+    ALTER TABLE product_routine_states ADD CONSTRAINT supplement_omega_state_duration CHECK (routine_id <> 'omega-10' OR current_day <= 10);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'product_routine_day_progress'::regclass AND conname = 'supplement_omega_progress_duration') THEN
+    ALTER TABLE product_routine_day_progress ADD CONSTRAINT supplement_omega_progress_duration CHECK (routine_id <> 'omega-10' OR day <= 10);
+  END IF;
   FOREACH target_table IN ARRAY ARRAY['routine_notification_jobs', 'qstash_product_routine_pilot_jobs'] LOOP
     check_name := target_table || '_elements_duration';
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = target_table::regclass AND conname = check_name) THEN
@@ -398,6 +404,10 @@ BEGIN
     check_name := target_table || '_nubi_duration';
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = target_table::regclass AND conname = check_name) THEN
       EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id <> ''nubi-10'' OR day <= 10)', target_table, check_name);
+    END IF;
+    check_name := target_table || '_omega_duration';
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = target_table::regclass AND conname = check_name) THEN
+      EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I CHECK (routine_id <> ''omega-10'' OR day <= 10)', target_table, check_name);
     END IF;
   END LOOP;
 END $$;
