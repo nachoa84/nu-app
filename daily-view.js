@@ -65,6 +65,9 @@ function addLinks(container, links) {
 }
 
 function createBlock(block) {
+  if (block.type === "complete" && getActiveRoutineConfig().category === "supplements") {
+    return createSupplementCompletion();
+  }
   if (block.type === "action") {
     const card = document.createElement("section");
     card.className = "training-card";
@@ -702,6 +705,8 @@ function splitRoutineTextBlocks(blocks) {
 }
 
 function renderStructuredDayDetail() {
+  const dayView = document.getElementById("view-hoy");
+  if (dayView) dayView.dataset.routineId = getActiveRoutineId();
   const blocks = currentBlocks();
   const rawTextBlocks = blocks.filter(block => block.type === "text");
   const materialIntroBlocks = rawTextBlocks.filter(isMaterialTransitionBlock);
@@ -722,7 +727,7 @@ function renderStructuredDayDetail() {
     <div class="native-day-hero">
       <div class="native-day-hero-copy">
         <h2>Día ${selectedDay}</h2>
-        <p>TU ACCIÓN DE HOY</p>
+        <p>${getActiveRoutineConfig().category === "supplements" ? "TUS MATERIALES DE HOY" : "TU ACCIÓN DE HOY"}</p>
       </div>
       <div class="native-day-hero-media" aria-hidden="true">
         <img src="${getRoutineHeroV92a()}" alt="" />
@@ -900,6 +905,11 @@ function renderSelectedDayHeader() {
     dailyNativeDayLabel.textContent = `Día ${selectedDay} de ${TOTAL_PROGRAM_DAYS}`;
   }
 
+  const progressButton = document.getElementById("dailyNativeProgressBtn");
+  if (progressButton) {
+    progressButton.setAttribute("aria-label", `Ver progreso de ${TOTAL_PROGRAM_DAYS} días`);
+  }
+
   if (dailyNativeRoutineTitle) {
     dailyNativeRoutineTitle.textContent = getActiveRoutineConfig().title;
   }
@@ -965,9 +975,9 @@ function selectDay(day, showImmediately = false) {
   selectedDay = day;
   renderSelectedDayHeader();
 
-  document
-    .querySelector('[data-view="hoy"]')
-    .click();
+  // Prepare the selected day before the browser paints the destination view.
+  // The nav click plus delayed open exposed the home screen for one frame.
+  activateMainView("hoy", { animate: false });
 
   chat.innerHTML = "";
   chat.className = "daily-detail continuous-day-detail";
@@ -975,8 +985,6 @@ function selectDay(day, showImmediately = false) {
   renderStructuredDayDetail();
 
   if (showImmediately) {
-    setTimeout(() => {
-      openNativeDayView({ markOpened: true });
-    }, 70);
+    openNativeDayView({ markOpened: true });
   }
 }

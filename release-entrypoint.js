@@ -5,6 +5,7 @@ const path = require("node:path");
 const INTERNAL_ROOT_FILES = new Set([
   "/server.js",
   "/release-entrypoint.js",
+  "/review-mode.js",
   "/package.json",
   "/package-lock.json",
   "/schema.sql",

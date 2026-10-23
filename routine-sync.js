@@ -216,11 +216,13 @@ window.addEventListener(
 
 // NU APP · SINCRONIZACIÓN MULTIRUTINA V98
 window.addEventListener("product-routines-state-updated", event => {
+  if (event.detail?.userId && event.detail.userId !== getRoutineProfile()?.userId) return;
   const routines = event.detail?.routines || {};
   Object.entries(routines).forEach(([routineId, serverState]) => {
     if (!ROUTINE_CATALOG[routineId] || ROUTINE_CATALOG[routineId].backend) return;
     if (serverState.initialized !== true) return;
-    const currentDay = Math.max(1, Math.min(10, Number(serverState.currentDay || 1)));
+    const totalDays = ROUTINE_CATALOG[routineId].totalDays;
+    const currentDay = Math.max(1, Math.min(totalDays, Number(serverState.currentDay || 1)));
     const nextUnlockAt = serverState.nextUnlockAt
       ? Number(serverState.nextUnlockAt)
       : null;
@@ -228,13 +230,13 @@ window.addEventListener("product-routines-state-updated", event => {
       currentDay,
       openedDays: serverState.openedDays || {},
       nextUnlockAt,
-      pendingNextDay: nextUnlockAt && currentDay < 10 ? currentDay + 1 : null,
+      pendingNextDay: nextUnlockAt && currentDay < totalDays ? currentDay + 1 : null,
       scheduleProfileSignature: null
     };
-    localStorage.setItem(`routineState:${routineId}`, JSON.stringify(localState));
-    for (let day = 1; day <= 10; day++) {
-      const key = `day:${routineId}:${day}:complete`;
-      const completedAtKey = `day:${routineId}:${day}:completedAt`;
+    localStorage.setItem(window.NuProductStorage.stateKey(routineId), JSON.stringify(localState));
+    for (let day = 1; day <= totalDays; day++) {
+      const key = window.NuProductStorage.completeKey(routineId, day);
+      const completedAtKey = window.NuProductStorage.completedAtKey(routineId, day);
 
       if (
         (serverState.completedDays || []).includes(day) ||

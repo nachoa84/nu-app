@@ -18,9 +18,14 @@ function renderDays() {
   grid.innerHTML = "";
   grid.className = "app-routine";
 
+  const isSupplement = getActiveRoutineConfig().category === "supplements";
+  const completedDays = isSupplement
+    ? Array.from({ length: TOTAL_PROGRAM_DAYS }, (_, index) => index + 1)
+      .filter(isDayComplete).length
+    : null;
   const progressValue = Math.min(
     100,
-    Math.round((state.currentDay / TOTAL_PROGRAM_DAYS) * 100)
+    Math.round(((isSupplement ? completedDays : state.currentDay) / TOTAL_PROGRAM_DAYS) * 100)
   );
 
   const currentComplete = isDayComplete(state.currentDay);
@@ -31,7 +36,7 @@ function renderDays() {
     <div class="app-progress-row">
       <div>
         <span class="app-label">TU PROGRESO</span>
-        <strong>Día ${state.currentDay} de ${TOTAL_PROGRAM_DAYS}</strong>
+        <strong>${isSupplement ? `${completedDays} de ${TOTAL_PROGRAM_DAYS} días completados` : `Día ${state.currentDay} de ${TOTAL_PROGRAM_DAYS}`}</strong>
       </div>
       <span class="app-progress-percent">${progressValue}%</span>
     </div>
@@ -57,16 +62,16 @@ function renderDays() {
       </span>
       <span class="app-today-copy">
         <strong>Continuar día ${state.currentDay}</strong>
-        <small>Tu acción del día</small>
+        <small>${isSupplement ? "Tus materiales del día" : "Tu acción del día"}</small>
       </span>
       <span class="app-today-arrow" aria-hidden="true">${ICONS.arrow}</span>
     </button>
-    <div class="app-checkin-area">
+    ${isSupplement ? "" : `<div class="app-checkin-area">
       <button type="button" class="app-checkin-btn${currentComplete ? " is-done" : ""}" ${currentComplete ? "disabled" : ""}>
         <span class="app-checkin-icon" aria-hidden="true">${currentComplete ? ICONS.checkCircleFilled : ICONS.check}</span>
         <span>${currentComplete ? "Hecho hoy" : "Hoy lo hice"}</span>
       </button>
-    </div>
+    </div>`}
   `;
 
   todayCard.querySelector(".app-today-main").onclick = () => {
@@ -74,7 +79,7 @@ function renderDays() {
   };
 
   const checkinBtn = todayCard.querySelector(".app-checkin-btn");
-  if (!currentComplete) {
+  if (checkinBtn && !currentComplete) {
     checkinBtn.onclick = () => {
       if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
       setDayComplete(state.currentDay, true);

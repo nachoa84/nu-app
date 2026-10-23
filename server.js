@@ -1,3 +1,4 @@
+const PRODUCT_ROUTINE_CONFIG = require("./product-routine-config");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -1520,9 +1521,7 @@ async function claimUnifiedRoutineNotificationBatchV109(limit) {
 // NU APP · ENVÍO AGRUPADO DE RUTINAS V109
 const ROUTINE_NOTIFICATION_NAMES_V101A = {
   "collagen-30": "Collagen+",
-  "lumispa-10": "LumiSpa",
-  "wellspa-10": "WellSpa",
-  "galvanicspa-10": "Galvanic Spa"
+  ...Object.fromEntries(Object.entries(PRODUCT_ROUTINE_CONFIG).map(([id, config]) => [id, config.title]))
 };
 
 function buildUnifiedRoutinePayloadV101A(batch) {
@@ -1543,7 +1542,9 @@ function buildUnifiedRoutinePayloadV101A(batch) {
     const name = ROUTINE_NOTIFICATION_NAMES_V101A[entry.routineId] || "tu rutina";
     return {
       title: `🔥 Tu Día ${entry.day} de ${name} está disponible`,
-      body: "Entrá y descubrí tu acción de hoy.",
+      body: PRODUCT_ROUTINE_CONFIG[entry.routineId]?.category === "supplements"
+        ? "Entrá y descubrí tus materiales de hoy."
+        : "Entrá y descubrí tu acción de hoy.",
       url: `/?routine=${encodeURIComponent(entry.routineId)}&day=${entry.day}&notification=1`,
       tag: `routine_daily_${batch.userId}`
     };
@@ -3259,11 +3260,9 @@ app.post(
 
 
 // NU APP · SINCRONIZACIÓN MULTIRUTINA V98
-const PRODUCT_ROUTINE_IDS_V98 = new Set([
-  "lumispa-10",
-  "wellspa-10",
-  "galvanicspa-10"
-]);
+const PRODUCT_ROUTINE_IDS_V98 = new Set(Object.keys(PRODUCT_ROUTINE_CONFIG));
+const PRODUCT_ROUTINE_DURATION_SQL = `(CASE state.routine_id ${Object.entries(PRODUCT_ROUTINE_CONFIG)
+  .map(([id, config]) => `WHEN '${id}' THEN ${config.totalDays}`).join(" ")} ELSE 10 END)`;
 
 function parseProductRoutineIdV98(value) {
   const routineId = String(value || "").trim();
@@ -3275,9 +3274,9 @@ function parseProductRoutineIdV98(value) {
   return routineId;
 }
 
-function parseProductRoutineDayV98(value) {
+function parseProductRoutineDayV98(value, routineId) {
   const day = Number(value);
-  if (!Number.isInteger(day) || day < 1 || day > 10) {
+  if (!Number.isInteger(day) || day < 1 || day > PRODUCT_ROUTINE_CONFIG[routineId].totalDays) {
     const error = new Error("Día de rutina no válido.");
     error.status = 400;
     throw error;
@@ -3311,7 +3310,7 @@ async function advanceProductRoutinesIfEligible(client, userId = null) {
          state.current_day,
          state.next_unlock_at
        FROM product_routine_states AS state
-       WHERE state.current_day < 10
+       WHERE state.current_day < ${PRODUCT_ROUTINE_DURATION_SQL}
          AND state.next_unlock_at IS NOT NULL
          AND state.next_unlock_at <= NOW()
          AND EXISTS (
@@ -3328,7 +3327,7 @@ async function advanceProductRoutinesIfEligible(client, userId = null) {
      advanced AS (
        UPDATE product_routine_states AS state
        SET
-         current_day = LEAST(state.current_day + 1, 10),
+         current_day = LEAST(state.current_day + 1, ${PRODUCT_ROUTINE_DURATION_SQL}),
          next_unlock_at = NULL,
          updated_at = NOW()
        FROM due
@@ -3406,7 +3405,7 @@ async function recalculateProductRoutinePendingUnlock(
   const state = stateResult.rows[0];
   const currentDay = Number(state.current_day);
 
-  if (currentDay >= 10) {
+  if (currentDay >= PRODUCT_ROUTINE_CONFIG[routineId].totalDays) {
     await client.query(
       `UPDATE product_routine_states
        SET next_unlock_at = NULL, updated_at = NOW()
@@ -3520,7 +3519,7 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
 
       for (const routineId of PRODUCT_ROUTINE_IDS_V98) {
         const local = localRoutines[routineId] || {};
-        const currentDay = parseProductRoutineDayV98(local.currentDay || 1);
+        const currentDay = parseProductRoutineDayV98(local.currentDay || 1, routineId);
         const completedAtByDay =
           local.completedAtByDay &&
           typeof local.completedAtByDay === "object"
@@ -3543,7 +3542,7 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
           [userId, routineId, currentDay]
         );
         for (const [rawDay, rawTimestamp] of Object.entries(local.openedDays || {})) {
-          const day = parseProductRoutineDayV98(rawDay);
+          const day = parseProductRoutineDayV98(rawDay, routineId);
           const openedAt = new Date(Number(rawTimestamp));
           if (Number.isNaN(openedAt.getTime())) continue;
           await client.query(
@@ -3567,7 +3566,7 @@ app.post("/api/product-routines/bootstrap", async (req, res, next) => {
           Number(canonicalState.rows[0]?.current_day || 1);
 
         for (const rawDay of Array.isArray(local.completedDays) ? local.completedDays : []) {
-          const day = parseProductRoutineDayV98(rawDay);
+          const day = parseProductRoutineDayV98(rawDay, routineId);
           if (day > canonicalCurrentDay) continue;
           if (!isNewProductState && day !== canonicalCurrentDay) continue;
 
@@ -3620,7 +3619,7 @@ app.post("/api/product-routines/open", async (req, res, next) => {
   try {
     const userId = String(req.body.userId || "").trim();
     const routineId = parseProductRoutineIdV98(req.body.routineId);
-    const day = parseProductRoutineDayV98(req.body.day);
+    const day = parseProductRoutineDayV98(req.body.day, routineId);
     const state = await withTransaction(async client => {
       await assertProductRoutineUserV98(client, userId);
       await client.query(
@@ -3665,7 +3664,7 @@ app.post("/api/product-routines/complete", async (req, res, next) => {
   try {
     const userId = String(req.body.userId || "").trim();
     const routineId = parseProductRoutineIdV98(req.body.routineId);
-    const day = parseProductRoutineDayV98(req.body.day);
+    const day = parseProductRoutineDayV98(req.body.day, routineId);
     const state = await withTransaction(async client => {
       await assertProductRoutineUserV98(client, userId);
       await client.query(
@@ -4796,6 +4795,7 @@ function isBlockedPublicPath(requestPath) {
       "/pilot-identity-store-v0.js",
       "/pilot-identity-store-v0.test.js",
       "/server.js",
+      "/review-mode.js",
       "/package.json",
       "/package-lock.json",
       "/schema.sql",
@@ -4855,6 +4855,15 @@ app.use(
     next();
   }
 );
+
+// Review-only controls must not become available on the published app.
+app.get("/api/review-mode.js", (req, res) => {
+  const { isReviewModeAllowed } = require("./review-mode");
+  res.set("Cache-Control", "no-store");
+  res.type("application/javascript").send(
+    `window.NuReviewModeAllowed = ${isReviewModeAllowed()};`
+  );
+});
 
 app.use(
   express.static(

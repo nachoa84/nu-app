@@ -402,26 +402,27 @@
 
 
   // NU APP · SINCRONIZACIÓN MULTIRUTINA V98
-  const PRODUCT_ROUTINE_IDS_V98 = ["lumispa-10", "wellspa-10", "galvanicspa-10"];
+  const PRODUCT_ROUTINE_IDS_V98 = Object.keys(window.NuProductRoutines);
 
   function getLocalProductRoutinesV98() {
     const routines = {};
     PRODUCT_ROUTINE_IDS_V98.forEach(routineId => {
+      const totalDays = window.NuProductRoutines[routineId].totalDays;
       let local = { currentDay: 1, openedDays: {} };
       try {
-        local = JSON.parse(localStorage.getItem(`routineState:${routineId}`) || "null") || local;
+        local = JSON.parse(localStorage.getItem(window.NuProductStorage.stateKey(routineId)) || "null") || local;
       } catch (error) { void error; }
       const completedDays = [];
       const completedAtByDay = {};
-      for (let day = 1; day <= 10; day++) {
-        if (localStorage.getItem(`day:${routineId}:${day}:complete`) === "1") {
+      for (let day = 1; day <= totalDays; day++) {
+        if (localStorage.getItem(window.NuProductStorage.completeKey(routineId, day)) === "1") {
           completedDays.push(day);
         }
 
         const completedAt =
           Number(
             localStorage.getItem(
-              `day:${routineId}:${day}:completedAt`
+              window.NuProductStorage.completedAtKey(routineId, day)
             )
           );
 
@@ -430,7 +431,7 @@
         }
       }
       routines[routineId] = {
-        currentDay: Math.max(1, Math.min(10, Number(local.currentDay || 1))),
+        currentDay: Math.max(1, Math.min(totalDays, Number(local.currentDay || 1))),
         openedDays: local.openedDays || {},
         completedDays,
         completedAtByDay
@@ -440,7 +441,7 @@
   }
 
   function publishProductRoutineStatesV98(state) {
-    if (state) emit("product-routines-state-updated", state);
+    if (state && (!state.userId || state.userId === getProfile()?.userId)) emit("product-routines-state-updated", state);
   }
 
   async function bootstrapProductRoutinesV98() {

@@ -4,7 +4,7 @@
 (() => {
   "use strict";
 
-  const FINAL_LAYOUT_VERSION = "20260901-layout-v6";
+  const FINAL_LAYOUT_VERSION = "supplements-polish-1";
   const COMPLETION_STYLE_VERSION = "20260901-completion-v1";
   const COPY_CLEANUP_VERSION = "20260901-copy-v2";
 

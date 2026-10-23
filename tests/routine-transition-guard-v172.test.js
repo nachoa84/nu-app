@@ -95,8 +95,9 @@ test("rutinas de producto conservan DB time, lock, avance de un día e idempoten
   assert.match(productTransition, /FOR UPDATE/);
   assert.match(
     productTransition,
-    /LEAST\(state\.current_day \+ 1, 10\)/
+    /LEAST\(state\.current_day \+ 1, \$\{PRODUCT_ROUTINE_DURATION_SQL\}\)/
   );
+  assert.match(source, /WHEN '\$\{id\}' THEN \$\{config\.totalDays\}/);
   assert.match(
     productTransition,
     /INSERT INTO routine_notification_jobs/

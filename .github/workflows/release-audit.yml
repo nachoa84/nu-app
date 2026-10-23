@@ -61,7 +61,10 @@ jobs:
           const appShellRefs = new Set();
           for (const match of html.matchAll(/<(?:script\b[^>]*\bsrc|link\b[^>]*\bhref)=["']([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/gi)) {
             const ref = match[1];
-            if (!/^https?:\/\//i.test(ref)) appShellRefs.add(ref.replace(/^\.\//, ''));
+            // Dynamic API scripts are network-only and cannot be precached.
+            if (!/^https?:\/\//i.test(ref) && !ref.startsWith('/api/')) {
+              appShellRefs.add(ref.replace(/^\.\//, ''));
+            }
           }
 
           const precacheRefs = new Set(

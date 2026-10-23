@@ -7,6 +7,22 @@ body:has(#view-hoy.day-open) #app {
   padding-bottom: 0 !important;
 }
 
+/* Prysm's written strategy needs room for its complete action on small screens. */
+#view-hoy.day-open[data-routine-id="prysm-5"] .routine-content-track,
+#view-hoy.day-open[data-routine-id="prysm-5"] .routine-content-slide {
+  height: 292px !important;
+  min-height: 292px !important;
+  max-height: 292px !important;
+}
+
+#view-hoy.day-open[data-routine-id="prysm-5"] .routine-content-card,
+#view-hoy.day-open[data-routine-id="prysm-5"] .routine-content-card.is-long-copy,
+#view-hoy.day-open[data-routine-id="prysm-5"] .routine-content-card.is-qa {
+  height: 272px !important;
+  min-height: 272px !important;
+  max-height: 272px !important;
+}
+
 #view-hoy.day-open {
   padding-bottom: 0 !important;
 
@@ -45,6 +61,43 @@ body:has(#view-hoy.day-open) #app {
   --routine-hero-track: rgba(39,50,71,.16);
   --routine-hero-fill: rgba(39,50,71,.72);
   --routine-hero-blur: rgba(255,255,255,.55);
+}
+
+/* Supplement banners follow each product's packaging and campaign palette. */
+#view-hoy.day-open[data-routine-id="colageno-10"] {
+  --routine-hero-start: #b45b30;
+  --routine-hero-end: #92482e;
+  --routine-hero-blur: rgba(255,234,210,.35);
+}
+
+#view-hoy.day-open[data-routine-id="lifepak-5"] {
+  --routine-hero-start: #3e789a;
+  --routine-hero-end: #245b78;
+  --routine-hero-blur: rgba(224,245,255,.32);
+}
+
+#view-hoy.day-open[data-routine-id="lifepak-elements-5"] {
+  --routine-hero-start: #3d806d;
+  --routine-hero-end: #326b5e;
+  --routine-hero-blur: rgba(239,255,246,.32);
+}
+
+#view-hoy.day-open[data-routine-id="nubi-10"] {
+  --routine-hero-start: #a06c1c;
+  --routine-hero-end: #8d621a;
+  --routine-hero-blur: rgba(255,236,174,.35);
+}
+
+#view-hoy.day-open[data-routine-id="omega-10"] {
+  --routine-hero-start: #477f54;
+  --routine-hero-end: #2f6948;
+  --routine-hero-blur: rgba(226,255,231,.32);
+}
+
+#view-hoy.day-open[data-routine-id="prysm-5"] {
+  --routine-hero-start: #257795;
+  --routine-hero-end: #185b76;
+  --routine-hero-blur: rgba(219,251,255,.34);
 }
 
 #view-hoy.day-open .chat-wrap {

@@ -10,6 +10,10 @@ const progressSource = fs.readFileSync(
   path.join(__dirname, "..", "routine-progress-sync-v1.js"),
   "utf8"
 );
+const productConfigSource = fs.readFileSync(
+  path.join(__dirname, "..", "product-routine-config.js"),
+  "utf8"
+);
 
 const source = fs.readFileSync(
   path.join(__dirname, "..", "backend-client.js"),
@@ -230,6 +234,9 @@ function createHarness({
       encodeURIComponent
     });
 
+  vm.runInContext(productConfigSource, context);
+  window.NuProductRoutines = context.NuProductRoutines;
+  window.NuProductStorage = context.NuProductStorage;
   vm.runInContext(progressSource, context);
   vm.runInContext(source, context);
 
@@ -270,7 +277,7 @@ test("index y service worker cargan sólo Progress Sync antes del adaptador", ()
   const progressAsset =
     "routine-progress-sync-v1.js?v=1-durable-progress-sync";
   const backendAsset =
-    "backend-client.js?v=progress-sync-v1";
+    "backend-client.js?v=progress-sync-supplements-1";
 
   assert.equal(
     indexSource.includes("routine-active-sync-v172.js"),
