@@ -1,9 +1,9 @@
-const CACHE="nuapp-supplements-polish-1";
+const CACHE="nuapp-supplements-release-review-1";
 
 const CORE=[
   "./product-routine-config.js?v=5",
   "./supplements-content.js?v=7",
-  "./supplements-view.js?v=13",
+  "./supplements-view.js?v=supplements-release-review-1",
   "./supplements.css?v=9",
   "./assets/supplements/covers/colageno-10.png",
   "./assets/supplements/covers/lifepak-5.png",
@@ -53,12 +53,12 @@ const CORE=[
   "./notifications-redesign-v2.js?v=143-no-legacy-css",
   "./foco-live.js?v=2",
   "./home-view.js?v=20260830-home-continuity-v4",
-  "./daily-view.js?v=supplements-polish-1",
+  "./daily-view.js?v=supplements-release-review-1",
   "./routine-content-quality-v2.js?v=supplements-polish-1",
   "./routine-ui-polish-v1.js?v=supplements-polish-1",
-  "./progress-view.js?v=63-collagen-30",
+  "./progress-view.js?v=supplements-release-review-1",
   "./media-preview.js?v=105-navigation-bot-fixes",
-  "./app.js?v=143-single-sw",
+  "./app.js?v=supplements-release-review-1",
   "./backend-client.js?v=supplements-pilot-1",
   "./push-client.js?v=61b-progress-canonical",
   "./onboarding.js?v=61b-progress-canonical",

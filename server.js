@@ -4549,6 +4549,7 @@ function isBlockedPublicPath(requestPath) {
       "/pilot-identity-store-v0.js",
       "/pilot-identity-store-v0.test.js",
       "/server.js",
+      "/review-mode.js",
       "/package.json",
       "/package-lock.json",
       "/schema.sql",
@@ -4608,6 +4609,15 @@ app.use(
     next();
   }
 );
+
+// Review-only controls must not become available on the published app.
+app.get("/api/review-mode.js", (req, res) => {
+  const { isReviewModeAllowed } = require("./review-mode");
+  res.set("Cache-Control", "no-store");
+  res.type("application/javascript").send(
+    `window.NuReviewModeAllowed = ${isReviewModeAllowed()};`
+  );
+});
 
 app.use(
   express.static(

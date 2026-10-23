@@ -7,8 +7,8 @@ const dailyNativeRoutineTitle = document.getElementById("dailyNativeRoutineTitle
 const chatTitle = document.querySelector(".chat-header strong");
 
 const params = new URLSearchParams(window.location.search);
-const isPreviewMode = params.get("preview") === "1";
-const isDemoMode = params.get("demo") === "1";
+const isPreviewMode = window.NuReviewModeAllowed === true && params.get("preview") === "1";
+const isDemoMode = window.NuReviewModeAllowed === true && params.get("demo") === "1";
 
 const initialRoutineState = getRoutineState();
 let selectedDay = isPreviewMode

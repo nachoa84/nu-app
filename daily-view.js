@@ -915,6 +915,11 @@ function renderSelectedDayHeader() {
     dailyNativeDayLabel.textContent = `Día ${selectedDay} de ${TOTAL_PROGRAM_DAYS}`;
   }
 
+  const progressButton = document.getElementById("dailyNativeProgressBtn");
+  if (progressButton) {
+    progressButton.setAttribute("aria-label", `Ver progreso de ${TOTAL_PROGRAM_DAYS} días`);
+  }
+
   if (dailyNativeRoutineTitle) {
     dailyNativeRoutineTitle.textContent = getActiveRoutineConfig().title;
   }

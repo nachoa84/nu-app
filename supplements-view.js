@@ -3,7 +3,7 @@ const SUPPLEMENT_GENERAL_ACTIONS = [
   ["Capacitate", "Conocé las características y los beneficios de cada suplemento para compartirlo con confianza."],
   ["Organizá tu tiempo", "Agendá un bloque de trabajo diario de 30 a 50 minutos para darle orden, prioridad y foco a tu negocio."],
   ["Armá tu lista", "Reuní al menos 100 contactos: profesionales de la salud y el bienestar, personas interesadas en nutrición, hábitos y autocuidado, emprendedores y potenciales aliados."],
-  ["Prepará Stela", "Desde Stela, vinculada a tu oficina virtual, creá enlaces para clientes, miembros y afiliados de marca y consultá tus ventas y las de tu equipo."],
+  ["Descargá Stela", "Desde Stela, vinculada a tu oficina virtual, creá enlaces para clientes, miembros y afiliados de marca y consultá tus ventas y las de tu equipo."],
   ["Conversá y compartí", "Contactá al menos a 10 personas nuevas por día con entusiasmo. Publicá contenido en tus redes y estados de WhatsApp y revisá los tutoriales del producto."],
   ["Prepará tu energía", "Escuchá música, mové el cuerpo y prepará tu espacio de trabajo. Recordá que cada acción cuenta para alcanzar tus objetivos."]
 ];
@@ -56,7 +56,7 @@ function renderSupplementActions() {
   root.replaceChildren();
   const general = document.createElement("section");
   general.className = "supplement-actions";
-  general.innerHTML = '<p class="supplement-actions-intro">Prepará tu negocio para posicionar y compartir los suplementos.</p>';
+  general.innerHTML = '<p class="supplement-actions-intro">La suplementación puede complementar un estilo de vida saludable. Conocer los productos y sus beneficios te ayuda a compartirlos con confianza y a desarrollar tu negocio.</p>';
   const list = document.createElement("ol");
   SUPPLEMENT_GENERAL_ACTIONS.forEach(([title, copy], index) => {
     const item = document.createElement("li");
