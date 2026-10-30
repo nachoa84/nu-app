@@ -634,101 +634,42 @@ function openBotDocument(documentBlock) {
 }
 
 
-function opportunityZipCrc32(bytes) {
-  let crc = 0xffffffff;
-  for (let i = 0; i < bytes.length; i += 1) {
-    crc ^= bytes[i];
-    for (let bit = 0; bit < 8; bit += 1) {
-      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
-    }
-  }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-function opportunityZipU16(view, offset, value) {
-  view.setUint16(offset, value, true);
-}
-
-function opportunityZipU32(view, offset, value) {
-  view.setUint32(offset, value >>> 0, true);
-}
-
-async function buildOpportunityImagesZip(items) {
-  const encoder = new TextEncoder();
-  const now = new Date();
-  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
-  const dosDate = ((Math.max(1980, now.getFullYear()) - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+async function downloadOpportunityImages(items, onProgress) {
   const files = [];
 
   for (let index = 0; index < items.length; index += 1) {
     const item = items[index];
+    if (typeof onProgress === "function") {
+      onProgress("Preparando " + (index + 1) + " de " + items.length + "…");
+    }
     const response = await fetch(item.src, { credentials: "same-origin" });
     if (!response.ok) throw new Error("No se pudo cargar la imagen " + (index + 1));
-    const data = new Uint8Array(await response.arrayBuffer());
-    const pathName = String(item.src || "").split("/").pop() || ("imagen-" + (index + 1) + ".jpg");
-    const name = String(index + 1).padStart(2, "0") + "-" + pathName;
-    const nameBytes = encoder.encode(name);
-    const crc = opportunityZipCrc32(data);
-    const local = new Uint8Array(30 + nameBytes.length);
-    const localView = new DataView(local.buffer);
-    opportunityZipU32(localView, 0, 0x04034b50);
-    opportunityZipU16(localView, 4, 20);
-    opportunityZipU16(localView, 6, 0x0800);
-    opportunityZipU16(localView, 8, 0);
-    opportunityZipU16(localView, 10, dosTime);
-    opportunityZipU16(localView, 12, dosDate);
-    opportunityZipU32(localView, 14, crc);
-    opportunityZipU32(localView, 18, data.length);
-    opportunityZipU32(localView, 22, data.length);
-    opportunityZipU16(localView, 26, nameBytes.length);
-    opportunityZipU16(localView, 28, 0);
-    local.set(nameBytes, 30);
-    files.push({ local, data, nameBytes, crc, dosTime, dosDate });
+    const blob = await response.blob();
+    const filename = String(item.src || "").split("/").pop() ||
+      (String(index + 1).padStart(2, "0") + "-imagen.jpg");
+    files.push({ blob, filename });
   }
 
-  const parts = [];
-  let localOffset = 0;
-  const centralParts = [];
-  for (const file of files) {
-    parts.push(file.local, file.data);
-    const central = new Uint8Array(46 + file.nameBytes.length);
-    const view = new DataView(central.buffer);
-    opportunityZipU32(view, 0, 0x02014b50);
-    opportunityZipU16(view, 4, 20);
-    opportunityZipU16(view, 6, 20);
-    opportunityZipU16(view, 8, 0x0800);
-    opportunityZipU16(view, 10, 0);
-    opportunityZipU16(view, 12, file.dosTime);
-    opportunityZipU16(view, 14, file.dosDate);
-    opportunityZipU32(view, 16, file.crc);
-    opportunityZipU32(view, 20, file.data.length);
-    opportunityZipU32(view, 24, file.data.length);
-    opportunityZipU16(view, 28, file.nameBytes.length);
-    opportunityZipU16(view, 30, 0);
-    opportunityZipU16(view, 32, 0);
-    opportunityZipU16(view, 34, 0);
-    opportunityZipU16(view, 36, 0);
-    opportunityZipU32(view, 38, 0);
-    opportunityZipU32(view, 42, localOffset);
-    central.set(file.nameBytes, 46);
-    centralParts.push(central);
-    localOffset += file.local.length + file.data.length;
+  for (let index = 0; index < files.length; index += 1) {
+    if (typeof onProgress === "function") {
+      onProgress("Descargando " + (index + 1) + " de " + files.length + "…");
+    }
+    const file = files[index];
+    const url = URL.createObjectURL(file.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    if (index < files.length - 1) {
+      await new Promise(resolve => window.setTimeout(resolve, 450));
+    }
   }
-
-  const centralSize = centralParts.reduce((total, part) => total + part.length, 0);
-  const end = new Uint8Array(22);
-  const endView = new DataView(end.buffer);
-  opportunityZipU32(endView, 0, 0x06054b50);
-  opportunityZipU16(endView, 4, 0);
-  opportunityZipU16(endView, 6, 0);
-  opportunityZipU16(endView, 8, files.length);
-  opportunityZipU16(endView, 10, files.length);
-  opportunityZipU32(endView, 12, centralSize);
-  opportunityZipU32(endView, 16, localOffset);
-  opportunityZipU16(endView, 20, 0);
-  parts.push(...centralParts, end);
-  return new Blob(parts, { type: "application/zip" });
 }
+
 
 function openOpportunityPreview(items) {
   const slides = Array.isArray(items) ? items.filter(item => item && item.src) : [];
@@ -952,22 +893,20 @@ function openOpportunityPreview(items) {
   download.onclick = async () => {
     const original = download.textContent;
     download.disabled = true;
-    download.textContent = "Preparando descarga…";
     download.style.opacity = "0.72";
     try {
-      const zip = await buildOpportunityImagesZip(slides);
-      const url = URL.createObjectURL(zip);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "oportunidad-de-negocio-nuskin.zip";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 30000);
-    } catch (error) {
-      console.warn("No se pudo preparar la descarga de oportunidad.", error);
+      await downloadOpportunityImages(slides, status => {
+        download.textContent = status;
+      });
+      download.textContent = "¡Listo! Se descargaron las imágenes";
       if (typeof toast === "function") {
-        toast("No se pudo preparar el archivo. Probá nuevamente.", { type: "error" });
+        toast("Se inició la descarga de las 8 imágenes en orden.", { type: "success" });
+      }
+      await new Promise(resolve => window.setTimeout(resolve, 1400));
+    } catch (error) {
+      console.warn("No se pudieron descargar las imágenes de oportunidad.", error);
+      if (typeof toast === "function") {
+        toast("No se pudieron descargar todas las imágenes. Probá nuevamente.", { type: "error" });
       }
     } finally {
       download.disabled = false;
