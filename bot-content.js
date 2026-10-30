@@ -227,11 +227,11 @@
           },
           {
             "title": "Chile",
-            "body": "Escribí: tramites chile"
+            "body": "Escribí: tramites chile. Para ver solo el acuerdo, escribí: acuerdo chile"
           },
           {
             "title": "Colombia",
-            "body": "Escribí: tramites colombia"
+            "body": "Escribí: tramites colombia. Para ver solo el acuerdo, escribí: acuerdo colombia"
           },
           {
             "title": "España",
@@ -247,7 +247,7 @@
           },
           {
             "title": "Perú",
-            "body": "Escribí: tramites peru"
+            "body": "Escribí: tramites peru. Para ver solo el acuerdo, escribí: acuerdo peru"
           }
         ],
         "description": "Elegí el mercado que necesitás."
@@ -427,7 +427,9 @@
       "tramite Chile",
       "acuerdo afiliado Chile",
       "formato entidad de negocio Chile"
-    ],
+    ,
+      "acuerdo chile"
+    ,
     "phrases": [
       "como iniciar el negocio en Chile",
       "como completar el acuerdo de afiliado en Chile",
@@ -490,7 +492,9 @@
       "tramite Colombia",
       "acuerdo afiliado Colombia",
       "formato entidad de negocio Colombia"
-    ],
+    ,
+      "acuerdo colombia"
+    ,
     "phrases": [
       "como iniciar el negocio en Colombia",
       "como completar el acuerdo de afiliado en Colombia",
@@ -957,7 +961,9 @@
       "tramite Perú",
       "cobrar comisiones Perú",
       "cobro comisiones Perú"
-    ],
+    ,
+      "acuerdo peru"
+    ,
     "phrases": [
       "como cobro en Perú",
       "como cobrar comisiones en Perú",
