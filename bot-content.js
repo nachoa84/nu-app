@@ -2676,6 +2676,19 @@
       }
     ],
     "sourceFlow": "navegar pagina"
+  },
+  {
+    "id": "cancelacion-pedidos",
+    "title": "Cancelación de pedidos",
+    "command": "cancelacion de pedido",
+    "aliases": ["cancelación de pedido", "cancelacion de pedidos", "cancelar pedido", "cancelar pedidos"],
+    "phrases": ["como cancelar un pedido", "quiero cancelar mi pedido", "guia para cancelar pedido"],
+    "keywords": ["cancelacion", "pedido", "devolver", "ventana de 15 minutos"],
+    "blocks": [
+      {"type":"text","content":"Te comparto la guía visual para cancelar un pedido. Abrila para verla en grande y descargar la imagen."},
+      {"type":"download-image","title":"Guía de cancelación de pedidos","description":"Pasos, ventana de 15 minutos y recomendaciones.","src":"/assets/cancelacion-pedidos.jpg","filename":"guia-cancelacion-pedidos.jpg","mediaType":"image","resourceKind":"guide"}
+    ],
+    "sourceFlow": "CANCELACIÓN DE PEDIDOS"
   }
 ];
 
