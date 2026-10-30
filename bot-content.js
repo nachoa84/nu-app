@@ -215,7 +215,7 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Tengo los trámites para cobrar comisiones organizados por país. Escribí el país junto al comando, por ejemplo: “tramites argentina”."
+        "content": "Tengo la documentación de inicio y los trámites para cobrar comisiones organizados por país. Escribí el país junto al comando, por ejemplo: “tramites argentina”."
       },
       {
         "type": "document",
@@ -224,6 +224,14 @@
           {
             "title": "Argentina",
             "body": "Escribí: tramites argentina"
+          },
+          {
+            "title": "Chile",
+            "body": "Escribí: tramites chile"
+          },
+          {
+            "title": "Colombia",
+            "body": "Escribí: tramites colombia"
           },
           {
             "title": "España",
@@ -300,14 +308,19 @@
           },
           {
             "title": "Documentación",
-            "body": "Completá el formulario de afiliado de marca, descargá tu constancia de inscripción en ARCA y adjuntala dentro del mismo formulario."
+            "body": "Completá el formulario en línea del Acuerdo del Afiliado de Marca Independiente. Si la afiliación se registra a nombre de una empresa o entidad, completá también el Formato de Entidad de Negocio. Adjuntá la constancia de inscripción en ARCA cuando el formulario te la solicite."
           }
         ],
         "actions": [
           {
             "title": "Completar formulario",
             "description": "Acuerdo de Afiliado de Marca",
-            "url": "https://nuskin.jotform.com/220546195814054"
+            "url": "https://zfrmz.com/QqcH0KVoFpKvJjVdNVMB"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad",
+            "url": "https://zfrmz.com/3KXywLtWFXimpAkf08i7"
           },
           {
             "title": "Obtener constancia en ARCA",
@@ -398,6 +411,132 @@
       }
     ],
     "country": "Argentina",
+    "sourceFlow": "tramites cobrar"
+  },
+  {
+    "id": "tramites-chile",
+    "title": "Trámites · Chile",
+    "command": "tramites chile",
+    "commands": [
+      "tramite chile"
+    ],
+    "aliases": [
+      "tramites Chile",
+      "tramite Chile",
+      "acuerdo afiliado Chile",
+      "formato entidad de negocio Chile"
+    ],
+    "phrases": [
+      "como iniciar el negocio en Chile",
+      "como completar el acuerdo de afiliado en Chile",
+      "formulario de entidad de negocio Chile"
+    ],
+    "keywords": [
+      "tramites",
+      "documentacion",
+      "inicio de negocio",
+      "acuerdo afiliado",
+      "entidad de negocio",
+      "Chile"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Estos son los formularios para iniciar tu negocio en Chile. Completá el Acuerdo del Afiliado de Marca Independiente y, si la cuenta se registra a nombre de una empresa o entidad de negocio, completá también el Formato de Entidad de Negocio."
+      },
+      {
+        "type": "document",
+        "kicker": "DOCUMENTOS DE INICIO",
+        "title": "Acuerdo del Afiliado de Marca Independiente",
+        "description": "Formularios oficiales de inicio para Chile.",
+        "sections": [
+          {
+            "title": "Acuerdo del Afiliado de Marca Independiente",
+            "body": "Completá el acuerdo de afiliación correspondiente al mercado de Chile."
+          },
+          {
+            "title": "Formato de Entidad de Negocio",
+            "body": "Completá este formulario si la cuenta se registra a nombre de una empresa o entidad de negocio."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Formulario de afiliación — Chile",
+            "url": "https://zfrmz.com/RjoouYeu6TW76uhJ14ZE"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Formulario para empresa o entidad — Chile",
+            "url": "https://zfrmz.com/GkeAHuZiyO5HZGZVRd93"
+          }
+        ]
+      }
+    ],
+    "country": "Chile",
+    "sourceFlow": "tramites cobrar"
+  },
+  {
+    "id": "tramites-colombia",
+    "title": "Trámites · Colombia",
+    "command": "tramites colombia",
+    "commands": [
+      "tramite colombia"
+    ],
+    "aliases": [
+      "tramites Colombia",
+      "tramite Colombia",
+      "acuerdo afiliado Colombia",
+      "formato entidad de negocio Colombia"
+    ],
+    "phrases": [
+      "como iniciar el negocio en Colombia",
+      "como completar el acuerdo de afiliado en Colombia",
+      "formulario de entidad de negocio Colombia"
+    ],
+    "keywords": [
+      "tramites",
+      "documentacion",
+      "inicio de negocio",
+      "acuerdo afiliado",
+      "entidad de negocio",
+      "Colombia"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Estos son los formularios para iniciar tu negocio en Colombia. Completá el Acuerdo del Afiliado de Marca Independiente y, si la cuenta se registra a nombre de una empresa o entidad de negocio, completá también el Formato de Entidad de Negocio."
+      },
+      {
+        "type": "document",
+        "kicker": "DOCUMENTOS DE INICIO",
+        "title": "Acuerdo del Afiliado de Marca Independiente",
+        "description": "Formularios oficiales de inicio para Colombia.",
+        "sections": [
+          {
+            "title": "Acuerdo del Afiliado de Marca Independiente",
+            "body": "Completá el acuerdo de afiliación correspondiente al mercado de Colombia."
+          },
+          {
+            "title": "Formato de Entidad de Negocio",
+            "body": "Completá este formulario si la cuenta se registra a nombre de una empresa o entidad de negocio."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Formulario de afiliación — Colombia",
+            "url": "https://zfrmz.com/rXj4wPGcUf4vcDvrubTH"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Formulario para empresa o entidad — Colombia",
+            "url": "https://zfrmz.com/txSjvQYyY8IzmB0zhQLk"
+          }
+        ]
+      }
+    ],
+    "country": "Colombia",
     "sourceFlow": "tramites cobrar"
   },
   {
@@ -666,19 +805,24 @@
       {
         "type": "document",
         "kicker": "ETAPA 1 DE 5",
-        "title": "Descargar el Acuerdo de Afiliado",
-        "description": "Obtené el documento oficial de Nu Skin.",
+        "title": "Completar el Acuerdo de Afiliado",
+        "description": "Completá el formulario oficial de Nu Skin en línea.",
         "sections": [
           {
             "title": "Acuerdo de Afiliado de Marca",
-            "body": "Descargá e imprimí el Acuerdo de Afiliado de Marca. En la siguiente etapa encontrarás una guía para completarlo correctamente."
+            "body": "Completá el formulario en línea del mercado mexicano. Si la afiliación se registra como empresa o entidad, completá también el Formato de Entidad de Negocio."
           }
         ],
         "actions": [
           {
-            "title": "Descargar Acuerdo de Afiliado",
-            "description": "Documento oficial de Nu Skin",
-            "url": "https://www.nuskin.com/content/dam/office/s_america/MX/es/business_materials/mx_acuerdo_del_afiliado.pdf"
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Acuerdo del Afiliado de Marca Independiente — México",
+            "url": "https://zfrmz.com/kvVQs6GvrLUvwfXHjwiq"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad — México",
+            "url": "https://zfrmz.com/yLLbI0YokViEYiSXsxBM"
           }
         ]
       },
@@ -690,7 +834,7 @@
         "sections": [
           {
             "title": "Cómo completarlo",
-            "body": "Consultá la guía antes de llenar el acuerdo. Completá todos los campos, firmalo y tomá una fotografía clara del documento terminado."
+            "body": "El Acuerdo de Afiliado actualizado se completa en línea. Usá esta guía como referencia complementaria y seguí las indicaciones del formulario oficial para enviarlo."
           }
         ],
         "actions": [
@@ -755,7 +899,7 @@
           },
           {
             "title": "Documentos que tenés que enviar",
-            "body": "Enviá el Acuerdo de Afiliado completo y la Constancia de Situación Fiscal a:\n\ndocumentos@nuskin.com"
+            "body": "Enviá la Constancia de Situación Fiscal actualizada y cualquier documentación adicional que Nu Skin te solicite a:\n\ndocumentos@nuskin.com"
           },
           {
             "title": "Asunto y cuerpo del correo",
@@ -860,18 +1004,23 @@
         "type": "document",
         "kicker": "ETAPA 2 DE 6",
         "title": "Acuerdo de Afiliado de Marca",
-        "description": "Descargá, imprimí y completá el acuerdo.",
+        "description": "Completá el formulario oficial en línea.",
         "sections": [
           {
             "title": "Prepará el acuerdo",
-            "body": "Descargá el Acuerdo de Afiliado de Marca, imprimilo y completalo con los datos correspondientes. Cuando termines, tomá una fotografía clara del documento."
+            "body": "Completá el formulario en línea del mercado peruano. Si la afiliación se registra como empresa o entidad, completá también el Formato de Entidad de Negocio."
           }
         ],
         "actions": [
           {
-            "title": "Descargar Acuerdo de Afiliado",
-            "description": "Documento oficial para Perú",
-            "url": "/api/bot-assets/f65f14d01b558c33558d31103fedfc627b4c119328ea2df96af2c01e6bbf7f2a.pdf"
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Acuerdo del Afiliado de Marca Independiente — Perú",
+            "url": "https://zfrmz.com/7pbw5Kx1NTr9Bwh87SRs"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad — Perú",
+            "url": "https://zfrmz.com/N2MKpxzi9JznYJLpdMZE"
           }
         ]
       },
@@ -898,11 +1047,11 @@
         "type": "document",
         "kicker": "ETAPA 4 DE 6",
         "title": "Enviar la documentación",
-        "description": "Enviá los dos documentos completos a Nu Skin.",
+        "description": "Enviá el Formato de depósito de comisiones completo a Nu Skin. El acuerdo se completa en línea.",
         "sections": [
           {
             "title": "Documentos que tenés que enviar",
-            "body": "Adjuntá la fotografía del Acuerdo de Afiliado de Marca y la fotografía del Formato de depósito de comisiones."
+            "body": "Completá el Acuerdo de Afiliado de Marca en el formulario en línea. Adjuntá a este correo una fotografía clara del Formato de depósito de comisiones completo."
           },
           {
             "title": "Dirección de envío",

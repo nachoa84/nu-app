@@ -108,6 +108,8 @@
 
   const TRAMITES_COUNTRY_COMMANDS = [
     "tramites argentina",
+    "tramites chile",
+    "tramites colombia",
     "tramites espana",
     "tramites italia",
     "tramites mexico",
