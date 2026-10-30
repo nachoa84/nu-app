@@ -528,7 +528,11 @@ function openBotDocument(documentBlock) {
       const link = document.createElement("a");
       link.className = "bot-document-action";
       link.href = action.url;
-      link.target = "_blank";
+      if (action.download) {
+        link.download = action.filename || action.title || "descarga";
+      } else {
+        link.target = "_blank";
+      }
       link.rel = "noopener noreferrer";
 
       const copy = document.createElement("span");

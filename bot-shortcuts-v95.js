@@ -9,7 +9,7 @@
       description: "Primeros pasos para desarrollar el negocio.",
       tone: "violet",
       icon: "briefcase",
-      commands: ["loi", "primera venta", "crear nuevo id", "crear una oferta"]
+      commands: ["loi", "primera venta", "crear nuevo id", "crear una oferta", "oportunidad de negocio"]
     },
     {
       id: "productos-asesoramiento",
