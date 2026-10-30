@@ -64,6 +64,178 @@ function addLinks(container, links) {
   container.appendChild(wrap);
 }
 
+
+function openRoutinePdfPreview(block, trigger) {
+  const url = String(block?.url || "");
+  if (!url || document.querySelector(".routine-pdf-preview-layer")) return;
+
+  const previousFocus = trigger || document.activeElement;
+  const previousOverflow = document.body.style.overflow;
+  const titleText = String(block.label || "Capacitación");
+  const filename = String(block.downloadName || (titleText.toLowerCase().endsWith(".pdf") ? titleText : titleText + ".pdf"));
+
+  const layer = document.createElement("div");
+  layer.className = "routine-pdf-preview-layer";
+  layer.setAttribute("role", "presentation");
+  Object.assign(layer.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "10060",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    padding: "10px",
+    background: "rgba(25, 32, 40, 0.58)"
+  });
+
+  const backdrop = document.createElement("button");
+  backdrop.type = "button";
+  backdrop.setAttribute("aria-label", "Cerrar la capacitación y volver al día " + selectedDay);
+  Object.assign(backdrop.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    border: "0",
+    background: "transparent"
+  });
+
+  const sheet = document.createElement("section");
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", titleText);
+  Object.assign(sheet.style, {
+    position: "relative",
+    zIndex: "1",
+    display: "flex",
+    flexDirection: "column",
+    width: "min(100%, 960px)",
+    height: "min(92dvh, 900px)",
+    minHeight: "320px",
+    overflow: "hidden",
+    borderRadius: "20px",
+    background: "#ffffff",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.28)"
+  });
+
+  const header = document.createElement("header");
+  Object.assign(header.style, {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    padding: "12px 14px",
+    borderBottom: "1px solid #e7ecee",
+    background: "#ffffff"
+  });
+
+  const heading = document.createElement("h2");
+  heading.textContent = titleText;
+  Object.assign(heading.style, {
+    flex: "1 1 180px",
+    minWidth: "0",
+    margin: "0",
+    color: "#283b43",
+    fontFamily: "inherit",
+    fontSize: "16px",
+    fontWeight: "600",
+    lineHeight: "1.3",
+    overflowWrap: "anywhere"
+  });
+
+  const actions = document.createElement("div");
+  Object.assign(actions.style, {
+    display: "flex",
+    flex: "0 1 auto",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "8px"
+  });
+
+  const download = document.createElement("a");
+  download.href = url;
+  download.setAttribute("download", filename);
+  download.textContent = "Descargar PDF";
+  download.setAttribute("aria-label", "Descargar " + filename);
+  Object.assign(download.style, {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "42px",
+    padding: "9px 14px",
+    borderRadius: "12px",
+    background: "#82b9c8",
+    color: "#ffffff",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    fontWeight: "600",
+    lineHeight: "1.2",
+    textDecoration: "none",
+    whiteSpace: "nowrap"
+  });
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Volver al día";
+  close.setAttribute("aria-label", "Cerrar la capacitación y volver al día " + selectedDay);
+  Object.assign(close.style, {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "42px",
+    padding: "9px 14px",
+    border: "1px solid #dbe4e7",
+    borderRadius: "12px",
+    background: "#ffffff",
+    color: "#36535d",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    fontWeight: "600",
+    lineHeight: "1.2",
+    whiteSpace: "nowrap",
+    cursor: "pointer"
+  });
+
+  actions.append(download, close);
+  header.append(heading, actions);
+
+  const frame = document.createElement("iframe");
+  frame.src = url;
+  frame.title = "Vista previa del PDF " + titleText;
+  frame.setAttribute("loading", "eager");
+  Object.assign(frame.style, {
+    display: "block",
+    flex: "1 1 auto",
+    width: "100%",
+    minHeight: "0",
+    border: "0",
+    background: "#f4f6f7"
+  });
+
+  sheet.append(header, frame);
+  layer.append(backdrop, sheet);
+  document.body.appendChild(layer);
+  document.body.style.overflow = "hidden";
+
+  const cleanup = () => {
+    document.body.style.overflow = previousOverflow;
+    document.removeEventListener("keydown", onKeyDown);
+    layer.remove();
+    previousFocus?.focus?.({ preventScroll: true });
+  };
+  const onKeyDown = event => {
+    if (event.key === "Escape") cleanup();
+  };
+
+  backdrop.onclick = cleanup;
+  close.onclick = cleanup;
+  document.addEventListener("keydown", onKeyDown);
+  requestAnimationFrame(() => close.focus({ preventScroll: true }));
+}
+
 function createBlock(block) {
   if (block.type === "complete" && getActiveRoutineConfig().category === "supplements") {
     return createSupplementCompletion();
@@ -90,7 +262,13 @@ function createBlock(block) {
         toast("No se pudo abrir la capacitación.", { type: "info" });
       };
     } else if (block.url) {
-      btn.onclick = () => window.open(block.url, "_blank", "noopener");
+      btn.onclick = () => {
+        if (block.previewInApp && block.resourceKind === "document") {
+          openRoutinePdfPreview(block, btn);
+          return;
+        }
+        window.open(block.url, "_blank", "noopener");
+      };
     } else {
       btn.onclick = () =>
         toast("Esta capacitación todavía está pendiente de cargar.");
