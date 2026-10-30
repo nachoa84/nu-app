@@ -646,7 +646,7 @@ async function downloadOpportunityImages(items, onProgress) {
     const response = await fetch(item.src, { credentials: "same-origin" });
     if (!response.ok) throw new Error("No se pudo cargar la imagen " + (index + 1));
     const blob = await response.blob();
-    const filename = String(item.src || "").split("/").pop() ||
+    const filename = item.filename || String(item.src || "").split("/").pop() ||
       (String(index + 1).padStart(2, "0") + "-imagen.jpg");
     files.push({ blob, filename });
   }
@@ -900,7 +900,7 @@ function openOpportunityPreview(items, options = {}) {
       await downloadOpportunityImages(slides, status => {
         download.textContent = status;
       });
-      download.textContent = "¡Listo! Se descargaron las imágenes";
+      download.textContent = slides.length === 1 ? "¡Listo! Imagen descargada" : "¡Listo! Se descargaron las imágenes";
       if (typeof toast === "function") {
         toast(slides.length === 1 ? "Se inició la descarga de la imagen." : "Se inició la descarga de " + slides.length + " imágenes en orden.", { type: "success" });
       }
@@ -908,7 +908,7 @@ function openOpportunityPreview(items, options = {}) {
     } catch (error) {
       console.warn("No se pudo descargar el material de Iris.", error);
       if (typeof toast === "function") {
-        toast("No se pudieron descargar todas las imágenes. Probá nuevamente.", { type: "error" });
+        toast(slides.length === 1 ? "No se pudo descargar la imagen. Probá nuevamente." : "No se pudieron descargar todas las imágenes. Probá nuevamente.", { type: "error" });
       }
     } finally {
       download.disabled = false;
@@ -1084,7 +1084,7 @@ function createBotResourceCard(block) {
     card.onclick = () => {
       if (block.type === "download-image") {
         openOpportunityPreview(
-          [{ src: block.src, label: block.title || "Guía de cancelación de pedidos" }],
+          [{ src: block.src, label: block.title || "Guía de cancelación de pedidos", filename: block.filename }],
           { title: block.title || "Guía de cancelación de pedidos", downloadLabel: "Descargar imagen" }
         );
         return;
