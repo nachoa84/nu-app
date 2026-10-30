@@ -1709,14 +1709,38 @@ function resolveBotAnswer(q) {
     };
   }
 
+  const countryBlocks = filterBotBlocksForCountry(
+    winner.blocks || [],
+    search.explicitCountry,
+    search.profileCountry
+  );
+  const countrySlug = search.explicitCountry
+    ? normalizeBotText(search.explicitCountry).replace(/\s+/g, "-")
+    : "";
+  const isCountryAgreementCommand =
+    search.contentQuery === "acuerdo" &&
+    search.explicitCountry &&
+    winner.id === "tramites-" + countrySlug;
+
+  const responseBlocks = isCountryAgreementCommand
+    ? countryBlocks.filter(block => {
+        if (block.type !== "document") return false;
+        const agreementText = [
+          block.title,
+          block.description,
+          ...(block.sections || []).flatMap(section => [
+            section?.title,
+            section?.body
+          ])
+        ].filter(Boolean).join(" ");
+        return normalizeBotText(agreementText).includes("acuerdo");
+      })
+    : countryBlocks;
+
   return {
     topicId: winner.id,
     topicTitle: winner.title || "",
-    blocks: filterBotBlocksForCountry(
-      winner.blocks || [],
-      search.explicitCountry,
-      search.profileCountry
-    )
+    blocks: responseBlocks
   };
 }
 
