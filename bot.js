@@ -675,7 +675,34 @@ function createBotResourceCard(block) {
     return card;
   }
 
-  if (block.type === "document") {
+  if (block.type === "document" && block.kicker === "OPORTUNIDAD DE NEGOCIO" && block.galleryTitle && Array.isArray(block.items) && block.items.length) {
+      const gallery = document.createElement("section");
+      gallery.className = "bot-opportunity-gallery";
+      gallery.setAttribute("role", "region"); gallery.setAttribute("aria-label", block.galleryTitle);
+      gallery.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:320px;margin:12px auto;padding:10px;border:1px solid #e8e4df;border-radius:16px;background:#fff;box-sizing:border-box";
+      const kicker=document.createElement("small"); kicker.textContent=block.galleryKicker||"IMÁGENES"; kicker.style.cssText="display:block;font-size:11px;font-weight:700;letter-spacing:.12em;color:#8b6a42;margin-bottom:5px";
+      const heading=document.createElement("strong"); heading.textContent=block.galleryTitle; heading.style.cssText="display:block;font-size:16px;margin-bottom:12px;color:#222";
+      const stage=document.createElement("div"); stage.style.cssText="position:relative;width:100%;max-width:240px;height:220px;margin:0 auto;background:#f5f2ee;border-radius:12px;overflow:hidden;touch-action:pan-y;user-select:none";
+      const image=document.createElement("img"); image.alt=""; image.loading="lazy"; image.style.cssText="display:block;width:100%;height:100%;object-fit:contain"; stage.appendChild(image);
+      const makeNav=(txt,side)=>{const b=document.createElement("button");b.type="button";b.textContent=txt;b.setAttribute("aria-label",side==="left"?"Imagen anterior":"Imagen siguiente");b.style.cssText="position:absolute;top:50%;"+side+":6px;transform:translateY(-50%);width:48px;height:48px;border:0;border-radius:50%;background:rgba(35,31,28,.78);color:#fff;font-size:32px;line-height:1;box-shadow:0 2px 12px #0004;cursor:pointer";return b};
+      const prev=makeNav("‹","left"), next=makeNav("›","right"); stage.append(prev,next);
+      const caption=document.createElement("div"); caption.style.cssText="display:flex;justify-content:space-between;gap:12px;align-items:center;margin:10px 2px 12px;color:#333";
+      const label=document.createElement("span"), count=document.createElement("small"); label.style.cssText="font-size:13px;line-height:1.35";count.style.cssText="flex:none;color:#777;font-variant-numeric:tabular-nums";caption.append(label,count);
+      let current=0; const show=i=>{current=(i+block.items.length)%block.items.length;const item=block.items[current];const nextItem=block.items[(current+1)%block.items.length];if(nextItem&&nextItem.src){const preloader=new Image();preloader.src=nextItem.src;}image.src=item.src;image.alt=item.label||("Imagen "+(current+1));label.textContent=(item.label||("Imagen "+(current+1))).replace(/^\d+\s+de\s+\d+\s*[·-]\s*/,"");count.textContent=(current+1)+" / "+block.items.length};
+      prev.addEventListener("click",()=>show(current-1));next.addEventListener("click",()=>show(current+1));
+      let pointerX=null;stage.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;pointerX=e.clientX;stage.setPointerCapture(e.pointerId)},{passive:true});stage.addEventListener("pointerup",e=>{if(pointerX===null)return;const dx=e.clientX-pointerX;pointerX=null;if(Math.abs(dx)>32)show(current+(dx<0?1:-1))},{passive:true});stage.addEventListener("pointercancel",()=>{pointerX=null});
+      const download=document.createElement("button");download.type="button";download.textContent="Descargar todo";download.style.cssText="width:100%;min-height:44px;border:0;border-radius:12px;background:#d96b3b;color:#fff;font-weight:700;font-size:14px;cursor:pointer";
+      download.addEventListener("click",async()=>{download.disabled=true;download.textContent="Preparando descarga…";try{
+        const files=await Promise.all(block.items.map(async(item,i)=>{const r=await fetch(item.src);if(!r.ok)throw Error("Descarga fallida: "+item.src);const data=new Uint8Array(await r.arrayBuffer());return{name:(item.src.split("?")[0].split("/").pop()||("imagen-"+(i+1)+".jpg")),data}}));
+        const crc32=data=>{let c=0xffffffff;for(const b of data){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^(c&1?0xedb88320:0)}return(c^0xffffffff)>>>0};const enc=new TextEncoder(),local=[],central=[];let offset=0;
+        for(const f of files){const n=enc.encode(f.name),crc=crc32(f.data),h=new Uint8Array(30+n.length),v=new DataView(h.buffer);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint32(14,crc,true);v.setUint32(18,f.data.length,true);v.setUint32(22,f.data.length,true);v.setUint16(26,n.length,true);h.set(n,30);local.push(h,f.data);
+          const d=new Uint8Array(46+n.length),w=new DataView(d.buffer);w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint32(16,crc,true);w.setUint32(20,f.data.length,true);w.setUint32(24,f.data.length,true);w.setUint16(28,n.length,true);w.setUint32(42,offset,true);d.set(n,46);central.push(d);offset+=h.length+f.data.length}
+        const size=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,size,true);ev.setUint32(16,offset,true);
+        const url=URL.createObjectURL(new Blob([...local,...central,end],{type:"application/zip"})),a=document.createElement("a");a.href=url;a.download="oportunidad-de-negocio.zip";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);download.textContent="Descargar todo";
+      }catch(err){console.error("No se pudo preparar la descarga",err);download.textContent="No se pudo descargar. Reintentá"}finally{download.disabled=false}});
+      gallery.append(stage,download);show(0);return gallery;
+    }
+    if (block.type === "document") {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "bot-resource-card bot-resource-document";
