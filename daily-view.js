@@ -160,6 +160,19 @@ function openRoutinePdfPreview(block, trigger) {
   download.setAttribute("download", filename);
   download.textContent = "Descargar PDF";
   download.setAttribute("aria-label", "Descargar " + filename);
+  if (url.includes("a62db606247ada6cced9ea63133cf435eead66dd80d2afb22371aecfd08314f9.pdf")) {
+    let resetDownloadLabel;
+    download.setAttribute("aria-live", "polite");
+    download.addEventListener("click", () => {
+      download.textContent = "Iniciando descarga…";
+      download.setAttribute("aria-label", "Iniciando descarga de " + filename);
+      clearTimeout(resetDownloadLabel);
+      resetDownloadLabel = setTimeout(() => {
+        download.textContent = "Descargar PDF";
+        download.setAttribute("aria-label", "Descargar " + filename);
+      }, 8000);
+    });
+  }
   Object.assign(download.style, {
     display: "inline-flex",
     alignItems: "center",
@@ -201,23 +214,123 @@ function openRoutinePdfPreview(block, trigger) {
 
   actions.append(download, close);
   header.append(heading, actions);
+  header.style.display = "none";
 
-  const frame = document.createElement("iframe");
-  frame.src = url;
-  frame.title = "Vista previa del PDF " + titleText;
-  frame.setAttribute("loading", "eager");
-  Object.assign(frame.style, {
-    display: "block",
+  const preview = document.createElement("div");
+  preview.className = "routine-pdf-pages";
+  preview.setAttribute("role", "region");
+  preview.setAttribute("aria-label", "Vista previa del PDF");
+  Object.assign(preview.style, {
+    display: "flex",
     flex: "1 1 auto",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    overflow: "auto",
     width: "100%",
     minHeight: "0",
-    border: "0",
-    background: "#f4f6f7"
+    padding: "14px",
+    boxSizing: "border-box",
+    background: "#e8eaed"
   });
 
-  sheet.append(header, frame);
-  layer.append(backdrop, sheet);
+  const loading = document.createElement("div");
+  loading.textContent = "Cargando vista previa...";
+  Object.assign(loading.style, { padding: "16px", color: "#53666f" });
+  preview.appendChild(loading);
+
+  actions.style.padding = "12px 14px";
+  actions.style.borderTop = "1px solid #e7ecee";
+  actions.style.background = "#ffffff";
+  actions.style.flex = "0 0 auto";
+  sheet.append(preview, actions);
+    layer.append(backdrop, sheet);
   document.body.appendChild(layer);
+  if (url.includes("a62db606247ada6cced9ea63133cf435eead66dd80d2afb22371aecfd08314f9.pdf")) {
+    for (let pageNumber = 1; pageNumber <= 6; pageNumber += 1) {
+      const pageImage = document.createElement("img");
+      pageImage.alt = "Página " + pageNumber + " de 6";
+      pageImage.width = 1445;
+      pageImage.height = 1870;
+      pageImage.loading = pageNumber === 1 ? "eager" : "lazy";
+      pageImage.decoding = "async";
+      if (pageNumber === 1) {
+        pageImage.fetchPriority = "high";
+        pageImage.addEventListener("load", () => loading.remove(), { once: true });
+        pageImage.addEventListener("error", () => {
+          loading.textContent = "No se pudo mostrar la vista previa. Podés descargar el PDF desde el botón de abajo.";
+        }, { once: true });
+      }
+      Object.assign(pageImage.style, {
+        display: "block",
+        width: "100%",
+        height: "auto",
+        maxWidth: "100%",
+        background: "#ffffff",
+        borderRadius: "4px",
+        boxShadow: "0 1px 6px rgba(0, 0, 0, 0.18)"
+      });
+      pageImage.tabIndex = 0;
+      pageImage.setAttribute("role", "button");
+      pageImage.setAttribute("aria-label", "Ampliar o reducir página " + pageNumber + " de 6");
+      pageImage.style.cursor = "zoom-in";
+      pageImage.addEventListener("click", () => {
+        const expanded = pageImage.dataset.expanded === "true";
+        pageImage.dataset.expanded = String(!expanded);
+        pageImage.style.width = expanded ? (preview.clientWidth - 28) + "px" : Math.min((preview.clientWidth - 28) * 3, 1200) + "px";
+        pageImage.style.maxWidth = expanded ? "100%" : "none";
+        pageImage.style.cursor = expanded ? "zoom-in" : "zoom-out";
+          if (expanded) preview.scrollLeft = 0;
+      });
+      pageImage.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          pageImage.click();
+        }
+      });
+      preview.appendChild(pageImage);
+      pageImage.src = "/wellspa-preview/page-" + pageNumber + ".webp";
+    }
+  } else {
+  import("/pdfjs-preview.mjs").then(async pdfjsLib => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdfjs-preview.worker.mjs";
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    loading.remove();
+    const outputScale = Math.min(window.devicePixelRatio || 1, 2);
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      if (!document.body.contains(layer)) return;
+      const page = await pdf.getPage(pageNumber);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const scale = Math.min(1, (preview.clientWidth - 28) / baseViewport.width);
+      const viewport = page.getViewport({ scale: Math.max(scale, 0.25) });
+      const canvas = document.createElement("canvas");
+      canvas.setAttribute("aria-label", "Página " + pageNumber + " de " + pdf.numPages);
+      canvas.width = Math.floor(viewport.width * outputScale);
+      canvas.height = Math.floor(viewport.height * outputScale);
+      Object.assign(canvas.style, {
+        display: "block",
+        width: viewport.width + "px",
+        height: viewport.height + "px",
+        maxWidth: "100%",
+        background: "#ffffff",
+        borderRadius: "4px",
+        boxShadow: "0 1px 6px rgba(0, 0, 0, 0.18)"
+      });
+      preview.appendChild(canvas);
+      await page.render({
+        canvasContext: canvas.getContext("2d"),
+        viewport,
+        transform: outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0]
+      }).promise;
+    }
+  }).catch(error => {
+    loading.textContent = "No se pudo mostrar el PDF. Podés descargarlo desde el botón de abajo.";
+    console.error("No se pudo renderizar el PDF de la capacitación.", error);
+  });
+
+  }
+
   document.body.style.overflow = "hidden";
 
   const cleanup = () => {
