@@ -267,6 +267,8 @@
       "tramite Argentina",
       "cobrar comisiones Argentina",
       "cobro comisiones Argentina"
+    ,
+      "acuerdo argentina"
     ],
     "phrases": [
       "como cobro en Argentina",
@@ -780,6 +782,8 @@
       "tramite México",
       "cobrar comisiones México",
       "cobro comisiones México"
+    ,
+      "acuerdo mexico"
     ],
     "phrases": [
       "como cobro en México",
