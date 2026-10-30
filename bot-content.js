@@ -2506,128 +2506,40 @@
     ],
     "blocks": [
       {
-        "type": "text",
-        "content": "Te comparto una secuencia de 8 imágenes para presentar la oportunidad de negocio de Nu Skin. Recorré las placas en orden y descargalas desde los botones numerados para compartirlas en la misma secuencia."
-      },
-      {
-        "type": "document",
-        "kicker": "OPORTUNIDAD DE NEGOCIO",
-        "title": "Secuencia para presentar la oportunidad",
-        "description": "Ocho imágenes en el orden recomendado para compartir.",
-        "sections": [
-          {
-            "title": "Cómo compartirlas",
-            "body": "Descargá las imágenes del 1 al 8 y envialas en ese orden. Podés acompañar la secuencia con tu historia y una conversación clara sobre el modelo, el aprendizaje y la acción que requiere construir el negocio."
-          }
-        ],
-        "actions": [
-          {
-            "title": "Descargar imagen 1 de 8",
-            "description": "¿Por qué el network marketing es el mejor modelo de negocio?",
-            "url": "/assets/iris/oportunidad-negocio/01-network-marketing.jpg",
-            "download": true,
-            "filename": "01-01-network-marketing.jpg"
-          },
-          {
-            "title": "Descargar imagen 2 de 8",
-            "description": "Libertad de tiempo real",
-            "url": "/assets/iris/oportunidad-negocio/02-libertad-de-tiempo.jpg",
-            "download": true,
-            "filename": "02-02-libertad-de-tiempo.jpg"
-          },
-          {
-            "title": "Descargar imagen 3 de 8",
-            "description": "Ingresos residuales",
-            "url": "/assets/iris/oportunidad-negocio/03-ingresos-residuales.jpg",
-            "download": true,
-            "filename": "03-03-ingresos-residuales.jpg"
-          },
-          {
-            "title": "Descargar imagen 4 de 8",
-            "description": "Tu oficina es el mundo",
-            "url": "/assets/iris/oportunidad-negocio/04-tu-oficina-es-el-mundo.jpg",
-            "download": true,
-            "filename": "04-04-tu-oficina-es-el-mundo.jpg"
-          },
-          {
-            "title": "Descargar imagen 5 de 8",
-            "description": "Sin techo de ingresos",
-            "url": "/assets/iris/oportunidad-negocio/05-sin-techo-de-ingresos.jpg",
-            "download": true,
-            "filename": "05-05-sin-techo-de-ingresos.jpg"
-          },
-          {
-            "title": "Descargar imagen 6 de 8",
-            "description": "Emprende sin riesgo",
-            "url": "/assets/iris/oportunidad-negocio/06-emprende-sin-riesgo.jpg",
-            "download": true,
-            "filename": "06-06-emprende-sin-riesgo.jpg"
-          },
-          {
-            "title": "Descargar imagen 7 de 8",
-            "description": "Tu mente es el activo más rentable",
-            "url": "/assets/iris/oportunidad-negocio/07-tu-mente-es-tu-activo.jpg",
-            "download": true,
-            "filename": "07-07-tu-mente-es-tu-activo.jpg"
-          },
-          {
-            "title": "Descargar imagen 8 de 8",
-            "description": "El Network Marketing no es para todos",
-            "url": "/assets/iris/oportunidad-negocio/08-no-es-para-todos.jpg",
-            "download": true,
-            "filename": "08-08-no-es-para-todos.jpg"
-          }
-        ],
-        "galleryKicker": "8 IMÁGENES",
-        "galleryTitle": "Ver secuencia completa",
+        "type": "opportunity-gallery",
+        "title": "Ver material",
         "items": [
           {
             "src": "/assets/iris/oportunidad-negocio/01-network-marketing.jpg",
-            "label": "1 de 8 · ¿Por qué el network marketing es el mejor modelo de negocio?",
-            "mediaType": "image",
-            "shareable": false
+            "label": "1 de 8 · ¿Por qué el network marketing es el mejor modelo de negocio?"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/02-libertad-de-tiempo.jpg",
-            "label": "2 de 8 · Libertad de tiempo real",
-            "mediaType": "image",
-            "shareable": false
+            "label": "2 de 8 · Libertad de tiempo real"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/03-ingresos-residuales.jpg",
-            "label": "3 de 8 · Ingresos residuales",
-            "mediaType": "image",
-            "shareable": false
+            "label": "3 de 8 · Ingresos residuales"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/04-tu-oficina-es-el-mundo.jpg",
-            "label": "4 de 8 · Tu oficina es el mundo",
-            "mediaType": "image",
-            "shareable": false
+            "label": "4 de 8 · Tu oficina es el mundo"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/05-sin-techo-de-ingresos.jpg",
-            "label": "5 de 8 · Sin techo de ingresos",
-            "mediaType": "image",
-            "shareable": false
+            "label": "5 de 8 · Sin techo de ingresos"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/06-emprende-sin-riesgo.jpg",
-            "label": "6 de 8 · Emprende sin riesgo",
-            "mediaType": "image",
-            "shareable": false
+            "label": "6 de 8 · Emprende sin riesgo"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/07-tu-mente-es-tu-activo.jpg",
-            "label": "7 de 8 · Tu mente es el activo más rentable",
-            "mediaType": "image",
-            "shareable": false
+            "label": "7 de 8 · Tu mente es el activo más rentable"
           },
           {
             "src": "/assets/iris/oportunidad-negocio/08-no-es-para-todos.jpg",
-            "label": "8 de 8 · El Network Marketing no es para todos",
-            "mediaType": "image",
-            "shareable": false
+            "label": "8 de 8 · El Network Marketing no es para todos"
           }
         ]
       }

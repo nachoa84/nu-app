@@ -633,8 +633,386 @@ function openBotDocument(documentBlock) {
   });
 }
 
+
+function opportunityZipCrc32(bytes) {
+  let crc = 0xffffffff;
+  for (let i = 0; i < bytes.length; i += 1) {
+    crc ^= bytes[i];
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function opportunityZipU16(view, offset, value) {
+  view.setUint16(offset, value, true);
+}
+
+function opportunityZipU32(view, offset, value) {
+  view.setUint32(offset, value >>> 0, true);
+}
+
+async function buildOpportunityImagesZip(items) {
+  const encoder = new TextEncoder();
+  const now = new Date();
+  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+  const dosDate = ((Math.max(1980, now.getFullYear()) - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  const files = [];
+
+  for (let index = 0; index < items.length; index += 1) {
+    const item = items[index];
+    const response = await fetch(item.src, { credentials: "same-origin" });
+    if (!response.ok) throw new Error("No se pudo cargar la imagen " + (index + 1));
+    const data = new Uint8Array(await response.arrayBuffer());
+    const pathName = String(item.src || "").split("/").pop() || ("imagen-" + (index + 1) + ".jpg");
+    const name = String(index + 1).padStart(2, "0") + "-" + pathName;
+    const nameBytes = encoder.encode(name);
+    const crc = opportunityZipCrc32(data);
+    const local = new Uint8Array(30 + nameBytes.length);
+    const localView = new DataView(local.buffer);
+    opportunityZipU32(localView, 0, 0x04034b50);
+    opportunityZipU16(localView, 4, 20);
+    opportunityZipU16(localView, 6, 0x0800);
+    opportunityZipU16(localView, 8, 0);
+    opportunityZipU16(localView, 10, dosTime);
+    opportunityZipU16(localView, 12, dosDate);
+    opportunityZipU32(localView, 14, crc);
+    opportunityZipU32(localView, 18, data.length);
+    opportunityZipU32(localView, 22, data.length);
+    opportunityZipU16(localView, 26, nameBytes.length);
+    opportunityZipU16(localView, 28, 0);
+    local.set(nameBytes, 30);
+    files.push({ local, data, nameBytes, crc, dosTime, dosDate });
+  }
+
+  const parts = [];
+  let localOffset = 0;
+  const centralParts = [];
+  for (const file of files) {
+    parts.push(file.local, file.data);
+    const central = new Uint8Array(46 + file.nameBytes.length);
+    const view = new DataView(central.buffer);
+    opportunityZipU32(view, 0, 0x02014b50);
+    opportunityZipU16(view, 4, 20);
+    opportunityZipU16(view, 6, 20);
+    opportunityZipU16(view, 8, 0x0800);
+    opportunityZipU16(view, 10, 0);
+    opportunityZipU16(view, 12, file.dosTime);
+    opportunityZipU16(view, 14, file.dosDate);
+    opportunityZipU32(view, 16, file.crc);
+    opportunityZipU32(view, 20, file.data.length);
+    opportunityZipU32(view, 24, file.data.length);
+    opportunityZipU16(view, 28, file.nameBytes.length);
+    opportunityZipU16(view, 30, 0);
+    opportunityZipU16(view, 32, 0);
+    opportunityZipU16(view, 34, 0);
+    opportunityZipU16(view, 36, 0);
+    opportunityZipU32(view, 38, 0);
+    opportunityZipU32(view, 42, localOffset);
+    central.set(file.nameBytes, 46);
+    centralParts.push(central);
+    localOffset += file.local.length + file.data.length;
+  }
+
+  const centralSize = centralParts.reduce((total, part) => total + part.length, 0);
+  const end = new Uint8Array(22);
+  const endView = new DataView(end.buffer);
+  opportunityZipU32(endView, 0, 0x06054b50);
+  opportunityZipU16(endView, 4, 0);
+  opportunityZipU16(endView, 6, 0);
+  opportunityZipU16(endView, 8, files.length);
+  opportunityZipU16(endView, 10, files.length);
+  opportunityZipU32(endView, 12, centralSize);
+  opportunityZipU32(endView, 16, localOffset);
+  opportunityZipU16(endView, 20, 0);
+  parts.push(...centralParts, end);
+  return new Blob(parts, { type: "application/zip" });
+}
+
+function openOpportunityPreview(items) {
+  const slides = Array.isArray(items) ? items.filter(item => item && item.src) : [];
+  if (!slides.length) return;
+  document.querySelector(".opportunity-preview-layer")?.remove();
+
+  const layer = document.createElement("div");
+  layer.className = "bot-document-layer opportunity-preview-layer";
+  Object.assign(layer.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "10050",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    padding: "16px",
+    background: "rgba(37, 48, 54, 0.24)"
+  });
+
+  const backdrop = document.createElement("button");
+  backdrop.type = "button";
+  backdrop.setAttribute("aria-label", "Cerrar previsualización");
+  Object.assign(backdrop.style, {
+    position: "absolute",
+    inset: "0",
+    border: "0",
+    background: "transparent",
+    cursor: "default"
+  });
+
+  const sheet = document.createElement("section");
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", "Previsualización de oportunidad de negocio");
+  Object.assign(sheet.style, {
+    position: "relative",
+    zIndex: "1",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    width: "min(100%, 440px)",
+    maxHeight: "min(88dvh, 780px)",
+    overflow: "auto",
+    boxSizing: "border-box",
+    padding: "18px",
+    gap: "14px",
+    borderRadius: "24px",
+    background: "#ffffff",
+    boxShadow: "0 18px 48px rgba(28, 42, 49, 0.16)"
+  });
+
+  const header = document.createElement("div");
+  Object.assign(header.style, {
+    display: "flex",
+    justifyContent: "flex-end",
+    minHeight: "28px"
+  });
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.setAttribute("aria-label", "Cerrar");
+  close.innerHTML = ICONS.close;
+  Object.assign(close.style, {
+    display: "grid",
+    placeItems: "center",
+    width: "36px",
+    height: "36px",
+    margin: "-5px -5px 0 0",
+    border: "0",
+    borderRadius: "50%",
+    background: "#f3f6f6",
+    color: "#33444b",
+    cursor: "pointer"
+  });
+  header.appendChild(close);
+
+  const frame = document.createElement("div");
+  Object.assign(frame.style, {
+    position: "relative",
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    minHeight: "180px",
+    maxHeight: "min(54dvh, 590px)",
+    overflow: "hidden",
+    borderRadius: "16px",
+    background: "#f5f7f7"
+  });
+
+  const image = document.createElement("img");
+  image.alt = "";
+  image.draggable = false;
+  Object.assign(image.style, {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    maxHeight: "min(54dvh, 590px)",
+    objectFit: "contain",
+    userSelect: "none"
+  });
+  frame.appendChild(image);
+
+  const controls = document.createElement("div");
+  Object.assign(controls.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "22px",
+    minHeight: "38px"
+  });
+
+  const makeArrow = (label, glyph) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("aria-label", label);
+    button.textContent = glyph;
+    Object.assign(button.style, {
+      display: "grid",
+      placeItems: "center",
+      width: "38px",
+      height: "38px",
+      border: "1px solid #e5ebeb",
+      borderRadius: "50%",
+      background: "#ffffff",
+      color: "#36535d",
+      fontSize: "24px",
+      lineHeight: "1",
+      cursor: "pointer"
+    });
+    return button;
+  };
+
+  const previous = makeArrow("Imagen anterior", "‹");
+  const counter = document.createElement("span");
+  counter.setAttribute("aria-live", "polite");
+  Object.assign(counter.style, {
+    minWidth: "56px",
+    textAlign: "center",
+    color: "#4b5d62",
+    fontSize: "14px",
+    fontWeight: "600"
+  });
+  const next = makeArrow("Imagen siguiente", "›");
+  controls.append(previous, counter, next);
+
+  const download = document.createElement("button");
+  download.type = "button";
+  download.textContent = "Descargar las " + slides.length + " imágenes";
+  Object.assign(download.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    minHeight: "50px",
+    marginTop: "2px",
+    padding: "12px 16px",
+    border: "0",
+    borderRadius: "14px",
+    background: "#82b9c8",
+    color: "#ffffff",
+    font: "inherit",
+    fontSize: "15px",
+    fontWeight: "600",
+    cursor: "pointer"
+  });
+
+  sheet.append(header, frame, controls, download);
+  layer.append(backdrop, sheet);
+  document.body.appendChild(layer);
+  document.body.classList.add("bot-document-open");
+
+  let current = 0;
+  let touchStartX = null;
+  const render = () => {
+    const item = slides[current];
+    image.src = item.src;
+    image.alt = item.label || ("Imagen " + (current + 1));
+    counter.textContent = (current + 1) + " de " + slides.length;
+    previous.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    previous.style.opacity = previous.disabled ? "0.42" : "1";
+    next.style.opacity = next.disabled ? "0.42" : "1";
+    if (slides[current + 1]) {
+      const preload = new Image();
+      preload.src = slides[current + 1].src;
+    }
+  };
+  const move = delta => {
+    const target = current + delta;
+    if (target < 0 || target >= slides.length) return;
+    current = target;
+    render();
+  };
+
+  const cleanup = () => {
+    document.body.classList.remove("bot-document-open");
+    layer.remove();
+    document.removeEventListener("keydown", onKeyDown);
+  };
+  const onKeyDown = event => {
+    if (event.key === "Escape") cleanup();
+    if (event.key === "ArrowLeft") move(-1);
+    if (event.key === "ArrowRight") move(1);
+  };
+
+  previous.onclick = () => move(-1);
+  next.onclick = () => move(1);
+  backdrop.onclick = cleanup;
+  close.onclick = cleanup;
+  frame.addEventListener("touchstart", event => {
+    touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }, { passive: true });
+  frame.addEventListener("touchend", event => {
+    const endX = event.changedTouches[0]?.clientX;
+    if (touchStartX === null || endX === undefined) return;
+    const distance = endX - touchStartX;
+    if (Math.abs(distance) > 40) move(distance < 0 ? 1 : -1);
+    touchStartX = null;
+  }, { passive: true });
+  download.onclick = async () => {
+    const original = download.textContent;
+    download.disabled = true;
+    download.textContent = "Preparando descarga…";
+    download.style.opacity = "0.72";
+    try {
+      const zip = await buildOpportunityImagesZip(slides);
+      const url = URL.createObjectURL(zip);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "oportunidad-de-negocio-nuskin.zip";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } catch (error) {
+      console.warn("No se pudo preparar la descarga de oportunidad.", error);
+      if (typeof toast === "function") {
+        toast("No se pudo preparar el archivo. Probá nuevamente.", { type: "error" });
+      }
+    } finally {
+      download.disabled = false;
+      download.textContent = original;
+      download.style.opacity = "1";
+    }
+  };
+  document.addEventListener("keydown", onKeyDown);
+  render();
+  requestAnimationFrame(() => close.focus({ preventScroll: true }));
+}
+
 function createBotResourceCard(block) {
   if (!block) return null;
+
+  if (block.type === "opportunity-gallery") {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bot-resource-card bot-resource-document";
+    button.setAttribute("aria-label", "Ver material de oportunidad de negocio");
+
+    const icon = document.createElement("span");
+    icon.className = "bot-resource-icon";
+    icon.innerHTML = ICONS.folder;
+
+    const copy = document.createElement("span");
+    copy.className = "bot-resource-copy";
+
+    const kind = document.createElement("small");
+    kind.textContent = "PRESENTACIÓN";
+
+    const title = document.createElement("strong");
+    title.textContent = block.title || "Ver material";
+
+    copy.append(kind, title);
+
+    const arrow = document.createElement("span");
+    arrow.className = "bot-resource-arrow";
+    arrow.innerHTML = ICONS.arrow;
+
+    button.append(icon, copy, arrow);
+    button.onclick = () => openOpportunityPreview(block.items || []);
+    return button;
+  }
+
 
   if (block.type === "link") {
     const card = document.createElement("a");
