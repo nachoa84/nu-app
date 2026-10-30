@@ -429,7 +429,7 @@
       "formato entidad de negocio Chile"
     ,
       "acuerdo chile"
-    ,
+    ],
     "phrases": [
       "como iniciar el negocio en Chile",
       "como completar el acuerdo de afiliado en Chile",
@@ -494,7 +494,7 @@
       "formato entidad de negocio Colombia"
     ,
       "acuerdo colombia"
-    ,
+    ],
     "phrases": [
       "como iniciar el negocio en Colombia",
       "como completar el acuerdo de afiliado en Colombia",
@@ -963,7 +963,7 @@
       "cobro comisiones Perú"
     ,
       "acuerdo peru"
-    ,
+    ],
     "phrases": [
       "como cobro en Perú",
       "como cobrar comisiones en Perú",
