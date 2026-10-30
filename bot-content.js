@@ -223,7 +223,7 @@
         "sections": [
           {
             "title": "Argentina",
-            "body": "Escribí: tramites argentina"
+            "body": "Escribí: tramites argentina. Para ver solo el acuerdo, escribí: acuerdo argentina."
           },
           {
             "title": "Chile",
@@ -243,7 +243,7 @@
           },
           {
             "title": "México",
-            "body": "Escribí: tramites mexico"
+            "body": "Escribí: tramites mexico. Para ver solo el acuerdo, escribí: acuerdo mexico."
           },
           {
             "title": "Perú",
