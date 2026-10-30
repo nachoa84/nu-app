@@ -352,6 +352,7 @@ function botResourceRoutineDay(block) {
 
 function botResourceKindLabel(block) {
   if (block.type === "document") return "Documento";
+  if (block.type === "download-image") return "Guía visual";
   if (block.type === "media") {
     return block.mediaType === "video" ? "Video" : "Imagen";
   }
@@ -671,7 +672,7 @@ async function downloadOpportunityImages(items, onProgress) {
 }
 
 
-function openOpportunityPreview(items) {
+function openOpportunityPreview(items, options = {}) {
   const slides = Array.isArray(items) ? items.filter(item => item && item.src) : [];
   if (!slides.length) return;
   document.querySelector(".opportunity-preview-layer")?.remove();
@@ -704,7 +705,7 @@ function openOpportunityPreview(items) {
   const sheet = document.createElement("section");
   sheet.setAttribute("role", "dialog");
   sheet.setAttribute("aria-modal", "true");
-  sheet.setAttribute("aria-label", "Previsualización de oportunidad de negocio");
+  sheet.setAttribute("aria-label", options.title ? "Previsualización: " + options.title : "Previsualización de oportunidad de negocio");
   Object.assign(sheet.style, {
     position: "relative",
     zIndex: "1",
@@ -815,10 +816,11 @@ function openOpportunityPreview(items) {
   });
   const next = makeArrow("Imagen siguiente", "›");
   controls.append(previous, counter, next);
+  controls.hidden = slides.length === 1;
 
   const download = document.createElement("button");
   download.type = "button";
-  download.textContent = "Descargar las " + slides.length + " imágenes";
+  download.textContent = options.downloadLabel || (slides.length === 1 ? "Descargar imagen" : "Descargar las " + slides.length + " imágenes");
   Object.assign(download.style, {
     display: "flex",
     alignItems: "center",
@@ -900,11 +902,11 @@ function openOpportunityPreview(items) {
       });
       download.textContent = "¡Listo! Se descargaron las imágenes";
       if (typeof toast === "function") {
-        toast("Se inició la descarga de las 8 imágenes en orden.", { type: "success" });
+        toast(slides.length === 1 ? "Se inició la descarga de la imagen." : "Se inició la descarga de " + slides.length + " imágenes en orden.", { type: "success" });
       }
       await new Promise(resolve => window.setTimeout(resolve, 1400));
     } catch (error) {
-      console.warn("No se pudieron descargar las imágenes de oportunidad.", error);
+      console.warn("No se pudo descargar el material de Iris.", error);
       if (typeof toast === "function") {
         toast("No se pudieron descargar todas las imágenes. Probá nuevamente.", { type: "error" });
       }
@@ -1028,7 +1030,7 @@ function createBotResourceCard(block) {
     return card;
   }
 
-  if (block.type === "media") {
+  if (block.type === "media" || block.type === "download-image") {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "bot-resource-card bot-resource-media";
@@ -1080,6 +1082,14 @@ function createBotResourceCard(block) {
     card.append(thumb, copy, arrow);
 
     card.onclick = () => {
+      if (block.type === "download-image") {
+        openOpportunityPreview(
+          [{ src: block.src, label: block.title || "Guía de cancelación de pedidos" }],
+          { title: block.title || "Guía de cancelación de pedidos", downloadLabel: "Descargar imagen" }
+        );
+        return;
+      }
+
       const sourceDay = botResourceRoutineDay(block);
 
       openMediaPreview(
