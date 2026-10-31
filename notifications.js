@@ -1,6 +1,8 @@
 // Rutina 30 Dias - modulo de notificaciones
 // Extraido sin reescribir la logica del Paso 11D estable.
 
+const PUSH_NOTIFICATIONS_ENABLED = false;
+
 function getOrCreateNotificationUserId() {
   const profile = getRoutineProfile() || {};
   const fromApi =
@@ -321,7 +323,7 @@ async function deactivateNotificationsFromSettings() {
 async function syncNotificationTimeWithBackend(profile) {
   const api = window.BackendAPI;
   const time = profile.notificationTime;
-  const reminderEnabled = await hasActivePushSubscription();
+  const reminderEnabled = PUSH_NOTIFICATIONS_ENABLED && await hasActivePushSubscription();
   const payload = {
     ...profile,
     userId: profile.userId || profile.id || getOrCreateNotificationUserId(),
@@ -393,8 +395,8 @@ async function renderNotificationSettings() {
     return;
   }
 
-  enable.textContent = "Activar";
-  enable.disabled = false;
+  enable.textContent = "Notificaciones desactivadas";
+  enable.disabled = true;
 }
 
 
@@ -595,7 +597,12 @@ function setupNotificationSettings() {
         return;
       }
 
-      await activateNotificationsFromSettings();
+      if (!PUSH_NOTIFICATIONS_ENABLED) {
+      await renderNotificationSettings();
+      return;
+    }
+
+    await activateNotificationsFromSettings();
       await renderNotificationSettings();
       toast("Notificaciones activadas", { type: "success" });
     } catch (error) {

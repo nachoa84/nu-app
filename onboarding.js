@@ -1089,39 +1089,6 @@
         resetRoutineForNewUser();
       }
 
-      const canRequestPush =
-        firstProfile &&
-        "Notification" in window &&
-        "PushManager" in window &&
-        "serviceWorker" in navigator &&
-        typeof window.PushClient?.subscribe === "function";
-
-      if (canRequestPush) {
-        if (finishButton) {
-          finishButton.textContent = "Activando notificaciones…";
-        }
-
-        try {
-          // Se pide el permiso directamente desde el toque del usuario.
-          // Esto es importante especialmente para navegadores móviles.
-          const permission =
-            await Notification.requestPermission();
-
-          if (permission === "granted") {
-            await window.PushClient.subscribe({
-              permissionAlreadyGranted: true
-            });
-          }
-        } catch (error) {
-          // Las notificaciones son complementarias:
-          // nunca bloquean la creación del perfil ni el inicio de la rutina.
-          console.warn(
-            "No se pudieron activar las notificaciones durante el onboarding.",
-            error
-          );
-        }
-      }
-
       showPreparing();
 
       setTimeout(() => {

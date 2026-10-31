@@ -169,7 +169,9 @@ const EXTRA_ALLOWED_ORIGINS =
       .filter(Boolean)
   );
 
+const { PUSH_NOTIFICATIONS_ENABLED } = require("./push-notifications-policy");
 const pushConfigured =
+  PUSH_NOTIFICATIONS_ENABLED &&
   Boolean(
     VAPID_PUBLIC_KEY &&
     VAPID_PRIVATE_KEY &&
@@ -976,36 +978,38 @@ async function advanceIfEligible(
       ]
     );
 
-    await client.query(
-      `
-      INSERT INTO notification_jobs (
-        user_id,
-        cycle,
-        day,
-        kind,
-        status
-      )
-      VALUES (
-        $1,
-        $2,
-        $3,
-        'day_available',
-        'pending'
-      )
-      ON CONFLICT (
-        user_id,
-        cycle,
-        day,
-        kind
-      )
-      DO NOTHING
-      `,
-      [
-        userId,
-        user.cycle,
-        nextDay
-      ]
-    );
+    if (PUSH_NOTIFICATIONS_ENABLED) {
+      await client.query(
+        `
+        INSERT INTO notification_jobs (
+          user_id,
+          cycle,
+          day,
+          kind,
+          status
+        )
+        VALUES (
+          $1,
+          $2,
+          $3,
+          'day_available',
+          'pending'
+        )
+        ON CONFLICT (
+          user_id,
+          cycle,
+          day,
+          kind
+        )
+        DO NOTHING
+        `,
+        [
+          userId,
+          user.cycle,
+          nextDay
+        ]
+      );
+    }
 
     return {
       advanced: true,
@@ -3361,6 +3365,7 @@ async function advanceProductRoutinesIfEligible(client, userId = null) {
        JOIN due
          ON due.user_id = advanced.user_id
         AND due.routine_id = advanced.routine_id
+       WHERE ${PUSH_NOTIFICATIONS_ENABLED ? "TRUE" : "FALSE"}
        ON CONFLICT (
          user_id,
          routine_id,
