@@ -1,5 +1,7 @@
 "use strict";
 
+const { PUSH_NOTIFICATIONS_ENABLED } = require("./push-notifications-policy");
+
 // NU APP · QSTASH NOTIFICATION PILOT V1
 // Prueba controlada de notificaciones futuras sin polling de PostgreSQL.
 // Se carga como preloader antes de server.js y agrega endpoints de prueba
@@ -126,7 +128,7 @@ function qstashConfigured() {
 }
 
 function pushConfigured() {
-  return Boolean(
+  return PUSH_NOTIFICATIONS_ENABLED && Boolean(
     process.env.VAPID_PUBLIC_KEY &&
     process.env.VAPID_PRIVATE_KEY &&
     process.env.VAPID_SUBJECT
@@ -284,6 +286,7 @@ function normalizeSubscription(value) {
 }
 
 async function publishQStashMessage({ destination, body, seconds }) {
+  if (!PUSH_NOTIFICATIONS_ENABLED) throw new Error("Notificaciones desactivadas.");
   const { token } = qstashConfig();
   const response = await fetch(`${QSTASH_API_BASE}/v2/publish/${destination}`, {
     method: "POST",
@@ -470,6 +473,10 @@ function attachQStashPilot(app) {
 
     if (!verifyQStashSignature(signature, rawBody, config.destination)) {
       return res.status(401).json({ ok: false, error: "Firma QStash inválida." });
+    }
+
+    if (!PUSH_NOTIFICATIONS_ENABLED) {
+      return res.json({ ok: true, disabled: true, sent: 0 });
     }
 
     if (!configureWebPush()) {

@@ -1,4 +1,5 @@
 (() => {
+  const PUSH_NOTIFICATIONS_ENABLED = false;
   const CARD_ID =
     "pushNotificationCard";
 
@@ -158,6 +159,9 @@
   }
 
   async function subscribe({ permissionAlreadyGranted = false } = {}) {
+    if (!PUSH_NOTIFICATIONS_ENABLED) {
+      throw new Error("Las notificaciones están desactivadas por ahora.");
+    }
     if (
       isAppleMobileDevice() &&
       !isStandaloneWebApp()
@@ -511,7 +515,7 @@
                         ? "Las notificaciones están bloqueadas. Podés volver a habilitarlas desde Ajustes del iPhone."
                         : "Las notificaciones están bloqueadas en el navegador."
                     )
-                  : "Recibí un aviso cuando tu próximo día esté disponible."
+                  : "Los avisos están desactivados por ahora."
             }
           </span>
           <span data-push-message></span>
@@ -530,6 +534,7 @@
                 <button
                   class="primary"
                   id="pushTestBtn"
+                ${PUSH_NOTIFICATIONS_ENABLED ? "" : "disabled"}
                   type="button"
                 >
                   Enviar prueba
@@ -549,14 +554,13 @@
                   id="pushEnableBtn"
                   type="button"
                   ${
-                    permission ===
-                    "denied"
-                      ? "disabled"
-                      : ""
+                    PUSH_NOTIFICATIONS_ENABLED && permission !== "denied"
+                    ? ""
+                    : "disabled"
                   }
                 >
-                  Activar
-                </button>
+            Notificaciones desactivadas
+          </button>
               `
           }
         </div>
@@ -568,7 +572,7 @@
         "pushEnableBtn"
       );
 
-    if (enableBtn) {
+    if (enableBtn && PUSH_NOTIFICATIONS_ENABLED) {
       enableBtn.onclick =
         async () => {
           enableBtn.disabled =

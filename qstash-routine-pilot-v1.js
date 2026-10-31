@@ -1,5 +1,7 @@
 "use strict";
 
+const { PUSH_NOTIFICATIONS_ENABLED } = require("./push-notifications-policy");
+
 // NU APP · QSTASH ROUTINE PILOT V1
 // Piloto controlado para programar el aviso real de Collagen+ con QStash.
 // No reemplaza todavía el scheduler estable. Sólo actúa para usuarios
@@ -75,7 +77,7 @@ function qstashConfigured() {
 }
 
 function pushConfigured() {
-  return Boolean(
+  return PUSH_NOTIFICATIONS_ENABLED && Boolean(
     String(process.env.VAPID_PUBLIC_KEY || "").trim() &&
     String(process.env.VAPID_PRIVATE_KEY || "").trim() &&
     String(process.env.VAPID_SUBJECT || "").trim()
