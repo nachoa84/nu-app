@@ -17,6 +17,7 @@ test("release guard bloquea directorios y módulos internos", () => {
     "/docs/internal.md",
     "/server.js",
     "/release-entrypoint.js",
+    "/review-mode.js",
     "/package.json",
     "/iris-ai-server-runtime-v1.js",
     "/iris-document-retrieval-store-v1.js",
@@ -26,6 +27,7 @@ test("release guard bloquea directorios y módulos internos", () => {
     "/qstash-routine-pilot-v1.js",
     "/qstash-main-rollout-v1.js",
     "/runtime-config-v113.js",
+    "/qstash-routine-pilot-v1.js",
     "/internal.csv"
   ];
 

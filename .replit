@@ -23,7 +23,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm start"
+args = "node --watch --watch-preserve-output -r ./qstash-notification-server-v1.js -r ./qstash-routine-pilot-v1.js -r ./pilot-qstash-product-routines-v1.js -r ./analytics-basic-server-v1.js release-entrypoint.js"
 waitForPort = 5000
 
 [[ports]]

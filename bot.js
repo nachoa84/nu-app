@@ -352,6 +352,7 @@ function botResourceRoutineDay(block) {
 
 function botResourceKindLabel(block) {
   if (block.type === "document") return "Documento";
+  if (block.type === "download-image") return "Guía visual";
   if (block.type === "media") {
     return block.mediaType === "video" ? "Video" : "Imagen";
   }
@@ -528,7 +529,11 @@ function openBotDocument(documentBlock) {
       const link = document.createElement("a");
       link.className = "bot-document-action";
       link.href = action.url;
-      link.target = "_blank";
+      if (action.download) {
+        link.download = action.filename || action.title || "descarga";
+      } else {
+        link.target = "_blank";
+      }
       link.rel = "noopener noreferrer";
 
       const copy = document.createElement("span");
@@ -629,8 +634,326 @@ function openBotDocument(documentBlock) {
   });
 }
 
+
+async function downloadOpportunityImages(items, onProgress) {
+  const files = [];
+
+  for (let index = 0; index < items.length; index += 1) {
+    const item = items[index];
+    if (typeof onProgress === "function") {
+      onProgress("Preparando " + (index + 1) + " de " + items.length + "…");
+    }
+    const response = await fetch(item.src, { credentials: "same-origin" });
+    if (!response.ok) throw new Error("No se pudo cargar la imagen " + (index + 1));
+    const blob = await response.blob();
+    const filename = item.filename || String(item.src || "").split("/").pop() ||
+      (String(index + 1).padStart(2, "0") + "-imagen.jpg");
+    files.push({ blob, filename });
+  }
+
+  for (let index = 0; index < files.length; index += 1) {
+    if (typeof onProgress === "function") {
+      onProgress("Descargando " + (index + 1) + " de " + files.length + "…");
+    }
+    const file = files[index];
+    const url = URL.createObjectURL(file.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    if (index < files.length - 1) {
+      await new Promise(resolve => window.setTimeout(resolve, 450));
+    }
+  }
+}
+
+
+function openOpportunityPreview(items, options = {}) {
+  const slides = Array.isArray(items) ? items.filter(item => item && item.src) : [];
+  if (!slides.length) return;
+  document.querySelector(".opportunity-preview-layer")?.remove();
+
+  const layer = document.createElement("div");
+  layer.className = "bot-document-layer opportunity-preview-layer";
+  Object.assign(layer.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "10050",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    padding: "16px",
+    background: "rgba(37, 48, 54, 0.24)"
+  });
+
+  const backdrop = document.createElement("button");
+  backdrop.type = "button";
+  backdrop.setAttribute("aria-label", "Cerrar previsualización");
+  Object.assign(backdrop.style, {
+    position: "absolute",
+    inset: "0",
+    border: "0",
+    background: "transparent",
+    cursor: "default"
+  });
+
+  const sheet = document.createElement("section");
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", options.title ? "Previsualización: " + options.title : "Previsualización de oportunidad de negocio");
+  Object.assign(sheet.style, {
+    position: "relative",
+    zIndex: "1",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    width: "min(100%, 440px)",
+    maxHeight: "min(88dvh, 780px)",
+    overflow: "auto",
+    boxSizing: "border-box",
+    padding: "18px",
+    gap: "14px",
+    borderRadius: "24px",
+    background: "#ffffff",
+    boxShadow: "0 18px 48px rgba(28, 42, 49, 0.16)"
+  });
+
+  const header = document.createElement("div");
+  Object.assign(header.style, {
+    display: "flex",
+    justifyContent: "flex-end",
+    minHeight: "28px"
+  });
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.setAttribute("aria-label", "Cerrar");
+  close.innerHTML = ICONS.close;
+  Object.assign(close.style, {
+    display: "grid",
+    placeItems: "center",
+    width: "36px",
+    height: "36px",
+    margin: "-5px -5px 0 0",
+    border: "0",
+    borderRadius: "50%",
+    background: "#f3f6f6",
+    color: "#33444b",
+    cursor: "pointer"
+  });
+  header.appendChild(close);
+
+  const frame = document.createElement("div");
+  Object.assign(frame.style, {
+    position: "relative",
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    minHeight: "180px",
+    maxHeight: "min(54dvh, 590px)",
+    overflow: "hidden",
+    borderRadius: "16px",
+    background: "#f5f7f7"
+  });
+
+  const image = document.createElement("img");
+  image.alt = "";
+  image.draggable = false;
+  Object.assign(image.style, {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    maxHeight: "min(54dvh, 590px)",
+    objectFit: "contain",
+    userSelect: "none"
+  });
+  frame.appendChild(image);
+
+  const controls = document.createElement("div");
+  Object.assign(controls.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "22px",
+    minHeight: "38px"
+  });
+
+  const makeArrow = (label, glyph) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("aria-label", label);
+    button.textContent = glyph;
+    Object.assign(button.style, {
+      display: "grid",
+      placeItems: "center",
+      width: "38px",
+      height: "38px",
+      border: "1px solid #e5ebeb",
+      borderRadius: "50%",
+      background: "#ffffff",
+      color: "#36535d",
+      fontSize: "24px",
+      lineHeight: "1",
+      cursor: "pointer"
+    });
+    return button;
+  };
+
+  const previous = makeArrow("Imagen anterior", "‹");
+  const counter = document.createElement("span");
+  counter.setAttribute("aria-live", "polite");
+  Object.assign(counter.style, {
+    minWidth: "56px",
+    textAlign: "center",
+    color: "#4b5d62",
+    fontSize: "14px",
+    fontWeight: "600"
+  });
+  const next = makeArrow("Imagen siguiente", "›");
+  controls.append(previous, counter, next);
+  controls.hidden = slides.length === 1;
+
+  const download = document.createElement("button");
+  download.type = "button";
+  download.textContent = options.downloadLabel || (slides.length === 1 ? "Descargar imagen" : "Descargar las " + slides.length + " imágenes");
+  Object.assign(download.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    minHeight: "50px",
+    marginTop: "2px",
+    padding: "12px 16px",
+    border: "0",
+    borderRadius: "14px",
+    background: "#82b9c8",
+    color: "#ffffff",
+    font: "inherit",
+    fontSize: "15px",
+    fontWeight: "600",
+    cursor: "pointer"
+  });
+
+  sheet.append(header, frame, controls, download);
+  layer.append(backdrop, sheet);
+  document.body.appendChild(layer);
+  document.body.classList.add("bot-document-open");
+
+  let current = 0;
+  let touchStartX = null;
+  const render = () => {
+    const item = slides[current];
+    image.src = item.src;
+    image.alt = item.label || ("Imagen " + (current + 1));
+    counter.textContent = (current + 1) + " de " + slides.length;
+    previous.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    previous.style.opacity = previous.disabled ? "0.42" : "1";
+    next.style.opacity = next.disabled ? "0.42" : "1";
+    if (slides[current + 1]) {
+      const preload = new Image();
+      preload.src = slides[current + 1].src;
+    }
+  };
+  const move = delta => {
+    const target = current + delta;
+    if (target < 0 || target >= slides.length) return;
+    current = target;
+    render();
+  };
+
+  const cleanup = () => {
+    document.body.classList.remove("bot-document-open");
+    layer.remove();
+    document.removeEventListener("keydown", onKeyDown);
+  };
+  const onKeyDown = event => {
+    if (event.key === "Escape") cleanup();
+    if (event.key === "ArrowLeft") move(-1);
+    if (event.key === "ArrowRight") move(1);
+  };
+
+  previous.onclick = () => move(-1);
+  next.onclick = () => move(1);
+  backdrop.onclick = cleanup;
+  close.onclick = cleanup;
+  frame.addEventListener("touchstart", event => {
+    touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }, { passive: true });
+  frame.addEventListener("touchend", event => {
+    const endX = event.changedTouches[0]?.clientX;
+    if (touchStartX === null || endX === undefined) return;
+    const distance = endX - touchStartX;
+    if (Math.abs(distance) > 40) move(distance < 0 ? 1 : -1);
+    touchStartX = null;
+  }, { passive: true });
+  download.onclick = async () => {
+    const original = download.textContent;
+    download.disabled = true;
+    download.style.opacity = "0.72";
+    try {
+      await downloadOpportunityImages(slides, status => {
+        download.textContent = status;
+      });
+      download.textContent = slides.length === 1 ? "¡Listo! Imagen descargada" : "¡Listo! Se descargaron las imágenes";
+      if (typeof toast === "function") {
+        toast(slides.length === 1 ? "Se inició la descarga de la imagen." : "Se inició la descarga de " + slides.length + " imágenes en orden.", { type: "success" });
+      }
+      await new Promise(resolve => window.setTimeout(resolve, 1400));
+    } catch (error) {
+      console.warn("No se pudo descargar el material de Iris.", error);
+      if (typeof toast === "function") {
+        toast(slides.length === 1 ? "No se pudo descargar la imagen. Probá nuevamente." : "No se pudieron descargar todas las imágenes. Probá nuevamente.", { type: "error" });
+      }
+    } finally {
+      download.disabled = false;
+      download.textContent = original;
+      download.style.opacity = "1";
+    }
+  };
+  document.addEventListener("keydown", onKeyDown);
+  render();
+  requestAnimationFrame(() => close.focus({ preventScroll: true }));
+}
+
 function createBotResourceCard(block) {
   if (!block) return null;
+
+  if (block.type === "opportunity-gallery") {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bot-resource-card bot-resource-document";
+    button.setAttribute("aria-label", "Ver material de oportunidad de negocio");
+
+    const icon = document.createElement("span");
+    icon.className = "bot-resource-icon";
+    icon.innerHTML = ICONS.folder;
+
+    const copy = document.createElement("span");
+    copy.className = "bot-resource-copy";
+
+    const kind = document.createElement("small");
+    kind.textContent = "PRESENTACIÓN";
+
+    const title = document.createElement("strong");
+    title.textContent = block.title || "Ver material";
+
+    copy.append(kind, title);
+
+    const arrow = document.createElement("span");
+    arrow.className = "bot-resource-arrow";
+    arrow.innerHTML = ICONS.arrow;
+
+    button.append(icon, copy, arrow);
+    button.onclick = () => openOpportunityPreview(block.items || []);
+    return button;
+  }
+
 
   if (block.type === "link") {
     const card = document.createElement("a");
@@ -671,7 +994,34 @@ function createBotResourceCard(block) {
     return card;
   }
 
-  if (block.type === "document") {
+  if (block.type === "document" && block.kicker === "OPORTUNIDAD DE NEGOCIO" && block.galleryTitle && Array.isArray(block.items) && block.items.length) {
+      const gallery = document.createElement("section");
+      gallery.className = "bot-opportunity-gallery";
+      gallery.setAttribute("role", "region"); gallery.setAttribute("aria-label", block.galleryTitle);
+      gallery.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:320px;margin:12px auto;padding:10px;border:1px solid #e8e4df;border-radius:16px;background:#fff;box-sizing:border-box";
+      const kicker=document.createElement("small"); kicker.textContent=block.galleryKicker||"IMÁGENES"; kicker.style.cssText="display:block;font-size:11px;font-weight:700;letter-spacing:.12em;color:#8b6a42;margin-bottom:5px";
+      const heading=document.createElement("strong"); heading.textContent=block.galleryTitle; heading.style.cssText="display:block;font-size:16px;margin-bottom:12px;color:#222";
+      const stage=document.createElement("div"); stage.style.cssText="position:relative;width:100%;max-width:240px;height:220px;margin:0 auto;background:#f5f2ee;border-radius:12px;overflow:hidden;touch-action:pan-y;user-select:none";
+      const image=document.createElement("img"); image.alt=""; image.loading="lazy"; image.style.cssText="display:block;width:100%;height:100%;object-fit:contain"; stage.appendChild(image);
+      const makeNav=(txt,side)=>{const b=document.createElement("button");b.type="button";b.textContent=txt;b.setAttribute("aria-label",side==="left"?"Imagen anterior":"Imagen siguiente");b.style.cssText="position:absolute;top:50%;"+side+":6px;transform:translateY(-50%);width:48px;height:48px;border:0;border-radius:50%;background:rgba(35,31,28,.78);color:#fff;font-size:32px;line-height:1;box-shadow:0 2px 12px #0004;cursor:pointer";return b};
+      const prev=makeNav("‹","left"), next=makeNav("›","right"); stage.append(prev,next);
+      const caption=document.createElement("div"); caption.style.cssText="display:flex;justify-content:space-between;gap:12px;align-items:center;margin:10px 2px 12px;color:#333";
+      const label=document.createElement("span"), count=document.createElement("small"); label.style.cssText="font-size:13px;line-height:1.35";count.style.cssText="flex:none;color:#777;font-variant-numeric:tabular-nums";caption.append(label,count);
+      let current=0; const show=i=>{current=(i+block.items.length)%block.items.length;const item=block.items[current];const nextItem=block.items[(current+1)%block.items.length];if(nextItem&&nextItem.src){const preloader=new Image();preloader.src=nextItem.src;}image.src=item.src;image.alt=item.label||("Imagen "+(current+1));label.textContent=(item.label||("Imagen "+(current+1))).replace(/^\d+\s+de\s+\d+\s*[·-]\s*/,"");count.textContent=(current+1)+" / "+block.items.length};
+      prev.addEventListener("click",()=>show(current-1));next.addEventListener("click",()=>show(current+1));
+      let pointerX=null;stage.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;pointerX=e.clientX;stage.setPointerCapture(e.pointerId)},{passive:true});stage.addEventListener("pointerup",e=>{if(pointerX===null)return;const dx=e.clientX-pointerX;pointerX=null;if(Math.abs(dx)>32)show(current+(dx<0?1:-1))},{passive:true});stage.addEventListener("pointercancel",()=>{pointerX=null});
+      const download=document.createElement("button");download.type="button";download.textContent="Descargar todo";download.style.cssText="width:100%;min-height:44px;border:0;border-radius:12px;background:#d96b3b;color:#fff;font-weight:700;font-size:14px;cursor:pointer";
+      download.addEventListener("click",async()=>{download.disabled=true;download.textContent="Preparando descarga…";try{
+        const files=await Promise.all(block.items.map(async(item,i)=>{const r=await fetch(item.src);if(!r.ok)throw Error("Descarga fallida: "+item.src);const data=new Uint8Array(await r.arrayBuffer());return{name:(item.src.split("?")[0].split("/").pop()||("imagen-"+(i+1)+".jpg")),data}}));
+        const crc32=data=>{let c=0xffffffff;for(const b of data){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^(c&1?0xedb88320:0)}return(c^0xffffffff)>>>0};const enc=new TextEncoder(),local=[],central=[];let offset=0;
+        for(const f of files){const n=enc.encode(f.name),crc=crc32(f.data),h=new Uint8Array(30+n.length),v=new DataView(h.buffer);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint32(14,crc,true);v.setUint32(18,f.data.length,true);v.setUint32(22,f.data.length,true);v.setUint16(26,n.length,true);h.set(n,30);local.push(h,f.data);
+          const d=new Uint8Array(46+n.length),w=new DataView(d.buffer);w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint32(16,crc,true);w.setUint32(20,f.data.length,true);w.setUint32(24,f.data.length,true);w.setUint16(28,n.length,true);w.setUint32(42,offset,true);d.set(n,46);central.push(d);offset+=h.length+f.data.length}
+        const size=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,size,true);ev.setUint32(16,offset,true);
+        const url=URL.createObjectURL(new Blob([...local,...central,end],{type:"application/zip"})),a=document.createElement("a");a.href=url;a.download="oportunidad-de-negocio.zip";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);download.textContent="Descargar todo";
+      }catch(err){console.error("No se pudo preparar la descarga",err);download.textContent="No se pudo descargar. Reintentá"}finally{download.disabled=false}});
+      gallery.append(stage,download);show(0);return gallery;
+    }
+    if (block.type === "document") {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "bot-resource-card bot-resource-document";
@@ -707,7 +1057,7 @@ function createBotResourceCard(block) {
     return card;
   }
 
-  if (block.type === "media") {
+  if (block.type === "media" || block.type === "download-image") {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "bot-resource-card bot-resource-media";
@@ -759,6 +1109,14 @@ function createBotResourceCard(block) {
     card.append(thumb, copy, arrow);
 
     card.onclick = () => {
+      if (block.type === "download-image") {
+        openOpportunityPreview(
+          [{ src: block.src, label: block.title || "Guía de cancelación de pedidos", filename: block.filename }],
+          { title: block.title || "Guía de cancelación de pedidos", downloadLabel: "Descargar imagen" }
+        );
+        return;
+      }
+
       const sourceDay = botResourceRoutineDay(block);
 
       openMediaPreview(
@@ -1361,14 +1719,38 @@ function resolveBotAnswer(q) {
     };
   }
 
+  const countryBlocks = filterBotBlocksForCountry(
+    winner.blocks || [],
+    search.explicitCountry,
+    search.profileCountry
+  );
+  const countrySlug = search.explicitCountry
+    ? normalizeBotText(search.explicitCountry).replace(/\s+/g, "-")
+    : "";
+  const isCountryAgreementCommand =
+    search.contentQuery === "acuerdo" &&
+    search.explicitCountry &&
+    winner.id === "tramites-" + countrySlug;
+
+  const responseBlocks = isCountryAgreementCommand
+    ? countryBlocks.filter(block => {
+        if (block.type !== "document") return false;
+        const agreementText = [
+          block.title,
+          block.description,
+          ...(block.sections || []).flatMap(section => [
+            section?.title,
+            section?.body
+          ])
+        ].filter(Boolean).join(" ");
+        return normalizeBotText(agreementText).includes("acuerdo");
+      })
+    : countryBlocks;
+
   return {
     topicId: winner.id,
     topicTitle: winner.title || "",
-    blocks: filterBotBlocksForCountry(
-      winner.blocks || [],
-      search.explicitCountry,
-      search.profileCountry
-    )
+    blocks: responseBlocks
   };
 }
 

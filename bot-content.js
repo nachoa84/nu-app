@@ -215,7 +215,7 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Tengo los trámites para cobrar comisiones organizados por país. Escribí el país junto al comando, por ejemplo: “tramites argentina”."
+        "content": "Tengo la documentación de inicio y los trámites para cobrar comisiones organizados por país. Escribí el país junto al comando, por ejemplo: “tramites argentina”."
       },
       {
         "type": "document",
@@ -223,7 +223,15 @@
         "sections": [
           {
             "title": "Argentina",
-            "body": "Escribí: tramites argentina"
+            "body": "Escribí: tramites argentina. Para ver solo el acuerdo, escribí: acuerdo argentina."
+          },
+          {
+            "title": "Chile",
+            "body": "Escribí: tramites chile. Para ver solo el acuerdo, escribí: acuerdo chile"
+          },
+          {
+            "title": "Colombia",
+            "body": "Escribí: tramites colombia. Para ver solo el acuerdo, escribí: acuerdo colombia"
           },
           {
             "title": "España",
@@ -235,11 +243,11 @@
           },
           {
             "title": "México",
-            "body": "Escribí: tramites mexico"
+            "body": "Escribí: tramites mexico. Para ver solo el acuerdo, escribí: acuerdo mexico."
           },
           {
             "title": "Perú",
-            "body": "Escribí: tramites peru"
+            "body": "Escribí: tramites peru. Para ver solo el acuerdo, escribí: acuerdo peru"
           }
         ],
         "description": "Elegí el mercado que necesitás."
@@ -259,6 +267,8 @@
       "tramite Argentina",
       "cobrar comisiones Argentina",
       "cobro comisiones Argentina"
+    ,
+      "acuerdo argentina"
     ],
     "phrases": [
       "como cobro en Argentina",
@@ -300,14 +310,19 @@
           },
           {
             "title": "Documentación",
-            "body": "Completá el formulario de afiliado de marca, descargá tu constancia de inscripción en ARCA y adjuntala dentro del mismo formulario."
+            "body": "Completá el formulario en línea del Acuerdo del Afiliado de Marca Independiente. Si la afiliación se registra a nombre de una empresa o entidad, completá también el Formato de Entidad de Negocio. Adjuntá la constancia de inscripción en ARCA cuando el formulario te la solicite."
           }
         ],
         "actions": [
           {
             "title": "Completar formulario",
             "description": "Acuerdo de Afiliado de Marca",
-            "url": "https://nuskin.jotform.com/220546195814054"
+            "url": "https://zfrmz.com/QqcH0KVoFpKvJjVdNVMB"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad",
+            "url": "https://zfrmz.com/3KXywLtWFXimpAkf08i7"
           },
           {
             "title": "Obtener constancia en ARCA",
@@ -375,29 +390,179 @@
         "title": "Cómo emitir y enviar tu factura",
         "description": "Facturá cuando hayas completado las etapas anteriores.",
         "sections": [
-          {
-            "title": "Prepará los datos",
-            "body": "Consultá tu comisión en Stela, dentro de Documentos, Impuestos o Tax Documents. Allí encontrarás la descripción y el importe que necesitás para confeccionar la factura."
-          },
-          {
-            "title": "Emití la factura",
-            "body": "Ingresá a ARCA con clave fiscal, abrí Comprobantes en línea y generá una factura C por servicios.\n\nCUIT de Nu Skin: 30-69083303-0\nCondición frente al IVA: Responsable inscripto\nCondición de venta: contado\n\nUsá la descripción indicada en Tax Documents y colocá el importe total de tu comisión."
-          },
-          {
-            "title": "Enviá la factura",
-            "body": "Descargá la factura en PDF y enviala a facturas@nuskin.com. Indicá tu número de ID AR… en el asunto del correo.\n\nUna vez recibida, el pago se acredita aproximadamente dentro de las 72 horas hábiles."
-          }
-        ],
+              {
+                "title": "Antes de emitir",
+                "body": "Consultá en Stella, dentro de Comisiones > Tax Documents, la descripción y el importe de la comisión que vas a facturar. Tené a mano tu número de ID AR. Si aparecen varias comisiones, revisá cada documento: la guía de Nu Skin indica una factura por cada comisión."
+              },
+              {
+                "title": "1. Entrá a ARCA",
+                "body": "Ingresá a ARCA con tu clave fiscal. Abrí Comprobantes en línea, hacé clic en tu nombre y elegí Generar comprobantes."
+              },
+              {
+                "title": "2. Elegí el comprobante",
+                "body": "Punto de venta a utilizar: seleccioná el habilitado para Factura en línea - Monotributo y asociado a tu domicilio fiscal. Si todavía no tenés uno, verificá si ARCA te lo asignó o habilitalo desde Administración de Puntos de Venta y Domicilios. El número no tiene que ser necesariamente 1.\nTipo de comprobante: factura C (para monotributistas)."
+              },
+              {
+                "title": "3. Fechas y concepto",
+                "body": "Fecha del comprobante: el día en que emitís la factura.\nConceptos a incluir: servicios.\nPeríodo desde/hasta: el período de la comisión que figura en Tax Documents (por ejemplo, del 01/MM/AAAA al último día de ese mes).\nVencimiento para el pago: la fecha de la factura, como indicaba el instructivo anterior. Luego tocá Continuar."
+              },
+              {
+                "title": "4. Datos de Nu Skin",
+                "body": "Condición frente al IVA del receptor: Responsable inscripto.\nCUIT de Nu Skin: 30-69083303-0 (30690833030). Verificá que ARCA muestre los datos de Nu Skin al ingresarlo.\nCondición de venta: contado.\nDejá el campo de remito en blanco y tocá Continuar."
+              },
+              {
+                "title": "5. Detalle de la factura",
+                "body": "Código: 001.\nProducto o servicio: copiá la descripción que figura en la factura de Tax Documents.\nCantidad: 1.\nUnidad de medida: unidad.\nPrecio unitario: el importe total de esa comisión. Luego tocá Continuar."
+              },
+              {
+                "title": "6. Revisá y descargá",
+                "body": "Comprobá todos los datos. Si encontrás un error, volvé al paso anterior y corregilo antes de confirmar. Confirmá la emisión. Si ARCA muestra otra confirmación de datos, revisala y confirmá; después descargá la factura en PDF."
+              },
+              {
+                "title": "7. Enviá la factura",
+                "body": "Adjuntá el PDF emitido por ARCA y envialo a facturas@nuskin.com.\nAsunto: Comisiones AR[tu número de ID].\nCuerpo: Buenos días, envío factura del AR[tu número de ID]. Muchas gracias.\nEl instructivo anterior estimaba una acreditación dentro de 72 horas hábiles desde que Nu Skin recibe la factura; el plazo puede variar."
+              }
+            ],
         "actions": [
           {
-            "title": "Abrir guía para emitir y enviar tu factura",
-            "description": "Guía paso a paso en PDF",
+            "title": "Ver guía de Nu Skin para Tax Documents",
+            "description": "Referencia visual para ubicar Tax Documents y enviar la factura (PDF)",
             "url": "/api/bot-assets/3fcf843de2056a6fbfb65a3227c1ab74865368071985349366a1763d7d75cd6e.pdf"
           }
         ]
       }
     ],
     "country": "Argentina",
+    "sourceFlow": "tramites cobrar"
+  },
+  {
+    "id": "tramites-chile",
+    "title": "Trámites · Chile",
+    "command": "tramites chile",
+    "commands": [
+      "tramite chile"
+    ],
+    "aliases": [
+      "tramites Chile",
+      "tramite Chile",
+      "acuerdo afiliado Chile",
+      "formato entidad de negocio Chile"
+    ,
+      "acuerdo chile"
+    ],
+    "phrases": [
+      "como iniciar el negocio en Chile",
+      "como completar el acuerdo de afiliado en Chile",
+      "formulario de entidad de negocio Chile"
+    ],
+    "keywords": [
+      "tramites",
+      "documentacion",
+      "inicio de negocio",
+      "acuerdo afiliado",
+      "entidad de negocio",
+      "Chile"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Estos son los formularios para iniciar tu negocio en Chile. Completá el Acuerdo del Afiliado de Marca Independiente y, si la cuenta se registra a nombre de una empresa o entidad de negocio, completá también el Formato de Entidad de Negocio."
+      },
+      {
+        "type": "document",
+        "kicker": "DOCUMENTOS DE INICIO",
+        "title": "Acuerdo del Afiliado de Marca Independiente",
+        "description": "Formularios oficiales de inicio para Chile.",
+        "sections": [
+          {
+            "title": "Acuerdo del Afiliado de Marca Independiente",
+            "body": "Completá el acuerdo de afiliación correspondiente al mercado de Chile."
+          },
+          {
+            "title": "Formato de Entidad de Negocio",
+            "body": "Completá este formulario si la cuenta se registra a nombre de una empresa o entidad de negocio."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Formulario de afiliación — Chile",
+            "url": "https://zfrmz.com/RjoouYeu6TW76uhJ14ZE"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Formulario para empresa o entidad — Chile",
+            "url": "https://zfrmz.com/GkeAHuZiyO5HZGZVRd93"
+          }
+        ]
+      }
+    ],
+    "country": "Chile",
+    "sourceFlow": "tramites cobrar"
+  },
+  {
+    "id": "tramites-colombia",
+    "title": "Trámites · Colombia",
+    "command": "tramites colombia",
+    "commands": [
+      "tramite colombia"
+    ],
+    "aliases": [
+      "tramites Colombia",
+      "tramite Colombia",
+      "acuerdo afiliado Colombia",
+      "formato entidad de negocio Colombia"
+    ,
+      "acuerdo colombia"
+    ],
+    "phrases": [
+      "como iniciar el negocio en Colombia",
+      "como completar el acuerdo de afiliado en Colombia",
+      "formulario de entidad de negocio Colombia"
+    ],
+    "keywords": [
+      "tramites",
+      "documentacion",
+      "inicio de negocio",
+      "acuerdo afiliado",
+      "entidad de negocio",
+      "Colombia"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Estos son los formularios para iniciar tu negocio en Colombia. Completá el Acuerdo del Afiliado de Marca Independiente y, si la cuenta se registra a nombre de una empresa o entidad de negocio, completá también el Formato de Entidad de Negocio."
+      },
+      {
+        "type": "document",
+        "kicker": "DOCUMENTOS DE INICIO",
+        "title": "Acuerdo del Afiliado de Marca Independiente",
+        "description": "Formularios oficiales de inicio para Colombia.",
+        "sections": [
+          {
+            "title": "Acuerdo del Afiliado de Marca Independiente",
+            "body": "Completá el acuerdo de afiliación correspondiente al mercado de Colombia."
+          },
+          {
+            "title": "Formato de Entidad de Negocio",
+            "body": "Completá este formulario si la cuenta se registra a nombre de una empresa o entidad de negocio."
+          }
+        ],
+        "actions": [
+          {
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Formulario de afiliación — Colombia",
+            "url": "https://zfrmz.com/rXj4wPGcUf4vcDvrubTH"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Formulario para empresa o entidad — Colombia",
+            "url": "https://zfrmz.com/txSjvQYyY8IzmB0zhQLk"
+          }
+        ]
+      }
+    ],
+    "country": "Colombia",
     "sourceFlow": "tramites cobrar"
   },
   {
@@ -641,6 +806,8 @@
       "tramite México",
       "cobrar comisiones México",
       "cobro comisiones México"
+    ,
+      "acuerdo mexico"
     ],
     "phrases": [
       "como cobro en México",
@@ -666,19 +833,24 @@
       {
         "type": "document",
         "kicker": "ETAPA 1 DE 5",
-        "title": "Descargar el Acuerdo de Afiliado",
-        "description": "Obtené el documento oficial de Nu Skin.",
+        "title": "Completar el Acuerdo de Afiliado",
+        "description": "Completá el formulario oficial de Nu Skin en línea.",
         "sections": [
           {
             "title": "Acuerdo de Afiliado de Marca",
-            "body": "Descargá e imprimí el Acuerdo de Afiliado de Marca. En la siguiente etapa encontrarás una guía para completarlo correctamente."
+            "body": "Completá el formulario en línea del mercado mexicano. Si la afiliación se registra como empresa o entidad, completá también el Formato de Entidad de Negocio."
           }
         ],
         "actions": [
           {
-            "title": "Descargar Acuerdo de Afiliado",
-            "description": "Documento oficial de Nu Skin",
-            "url": "https://www.nuskin.com/content/dam/office/s_america/MX/es/business_materials/mx_acuerdo_del_afiliado.pdf"
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Acuerdo del Afiliado de Marca Independiente — México",
+            "url": "https://zfrmz.com/kvVQs6GvrLUvwfXHjwiq"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad — México",
+            "url": "https://zfrmz.com/yLLbI0YokViEYiSXsxBM"
           }
         ]
       },
@@ -690,7 +862,7 @@
         "sections": [
           {
             "title": "Cómo completarlo",
-            "body": "Consultá la guía antes de llenar el acuerdo. Completá todos los campos, firmalo y tomá una fotografía clara del documento terminado."
+            "body": "El Acuerdo de Afiliado actualizado se completa en línea. Usá esta guía como referencia complementaria y seguí las indicaciones del formulario oficial para enviarlo."
           }
         ],
         "actions": [
@@ -755,7 +927,7 @@
           },
           {
             "title": "Documentos que tenés que enviar",
-            "body": "Enviá el Acuerdo de Afiliado completo y la Constancia de Situación Fiscal a:\n\ndocumentos@nuskin.com"
+            "body": "Enviá la Constancia de Situación Fiscal actualizada y cualquier documentación adicional que Nu Skin te solicite a:\n\ndocumentos@nuskin.com"
           },
           {
             "title": "Asunto y cuerpo del correo",
@@ -809,6 +981,8 @@
       "tramite Perú",
       "cobrar comisiones Perú",
       "cobro comisiones Perú"
+    ,
+      "acuerdo peru"
     ],
     "phrases": [
       "como cobro en Perú",
@@ -860,18 +1034,23 @@
         "type": "document",
         "kicker": "ETAPA 2 DE 6",
         "title": "Acuerdo de Afiliado de Marca",
-        "description": "Descargá, imprimí y completá el acuerdo.",
+        "description": "Completá el formulario oficial en línea.",
         "sections": [
           {
             "title": "Prepará el acuerdo",
-            "body": "Descargá el Acuerdo de Afiliado de Marca, imprimilo y completalo con los datos correspondientes. Cuando termines, tomá una fotografía clara del documento."
+            "body": "Completá el formulario en línea del mercado peruano. Si la afiliación se registra como empresa o entidad, completá también el Formato de Entidad de Negocio."
           }
         ],
         "actions": [
           {
-            "title": "Descargar Acuerdo de Afiliado",
-            "description": "Documento oficial para Perú",
-            "url": "/api/bot-assets/f65f14d01b558c33558d31103fedfc627b4c119328ea2df96af2c01e6bbf7f2a.pdf"
+            "title": "Completar Acuerdo de Afiliado",
+            "description": "Acuerdo del Afiliado de Marca Independiente — Perú",
+            "url": "https://zfrmz.com/7pbw5Kx1NTr9Bwh87SRs"
+          },
+          {
+            "title": "Completar Formato de Entidad de Negocio",
+            "description": "Para cuentas registradas como empresa o entidad — Perú",
+            "url": "https://zfrmz.com/N2MKpxzi9JznYJLpdMZE"
           }
         ]
       },
@@ -898,11 +1077,11 @@
         "type": "document",
         "kicker": "ETAPA 4 DE 6",
         "title": "Enviar la documentación",
-        "description": "Enviá los dos documentos completos a Nu Skin.",
+        "description": "Enviá el Formato de depósito de comisiones completo a Nu Skin. El acuerdo se completa en línea.",
         "sections": [
           {
             "title": "Documentos que tenés que enviar",
-            "body": "Adjuntá la fotografía del Acuerdo de Afiliado de Marca y la fotografía del Formato de depósito de comisiones."
+            "body": "Completá el Acuerdo de Afiliado de Marca en el formulario en línea. Adjuntá a este correo una fotografía clara del Formato de depósito de comisiones completo."
           },
           {
             "title": "Dirección de envío",
@@ -2330,6 +2509,73 @@
     ],
     "sourceFlow": "VERA"
   },
+{
+    "id": "oportunidad-negocio",
+    "title": "Oportunidad de negocio",
+    "command": "oportunidad de negocio",
+    "aliases": [
+      "presentar oportunidad",
+      "presentacion de negocio",
+      "presentación de negocio",
+      "imagenes oportunidad",
+      "imágenes oportunidad"
+    ],
+    "phrases": [
+      "quiero presentar la oportunidad de negocio",
+      "como presentar el negocio",
+      "material para presentar el negocio",
+      "secuencia de oportunidad de negocio"
+    ],
+    "keywords": [
+      "oportunidad",
+      "negocio",
+      "network marketing",
+      "presentacion",
+      "ingresos",
+      "emprender"
+    ],
+    "blocks": [
+      {
+        "type": "opportunity-gallery",
+        "title": "Ver material",
+        "items": [
+          {
+            "src": "/assets/iris/oportunidad-negocio/01-network-marketing.jpg",
+            "label": "1 de 8 · ¿Por qué el network marketing es el mejor modelo de negocio?"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/02-libertad-de-tiempo.jpg",
+            "label": "2 de 8 · Libertad de tiempo real"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/03-ingresos-residuales.jpg",
+            "label": "3 de 8 · Ingresos residuales"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/04-tu-oficina-es-el-mundo.jpg",
+            "label": "4 de 8 · Tu oficina es el mundo"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/05-sin-techo-de-ingresos.jpg",
+            "label": "5 de 8 · Sin techo de ingresos"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/06-emprende-sin-riesgo.jpg",
+            "label": "6 de 8 · Emprende sin riesgo"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/07-tu-mente-es-tu-activo.jpg",
+            "label": "7 de 8 · Tu mente es el activo más rentable"
+          },
+          {
+            "src": "/assets/iris/oportunidad-negocio/08-no-es-para-todos.jpg",
+            "label": "8 de 8 · El Network Marketing no es para todos"
+          }
+        ]
+      }
+    ],
+    "sourceFlow": "OPORTUNIDAD DE NEGOCIO"
+  },
   {
     "id": "crear-oferta",
     "title": "Crear una oferta",
@@ -2360,7 +2606,7 @@
       {
         "type": "link",
         "title": "Tutorial · Crear una oferta",
-        "url": "https://www.youtube.com/watch?v=rRPg_-xCEzo&feature=youtu.be",
+        "url": "https://youtube.com/shorts/3rwf04s2WHE?feature=share",
         "actionLabel": "Abrir",
         "description": "El ejemplo usa LumiSpa, pero el procedimiento puede aplicarse a otros productos.",
         "resourceKind": "video"
@@ -2450,6 +2696,19 @@
       }
     ],
     "sourceFlow": "navegar pagina"
+  },
+  {
+    "id": "cancelacion-pedidos",
+    "title": "Cancelación de pedidos",
+    "command": "cancelacion de pedido",
+    "aliases": ["cancelación de pedido", "cancelacion de pedidos", "cancelar pedido", "cancelar pedidos"],
+    "phrases": ["como cancelar un pedido", "quiero cancelar mi pedido", "guia para cancelar pedido"],
+    "keywords": ["cancelacion", "pedido", "devolver", "ventana de 15 minutos"],
+    "blocks": [
+      {"type":"text","content":"Te comparto la guía visual para cancelar un pedido. Abrila para verla en grande y descargar la imagen."},
+      {"type":"download-image","title":"Guía de cancelación de pedidos","description":"Pasos, ventana de 15 minutos y recomendaciones.","src":"/assets/cancelacion-pedidos.jpg","filename":"guia-cancelacion-pedidos.jpg","mediaType":"image","resourceKind":"guide"}
+    ],
+    "sourceFlow": "CANCELACIÓN DE PEDIDOS"
   }
 ];
 
@@ -2513,6 +2772,11 @@
     "command": "vera",
     "topicId": "vera",
     "label": "Vera"
+  },
+  {
+    "command": "oportunidad de negocio",
+    "topicId": "oportunidad-negocio",
+    "label": "Oportunidad de negocio"
   },
   {
     "command": "crear una oferta",

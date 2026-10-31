@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Nu App · Prueba móvil V170</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:#faf8f2;color:#302e2a;font:16px/1.55 system-ui,-apple-system,sans-serif;display:grid;place-items:center;padding:24px}main{width:min(100%,420px);background:white;border:1px solid #ebe7dc;border-radius:20px;padding:28px}h1{font-size:22px;line-height:1.25;font-weight:600;margin:0 0 16px}p{margin:0 0 16px}small{display:block;color:#716e65;margin-top:14px}button{width:100%;padding:14px 18px;border:0;border-radius:12px;background:#e6ad4e;color:#29251e;font:inherit;font-weight:600;cursor:pointer}button:disabled{opacity:.45;cursor:default}#status{white-space:pre-wrap;font-size:14px;color:#625e55}#status.error{color:#9a2929}
+</style>
+</head>
+<body><main>
+<h1>Prueba móvil de Collagen+</h1>
+<p>Vincularemos esta instalación únicamente con la cuenta Test Collagen V170 de Development. No se creará otro usuario.</p>
+<p id="status" role="status">Comprobando el entorno…</p>
+<button id="connect" type="button" disabled>Vincular cuenta de prueba</button>
+<small>Esta herramienta es temporal. No modifica PostgreSQL ni habilita el modo demo. Si encuentra un perfil anterior, se detiene sin reemplazarlo.</small>
+</main>
+<script>
+(() => {
+  'use strict';
+  const ID = '93237fe7-0a64-4a15-bbff-6ef13d1b3ff7';
+  const NAME = 'Test Collagen V170';
+  const PROFILE_KEY = 'routineUserProfile';
+  const button = document.getElementById('connect');
+  const status = document.getElementById('status');
+  let verifiedState = null;
+  function show(message, error = false) {
+    status.textContent = message;
+    status.classList.toggle('error', error);
+  }
+  function assertEmptyProfile() {
+    if (localStorage.getItem(PROFILE_KEY) !== null) {
+      throw new Error('Esta instalación ya tiene un perfil. No se modificó. Abrí esta página desde una instalación nueva y separada.');
+    }
+    if (Object.keys(localStorage).some(key =>
+      /^routineState:/.test(key) ||
+      /^day:\w.*:complete$/.test(key) ||
+      /^day\d+Complete$/.test(key) && localStorage.getItem(key) === '1'
+    )) {
+      throw new Error('Hay datos de rutina anteriores en este navegador. No se modificó nada.');
+    }
+  }
+  async function getJson(path) {
+    const response = await fetch(path, { cache: 'no-store', credentials: 'same-origin' });
+    if (!response.ok) throw new Error('No se pudo consultar Development (HTTP ' + response.status + ').');
+    const payload = await response.json();
+    if (payload.ok === false) throw new Error(payload.error || 'El servidor rechazó la consulta.');
+    return payload;
+  }
+  function assertState(state) {
+    const completed = [...(state.completedDays || [])].map(Number).sort((a,b) => a-b);
+    if (state.userId !== ID || Number(state.currentDay) !== 4 ||
+        JSON.stringify(completed) !== '[1,2,3]' || state.nextUnlockAt != null) {
+      throw new Error('El estado de la cuenta de prueba cambió. No se vinculó nada; verificá primero PostgreSQL.');
+    }
+    return state;
+  }
+  function timestamp(value) {
+    if (value == null || value === '') return null;
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric > 0) return numeric;
+    const parsed = Date.parse(String(value));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  async function prepare() {
+    try {
+      const host = location.hostname;
+      if (host !== '4d2c3a61-843a-4bcb-a128-6f861a2ddc66-00-3ibmuqgv4nsz5.riker.replit.dev' &&
+          !['localhost', '127.0.0.1'].includes(host)) {
+        throw new Error('Esta herramienta solo puede usarse en el Preview de Development previsto.');
+      }
+      assertEmptyProfile();
+      const [health, source] = await Promise.all([
+        getJson('/api/health'),
+        fetch('/daily-view.js', { cache: 'no-store' }).then(async response => {
+          if (!response.ok) throw new Error('No se pudo verificar daily-view.js.');
+          return response.text();
+        })
+      ]);
+      if (!health || !source.includes('CONFIRMACIÓN DE PROGRESO COLLAGEN V170')) {
+        throw new Error('El Preview no está sirviendo V170. No se modificó nada.');
+      }
+      verifiedState = assertState((await getJson('/api/state/' + ID)).state);
+      show('Cuenta verificada: día 4, días 1–3 completados, sin desbloqueo pendiente. Podés vincularla.');
+      button.disabled = false;
+    } catch (error) {
+      show(error.message, true);
+    }
+  }
+  button.addEventListener('click', async () => {
+    if (!verifiedState || button.disabled) return;
+    button.disabled = true;
+    try {
+      assertEmptyProfile();
+      const state = assertState((await getJson('/api/state/' + ID)).state);
+      const profile = {
+        userId: ID, name: NAME, country: 'ES',
+        timezone: 'Europe/Madrid', notificationTime: '09:00',
+        startedAt: new Date().toISOString()
+      };
+      const openedDays = {};
+      for (const [day, value] of Object.entries(state.openedDays || {})) {
+        const parsed = timestamp(value);
+        if (parsed !== null) openedDays[day] = parsed;
+      }
+      const local = {
+        currentDay: 4,
+        openedDays,
+        nextUnlockAt: null
+      };
+      // Only canonical data for the fixed synthetic account is imported.
+      // No routine is completed, opened, advanced or created by this page.
+      localStorage.setItem('routineState', JSON.stringify(local));
+      localStorage.setItem('selectedDay', '4');
+      for (const day of [1, 2, 3]) {
+        localStorage.setItem('day' + day + 'Complete', '1');
+        const completedAt = timestamp(state.completedAtByDay?.[day]);
+        if (completedAt !== null) {
+          localStorage.setItem('day' + day + 'CompletedAt', String(completedAt));
+        }
+      }
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      show('Cuenta vinculada. Abriendo Nu App…');
+      location.replace('/');
+    } catch (error) {
+      show(error.message, true);
+      button.disabled = false;
+    }
+  });
+  prepare();
+})();
+</script>
+</body></html>

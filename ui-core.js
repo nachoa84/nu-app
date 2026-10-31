@@ -425,7 +425,7 @@ function currentMainViewName() {
 }
 
 function nativeViewDirection(fromView, toView) {
-  const homeChildViews = new Set(["rutina", "guia"]);
+  const homeChildViews = new Set(["rutina", "guia", "suplementos", "suplementos-acciones"]);
   const fromNav = homeChildViews.has(fromView) ? "hoy" : fromView;
   const toNav = homeChildViews.has(toView) ? "hoy" : toView;
   const fromIndex = MAIN_VIEW_ORDER.indexOf(fromNav);
@@ -517,7 +517,7 @@ function setupGlobalNativePressFeedback() {
   window.addEventListener("scroll", releaseNativePressFeedback, { passive: true });
 }
 
-function activateMainView(view, { vibrate = false } = {}) {
+function activateMainView(view, { vibrate = false, animate = true } = {}) {
   const target = document.getElementById(`view-${view}`);
   if (!target) return;
 
@@ -525,7 +525,7 @@ function activateMainView(view, { vibrate = false } = {}) {
   const previousTarget = document.getElementById(`view-${previousView}`);
   const changingView = previousView !== view;
   const direction = nativeViewDirection(previousView, view);
-  const navView = ["rutina", "guia"].includes(view) ? "hoy" : view;
+  const navView = ["rutina", "guia", "suplementos", "suplementos-acciones"].includes(view) ? "hoy" : view;
   const activeNav = document.querySelector(`.nav-btn[data-view="${navView}"]`);
   const navWasActive = activeNav?.classList.contains("active") === true;
 
@@ -555,9 +555,11 @@ function activateMainView(view, { vibrate = false } = {}) {
   document.documentElement.scrollTop = restoreTop;
   document.body.scrollTop = restoreTop;
 
-  if (changingView) animateNativeViewEnter(target, direction);
+  if (changingView && animate) animateNativeViewEnter(target, direction);
 
   if (view === "rutina") renderDays();
+  if (view === "suplementos") renderSupplements();
+  if (view === "suplementos-acciones") renderSupplementActions();
   if (view === "favoritos") renderFavorites();
 
   if (view === "bot") {
@@ -618,11 +620,14 @@ function setupMainNavigation() {
   if (openRoutineButton) openRoutineButton.onclick = () => activateMainView("rutina");
   if (routineBackButton) {
     routineBackButton.innerHTML = ICONS.back;
-    routineBackButton.onclick = () => activateMainView("hoy");
+    routineBackButton.onclick = () => activateMainView(getActiveRoutineConfig().category === "supplements" ? "suplementos" : "hoy");
   }
   if (dayBackButton) {
     dayBackButton.innerHTML = ICONS.back;
-    dayBackButton.onclick = closeNativeDayView;
+    dayBackButton.onclick = () => {
+      closeNativeDayView();
+      if (getActiveRoutineConfig().category === "supplements") activateMainView("suplementos");
+    };
   }
   if (dayProgressButton) {
     dayProgressButton.innerHTML = ICONS.calendar;
