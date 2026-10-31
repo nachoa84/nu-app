@@ -390,23 +390,43 @@
         "title": "Cómo emitir y enviar tu factura",
         "description": "Facturá cuando hayas completado las etapas anteriores.",
         "sections": [
-          {
-            "title": "Prepará los datos",
-            "body": "Consultá tu comisión en Stela, dentro de Documentos, Impuestos o Tax Documents. Allí encontrarás la descripción y el importe que necesitás para confeccionar la factura."
-          },
-          {
-            "title": "Emití la factura",
-            "body": "Ingresá a ARCA con clave fiscal, abrí Comprobantes en línea y generá una factura C por servicios.\n\nCUIT de Nu Skin: 30-69083303-0\nCondición frente al IVA: Responsable inscripto\nCondición de venta: contado\n\nUsá la descripción indicada en Tax Documents y colocá el importe total de tu comisión."
-          },
-          {
-            "title": "Enviá la factura",
-            "body": "Descargá la factura en PDF y enviala a facturas@nuskin.com. Indicá tu número de ID AR… en el asunto del correo.\n\nUna vez recibida, el pago se acredita aproximadamente dentro de las 72 horas hábiles."
-          }
-        ],
+              {
+                "title": "Antes de emitir",
+                "body": "Consultá en Stella, dentro de Comisiones > Tax Documents, la descripción y el importe de la comisión que vas a facturar. Tené a mano tu número de ID AR. Si aparecen varias comisiones, revisá cada documento: la guía de Nu Skin indica una factura por cada comisión."
+              },
+              {
+                "title": "1. Entrá a ARCA",
+                "body": "Ingresá a ARCA con tu clave fiscal. Abrí Comprobantes en línea, hacé clic en tu nombre y elegí Generar comprobantes."
+              },
+              {
+                "title": "2. Elegí el comprobante",
+                "body": "Punto de venta a utilizar: seleccioná el habilitado para Factura en línea - Monotributo y asociado a tu domicilio fiscal. Si todavía no tenés uno, verificá si ARCA te lo asignó o habilitalo desde Administración de Puntos de Venta y Domicilios. El número no tiene que ser necesariamente 1.\nTipo de comprobante: factura C (para monotributistas)."
+              },
+              {
+                "title": "3. Fechas y concepto",
+                "body": "Fecha del comprobante: el día en que emitís la factura.\nConceptos a incluir: servicios.\nPeríodo desde/hasta: el período de la comisión que figura en Tax Documents (por ejemplo, del 01/MM/AAAA al último día de ese mes).\nVencimiento para el pago: la fecha de la factura, como indicaba el instructivo anterior. Luego tocá Continuar."
+              },
+              {
+                "title": "4. Datos de Nu Skin",
+                "body": "Condición frente al IVA del receptor: Responsable inscripto.\nCUIT de Nu Skin: 30-69083303-0 (30690833030). Verificá que ARCA muestre los datos de Nu Skin al ingresarlo.\nCondición de venta: contado.\nDejá el campo de remito en blanco y tocá Continuar."
+              },
+              {
+                "title": "5. Detalle de la factura",
+                "body": "Código: 001.\nProducto o servicio: copiá la descripción que figura en la factura de Tax Documents.\nCantidad: 1.\nUnidad de medida: unidad.\nPrecio unitario: el importe total de esa comisión. Luego tocá Continuar."
+              },
+              {
+                "title": "6. Revisá y descargá",
+                "body": "Comprobá todos los datos. Si encontrás un error, volvé al paso anterior y corregilo antes de confirmar. Confirmá la emisión. Si ARCA muestra otra confirmación de datos, revisala y confirmá; después descargá la factura en PDF."
+              },
+              {
+                "title": "7. Enviá la factura",
+                "body": "Adjuntá el PDF emitido por ARCA y envialo a facturas@nuskin.com.\nAsunto: Comisiones AR[tu número de ID].\nCuerpo: Buenos días, envío factura del AR[tu número de ID]. Muchas gracias.\nEl instructivo anterior estimaba una acreditación dentro de 72 horas hábiles desde que Nu Skin recibe la factura; el plazo puede variar."
+              }
+            ],
         "actions": [
           {
-            "title": "Abrir guía para emitir y enviar tu factura",
-            "description": "Guía paso a paso en PDF",
+            "title": "Ver guía de Nu Skin para Tax Documents",
+            "description": "Referencia visual para ubicar Tax Documents y enviar la factura (PDF)",
             "url": "/api/bot-assets/3fcf843de2056a6fbfb65a3227c1ab74865368071985349366a1763d7d75cd6e.pdf"
           }
         ]
