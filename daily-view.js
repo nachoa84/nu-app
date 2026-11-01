@@ -64,6 +64,291 @@ function addLinks(container, links) {
   container.appendChild(wrap);
 }
 
+
+function openRoutinePdfPreview(block, trigger) {
+  const url = String(block?.url || "");
+  if (!url || document.querySelector(".routine-pdf-preview-layer")) return;
+
+  const previousFocus = trigger || document.activeElement;
+  const previousOverflow = document.body.style.overflow;
+  const titleText = String(block.label || "Capacitación");
+  const filename = String(block.downloadName || (titleText.toLowerCase().endsWith(".pdf") ? titleText : titleText + ".pdf"));
+
+  const layer = document.createElement("div");
+  layer.className = "routine-pdf-preview-layer";
+  layer.setAttribute("role", "presentation");
+  Object.assign(layer.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "10060",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    padding: "10px",
+    background: "rgba(25, 32, 40, 0.58)"
+  });
+
+  const backdrop = document.createElement("button");
+  backdrop.type = "button";
+  backdrop.setAttribute("aria-label", "Cerrar la capacitación y volver al día " + selectedDay);
+  Object.assign(backdrop.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    border: "0",
+    background: "transparent"
+  });
+
+  const sheet = document.createElement("section");
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", titleText);
+  Object.assign(sheet.style, {
+    position: "relative",
+    zIndex: "1",
+    display: "flex",
+    flexDirection: "column",
+    width: "min(100%, 960px)",
+    height: "min(92dvh, 900px)",
+    minHeight: "320px",
+    overflow: "hidden",
+    borderRadius: "20px",
+    background: "#ffffff",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.28)"
+  });
+
+  const header = document.createElement("header");
+  Object.assign(header.style, {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    padding: "12px 14px",
+    borderBottom: "1px solid #e7ecee",
+    background: "#ffffff"
+  });
+
+  const heading = document.createElement("h2");
+  heading.textContent = titleText;
+  Object.assign(heading.style, {
+    flex: "1 1 180px",
+    minWidth: "0",
+    margin: "0",
+    color: "#283b43",
+    fontFamily: "inherit",
+    fontSize: "16px",
+    fontWeight: "600",
+    lineHeight: "1.3",
+    overflowWrap: "anywhere"
+  });
+
+  const actions = document.createElement("div");
+  Object.assign(actions.style, {
+    display: "flex",
+    flex: "0 1 auto",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "8px"
+  });
+
+  const download = document.createElement("a");
+  download.href = url;
+  download.setAttribute("download", filename);
+  download.textContent = "Descargar PDF";
+  download.setAttribute("aria-label", "Descargar " + filename);
+  if (url.includes("a62db606247ada6cced9ea63133cf435eead66dd80d2afb22371aecfd08314f9.pdf")) {
+    let resetDownloadLabel;
+    download.setAttribute("aria-live", "polite");
+    download.addEventListener("click", () => {
+      download.textContent = "Iniciando descarga…";
+      download.setAttribute("aria-label", "Iniciando descarga de " + filename);
+      clearTimeout(resetDownloadLabel);
+      resetDownloadLabel = setTimeout(() => {
+        download.textContent = "Descargar PDF";
+        download.setAttribute("aria-label", "Descargar " + filename);
+      }, 8000);
+    });
+  }
+  Object.assign(download.style, {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "42px",
+    padding: "9px 14px",
+    borderRadius: "12px",
+    background: "#82b9c8",
+    color: "#ffffff",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    fontWeight: "600",
+    lineHeight: "1.2",
+    textDecoration: "none",
+    whiteSpace: "nowrap"
+  });
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Volver al día";
+  close.setAttribute("aria-label", "Cerrar la capacitación y volver al día " + selectedDay);
+  Object.assign(close.style, {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "42px",
+    padding: "9px 14px",
+    border: "1px solid #dbe4e7",
+    borderRadius: "12px",
+    background: "#ffffff",
+    color: "#36535d",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    fontWeight: "600",
+    lineHeight: "1.2",
+    whiteSpace: "nowrap",
+    cursor: "pointer"
+  });
+
+  actions.append(download, close);
+  header.append(heading, actions);
+  header.style.display = "none";
+
+  const preview = document.createElement("div");
+  preview.className = "routine-pdf-pages";
+  preview.setAttribute("role", "region");
+  preview.setAttribute("aria-label", "Vista previa del PDF");
+  Object.assign(preview.style, {
+    display: "flex",
+    flex: "1 1 auto",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    overflow: "auto",
+    width: "100%",
+    minHeight: "0",
+    padding: "14px",
+    boxSizing: "border-box",
+    background: "#e8eaed"
+  });
+
+  const loading = document.createElement("div");
+  loading.textContent = "Cargando vista previa...";
+  Object.assign(loading.style, { padding: "16px", color: "#53666f" });
+  preview.appendChild(loading);
+
+  actions.style.padding = "12px 14px";
+  actions.style.borderTop = "1px solid #e7ecee";
+  actions.style.background = "#ffffff";
+  actions.style.flex = "0 0 auto";
+  sheet.append(preview, actions);
+    layer.append(backdrop, sheet);
+  document.body.appendChild(layer);
+  if (url.includes("a62db606247ada6cced9ea63133cf435eead66dd80d2afb22371aecfd08314f9.pdf")) {
+    for (let pageNumber = 1; pageNumber <= 6; pageNumber += 1) {
+      const pageImage = document.createElement("img");
+      pageImage.alt = "Página " + pageNumber + " de 6";
+      pageImage.width = 1445;
+      pageImage.height = 1870;
+      pageImage.loading = pageNumber === 1 ? "eager" : "lazy";
+      pageImage.decoding = "async";
+      if (pageNumber === 1) {
+        pageImage.fetchPriority = "high";
+        pageImage.addEventListener("load", () => loading.remove(), { once: true });
+        pageImage.addEventListener("error", () => {
+          loading.textContent = "No se pudo mostrar la vista previa. Podés descargar el PDF desde el botón de abajo.";
+        }, { once: true });
+      }
+      Object.assign(pageImage.style, {
+        display: "block",
+        width: "100%",
+        height: "auto",
+        maxWidth: "100%",
+        background: "#ffffff",
+        borderRadius: "4px",
+        boxShadow: "0 1px 6px rgba(0, 0, 0, 0.18)"
+      });
+      pageImage.tabIndex = 0;
+      pageImage.setAttribute("role", "button");
+      pageImage.setAttribute("aria-label", "Ampliar o reducir página " + pageNumber + " de 6");
+      pageImage.style.cursor = "zoom-in";
+      pageImage.addEventListener("click", () => {
+        const expanded = pageImage.dataset.expanded === "true";
+        pageImage.dataset.expanded = String(!expanded);
+        pageImage.style.width = expanded ? (preview.clientWidth - 28) + "px" : Math.min((preview.clientWidth - 28) * 3, 1200) + "px";
+        pageImage.style.maxWidth = expanded ? "100%" : "none";
+        pageImage.style.cursor = expanded ? "zoom-in" : "zoom-out";
+          if (expanded) preview.scrollLeft = 0;
+      });
+      pageImage.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          pageImage.click();
+        }
+      });
+      preview.appendChild(pageImage);
+      pageImage.src = "/wellspa-preview/page-" + pageNumber + ".webp";
+    }
+  } else {
+  import("/pdfjs-preview.mjs").then(async pdfjsLib => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdfjs-preview.worker.mjs";
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    loading.remove();
+    const outputScale = Math.min(window.devicePixelRatio || 1, 2);
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      if (!document.body.contains(layer)) return;
+      const page = await pdf.getPage(pageNumber);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const scale = Math.min(1, (preview.clientWidth - 28) / baseViewport.width);
+      const viewport = page.getViewport({ scale: Math.max(scale, 0.25) });
+      const canvas = document.createElement("canvas");
+      canvas.setAttribute("aria-label", "Página " + pageNumber + " de " + pdf.numPages);
+      canvas.width = Math.floor(viewport.width * outputScale);
+      canvas.height = Math.floor(viewport.height * outputScale);
+      Object.assign(canvas.style, {
+        display: "block",
+        width: viewport.width + "px",
+        height: viewport.height + "px",
+        maxWidth: "100%",
+        background: "#ffffff",
+        borderRadius: "4px",
+        boxShadow: "0 1px 6px rgba(0, 0, 0, 0.18)"
+      });
+      preview.appendChild(canvas);
+      await page.render({
+        canvasContext: canvas.getContext("2d"),
+        viewport,
+        transform: outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0]
+      }).promise;
+    }
+  }).catch(error => {
+    loading.textContent = "No se pudo mostrar el PDF. Podés descargarlo desde el botón de abajo.";
+    console.error("No se pudo renderizar el PDF de la capacitación.", error);
+  });
+
+  }
+
+  document.body.style.overflow = "hidden";
+
+  const cleanup = () => {
+    document.body.style.overflow = previousOverflow;
+    document.removeEventListener("keydown", onKeyDown);
+    layer.remove();
+    previousFocus?.focus?.({ preventScroll: true });
+  };
+  const onKeyDown = event => {
+    if (event.key === "Escape") cleanup();
+  };
+
+  backdrop.onclick = cleanup;
+  close.onclick = cleanup;
+  document.addEventListener("keydown", onKeyDown);
+  requestAnimationFrame(() => close.focus({ preventScroll: true }));
+}
+
 function createBlock(block) {
   if (block.type === "complete" && getActiveRoutineConfig().category === "supplements") {
     return createSupplementCompletion();
@@ -90,7 +375,13 @@ function createBlock(block) {
         toast("No se pudo abrir la capacitación.", { type: "info" });
       };
     } else if (block.url) {
-      btn.onclick = () => window.open(block.url, "_blank", "noopener");
+      btn.onclick = () => {
+        if (block.previewInApp && block.resourceKind === "document") {
+          openRoutinePdfPreview(block, btn);
+          return;
+        }
+        window.open(block.url, "_blank", "noopener");
+      };
     } else {
       btn.onclick = () =>
         toast("Esta capacitación todavía está pendiente de cargar.");

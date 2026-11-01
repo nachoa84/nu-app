@@ -396,7 +396,7 @@ test(
     assert.equal(Number(finalState.current_day), 2);
     assert.equal(client.calls().canonical, 2);
     assert.equal(client.canonicalPublished.at(-1)?.currentDay, 2);
-    assert.equal(jobs.rows[0].count, 1);
+    assert.equal(jobs.rows[0].count, 0);
   }
 );
 
@@ -459,7 +459,7 @@ test(
     assert.equal(Number(finalState.current_day), 2);
     assert.equal(client.calls().canonical, 1);
     assert.equal(client.canonicalPublished.at(-1)?.currentDay, 2);
-    assert.equal(jobs.rows[0].count, 1);
+    assert.equal(jobs.rows[0].count, 0);
   }
 );
 
@@ -513,7 +513,7 @@ test(
     assert.equal(bootstrap.state.currentDay, 2);
     assert.equal(Number(finalState.current_day), 2);
     assert.equal(client.calls().canonical, 0);
-    assert.equal(jobs.rows[0].count, 1);
+    assert.equal(jobs.rows[0].count, 0);
   }
 );
 
@@ -535,7 +535,7 @@ test(
 
     const rows = await productDbStates(userId);
     const routines = Object.fromEntries(
-      rows.map(row => [
+      rows.filter(row => routineIds.includes(row.routine_id)).map(row => [
         row.routine_id,
         {
           initialized: true,
@@ -587,7 +587,7 @@ test(
     );
 
     assert.deepEqual(
-      finalStates.map(row => ({
+      finalStates.filter(row => routineIds.includes(row.routine_id)).map(row => ({
         routineId: row.routine_id,
         currentDay: Number(row.current_day),
         nextUnlockAt: row.next_unlock_at
@@ -603,17 +603,6 @@ test(
       client.productsPublished.at(-1)?.routines?.["lumispa-10"]?.currentDay,
       2
     );
-    assert.deepEqual(
-      jobs.rows.map(row => ({
-        routineId: row.routine_id,
-        day: Number(row.day),
-        count: Number(row.count)
-      })),
-      [
-        { routineId: "galvanicspa-10", day: 2, count: 1 },
-        { routineId: "lumispa-10", day: 2, count: 1 },
-        { routineId: "wellspa-10", day: 2, count: 1 }
-      ]
-    );
+    assert.deepEqual(jobs.rows, []);
   }
 );

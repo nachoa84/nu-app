@@ -1,4 +1,4 @@
-const CACHE="nuapp-v173-supplements-main-1";
+const CACHE="nuapp-v174-content-notifications-off";
 
 const CORE=[
   "./product-routine-config.js?v=5",
@@ -33,7 +33,7 @@ const CORE=[
   "./bot.css?v=143-iris-layout-9",
   "./favorites.css?v=94-bot-folders",
   "./favorites-redesign-v1.css?v=146-wellspa-scale",
-  "./bot-content.js?v=131-country-catalogs",
+  "./bot-content.js?v=134-ar-invoice-steps",
   "./ui-core.js?v=supplements-polish-1",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",

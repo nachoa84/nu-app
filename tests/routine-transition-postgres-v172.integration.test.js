@@ -369,13 +369,7 @@ test(
 
     assert.equal(Number(state.rows[0].current_day), 2);
     assert.equal(state.rows[0].next_unlock_at, null);
-    assert.deepEqual(
-      jobs.rows.map(row => ({
-        day: Number(row.day),
-        count: Number(row.count)
-      })),
-      [{ day: 2, count: 1 }]
-    );
+    assert.deepEqual(jobs.rows, []);
   }
 );
 
@@ -421,7 +415,7 @@ test(
     );
 
     assert.equal(Number(state.rows[0].current_day), 2);
-    assert.equal(jobs.rows[0].count, 1);
+    assert.equal(jobs.rows[0].count, 0);
   }
 );
 
@@ -527,7 +521,7 @@ test(
     );
 
     assert.deepEqual(
-      states.rows.map(row => ({
+      states.rows.filter(row => ["galvanicspa-10", "lumispa-10", "wellspa-10"].includes(row.routine_id)).map(row => ({
         routineId: row.routine_id,
         day: Number(row.current_day),
         nextUnlockAt: row.next_unlock_at
@@ -551,29 +545,6 @@ test(
       ]
     );
 
-    assert.deepEqual(
-      jobs.rows.map(row => ({
-        routineId: row.routine_id,
-        day: Number(row.day),
-        count: Number(row.count)
-      })),
-      [
-        {
-          routineId: "galvanicspa-10",
-          day: 2,
-          count: 1
-        },
-        {
-          routineId: "lumispa-10",
-          day: 2,
-          count: 1
-        },
-        {
-          routineId: "wellspa-10",
-          day: 2,
-          count: 1
-        }
-      ]
-    );
+    assert.deepEqual(jobs.rows, []);
   }
 );
