@@ -7,6 +7,7 @@
   const button=(label,action,cls)=>{const n=create("button",cls,label);n.type="button";n.onclick=action;return n;};
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
   const valid=item=>item&&/^(image|video)$/.test(item.type)&&/^\/api\/international-assets\/[a-z0-9-]+\/\d+\/\d+$/.test(item.src);
+  const isMovTest=(id,day)=>id==="collagen/es"&&day===2;
   const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"LumiSpa · Italia";
   function frame(heading,subheading,back){
     if(!sheet?.isConnected)return null;
@@ -54,6 +55,7 @@
       button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
     list.append(allActions);
     prepareDayForSharing(id,day,allActions);
+    if(isMovTest(id,day))list.append(create("p","nu-il-notice","Prueba temporal: Compartir enviará los materiales 2, 3 y 4 (sin el MOV). Descargar todo conserva los 4 archivos."));
     items.forEach((item,index)=>{
       if(!valid(item))return;
       const b=button("",()=>showPreview(id,day,index),"nu-il-media-row");
@@ -91,6 +93,7 @@
       button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
     list.append(allActions);
     prepareDayForSharing(id,day,allActions);
+    if(isMovTest(id,day))list.append(create("p","nu-il-notice","Prueba temporal: Compartir excluye el MOV. Descargar todo conserva los 4 archivos."));
   }
   async function assetFile(item,id,day,index){
     const response=await fetch(item.src);if(!response.ok)throw Error("Archivo no disponible");
@@ -170,6 +173,7 @@
       if(!items.length||items.some(item=>!valid(item)))throw Error("El día todavía no está completo");
       const files=[];
       for(let index=0;index<items.length;index++){
+        if(isMovTest(id,day)&&index===0)continue;
         const file=await assetFile(items[index],id,day,index);
         files.push(file);
       }
@@ -188,7 +192,7 @@
     loadDayFiles(id,day).then(files=>{
       if(!button.isConnected)return;
       button.disabled=false;
-      button.textContent="Compartir todo ("+files.length+")";
+      button.textContent=isMovTest(id,day)?"Compartir 3 sin MOV (prueba)":"Compartir todo ("+files.length+")";
     }).catch(()=>{
       if(!button.isConnected)return;
       button.disabled=false;
