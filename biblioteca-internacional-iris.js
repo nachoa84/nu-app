@@ -206,14 +206,18 @@
       alert("Este navegador no permite compartir todos estos archivos juntos. Podés utilizar Descargar todo para obtener el ZIP.");
       return;
     }
+    const reportError=error=>{
+      if(error?.name==="AbortError")return;
+      const code=String(error?.name||"ErrorDesconocido").slice(0,40);
+      const size=(filesReady.reduce((total,file)=>total+file.size,0)/1048576).toFixed(1);
+      console.warn("Compartir todo: rechazo de Android",{code,detail:error?.message,collection:id,day,
+        files:filesReady.map(file=>({type:file.type,size:file.size}))});
+      alert("Android rechazó Compartir todo. Código: "+code+
+        ". Total: "+filesReady.length+" archivos, "+size+" MB. Pasame estos datos para identificar la causa.");
+    };
     try{
-      const result=navigator.share({files:filesReady,title:title(id)+" · Día "+day});
-      Promise.resolve(result).catch(error=>{
-        if(error?.name!=="AbortError")alert("No se pudieron compartir juntos los archivos. Probá con Descargar todo.");
-      });
-    }catch(error){
-      if(error?.name!=="AbortError")alert("Este dispositivo no pudo compartir todos los archivos juntos.");
-    }
+      Promise.resolve(navigator.share({files:filesReady,title:title(id)+" · Día "+day})).catch(reportError);
+    }catch(error){reportError(error);}
   }
   async function downloadAll(id,day){
     const actionRow=sheet?.querySelector(".nu-il-all-actions");
