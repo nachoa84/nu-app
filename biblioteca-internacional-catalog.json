@@ -1,0 +1,610 @@
+{
+  "collagen/es/1": [
+    {
+      "filename": "1.mov",
+      "type": "video"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/2": [
+    {
+      "filename": "1.mov",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/3": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/4": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "6.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "7.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/5": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/6": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.mov",
+      "type": "video"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/7": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/8": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/9": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.mov",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/es/10": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/1": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.mp4",
+      "type": "video"
+    }
+  ],
+  "collagen/it/2": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/3": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/4": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "6.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "7.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/5": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/6": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.mov",
+      "type": "video"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/7": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/8": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/9": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/it/10": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "lumispa/it/1": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/2": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/3": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/4": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/5": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "lumispa/it/6": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "5.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/7": [
+    {
+      "filename": "1.mov",
+      "type": "video"
+    },
+    {
+      "filename": "2.mov",
+      "type": "video"
+    },
+    {
+      "filename": "3.mov",
+      "type": "video"
+    },
+    {
+      "filename": "4.mov",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/8": [
+    {
+      "filename": "1.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "2.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    }
+  ],
+  "lumispa/it/9": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "lumispa/it/10": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.mp4",
+      "type": "video"
+    },
+    {
+      "filename": "4.mp4",
+      "type": "video"
+    }
+  ]
+}
