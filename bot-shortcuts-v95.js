@@ -234,7 +234,9 @@
       const isTramitesEntry = category.id === "tramites-informacion" && item.command === "tramites";
       button.onclick = isTramitesEntry
         ? () => renderTramitesCountryList(sheet, category, categories, item)
-        : () => chooseBotCommand(item);
+        : item.command === "material internacional" && typeof window.openInternationalLibrary === "function"
+          ? () => window.openInternationalLibrary(sheet, () => renderCommandList(sheet, category, categories))
+          : () => chooseBotCommand(item);
       list.appendChild(button);
     });
   }
