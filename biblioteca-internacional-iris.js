@@ -85,6 +85,10 @@
     actions.append(button("Compartir",()=>share(item,id,day,index),"nu-il-action nu-il-primary"),
       button("Descargar",()=>download(item,id,day,index),"nu-il-action"));
     list.append(actions);
+    const allActions=create("div","nu-il-action-row nu-il-all-actions");
+    allActions.append(button("Compartir todo el día",()=>shareAll(id,day),"nu-il-action nu-il-primary"),
+      button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
+    list.append(allActions);
   }
   async function assetFile(item,id,day,index){
     const response=await fetch(item.src);if(!response.ok)throw Error("Archivo no disponible");
