@@ -56,6 +56,7 @@
     list.append(allActions);
     prepareDayForSharing(id,day,allActions);
     if(isMovTest(id,day))list.append(create("p","nu-il-notice","Prueba temporal: Compartir enviará los materiales 2, 3 y 4 (sin el MOV). Descargar todo conserva los 4 archivos."));
+    if(isMovTest(id,day))renderShareDiagnostics(list);
     items.forEach((item,index)=>{
       if(!valid(item))return;
       const b=button("",()=>showPreview(id,day,index),"nu-il-media-row");
@@ -233,6 +234,47 @@
     }catch(error){alert("No se pudo descargar el día completo: "+error.message);}
     finally{if(button){button.disabled=false;button.textContent=previous;}}
   }
+  // Pruebas temporales aisladas: no alteran el catálogo ni los archivos originales.
+  const diagnosticCases=[
+    {id:"A",label:"A · 3 imágenes JPG",day:3,indexes:[0,1,2]},
+    {id:"B",label:"B · 2 videos MP4",day:2,indexes:[1,2]},
+    {id:"C",label:"C · 2 MP4 + 1 JPG",day:2,indexes:[1,2,3]}
+  ];
+  const diagnosticReady=new Map();
+  function renderShareDiagnostics(list){
+    const section=create("section","nu-il-diagnostics");
+    section.append(create("h3","nu-il-group-heading","Prueba de compartir en WhatsApp"),
+      create("p","nu-il-notice","Probá A, B y C. Los archivos son de España, días 2 y 3; no se modifica ningún material."));
+    for(const test of diagnosticCases){
+      const action=button("Preparando "+test.id+"…",()=>runShareDiagnostic(test),"nu-il-action nu-il-test");
+      action.disabled=true;section.append(action);
+      const task=Promise.all(test.indexes.map(async index=>{
+        const item=entries("collagen/es",test.day)[index];
+        if(!valid(item))throw Error("Archivo faltante");
+        return assetFile(item,"collagen/es",test.day,index);
+      }));
+      task.then(files=>{diagnosticReady.set(test.id,files);
+        if(action.isConnected){action.disabled=false;action.textContent=test.label;}
+      }).catch(error=>{if(action.isConnected)action.textContent="No se pudo preparar "+test.id;console.warn("Prueba "+test.id,error);});
+    }
+    list.append(section);
+  }
+  function runShareDiagnostic(test){
+    const files=diagnosticReady.get(test.id);
+    if(!files?.length){alert("La prueba todavía no está preparada.");return;}
+    if(!navigator.canShare?.({files})||typeof navigator.share!=="function"){
+      alert("La prueba "+test.id+" no es compatible con el navegador.");
+      return;
+    }
+    const report=error=>{
+      if(error?.name==="AbortError")return;
+      alert("Prueba "+test.id+": "+(error?.name||"Error")+
+        " · "+(files.reduce((sum,file)=>sum+file.size,0)/1048576).toFixed(1)+" MB");
+      console.warn("Diagnóstico compartir "+test.id,error);
+    };
+    try{Promise.resolve(navigator.share({files})).catch(report);}
+    catch(error){report(error);}
+  }
   window.openInternationalLibrary=(targetSheet,back)=>{
     if(!targetSheet?.isConnected){
       if(typeof window.openBotQuickAccess==="function"){
@@ -267,7 +309,7 @@
     .nu-il-action-row{display:flex;gap:8px;margin-top:12px}\n    .nu-il-all-actions{margin:8px 0 16px}
     .nu-il-action{flex:1;border:1px solid #dce6f4;border-radius:11px;min-height:42px;padding:7px;background:#fff;color:#2869d5;font:600 12px system-ui;cursor:pointer}
     .nu-il-action:disabled{opacity:.35;cursor:default}.nu-il-primary{background:#3475da;color:#fff;border-color:#3475da}
-    .nu-il-notice,.nu-il-error{font-size:12px;color:#9b4d32;padding:10px}
+    .nu-il-notice,.nu-il-error{font-size:12px;color:#9b4d32;padding:10px}\n    .nu-il-diagnostics{padding:10px;background:#eef5ff;border-radius:13px;margin:12px 0}\n    .nu-il-diagnostics .nu-il-test{display:block;width:100%;margin:8px 0}.nu-il-test:disabled{opacity:.55}
   `;
   document.head.append(style);
 })();
