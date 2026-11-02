@@ -138,6 +138,10 @@
     if (!item?.command) return;
     const command = item.command;
     closeBotQuickAccess();
+    if (command === "material internacional" && typeof window.openInternationalLibrary === "function") {
+      window.openInternationalLibrary();
+      return;
+    }
     window.requestAnimationFrame(() => {
       if (typeof botAsk === "function") {
         botAsk(command);
