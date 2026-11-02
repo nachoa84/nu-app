@@ -45,7 +45,7 @@
     { id:"lumispa", name:"LumiSpa", countries:[{id:"it",label:"Italia",flag:"🇮🇹"}] }
   ];
   const root = document.getElementById("library");
-  const manifest = window.NuInternationalLibraryData || {};
+  let manifest = window.NuInternationalLibraryData || {};
   const el = (tag, cls, value) => { const n=document.createElement(tag); if(cls)n.className=cls; if(value!==undefined)n.textContent=value; return n; };
   function card(label,description,action) {
     const b=el("button","card");b.type="button";
@@ -95,6 +95,7 @@
     }
     root.append(el("p","footer-note","Los archivos se muestran en el orden definido para este día."));
   }
+  addEventListener("nu-international-catalog-ready", () => { manifest = window.NuInternationalLibraryData || {}; render(); });
   addEventListener("hashchange",render);render();
 })();
 </script>
