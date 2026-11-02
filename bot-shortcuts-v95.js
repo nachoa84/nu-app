@@ -25,7 +25,8 @@
         "como usar face wash 180",
         "box colageno",
         "como asesorar lumi spa",
-        "estrategia colageno europa"
+        "estrategia colageno europa",
+        "material internacional"
       ]
     },
     {
