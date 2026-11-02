@@ -53,6 +53,7 @@
     allActions.append(button("Compartir todo",()=>shareAll(id,day),"nu-il-action nu-il-primary"),
       button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
     list.append(allActions);
+    prepareDayForSharing(id,day,allActions);
     items.forEach((item,index)=>{
       if(!valid(item))return;
       const b=button("",()=>showPreview(id,day,index),"nu-il-media-row");
@@ -89,6 +90,7 @@
     allActions.append(button("Compartir todo el día",()=>shareAll(id,day),"nu-il-action nu-il-primary"),
       button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
     list.append(allActions);
+    prepareDayForSharing(id,day,allActions);
   }
   async function assetFile(item,id,day,index){
     const response=await fetch(item.src);if(!response.ok)throw Error("Archivo no disponible");
@@ -158,28 +160,71 @@
     const url=URL.createObjectURL(blob),a=create("a");a.href=url;a.download=name;
     document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
   }
-  async function withArchive(id,day,mode){
-    const list=sheet?.querySelector(".nu-il-all-actions"),buttons=list?[...list.querySelectorAll("button")]:[];
-    buttons.forEach(b=>b.disabled=true);
-    const target=buttons[mode==="share"?0:1],original=target?.textContent;
-    if(target)target.textContent="Preparando archivos…";
-    try{
-      const blob=await dayArchive(id,day),name=archiveName(id,day);
-      if(mode==="download"){saveArchive(blob,name);return;}
-      const file=new File([blob],name,{type:"application/zip"});
-      // Los navegadores pueden perder la activación de compartir mientras descargan los archivos.
-      // En ese caso se entrega un ZIP único, sin compartir materiales incompletos.
-      if(navigator.canShare?.({files:[file]})&&navigator.share){
-        try{await navigator.share({files:[file],title:title(id)+" · Día "+day});return;}
-        catch(error){if(error.name==="AbortError")return;}
+  const shareCache=new Map();
+  const shareReady=new Map();
+  async function loadDayFiles(id,day){
+    const key=id+"/"+day;
+    if(shareCache.has(key))return shareCache.get(key);
+    const task=(async()=>{
+      const items=entries(id,day);
+      if(!items.length||items.some(item=>!valid(item)))throw Error("El día todavía no está completo");
+      const files=[];
+      for(let index=0;index<items.length;index++){
+        const file=await assetFile(items[index],id,day,index);
+        files.push(file);
       }
-      saveArchive(blob,name);
-      alert("Se descargó un único ZIP con todos los materiales del día para que puedas compartirlo.");
-    }catch(error){alert("No se pudo preparar el día completo: "+error.message);}
-    finally{buttons.forEach(b=>b.disabled=false);if(target)target.textContent=original;}
+      shareReady.set(key,files);
+      return files;
+    })();
+    shareCache.set(key,task);
+    task.catch(()=>shareCache.delete(key));
+    return task;
   }
-  function shareAll(id,day){return withArchive(id,day,"share");}
-  function downloadAll(id,day){return withArchive(id,day,"download");}
+  function prepareDayForSharing(id,day,actionRow){
+    const button=actionRow?.querySelector("button");
+    if(!button)return;
+    button.disabled=true;
+    button.textContent="Preparando para compartir…";
+    loadDayFiles(id,day).then(files=>{
+      if(!button.isConnected)return;
+      button.disabled=false;
+      button.textContent="Compartir todo ("+files.length+")";
+    }).catch(()=>{
+      if(!button.isConnected)return;
+      button.disabled=false;
+      button.textContent="Reintentar compartir";
+    });
+  }
+  function shareAll(id,day){
+    const task=shareCache.get(id+"/"+day);
+    if(!task){alert("Los archivos todavía no están preparados. Esperá unos segundos.");return;}
+    // El botón queda habilitado después de cargar todos los archivos, para
+    // preservar el gesto de usuario requerido por Web Share API.
+    const filesReady=shareReady.get(id+"/"+day);
+    if(!filesReady){alert("Los archivos se están preparando. Esperá unos segundos.");return;}
+    if(typeof navigator.share!=="function"||!navigator.canShare?.({files:filesReady})){
+      alert("Este navegador no permite compartir todos estos archivos juntos. Podés utilizar Descargar todo para obtener el ZIP.");
+      return;
+    }
+    try{
+      const result=navigator.share({files:filesReady,title:title(id)+" · Día "+day});
+      Promise.resolve(result).catch(error=>{
+        if(error?.name!=="AbortError")alert("No se pudieron compartir juntos los archivos. Probá con Descargar todo.");
+      });
+    }catch(error){
+      if(error?.name!=="AbortError")alert("Este dispositivo no pudo compartir todos los archivos juntos.");
+    }
+  }
+  async function downloadAll(id,day){
+    const actionRow=sheet?.querySelector(".nu-il-all-actions");
+    const button=actionRow?.querySelectorAll("button")[1],previous=button?.textContent;
+    if(button){button.disabled=true;button.textContent="Preparando ZIP…";}
+    try{
+      const archive=await dayArchive(id,day);
+      saveArchive(archive,archiveName(id,day));
+    }catch(error){alert("No se pudo descargar el día completo: "+error.message);}
+    finally{if(button){button.disabled=false;button.textContent=previous;}}
+  }
   window.openInternationalLibrary=(targetSheet,back)=>{
     if(!targetSheet?.isConnected){
       if(typeof window.openBotQuickAccess==="function"){
