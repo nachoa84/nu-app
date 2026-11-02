@@ -3,6 +3,19 @@
   // Los comandos visibles conservan los nombres conocidos, sin necesitar el punto inicial.
   window.BotContent = [
   {
+    "id": "biblioteca-internacional",
+    "title": "Material internacional",
+    "command": "material internacional",
+    "aliases": ["biblioteca internacional", "materiales internacionales", "rutinas internacionales"],
+    "phrases": ["quiero material de españa", "quiero material de italia", "biblioteca de materiales internacionales"],
+    "keywords": ["collagen españa", "collagen italia", "lumispa italia"],
+    "blocks": [
+      { "type": "text", "content": "Encontrá los materiales internacionales organizados por producto, país y día. La biblioteca está en preparación; los archivos se incorporarán después de su revisión." },
+      { "type": "link", "title": "Abrir Biblioteca Internacional", "url": "/biblioteca-internacional.html", "actionLabel": "Abrir biblioteca", "resourceKind": "link" }
+    ],
+    "sourceFlow": "material internacional"
+  },
+  {
     "id": "catalogos",
     "title": "Catálogos",
     "command": "catalogo",
