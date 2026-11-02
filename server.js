@@ -4762,6 +4762,69 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
   };
 }
 
+// Biblioteca Internacional: ruta de solo lectura, aislada de los assets existentes.
+// Los índices se resuelven contra una lista cerrada de materiales aprobados.
+const internationalLibraryCatalog = require("./biblioteca-internacional-catalog.json");
+const internationalCollectionFolders = Object.freeze({
+  "collagen-es": ["collagen", "es", "ES COLAGENO"],
+  "collagen-it": ["collagen", "it", "IT COLAGENO"],
+  "lumispa-it": ["lumispa", "it", "IT LUMI"]
+});
+
+app.use("/api/international-assets/:collection/:day/:index", async (req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return res.status(405).set("Allow", "GET, HEAD").end();
+  }
+  const collection = internationalCollectionFolders[req.params.collection];
+  const day = Number(req.params.day);
+  const index = Number(req.params.index);
+  if (!collection || !Number.isInteger(day) || day < 1 || day > 10 ||
+      !Number.isInteger(index) || index < 1) return res.status(404).end();
+  const files = internationalLibraryCatalog[`${collection[0]}/${collection[1]}/${day}`];
+  const item = files?.[index - 1];
+  if (!item || !/^[0-9]+\.(?:jpg|jpeg|png|mp4|mov)$/i.test(item.filename)) {
+    return res.status(404).end();
+  }
+
+  const folderNames = [`DIA ${day}`, `DÍA ${day}`];
+  const filenames = [item.filename];
+  if (/\.jpg$/i.test(item.filename)) filenames.push(item.filename.replace(/\.jpg$/i, ".JPG"));
+  let asset;
+  try {
+    // Los nombres de las carpetas subidas pueden conservar o perder el acento.
+    for (const folder of folderNames) {
+      for (const filename of [...new Set(filenames)]) {
+        const name = `bot/active/international/v1/${collection[2]}/${folder}/${filename}`;
+        try { asset = await getAssetFileV108(name); break; }
+        catch (error) {
+          if (Number(error?.code) !== 404 && Number(error?.status) !== 404) throw error;
+        }
+      }
+      if (asset) break;
+    }
+    if (!asset) return res.status(404).end();
+
+    const { file, totalSize, contentType, etag } = asset;
+    const headers = { "Accept-Ranges": "bytes", "Cache-Control": "public, max-age=86400", "Content-Type": contentType };
+    if (etag) headers.ETag = etag;
+    res.set(headers);
+    if (shouldReturnNotModifiedV114(req, etag)) return res.status(304).end();
+    if (req.headers.range && shouldHonorRangeV114(req, etag)) {
+      const range = parseBotAssetRange(req.headers.range, totalSize);
+      if (!range || range.unsatisfiable) return res.status(416).set("Content-Range", `bytes */${totalSize}`).end();
+      res.status(206).set({
+        "Content-Range": `bytes ${range.start}-${range.end}/${totalSize}`,
+        "Content-Length": String(range.end - range.start + 1)
+      });
+      if (req.method === "HEAD") return res.end();
+      return pipeAssetStreamV108(file.createReadStream({start:range.start,end:range.end,decompress:false}),res,next);
+    }
+    res.status(200).set("Content-Length", String(totalSize));
+    if (req.method === "HEAD") return res.end();
+    return pipeAssetStreamV108(file.createReadStream({decompress:false}),res,next);
+  } catch (error) { return next(error); }
+});
+
 app.use(
   "/api/bot-assets",
   createStorageAssetHandlerV108(BOT_ASSET_STORAGE_PREFIX, "bot-assets")
