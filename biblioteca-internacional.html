@@ -86,7 +86,7 @@
     const entries=Array.isArray(manifest[key])?manifest[key]:[];
     if(!entries.length){root.append(el("p","notice","Material pendiente de cargar. La estructura está preparada, pero todavía no hay archivos publicados para este día."));return;}
     for(const item of entries){
-      if(!item||typeof item.src!=="string"||!/^\/(assets\/|api\/bot-assets\/)[a-z0-9_./%-]+$/i.test(item.src)||item.src.includes(".."))continue;
+      if(!item||typeof item.src!=="string"||!/^\/(assets\/|api\/bot-assets\/|api\/international-assets\/)[a-z0-9_./%-]+$/i.test(item.src)||item.src.includes(".."))continue;
       const box=el("article","asset");box.append(el("strong","",item.title||"Material"));
       if(item.type==="image"){const img=el("img");img.src=item.src;img.loading="lazy";img.alt=item.title||"Material visual";box.append(img);}
       else if(item.type==="video"){const video=el("video");video.src=item.src;video.controls=true;video.preload="metadata";video.playsInline=true;box.append(video);}
