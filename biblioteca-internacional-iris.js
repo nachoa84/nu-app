@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   const groups=[{name:"España",flag:"🇪🇸",items:[["collagen/es","Collagen+"]]},
-    {name:"Italia",flag:"🇮🇹",items:[["collagen/it","Collagen+"],["lumispa/it","LumiSpa"]]}];
+    {name:"Italia",flag:"🇮🇹",items:[["collagen/it","Collagen+"],["lumispa/it","Lumi"]]}];
   let sheet=null, returnToProducts=null, selection=null;
   const create=(tag,className,text)=>{const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;};
   const button=(label,action,cls)=>{const n=create("button",cls,label);n.type="button";n.onclick=action;return n;};
@@ -22,7 +22,8 @@
   function row(list,label,description,action){
     const b=button("",action,"bot-quick-access-row is-command nu-il-row");
     const text=create("span","bot-quick-access-row-copy");
-    text.append(create("strong","",label),create("small","",description));
+    text.append(create("strong","",label));
+    if(description)text.append(create("small","",description));
     b.append(text,create("span","nu-il-chevron","›"));list.append(b);
   }
   function showGroups(){
@@ -31,7 +32,7 @@
     if(!list)return;
     groups.forEach(group=>{
       list.append(create("h3","nu-il-group-heading",group.flag+" "+group.name));
-      group.items.forEach(([id,name])=>row(list,name,"Contenido de 10 días",()=>showDays(id)));
+      group.items.forEach(([id,name])=>row(list,name,"",()=>showDays(id)));
     });
   }
   function showDays(id){
@@ -48,6 +49,10 @@
     if(!list)return;
     const items=entries(id,day);
     if(!items.length){list.append(create("p","nu-il-notice","Cargando materiales…"));return;}
+    const allActions=create("div","nu-il-action-row nu-il-all-actions");
+    allActions.append(button("Compartir todo",()=>shareAll(id,day),"nu-il-action nu-il-primary"),
+      button("Descargar todo",()=>downloadAll(id,day),"nu-il-action"));
+    list.append(allActions);
     items.forEach((item,index)=>{
       if(!valid(item))return;
       const b=button("",()=>showPreview(id,day,index),"nu-il-media-row");
@@ -101,6 +106,76 @@
       setTimeout(()=>URL.revokeObjectURL(url),60000);
     }catch{alert("No se pudo descargar este material.");}
   }
+  // Archivo ZIP sin dependencias externas: conserva nombre y orden de cada material del día.
+  const zipCache=new Map();
+  const crcTable=Array.from({length:256},(_,n)=>{let c=n;for(let i=0;i<8;i++)c=c&1?0xedb88320^(c>>>1):c>>>1;return c>>>0;});
+  function checksum(data){let c=0xffffffff;for(const byte of data)c=crcTable[(c^byte)&255]^(c>>>8);return(c^0xffffffff)>>>0;}
+  function zipFile(name,data){
+    const encoder=new TextEncoder(),nameBytes=encoder.encode(name),len=data.length,crc=checksum(data);
+    const local=new Uint8Array(30+nameBytes.length),lv=new DataView(local.buffer);
+    lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0x0800,true);
+    lv.setUint32(14,crc,true);lv.setUint32(18,len,true);lv.setUint32(22,len,true);
+    lv.setUint16(26,nameBytes.length,true);local.set(nameBytes,30);
+    return {local,nameBytes,len,crc,data};
+  }
+  async function dayArchive(id,day){
+    const key=id+"/"+day;if(zipCache.has(key))return zipCache.get(key);
+    const promise=(async()=>{
+      const items=entries(id,day);if(!items.length||items.some(item=>!valid(item)))throw Error("Catálogo incompleto");
+      const files=[];
+      for(let i=0;i<items.length;i++){
+        const response=await fetch(items[i].src);
+        if(!response.ok)throw Error("Material "+(i+1)+" no disponible");
+        const bytes=new Uint8Array(await response.arrayBuffer());
+        const type=response.headers.get("content-type")||"";
+        const ext=items[i].type==="video"?(type.includes("quicktime")?"mov":"mp4"):type.includes("png")?"png":"jpg";
+        files.push(zipFile(String(i+1).padStart(2,"0")+"."+ext,bytes));
+      }
+      const parts=[],central=[];let offset=0,centralSize=0;
+      for(const file of files){
+        parts.push(file.local,file.data);
+        const record=new Uint8Array(46+file.nameBytes.length),v=new DataView(record.buffer);
+        v.setUint32(0,0x02014b50,true);v.setUint16(4,20,true);v.setUint16(6,20,true);v.setUint16(8,0x0800,true);
+        v.setUint32(16,file.crc,true);v.setUint32(20,file.len,true);v.setUint32(24,file.len,true);
+        v.setUint16(28,file.nameBytes.length,true);v.setUint32(42,offset,true);
+        record.set(file.nameBytes,46);central.push(record);centralSize+=record.length;
+        offset+=file.local.length+file.len;
+      }
+      const end=new Uint8Array(22),v=new DataView(end.buffer);
+      v.setUint32(0,0x06054b50,true);v.setUint16(8,files.length,true);v.setUint16(10,files.length,true);
+      v.setUint32(12,centralSize,true);v.setUint32(16,offset,true);
+      return new Blob([...parts,...central,end],{type:"application/zip"});
+    })();
+    zipCache.set(key,promise);
+    promise.catch(()=>zipCache.delete(key));return promise;
+  }
+  function archiveName(id,day){return "Nu-"+id.replace("/","-")+"-dia-"+day+".zip";}
+  function saveArchive(blob,name){
+    const url=URL.createObjectURL(blob),a=create("a");a.href=url;a.download=name;
+    document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }
+  async function withArchive(id,day,mode){
+    const list=sheet?.querySelector(".nu-il-all-actions"),buttons=list?[...list.querySelectorAll("button")]:[];
+    buttons.forEach(b=>b.disabled=true);
+    const target=buttons[mode==="share"?0:1],original=target?.textContent;
+    if(target)target.textContent="Preparando archivos…";
+    try{
+      const blob=await dayArchive(id,day),name=archiveName(id,day);
+      if(mode==="download"){saveArchive(blob,name);return;}
+      const file=new File([blob],name,{type:"application/zip"});
+      // Los navegadores pueden perder la activación de compartir mientras descargan los archivos.
+      // En ese caso se entrega un ZIP único, sin compartir materiales incompletos.
+      if(navigator.canShare?.({files:[file]})&&navigator.share){
+        try{await navigator.share({files:[file],title:title(id)+" · Día "+day});return;}
+        catch(error){if(error.name==="AbortError")return;}
+      }
+      saveArchive(blob,name);
+      alert("Se descargó un único ZIP con todos los materiales del día para que puedas compartirlo.");
+    }catch(error){alert("No se pudo preparar el día completo: "+error.message);}
+    finally{buttons.forEach(b=>b.disabled=false);if(target)target.textContent=original;}
+  }
+  function shareAll(id,day){return withArchive(id,day,"share");}
+  function downloadAll(id,day){return withArchive(id,day,"download");}
   window.openInternationalLibrary=(targetSheet,back)=>{
     if(!targetSheet?.isConnected){
       if(typeof window.openBotQuickAccess==="function"){
@@ -132,7 +207,7 @@
     .nu-il-media-copy{flex:1;display:grid;gap:3px}.nu-il-media-copy strong{font-size:13px}.nu-il-media-copy small{font-size:12px;color:#738094}
     .nu-il-stage{background:#edf2f8;border-radius:12px;overflow:hidden;min-height:180px;display:grid;place-items:center}
     .nu-il-stage img,.nu-il-stage video{width:100%;max-height:42dvh;object-fit:contain;display:block}
-    .nu-il-action-row{display:flex;gap:8px;margin-top:12px}
+    .nu-il-action-row{display:flex;gap:8px;margin-top:12px}\n    .nu-il-all-actions{margin:8px 0 16px}
     .nu-il-action{flex:1;border:1px solid #dce6f4;border-radius:11px;min-height:42px;padding:7px;background:#fff;color:#2869d5;font:600 12px system-ui;cursor:pointer}
     .nu-il-action:disabled{opacity:.35;cursor:default}.nu-il-primary{background:#3475da;color:#fff;border-color:#3475da}
     .nu-il-notice,.nu-il-error{font-size:12px;color:#9b4d32;padding:10px}
