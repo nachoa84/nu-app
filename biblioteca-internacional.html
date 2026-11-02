@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Biblioteca Internacional · Nu Comunidad</title>
+  <style>
+    :root { color-scheme:light; --blue:#2769d8; --orange:#f38c46; --ink:#263448; --muted:#64748b; --line:#e8edf4; --bg:#f6f9fd; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; }
+    header { background:white; border-bottom:1px solid var(--line); padding:18px max(20px,calc((100vw - 760px)/2)); }
+    header small { display:block; color:var(--blue); font-weight:750; letter-spacing:.06em; text-transform:uppercase; }
+    header h1 { margin:3px 0 0; font-size:1.3rem; }
+    main { max-width:760px; margin:auto; padding:22px 16px 72px; }
+    .intro { margin:0 0 24px; color:var(--muted); }
+    .crumb { display:flex; gap:8px; align-items:center; margin-bottom:22px; }
+    button, a { font:inherit; } button { cursor:pointer; }
+    .back { background:white; border:1px solid var(--line); border-radius:12px; color:var(--blue); padding:9px 13px; }
+    h2 { font-size:1.35rem; margin:0 0 6px; } .sub { color:var(--muted); margin:0 0 18px; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+    .card { background:white; width:100%; text-align:left; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 5px 18px #192c4610; display:flex; justify-content:space-between; align-items:center; gap:12px; color:inherit; }
+    .card:hover,.card:focus-visible { border-color:var(--blue); outline-offset:3px; }
+    .card strong { display:block; font-size:1.07rem; } .card small { display:block; color:var(--muted); margin-top:3px; }
+    .arrow { color:var(--blue); font-size:1.35rem; }
+    .days { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; }
+    .day { padding:14px 2px; text-align:center; background:white; border:1px solid var(--line); border-radius:12px; color:var(--ink); }
+    .day[aria-current="true"] { color:white; background:var(--blue); border-color:var(--blue); }
+    .notice { padding:15px 17px; border-radius:14px; background:#fff7ef; border:1px solid #f8ddc4; color:#82512d; margin:16px 0; }
+    .asset { background:white; border:1px solid var(--line); padding:14px; border-radius:12px; margin:10px 0; }
+    .asset img,.asset video { width:100%; display:block; max-height:470px; object-fit:contain; border-radius:8px; background:#f1f3f6; }
+    .asset a { display:inline-block; margin-top:10px; color:var(--blue); font-weight:650; }
+    .footer-note { color:var(--muted); font-size:.82rem; margin-top:28px; }
+    @media(max-width:440px) { .days {grid-template-columns:repeat(5,minmax(0,1fr));} .day{font-size:.85rem;} header{padding:16px;} }
+  </style>
+</head>
+<body>
+<header><small>Nu Comunidad</small><h1>Biblioteca Internacional</h1></header>
+<main id="library" aria-live="polite"></main>
+<script src="/biblioteca-internacional-data.js"></script>
+<script>
+(() => {
+  "use strict";
+  const collections = [
+    { id:"collagen", name:"Collagen+", countries:[{id:"es",label:"España",flag:"🇪🇸"},{id:"it",label:"Italia",flag:"🇮🇹"}] },
+    { id:"lumispa", name:"LumiSpa", countries:[{id:"it",label:"Italia",flag:"🇮🇹"}] }
+  ];
+  const root = document.getElementById("library");
+  const manifest = window.NuInternationalLibraryData || {};
+  const el = (tag, cls, value) => { const n=document.createElement(tag); if(cls)n.className=cls; if(value!==undefined)n.textContent=value; return n; };
+  function card(label,description,action) {
+    const b=el("button","card");b.type="button";
+    const body=el("span");body.append(el("strong","",label),el("small","",description));
+    b.append(body,el("span","arrow","›"));b.addEventListener("click",action);return b;
+  }
+  function go(...parts) { location.hash="#/"+parts.join("/"); }
+  function parse() { return decodeURIComponent(location.hash.replace(/^#\/?/,"")).split("/").filter(Boolean).slice(0,3); }
+  function heading(title,subtitle) { root.append(el("h2","",title),el("p","sub",subtitle)); }
+  function back(label,handler) { const row=el("div","crumb"); const b=el("button","back","← "+label);b.addEventListener("click",handler);row.append(b);root.append(row); }
+  function render() {
+    root.replaceChildren();
+    const [productId,countryId,dayText]=parse();
+    const product=collections.find(x=>x.id===productId);
+    const country=product?.countries.find(x=>x.id===countryId);
+    const day=Number(dayText);
+    if(!product) {
+      root.append(el("p","intro","Materiales organizados para que puedas encontrarlos y compartirlos fácilmente."));
+      heading("Elegí un producto","Seleccioná la colección que necesitás.");
+      const cards=el("div","cards");
+      for(const item of collections)cards.append(card(item.name,item.countries.length+" mercado(s) disponibles",()=>go(item.id)));
+      root.append(cards);return;
+    }
+    back("Productos",()=>go());
+    if(!country) {
+      heading(product.name,"Elegí el país del material.");
+      const cards=el("div","cards");
+      for(const item of product.countries)cards.append(card(item.flag+" "+item.label,"Material organizado en 10 días",()=>go(product.id,item.id)));
+      root.append(cards);return;
+    }
+    back("Países",()=>go(product.id));
+    heading(product.name+" · "+country.flag+" "+country.label,day>=1&&day<=10?"Día "+day+" de 10":"Elegí el día que necesitás. Todos los días se podrán consultar libremente.");
+    const days=el("div","days");
+    for(let n=1;n<=10;n++){const b=el("button","day","Día "+n);b.type="button";b.setAttribute("aria-current",String(n===day));b.addEventListener("click",()=>go(product.id,country.id,n));days.append(b);}
+    root.append(days);
+    if(!(day>=1&&day<=10&&Number.isInteger(day)))return;
+    const key=product.id+"/"+country.id+"/"+day;
+    const entries=Array.isArray(manifest[key])?manifest[key]:[];
+    if(!entries.length){root.append(el("p","notice","Material pendiente de cargar. La estructura está preparada, pero todavía no hay archivos publicados para este día."));return;}
+    for(const item of entries){
+      if(!item||typeof item.src!=="string"||!/^\/(assets\/|api\/bot-assets\/)[a-z0-9_./%-]+$/i.test(item.src)||item.src.includes(".."))continue;
+      const box=el("article","asset");box.append(el("strong","",item.title||"Material"));
+      if(item.type==="image"){const img=el("img");img.src=item.src;img.loading="lazy";img.alt=item.title||"Material visual";box.append(img);}
+      else if(item.type==="video"){const video=el("video");video.src=item.src;video.controls=true;video.preload="metadata";video.playsInline=true;box.append(video);}
+      else continue;
+      const link=el("a","","Abrir o descargar archivo");link.href=item.src;link.target="_blank";link.rel="noopener";box.append(link);root.append(box);
+    }
+    root.append(el("p","footer-note","Los archivos se muestran en el orden definido para este día."));
+  }
+  addEventListener("hashchange",render);render();
+})();
+</script>
+</body>
+</html>
