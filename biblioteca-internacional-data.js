@@ -1,6 +1,6 @@
 // Biblioteca Internacional: carga el catálogo aprobado, sin modificar contenido de Iris.
 window.NuInternationalLibraryData = Object.create(null);
-fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin" })
+fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", cache: "no-store" })
   .then(response => { if (!response.ok) throw new Error("Catálogo no disponible"); return response.json(); })
   .then(catalog => {
     const entries = Object.create(null);
@@ -10,7 +10,8 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin" })
       entries[key] = files.map((file, index) => ({
         title: "Material " + (index + 1),
         type: file.type,
-        src: "/api/international-assets/" + parts[0] + "-" + parts[1] + "/" + parts[2] + "/" + (index + 1)
+        src: "/api/international-assets/" + parts[0] + "-" + parts[1] + "/" + parts[2] + "/" + (index + 1) +
+          (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" : "")
       }));
     }
     window.NuInternationalLibraryData = entries;
