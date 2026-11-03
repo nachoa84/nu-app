@@ -280,10 +280,16 @@
   function prepareInternationalShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
     let pending=null,disposed=false,scheduled=null,playbackUrl=null;
+    // Mantener siempre SVG + texto: textContent sobre el botón borra el icono.
+    const setShareLabel=label=>{
+      const span=control.querySelector("span");
+      if(span)span.textContent=label;
+      else control.textContent=label;
+    };
     const enable=ready=>{
       if(disposed||!control.isConnected)return;
       control.disabled=false;
-      control.textContent="Compartir";
+      setShareLabel("Compartir");
       control.onclick=()=>sharePreparedFile(ready);
     };
     const begin=()=>{
@@ -291,7 +297,7 @@
       const cached=shareReadyFiles.get(key);
       if(cached){enable(cached);return;}
       control.disabled=true;
-      control.textContent="Compartir";
+      setShareLabel("Compartir");
       control.onclick=null;
       const controller=new AbortController();
       const task={controller,promise:readShareFile(item,id,day,index,undefined,controller)};
@@ -307,13 +313,13 @@
         if(disposed||error?.name==="AbortError")return;
         console.warn("No se pudo preparar el material internacional",error);
         control.disabled=false;
-        control.textContent="Reintentar compartir";
+        setShareLabel("Reintentar compartir");
         control.onclick=begin;
       });
     };
-    // Dejar que el Play inicie el stream antes de competir por ancho de banda.
-    if(item.type==="video")scheduled=setTimeout(()=>{scheduled=null;begin();},450);
-    else begin();
+    // En imágenes esperamos a que se vea la imagen antes de descargar para compartir.
+    // En videos damos prioridad al Play, pero también preparamos si no se reproduce.
+    if(item.type==="video")scheduled=setTimeout(()=>{scheduled=null;begin();},1500);
     return {
       playbackSrc(defaultSrc){
         const ready=shareReadyFiles.get(key);
@@ -322,14 +328,22 @@
         return playbackUrl;
       },
       onPlay(){
-        // La preparación sigue en segundo plano mientras se reproduce.
-        // Si la cancelamos aquí, Compartir recién se habilita cuando termina.
+        // Si empieza a reproducir, suspender la descarga duplicada hasta
+        // que el video esté realmente reproduciéndose, no hasta que termine.
+        if(scheduled!==null){clearTimeout(scheduled);scheduled=null;}
+        if(pending&&!shareReadyFiles.has(key)){
+          const task=pending;
+          pending=null;
+          task.controller.abort();
+        }
         if(!shareReadyFiles.has(key)){
           control.disabled=true;
-          control.textContent="Compartir";
+          setShareLabel("Compartir");
           control.onclick=null;
         }
       },
+      onPlaying(){begin();},
+      onDisplayReady(){begin();},
       onPause(){begin();},
       dispose(){
         disposed=true;
