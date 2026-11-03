@@ -4786,9 +4786,17 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     return res.status(404).end();
   }
 
+  // Únicamente el piloto optimizado de Collagen+ día 6 tiene póster estático.
+  const pilotPoster = req.query.poster === "first-frame" &&
+    (req.params.collection === "collagen-es" || req.params.collection === "collagen-it") &&
+    day === 6 && index === 2 && item.filename === "2002.mp4";
+  if (Object.prototype.hasOwnProperty.call(req.query, "poster") && !pilotPoster) {
+    return res.status(404).end();
+  }
+  const assetFilename = pilotPoster ? "2002.jpg" : item.filename;
   const folderNames = [`DIA ${day}`, `DÍA ${day}`];
-  const filenames = [item.filename];
-  if (/\.jpg$/i.test(item.filename)) filenames.push(item.filename.replace(/\.jpg$/i, ".JPG"));
+  const filenames = [assetFilename];
+  if (/\.jpg$/i.test(assetFilename)) filenames.push(assetFilename.replace(/\.jpg$/i, ".JPG"));
   let asset;
   try {
     // Los nombres de las carpetas subidas pueden conservar o perder el acento.
