@@ -15,6 +15,8 @@
   const create=(tag,cls,label)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(label!==undefined)el.textContent=label;return el;};
   const button=(label,click,cls)=>{const el=create("button",cls,label);el.type="button";el.onclick=click;return el;};
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
+  // Piloto acotado antes de migrar el resto de las rutinas internacionales.
+  const canonicalGalleryPilot=(id,day)=>id==="collagen/es"&&day===6;
   const isValid=item=>item&&/^(image|video)$/.test(item.type)&&/^\/api\/international-assets\/[a-z0-9-]+\/\d+\/\d+(?:\?v=[a-z0-9-]+)?$/.test(item.src);
   const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
 
@@ -62,7 +64,7 @@
     if(!files.length){list.append(create("p","nu-il-notice","Cargando materiales…"));return;}
     files.forEach((file,index)=>{
       if(!isValid(file))return;
-      const row=button("",()=>showPreview(id,day,index),"nu-il-media-row");
+      const row=button("",()=>canonicalGalleryPilot(id,day)?showCanonicalGalleryPilot(id,day,index):showPreview(id,day,index),"nu-il-media-row");
       const thumb=create("span","nu-il-thumbnail");
       if(file.type==="image"){
         const img=create("img");img.src=file.src;img.alt="Material "+(index+1);img.loading="lazy";
@@ -95,6 +97,29 @@
     }else start();
     video.addEventListener("loadeddata",()=>{if(video.dataset.nuPlayback!=="active")video.pause();},{once:true});
     return video;
+  }
+  function showCanonicalGalleryPilot(id,day,index){
+    if(typeof window.openMediaPreview!=="function"){
+      showPreview(id,day,index);
+      return;
+    }
+    const files=entries(id,day);
+    const items=files.map((file,position)=>{
+      if(!isValid(file))return null;
+      return {
+        src:file.src,
+        label:"Material "+(position+1),
+        mediaType:file.type,
+        poster:hasPilotPoster(file)?file.poster:undefined,
+        favorite:false,
+        international:true,
+        prepareShare:control=>preparePilotShareFile(file,id,day,position,control),
+        download:()=>download(file,id,day,position)
+      };
+    }).filter(Boolean);
+    if(!items.length)return;
+    const selected=files.slice(0,index).filter(isValid).length;
+    window.openMediaPreview(items,selected,day);
   }
   function showPreview(id,day,index){
     const files=entries(id,day),file=files[index];
@@ -245,6 +270,7 @@
   function preparePilotShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
     let pending=null,playing=false,disposed=false;
+    const playbackUrls=new Set();
     const enable=ready=>{
       if(disposed||!control.isConnected)return;
       control.disabled=false;
@@ -278,6 +304,13 @@
     };
     begin();
     return {
+      playbackSrc(defaultSrc){
+        const ready=pilotShareReadyFiles.get(key);
+        if(!ready)return defaultSrc;
+        const url=URL.createObjectURL(ready);
+        playbackUrls.add(url);
+        return url;
+      },
       onPlay(){
         playing=true;
         if(pending){
@@ -294,6 +327,8 @@
       onPause(){playing=false;begin();},
       dispose(){
         disposed=true;
+        for(const url of playbackUrls)URL.revokeObjectURL(url);
+        playbackUrls.clear();
         if(pending){
           const task=pending;
           pending=null;
@@ -379,6 +414,11 @@
   const style=create("style");
   style.textContent=`
     .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;max-height:min(65dvh,540px);padding-bottom:15px}
+    /* El visor canónico debe quedar por encima de la hoja de selección (z-index 260).
+       Se limita el área visual para conservar un tamaño cómodo en el teléfono. */
+    .media-preview.is-international{z-index:300}
+    .media-preview.is-international .media-preview-stage>img{width:min(88vw,440px);height:min(48dvh,380px);object-fit:contain}
+    .media-preview.is-international .preview-video-shell{position:relative;inset:auto;width:min(88vw,440px);height:min(48dvh,380px)}
     .nu-il-group-heading{margin:16px 10px 8px;color:#33455f;font-size:14px;font-weight:750}
     .nu-il-row{width:100%;margin-bottom:8px}
     .nu-il-chevron{margin-left:auto;color:#3b82f6;font-size:20px;flex-shrink:0}
