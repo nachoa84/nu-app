@@ -76,13 +76,25 @@
       const row=button("",()=>showCanonicalGallery(id,day,index),"nu-il-media-row");
       const thumb=create("span","nu-il-thumbnail");
       if(file.type==="image"){
-        const img=create("img");img.src=file.src;img.alt="Material "+(index+1);img.loading="lazy";
-        img.onerror=()=>thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
+        const img=create("img");
+        img.alt="Material "+(index+1);
+        img.loading="lazy";
+        img.decoding="async";
+        let originalTried=false;
+        img.onerror=()=>{
+          if(!originalTried&&file.thumbSrc){
+            originalTried=true;img.src=file.src;return;
+          }
+          thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
+        };
+        img.src=file.thumbSrc||file.src;
         thumb.append(img);
       }else{
         if(hasStaticPoster(file)){
           const still=create("img");
-          still.src=file.poster;still.alt="Primer fotograma del video";still.loading="lazy";
+          still.alt="Primer fotograma del video";
+          still.loading="lazy";still.decoding="async";
+          still.src=file.poster;
           thumb.append(still);
         }else thumb.append(firstFrame(file.src,"nu-il-video-thumb"));
         thumb.append(create("span","nu-il-play","▶"));
@@ -117,6 +129,8 @@
       if(!isValid(file))return null;
       return {
         src:file.src,
+        displaySrc:file.type==="image"?(file.previewSrc||file.src):undefined,
+        fallbackSrc:file.type==="image"?file.src:undefined,
         label:"Material "+(position+1),
         mediaType:file.type,
         poster:hasStaticPoster(file)?file.poster:undefined,
