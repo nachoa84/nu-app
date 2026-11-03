@@ -34,6 +34,9 @@ function normalizePreviewItem(item) {
   return {
     src: item.src,
     displaySrc: item.mediaType === "video" ? item.src : (item.displaySrc || item.src),
+    fallbackSrc: mediaType === "image" && typeof item.fallbackSrc === "string"
+      ? item.fallbackSrc
+      : null,
     label: item.label || "Material",
     mediaType,
     poster: mediaType === "video"
@@ -364,7 +367,17 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       finishPreviewLoad();
       activePreviewCustomShare?.onDisplayReady?.();
     }, { once: true });
-    media.addEventListener("error", failPreviewLoad, { once: true });
+    let originalFallbackUsed = false;
+    media.addEventListener("error", () => {
+      if (!originalFallbackUsed &&
+          item.fallbackSrc &&
+          media.getAttribute("src") !== item.fallbackSrc) {
+        originalFallbackUsed = true;
+        media.src = item.fallbackSrc;
+        return;
+      }
+      failPreviewLoad();
+    });
     media.src = item.displaySrc;
     stage.appendChild(media);
 
