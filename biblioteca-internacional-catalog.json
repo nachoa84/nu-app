@@ -23,7 +23,7 @@
   ],
   "collagen/es/2": [
     {
-      "filename": "1.mov",
+      "filename": "1.mp4",
       "type": "video"
     },
     {
@@ -115,7 +115,7 @@
       "type": "image"
     },
     {
-      "filename": "2.mov",
+      "filename": "2.mp4",
       "type": "video"
     },
     {
@@ -177,7 +177,7 @@
       "type": "image"
     },
     {
-      "filename": "2.mov",
+      "filename": "2.mp4",
       "type": "video"
     },
     {
@@ -327,7 +327,7 @@
       "type": "image"
     },
     {
-      "filename": "2.mov",
+      "filename": "2.mp4",
       "type": "video"
     },
     {
@@ -533,19 +533,19 @@
   ],
   "lumispa/it/7": [
     {
-      "filename": "1.mov",
+      "filename": "1.mp4",
       "type": "video"
     },
     {
-      "filename": "2.mov",
+      "filename": "2.mp4",
       "type": "video"
     },
     {
-      "filename": "3.mov",
+      "filename": "3.mp4",
       "type": "video"
     },
     {
-      "filename": "4.mov",
+      "filename": "4.mp4",
       "type": "video"
     }
   ],
