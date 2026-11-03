@@ -378,7 +378,7 @@
   },true);
   const style=create("style");
   style.textContent=`
-    .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;height:min(68dvh,580px)!important;max-height:min(68dvh,580px)!important;padding-bottom:15px}
+    .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;max-height:min(65dvh,540px);padding-bottom:15px}
     .nu-il-group-heading{margin:16px 10px 8px;color:#33455f;font-size:14px;font-weight:750}
     .nu-il-row{width:100%;margin-bottom:8px}
     .nu-il-chevron{margin-left:auto;color:#3b82f6;font-size:20px;flex-shrink:0}
