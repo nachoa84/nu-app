@@ -92,14 +92,19 @@
       img.onerror=()=>stage.replaceChildren(create("p","nu-il-error","No se pudo cargar esta imagen."));
       stage.append(img);
     }else{
+      const media=create("div","nu-il-video-shell");
       const video=firstFrame(file.src,"nu-il-video-stage");
       video.onerror=()=>stage.append(create("p","nu-il-error","El dispositivo no puede previsualizar este formato."));
-      stage.append(video);
-      const play=button("▶ Reproducir video",()=>{
-        play.remove();video.controls=true;video.preload="auto";
+      const play=button("▶",()=>{
+        play.remove();
+        if(!video.getAttribute("src"))video.src=file.src+"#t=0.001";
+        video.controls=true;video.preload="auto";
         video.play().catch(()=>{stage.append(create("p","nu-il-error","No se pudo reproducir este formato de video."));});
-      },"nu-il-play-button");
-      stage.append(play);
+      },"nu-il-play-overlay");
+      play.setAttribute("aria-label","Reproducir video");
+      play.title="Reproducir video";
+      media.append(video,play);
+      stage.append(media);
     }
     list.append(stage);
     const nav=create("div","nu-il-action-row");
@@ -221,9 +226,10 @@
     .nu-il-media-row{width:100%;display:flex;align-items:center;gap:12px;border:1px solid #e7edf5;background:#fff;border-radius:14px;padding:10px;margin:8px 0;text-align:left;color:inherit;cursor:pointer}
     .nu-il-thumbnail{width:60px;height:60px;border-radius:9px;background:#eef4fd;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
     .nu-il-thumbnail img,.nu-il-thumbnail video{width:100%;height:100%;object-fit:cover}.nu-il-play{color:#3377d8;font-size:22px}
-    .nu-il-thumbnail{position:relative}.nu-il-thumbnail .nu-il-play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;text-shadow:0 1px 5px #222}
+    .nu-il-thumbnail{position:relative}.nu-il-thumbnail .nu-il-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.95);color:#2869d5;font:700 13px system-ui;text-shadow:none;pointer-events:none}
     .nu-il-video-stage{display:block;width:100%;max-height:42dvh;object-fit:contain}
-    .nu-il-play-button{background:#2869d5;color:#fff;border:0;border-radius:10px;min-height:42px;padding:10px 16px;margin:10px auto;cursor:pointer}
+    .nu-il-video-shell{position:relative;width:100%;max-height:42dvh;display:grid;place-items:center}
+    .nu-il-play-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;display:grid;place-items:center;width:48px;height:48px;border:1px solid #e3eaf4;border-radius:50%;padding:0;background:rgba(255,255,255,.96);color:#2869d5;font:700 20px system-ui;cursor:pointer}
     .nu-il-media-copy{flex:1;display:grid;gap:3px}.nu-il-media-copy strong{font-size:13px}.nu-il-media-copy small{font-size:12px;color:#738094}
     .nu-il-stage{background:#edf2f8;border-radius:12px;overflow:hidden;min-height:180px;display:grid;place-items:center}
     .nu-il-stage img,.nu-il-stage video{width:100%;max-height:42dvh;object-fit:contain;display:block}
