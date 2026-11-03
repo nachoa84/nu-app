@@ -4786,14 +4786,16 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     return res.status(404).end();
   }
 
-  // Únicamente el piloto optimizado de Collagen+ día 6 tiene póster estático.
-  const pilotPoster = req.query.poster === "first-frame" &&
-    (req.params.collection === "collagen-es" || req.params.collection === "collagen-it") &&
-    day === 6 && index === 2 && item.filename === "2002.mp4";
-  if (Object.prototype.hasOwnProperty.call(req.query, "poster") && !pilotPoster) {
-    return res.status(404).end();
-  }
-  const assetFilename = pilotPoster ? "2002.jpg" : item.filename;
+  // Los 55 JPG del lote verificado se derivan exclusivamente del MP4
+  // aprobado para cada índice; nunca se expone un nombre arbitrario de Storage.
+  const posterRequested = Object.prototype.hasOwnProperty.call(req.query, "poster");
+  const validPoster = posterRequested &&
+    req.query.poster === "first-frame" &&
+    item.type === "video" && /^[0-9]+\.mp4$/i.test(item.filename);
+  if (posterRequested && !validPoster) return res.status(404).end();
+  const assetFilename = validPoster
+    ? item.filename.replace(/\.mp4$/i, ".jpg")
+    : item.filename;
   const folderNames = [`DIA ${day}`, `DÍA ${day}`];
   const filenames = [assetFilename];
   if (/\.jpg$/i.test(assetFilename)) filenames.push(assetFilename.replace(/\.jpg$/i, ".JPG"));
