@@ -4786,16 +4786,25 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     return res.status(404).end();
   }
 
-  // Los 55 JPG del lote verificado se derivan exclusivamente del MP4
-  // aprobado para cada índice; nunca se expone un nombre arbitrario de Storage.
+  // Variantes verificadas: 55 posters y 82 pares preview/thumbnail.
+  // Los nombres siempre se derivan del catálogo aprobado.
   const posterRequested = Object.prototype.hasOwnProperty.call(req.query, "poster");
+  const variantRequested = Object.prototype.hasOwnProperty.call(req.query, "variant");
+  if (posterRequested && variantRequested) return res.status(404).end();
   const validPoster = posterRequested &&
     req.query.poster === "first-frame" &&
     item.type === "video" && /^[0-9]+\.mp4$/i.test(item.filename);
-  if (posterRequested && !validPoster) return res.status(404).end();
+  const validVariant = variantRequested &&
+    (req.query.variant === "preview" || req.query.variant === "thumb") &&
+    item.type === "image" && /^[0-9]+\.jpg$/i.test(item.filename);
+  if ((posterRequested && !validPoster) || (variantRequested && !validVariant)) {
+    return res.status(404).end();
+  }
   const assetFilename = validPoster
     ? item.filename.replace(/\.mp4$/i, ".jpg")
-    : item.filename;
+    : validVariant
+      ? item.filename.replace(/\.jpg$/i, "." + req.query.variant + ".jpg")
+      : item.filename;
   const folderNames = [`DIA ${day}`, `DÍA ${day}`];
   const filenames = [assetFilename];
   if (/\.jpg$/i.test(assetFilename)) filenames.push(assetFilename.replace(/\.jpg$/i, ".JPG"));
@@ -4815,7 +4824,10 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     if (!asset) return res.status(404).end();
 
     const { file, totalSize, contentType, etag } = asset;
-    const headers = { "Accept-Ranges": "bytes", "Cache-Control": "public, max-age=86400", "Content-Type": contentType };
+    const cacheControl = validPoster || validVariant
+      ? "public, max-age=31536000, immutable"
+      : "public, max-age=86400";
+    const headers = { "Accept-Ranges": "bytes", "Cache-Control": cacheControl, "Content-Type": contentType };
     if (etag) headers.ETag = etag;
     res.set(headers);
     if (shouldReturnNotModifiedV114(req, etag)) return res.status(304).end();
