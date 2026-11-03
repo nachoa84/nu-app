@@ -271,8 +271,9 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       video.playsInline = true;
       video.setAttribute("playsinline", "");
       video.setAttribute("webkit-playsinline", "");
-      // La fuente recién se agrega por este gesto; priorizar el inicio real.
-      video.preload = "auto";
+      // Mantener el comportamiento probado de las rutinas originales.
+      // play() inicia la carga tras el gesto, sin sugerir descarga completa.
+      video.preload = "none";
       video.draggable = false;
       video.setAttribute("draggable", "false");
       video.src = activePreviewCustomShare?.playbackSrc?.(item.src) || item.src;
