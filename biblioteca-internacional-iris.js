@@ -71,14 +71,14 @@
     const video=create("video",cls);
     video.muted=true;video.playsInline=true;video.preload="metadata";
     video.autoplay=false;video.loop=false;video.controls=false;
-    const start=()=>{video.src=src+"#t=0.001";};
+    const start=()=>{if(video.dataset.nuPlayback!=="active"&&!video.getAttribute("src"))video.src=src+"#t=0.001";};
     if(typeof IntersectionObserver!=="undefined"){
       const observer=new IntersectionObserver(items=>{
         if(items.some(item=>item.isIntersecting)){observer.disconnect();start();}
       },{rootMargin:"120px"});
       observer.observe(video);
     }else start();
-    video.addEventListener("loadeddata",()=>video.pause(),{once:true});
+    video.addEventListener("loadeddata",()=>{if(video.dataset.nuPlayback!=="active")video.pause();},{once:true});
     return video;
   }
   function showPreview(id,day,index){
@@ -94,15 +94,37 @@
     }else{
       const media=create("div","nu-il-video-shell");
       const video=firstFrame(file.src,"nu-il-video-stage");
-      video.onerror=()=>stage.append(create("p","nu-il-error","El dispositivo no puede previsualizar este formato."));
+      let starting=false;
+      const showPlaybackError=message=>{
+        let notice=stage.querySelector(".nu-il-video-error");
+        if(!notice){notice=create("p","nu-il-error nu-il-video-error");stage.append(notice);}
+        notice.textContent=message;
+      };
+      video.onerror=()=>showPlaybackError("No se pudo cargar el video. Probá nuevamente.");
       const play=button("▶",()=>{
-        play.remove();
-        if(!video.getAttribute("src"))video.src=file.src+"#t=0.001";
-        video.controls=true;video.preload="auto";
-        video.play().catch(()=>{stage.append(create("p","nu-il-error","No se pudo reproducir este formato de video."));});
+        if(starting)return;
+        starting=true;
+        // Reproducción real: fuente completa sin fragmento, sonido y sin
+        // pausa automática del primer fotograma ni controles nativos superpuestos.
+        video.dataset.nuPlayback="active";
+        video.muted=false;video.controls=false;video.preload="auto";
+        if(video.getAttribute("src")!==file.src)video.src=file.src;
+        const notice=stage.querySelector(".nu-il-video-error");
+        if(notice)notice.remove();
+        Promise.resolve(video.play()).then(()=>{
+          starting=false;
+          play.style.visibility="hidden";
+        }).catch(error=>{
+          starting=false;
+          play.style.visibility="visible";
+          console.warn("No se pudo iniciar el video internacional",error);
+          showPlaybackError("No se pudo iniciar el video. Probá nuevamente.");
+        });
       },"nu-il-play-overlay");
       play.setAttribute("aria-label","Reproducir video");
       play.title="Reproducir video";
+      video.addEventListener("ended",()=>{video.dataset.nuPlayback="";play.style.visibility="visible";});
+      video.addEventListener("click",()=>{if(!video.paused){video.pause();play.style.visibility="visible";}});
       media.append(video,play);
       stage.append(media);
     }
@@ -229,7 +251,8 @@
     .nu-il-thumbnail{position:relative}.nu-il-thumbnail .nu-il-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.95);color:#2869d5;font:700 13px system-ui;text-shadow:none;pointer-events:none}
     .nu-il-video-stage{display:block;width:100%;max-height:42dvh;object-fit:contain}
     .nu-il-video-shell{position:relative;width:100%;max-height:42dvh;display:grid;place-items:center}
-    .nu-il-play-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;display:grid;place-items:center;width:48px;height:48px;border:1px solid #e3eaf4;border-radius:50%;padding:0;background:rgba(255,255,255,.96);color:#2869d5;font:700 20px system-ui;cursor:pointer}
+    .nu-il-play-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)!important;z-index:1;display:grid;place-items:center;width:48px;height:48px;border:1px solid #e3eaf4;border-radius:50%;padding:0;background:rgba(255,255,255,.96);color:#2869d5;font:700 20px system-ui;cursor:pointer;transition:none!important;animation:none!important;box-shadow:none!important}
+    .nu-il-play-overlay:active,.nu-il-play-overlay:hover,.nu-il-play-overlay:focus{transform:translate(-50%,-50%)!important;transition:none!important;animation:none!important;box-shadow:none!important}
     .nu-il-media-copy{flex:1;display:grid;gap:3px}.nu-il-media-copy strong{font-size:13px}.nu-il-media-copy small{font-size:12px;color:#738094}
     .nu-il-stage{background:#edf2f8;border-radius:12px;overflow:hidden;min-height:180px;display:grid;place-items:center}
     .nu-il-stage img,.nu-il-stage video{width:100%;max-height:42dvh;object-fit:contain;display:block}
