@@ -86,13 +86,50 @@
     next.disabled=index===files.length-1;
     nav.append(previous,next);list.append(nav);
     const actions=create("div","nu-il-action-row");
-    const share=button("Compartir",null,"nu-il-action nu-il-primary");
-    share.onclick=()=>{
-      if(typeof shareAsset==="function")shareAsset(file.src,"Material "+(index+1),file.type,share);
-      else alert("Compartir no está disponible en esta vista.");
-    };
+    const share=button("Preparando…",null,"nu-il-action nu-il-primary");
+    share.disabled=true;
+    prepareShareFile(file,id,day,index,share);
     actions.append(share,button("Descargar",()=>download(file,id,day,index),"nu-il-action"));
     list.append(actions);
+  }
+  const preparedShareFiles=new Map();
+  function prepareShareFile(item,id,day,index,control){
+    const key=id+"/"+day+"/"+index;
+    if(!preparedShareFiles.has(key)){
+      const task=(async()=>{
+        const response=await fetch(item.src);
+        if(!response.ok)throw Error("HTTP "+response.status);
+        const blob=await response.blob();
+        const mime=blob.type||(item.type==="video"?"video/mp4":"image/jpeg");
+        const ext=item.type==="video"?(mime.includes("quicktime")?"mov":"mp4"):
+          mime.includes("png")?"png":"jpg";
+        return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type:mime});
+      })();
+      preparedShareFiles.set(key,task);
+      task.catch(()=>preparedShareFiles.delete(key));
+    }
+    preparedShareFiles.get(key).then(prepared=>{
+      if(!control.isConnected)return;
+      control.disabled=false;control.textContent="Compartir";
+      control.onclick=()=>sharePreparedFile(prepared);
+    }).catch(()=>{
+      if(!control.isConnected)return;
+      control.disabled=false;control.textContent="Reintentar";
+      control.onclick=()=>prepareShareFile(item,id,day,index,control);
+    });
+  }
+  function sharePreparedFile(file){
+    if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[file]})){
+      alert("Este navegador no admite compartir este formato. Podés usar Descargar para guardar el archivo.");
+      return;
+    }
+    const showError=error=>{
+      if(error?.name==="AbortError")return;
+      console.warn("No se pudo compartir el material internacional",error);
+      alert("No se pudo abrir el menú de compartir ("+(error?.name||"error")+"). El archivo no se descargó.");
+    };
+    try{Promise.resolve(navigator.share({files:[file]})).catch(showError);}
+    catch(error){showError(error);}
   }
   async function download(file,id,day,index){
     try{
