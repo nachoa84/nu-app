@@ -312,12 +312,9 @@
         return url;
       },
       onPlay(){
+        // La preparación sigue en segundo plano mientras se reproduce.
+        // Si la cancelamos aquí, Compartir recién se habilita cuando termina.
         playing=true;
-        if(pending){
-          const task=pending;
-          pending=null;
-          task.controller.abort();
-        }
         if(!pilotShareReadyFiles.has(key)){
           control.disabled=true;
           control.textContent="Compartir";
