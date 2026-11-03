@@ -5,6 +5,14 @@
 
 let previewState = { items: [], index: 0, day: 1 };
 let activePreviewVideo = null;
+// Extensión opcional: permite compartir archivos internacionales ya preparados
+// sin alterar el comportamiento de las rutinas originales.
+let activePreviewCustomShare = null;
+function disposeActivePreviewCustomShare() {
+  const lifecycle = activePreviewCustomShare;
+  activePreviewCustomShare = null;
+  try { lifecycle?.dispose?.(); } catch (error) { console.warn("No se pudo liberar el material", error); }
+}
 
 // NU APP · HISTORIAL DEL VISOR V105
 // El gesto Atrás de Android/iPhone cierra primero el visor sin salir de la PWA.
@@ -32,6 +40,9 @@ function normalizePreviewItem(item) {
       : null,
     favorite: item.favorite !== false,
     shareable: item.shareable !== false,
+    prepareShare: typeof item.prepareShare === "function" ? item.prepareShare : null,
+    download: typeof item.download === "function" ? item.download : null,
+    international: item.international === true,
     url: item.url || null
   };
 }
@@ -92,8 +103,9 @@ function closeMediaPreview(direction = "right") {
     window.history.back();
   }
 
-  // Cortamos reproducción/red inmediatamente al cerrar el visor.
+  // Cortamos las preparaciones de compartir y la reproducción al cerrar.
   destroyActivePreviewVideo();
+  disposeActivePreviewCustomShare();
 
   // Invalida callbacks de carga de la story que se está cerrando.
   previewRenderToken += 1;
@@ -110,7 +122,7 @@ function closeMediaPreview(direction = "right") {
   setTimeout(() => {
     modal.hidden = true;
     modal.setAttribute("aria-hidden", "true");
-    modal.classList.remove("is-closing");
+    modal.classList.remove("is-closing", "is-international");
     document.body.classList.remove("preview-open");
     document.getElementById("previewStage").innerHTML = "";
     if (shell) {
@@ -156,8 +168,9 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   title.textContent = item.label;
   type.textContent = item.mediaType === "video" ? "Video" : "Imagen";
 
-  // Destruir completamente cualquier reproductor de la story anterior.
+  // Liberar también cualquier preparación del archivo de la story anterior.
   destroyActivePreviewVideo();
+  disposeActivePreviewCustomShare();
 
   stage.classList.remove(
     "preview-enter-left",
@@ -247,6 +260,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
       // IMPORTANTE: crear, insertar y llamar play() dentro del mismo gesto.
       // No hay await/fetch antes de play().
+      activePreviewCustomShare?.onPlay?.();
       const video = document.createElement("video");
       video.className = "preview-video-media";
       video.controls = false;
@@ -256,7 +270,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       video.preload = "none";
       video.draggable = false;
       video.setAttribute("draggable", "false");
-      video.src = item.src;
+      video.src = activePreviewCustomShare?.playbackSrc?.(item.src) || item.src;
 
       activePreviewVideo = video;
       shell.insertBefore(video, shell.firstChild);
@@ -284,6 +298,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
         }
 
         failureHandled = true;
+        activePreviewCustomShare?.onPause?.();
         disposePreviewVideoElement(video);
         shell.classList.add("is-error");
         restoreReadyState();
@@ -311,8 +326,13 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       video.addEventListener("ended", () => {
         if (video.dataset.previewDisposed === "1") return;
 
+        activePreviewCustomShare?.onPause?.();
         disposePreviewVideoElement(video);
         restoreReadyState();
+      });
+
+      video.addEventListener("pause", () => {
+        if (video.dataset.previewDisposed !== "1" && !video.ended) activePreviewCustomShare?.onPause?.();
       });
 
       video.addEventListener("error", () => {
@@ -359,7 +379,8 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
   warmPreviewNeighbors();
 
-  const saved = isFavorite(item.src, previewState.day);
+  const saved = item.favorite && isFavorite(item.src, previewState.day);
+  save.style.display = item.favorite ? "" : "none";
   saveTop.hidden = true;
   saveTop.setAttribute("aria-hidden", "true");
   save.dataset.favoriteSrc = item.src;
@@ -383,7 +404,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   };
 
   saveTop.onclick = null;
-  save.onclick = toggleFavorite;
+  save.onclick = item.favorite ? toggleFavorite : null;
 
   if (favoritePulse && !prefersReducedMotion()) {
     save.classList.add("favorite-pop");
@@ -393,8 +414,29 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   }
 
   share.hidden = !item.shareable;
+  share.style.display = item.shareable ? "" : "none";
+  share.disabled = false;
   share.innerHTML = `${ICONS.share}<span>Compartir</span>`;
-  share.onclick = () => shareAsset(item.src, item.label, item.mediaType, share);
+  share.onclick = item.prepareShare ? null : () => shareAsset(item.src, item.label, item.mediaType, share);
+  if (item.prepareShare) {
+    share.disabled = true;
+    try { activePreviewCustomShare = item.prepareShare(share) || null; }
+    catch (error) { console.warn("No se pudo preparar Compartir", error); share.textContent = "Compartir no disponible"; }
+  }
+
+  // Solo Biblioteca Internacional: reemplaza Guardar por una descarga explícita.
+  let downloadButton = document.getElementById("previewDownloadBtn");
+  if (item.download && !downloadButton) {
+    downloadButton = document.createElement("button");
+    downloadButton.id = "previewDownloadBtn";
+    downloadButton.type = "button";
+    document.querySelector(".media-preview-actions")?.append(downloadButton);
+  }
+  if (downloadButton) {
+    downloadButton.style.display = item.download ? "" : "none";
+    downloadButton.textContent = "Descargar";
+    downloadButton.onclick = item.download || null;
+  }
 
   prev.innerHTML = ICONS.back;
   next.innerHTML = ICONS.arrow;
@@ -515,6 +557,7 @@ function openMediaPreview(items, index = 0, day = selectedDay) {
   previewRenderToken += 1;
   previewNeighborCache.clear();
 
+  modal?.classList.toggle("is-international", normalized[0]?.international === true);
   previewState = {
     items: normalized,
     index: Math.min(Math.max(index, 0), normalized.length - 1),
