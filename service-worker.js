@@ -1,4 +1,4 @@
-const CACHE="nuapp-v174-content-notifications-off";
+const CACHE="nuapp-v175-media-http-cache-pilot";
 
 const CORE=[
   "./product-routine-config.js?v=5",
@@ -144,6 +144,9 @@ const CORE=[
 ];
 
 self.addEventListener("install",event=>{
+  // Preview siempre consulta el código en red: precachear más de cien
+  // recursos aquí solo compite con la carga de medios durante las pruebas.
+  if (self.location.hostname.endsWith("replit.dev")) return;
   event.waitUntil(
     caches.open(CACHE)
       .then(async cache=>{
@@ -319,8 +322,23 @@ self.addEventListener("fetch",event=>{
     requestUrl.origin === self.location.origin &&
     requestUrl.pathname.startsWith("/api/");
 
-  // El estado del usuario, progreso, configuración y demás respuestas API
-  // siempre vienen del servidor. Nunca deben persistirse en Cache Storage.
+  // Los archivos de las rutinas son públicos y el servidor declara su
+  // Cache-Control. Dejar al navegador usar su caché HTTP, sin almacenar MP4
+  // completos en Cache Storage ni alterar pedidos Range (206 Partial Content).
+  const isRoutineMediaApi =
+    isSameOriginApi &&
+    (
+      requestUrl.pathname.startsWith("/api/routine-assets/") ||
+      requestUrl.pathname.startsWith("/api/international-assets/")
+    );
+
+  if (isRoutineMediaApi && !req.headers.has("Authorization")) {
+    event.respondWith(fetch(req));
+    return;
+  }
+
+  // Usuario, progreso y demás API dinámicas siguen siempre desde servidor.
+  // Nunca deben persistirse en la caché del navegador.
   if (isSameOriginApi) {
     event.respondWith(fetch(req, { cache: "no-store" }));
     return;
