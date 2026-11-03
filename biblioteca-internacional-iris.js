@@ -57,11 +57,29 @@
         const img=create("img");img.src=file.src;img.alt="Material "+(index+1);img.loading="lazy";
         img.onerror=()=>thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
         thumb.append(img);
-      }else thumb.append(create("span","nu-il-play","▶"));
+      }else{
+        const still=firstFrame(file.src,"nu-il-video-thumb");
+        thumb.append(still,create("span","nu-il-play","▶"));
+      }
       const copy=create("span","nu-il-media-copy");
       copy.append(create("strong","","Material "+(index+1)),create("small","",file.type==="video"?"Video":"Imagen"));
       row.append(thumb,copy,create("span","nu-il-chevron","›"));list.append(row);
     });
+  }
+  function firstFrame(src,cls){
+    // Vista de primer fotograma: solo se solicita metadata/fragmento inicial.
+    const video=create("video",cls);
+    video.muted=true;video.playsInline=true;video.preload="metadata";
+    video.autoplay=false;video.loop=false;video.controls=false;
+    const start=()=>{video.src=src+"#t=0.001";};
+    if(typeof IntersectionObserver!=="undefined"){
+      const observer=new IntersectionObserver(items=>{
+        if(items.some(item=>item.isIntersecting)){observer.disconnect();start();}
+      },{rootMargin:"120px"});
+      observer.observe(video);
+    }else start();
+    video.addEventListener("loadeddata",()=>video.pause(),{once:true});
+    return video;
   }
   function showPreview(id,day,index){
     const files=entries(id,day),file=files[index];
@@ -74,9 +92,14 @@
       img.onerror=()=>stage.replaceChildren(create("p","nu-il-error","No se pudo cargar esta imagen."));
       stage.append(img);
     }else{
-      const video=create("video");video.src=file.src;video.controls=true;video.playsInline=true;video.preload="none";
-      video.onerror=()=>stage.append(create("p","nu-il-error","No se pudo reproducir este video."));
+      const video=firstFrame(file.src,"nu-il-video-stage");
+      video.onerror=()=>stage.append(create("p","nu-il-error","El dispositivo no puede previsualizar este formato."));
       stage.append(video);
+      const play=button("▶ Reproducir video",()=>{
+        play.remove();video.controls=true;video.preload="auto";
+        video.play().catch(()=>{stage.append(create("p","nu-il-error","No se pudo reproducir este formato de video."));});
+      },"nu-il-play-button");
+      stage.append(play);
     }
     list.append(stage);
     const nav=create("div","nu-il-action-row");
@@ -129,14 +152,9 @@
   function prepareShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
     control.disabled=true;
-    control.textContent="Preparando…";
+    control.textContent="Compartir";
     if(!preparedShareFiles.has(key)){
-      const task=readShareFile(item,id,day,index,(percentage,bytes)=>{
-        if(!control.isConnected)return;
-        control.textContent=percentage===null?
-          "Cargando "+(bytes/1048576).toFixed(1)+" MB…":
-          "Cargando "+percentage+"%…";
-      });
+      const task=readShareFile(item,id,day,index);
       preparedShareFiles.set(key,task);
       task.catch(()=>preparedShareFiles.delete(key));
     }
@@ -202,7 +220,10 @@
     .nu-il-day{border:1px solid #e6edf6;background:#fff;border-radius:13px;min-height:48px;color:#3565c4;font:600 14px system-ui;cursor:pointer}
     .nu-il-media-row{width:100%;display:flex;align-items:center;gap:12px;border:1px solid #e7edf5;background:#fff;border-radius:14px;padding:10px;margin:8px 0;text-align:left;color:inherit;cursor:pointer}
     .nu-il-thumbnail{width:60px;height:60px;border-radius:9px;background:#eef4fd;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
-    .nu-il-thumbnail img{width:100%;height:100%;object-fit:cover}.nu-il-play{color:#3377d8;font-size:22px}
+    .nu-il-thumbnail img,.nu-il-thumbnail video{width:100%;height:100%;object-fit:cover}.nu-il-play{color:#3377d8;font-size:22px}
+    .nu-il-thumbnail{position:relative}.nu-il-thumbnail .nu-il-play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;text-shadow:0 1px 5px #222}
+    .nu-il-video-stage{display:block;width:100%;max-height:42dvh;object-fit:contain}
+    .nu-il-play-button{background:#2869d5;color:#fff;border:0;border-radius:10px;min-height:42px;padding:10px 16px;margin:10px auto;cursor:pointer}
     .nu-il-media-copy{flex:1;display:grid;gap:3px}.nu-il-media-copy strong{font-size:13px}.nu-il-media-copy small{font-size:12px;color:#738094}
     .nu-il-stage{background:#edf2f8;border-radius:12px;overflow:hidden;min-height:180px;display:grid;place-items:center}
     .nu-il-stage img,.nu-il-stage video{width:100%;max-height:42dvh;object-fit:contain;display:block}
