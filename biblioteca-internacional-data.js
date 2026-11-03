@@ -15,6 +15,8 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
       "lumispa/it/7/3",
       "lumispa/it/7/4"
     ]);
+    // Variantes 720p verificadas, exclusivas del piloto de día 6.
+    const optimizedDay6 = new Set(["collagen/es/6/2", "collagen/it/6/2"]);
     for (const [key, files] of Object.entries(catalog)) {
       const parts = key.split("/");
       if (parts.length !== 3 || !Array.isArray(files)) continue;
@@ -23,6 +25,7 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
         type: file.type,
         src: "/api/international-assets/" + parts[0] + "-" + parts[1] + "/" + parts[2] + "/" + (index + 1) +
           (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
+            optimizedDay6.has(key + "/" + (index + 1)) ? "?v=day6-mobile-optimized-1" :
             convertedMovBatch.has(key + "/" + (index + 1)) ? "?v=international-mov-mp4-batch-1" : "")
       }));
     }
