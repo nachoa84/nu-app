@@ -33,6 +33,13 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
           // Miniaturas JPEG verificadas para los 55 MP4 internacionales.
           poster: file.type === "video"
             ? assetPath + "?poster=first-frame&v=international-posters-55-1"
+            : undefined,
+          // 82 JPG originales intactos: la UI solo recibe versiones visuales livianas.
+          previewSrc: file.type === "image"
+            ? assetPath + "?variant=preview&v=international-images-82-1"
+            : undefined,
+          thumbSrc: file.type === "image"
+            ? assetPath + "?variant=thumb&v=international-images-82-1"
             : undefined
         };
       });
