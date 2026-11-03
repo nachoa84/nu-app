@@ -6,6 +6,12 @@
     {name:"Italia",flag:"🇮🇹",items:[["collagen/it","Collagen+"],["lumispa/it","Lumi"]]}
   ];
   let sheet=null,returnToProducts=null;
+  let disposePilotPreview=null,pilotCloseObserver=null;
+  const pilotShareReadyFiles=new Map();
+  const hasPilotPoster=item=>item?.type==="video"&&(
+    item.poster==="/api/international-assets/collagen-es/6/2?poster=first-frame&v=day6-poster-1"||
+    item.poster==="/api/international-assets/collagen-it/6/2?poster=first-frame&v=day6-poster-1"
+  );
   const create=(tag,cls,label)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(label!==undefined)el.textContent=label;return el;};
   const button=(label,click,cls)=>{const el=create("button",cls,label);el.type="button";el.onclick=click;return el;};
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
@@ -13,6 +19,11 @@
   const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
 
   function frame(heading,subtitle,back){
+    if(disposePilotPreview){
+      const dispose=disposePilotPreview;
+      disposePilotPreview=null;
+      dispose();
+    }
     if(!sheet?.isConnected)return null;
     const list=sheet.querySelector(".bot-quick-access-list");
     const backButton=sheet.querySelector(".bot-quick-access-back");
@@ -58,8 +69,12 @@
         img.onerror=()=>thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
         thumb.append(img);
       }else{
-        const still=firstFrame(file.src,"nu-il-video-thumb");
-        thumb.append(still,create("span","nu-il-play","▶"));
+        if(hasPilotPoster(file)){
+          const still=create("img");
+          still.src=file.poster;still.alt="Primer fotograma del video";still.loading="lazy";
+          thumb.append(still);
+        }else thumb.append(firstFrame(file.src,"nu-il-video-thumb"));
+        thumb.append(create("span","nu-il-play","▶"));
       }
       const copy=create("span","nu-il-media-copy");
       copy.append(create("strong","","Material "+(index+1)),create("small","",file.type==="video"?"Video":"Imagen"));
@@ -87,13 +102,28 @@
     const list=frame("Material "+(index+1)+" de "+files.length,title(id)+" · Día "+day,()=>showDay(id,day));
     if(!list)return;
     const stage=create("div","nu-il-stage");
+    const pilot=hasPilotPoster(file);
+    let pilotVideo=null,pilotVideoObjectUrl=null,pilotShareLifecycle=null;
     if(file.type==="image"){
       const img=create("img");img.src=file.src;img.alt="Material "+(index+1);
       img.onerror=()=>stage.replaceChildren(create("p","nu-il-error","No se pudo cargar esta imagen."));
       stage.append(img);
     }else{
       const media=create("div","nu-il-video-shell");
-      const video=firstFrame(file.src,"nu-il-video-stage");
+      const video=pilot?create("video","nu-il-video-stage"):firstFrame(file.src,"nu-il-video-stage");
+      if(pilot){
+        // Miniatura JPG fija: el MP4 no se solicita hasta que se presiona Play.
+        video.poster=file.poster;
+        video.preload="none";
+        video.playsInline=true;
+        video.controls=false;
+        pilotVideo=video;
+      }
+      const posterImage=pilot?create("img","nu-il-video-poster"):null;
+      if(posterImage){
+        posterImage.src=file.poster;
+        posterImage.alt="Primer fotograma";
+      }
       let starting=false;
       const showPlaybackError=message=>{
         let notice=stage.querySelector(".nu-il-video-error");
@@ -107,8 +137,20 @@
         // Reproducción real: fuente completa sin fragmento, sonido y sin
         // pausa automática del primer fotograma ni controles nativos superpuestos.
         video.dataset.nuPlayback="active";
-        video.muted=false;video.controls=false;video.preload="auto";
-        if(video.getAttribute("src")!==file.src)video.src=file.src;
+        video.muted=false;video.controls=false;
+        if(pilot){
+          pilotShareLifecycle?.onPlay();
+          if(!video.getAttribute("src")){
+            const ready=pilotShareReadyFiles.get(id+"/"+day+"/"+index);
+            if(ready){
+              pilotVideoObjectUrl=URL.createObjectURL(ready);
+              video.src=pilotVideoObjectUrl;
+            }else video.src=file.src;
+          }
+        }else{
+          video.preload="auto";
+          if(video.getAttribute("src")!==file.src)video.src=file.src;
+        }
         const notice=stage.querySelector(".nu-il-video-error");
         if(notice)notice.remove();
         Promise.resolve(video.play()).then(()=>{
@@ -119,12 +161,26 @@
           play.style.visibility="visible";
           console.warn("No se pudo iniciar el video internacional",error);
           showPlaybackError("No se pudo iniciar el video. Probá nuevamente.");
+          if(pilot)pilotShareLifecycle?.onPause();
         });
       },"nu-il-play-overlay");
       play.setAttribute("aria-label","Reproducir video");
-      video.addEventListener("ended",()=>{video.dataset.nuPlayback="";play.style.visibility="visible";});
+      if(posterImage)video.addEventListener("playing",()=>{
+        posterImage.style.visibility="hidden";
+      });
+      video.addEventListener("ended",()=>{
+        video.dataset.nuPlayback="";play.style.visibility="visible";
+        if(pilot)pilotShareLifecycle?.onPause();
+      });
+      video.addEventListener("pause",()=>{
+        if(pilot&&!video.ended){
+          play.style.visibility="visible";
+          pilotShareLifecycle?.onPause();
+        }
+      });
       video.addEventListener("click",()=>{if(!video.paused){video.pause();play.style.visibility="visible";}});
-      media.append(video,play);
+      if(posterImage)media.append(video,posterImage,play);
+      else media.append(video,play);
       stage.append(media);
     }
     list.append(stage);
@@ -137,13 +193,24 @@
     const actions=create("div","nu-il-action-row");
     const share=button("Preparando…",null,"nu-il-action nu-il-primary");
     share.disabled=true;
-    prepareShareFile(file,id,day,index,share);
+    if(pilot){
+      pilotShareLifecycle=preparePilotShareFile(file,id,day,index,share);
+      disposePilotPreview=()=>{
+        pilotShareLifecycle?.dispose();
+        if(pilotVideo){
+          pilotVideo.pause();
+          pilotVideo.removeAttribute("src");
+          pilotVideo.load();
+        }
+        if(pilotVideoObjectUrl)URL.revokeObjectURL(pilotVideoObjectUrl);
+      };
+    }else prepareShareFile(file,id,day,index,share);
     actions.append(share,button("Descargar",()=>download(file,id,day,index),"nu-il-action"));
     list.append(actions);
   }
   const preparedShareFiles=new Map();
-  async function readShareFile(item,id,day,index,onProgress){
-    const controller=new AbortController();
+  async function readShareFile(item,id,day,index,onProgress,requestController){
+    const controller=requestController||new AbortController();
     // Un archivo puede ser grande: el tiempo se reinicia mientras llegan datos.
     let inactivityTimer;
     const resetTimeout=()=>{
@@ -174,6 +241,66 @@
         type.includes("png")?"png":"jpg";
       return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type});
     }finally{clearTimeout(inactivityTimer);}
+  }
+  function preparePilotShareFile(item,id,day,index,control){
+    const key=id+"/"+day+"/"+index;
+    let pending=null,playing=false,disposed=false;
+    const enable=ready=>{
+      if(disposed||!control.isConnected)return;
+      control.disabled=false;
+      control.textContent="Compartir";
+      control.onclick=()=>sharePreparedFile(ready);
+    };
+    const begin=()=>{
+      if(disposed||playing||pending)return;
+      const cached=pilotShareReadyFiles.get(key);
+      if(cached){enable(cached);return;}
+      control.disabled=true;
+      control.textContent="Compartir";
+      control.onclick=null;
+      const controller=new AbortController();
+      const task={controller,promise:readShareFile(item,id,day,index,undefined,controller)};
+      pending=task;
+      task.promise.then(ready=>{
+        pilotShareReadyFiles.set(key,ready);
+        if(pending!==task)return;
+        pending=null;
+        enable(ready);
+      }).catch(error=>{
+        if(pending!==task)return;
+        pending=null;
+        if(disposed||error?.name==="AbortError")return;
+        console.warn("No se pudo preparar el video piloto",error);
+        control.disabled=false;
+        control.textContent="Reintentar compartir";
+        control.onclick=begin;
+      });
+    };
+    begin();
+    return {
+      onPlay(){
+        playing=true;
+        if(pending){
+          const task=pending;
+          pending=null;
+          task.controller.abort();
+        }
+        if(!pilotShareReadyFiles.has(key)){
+          control.disabled=true;
+          control.textContent="Compartir";
+          control.onclick=null;
+        }
+      },
+      onPause(){playing=false;begin();},
+      dispose(){
+        disposed=true;
+        if(pending){
+          const task=pending;
+          pending=null;
+          task.controller.abort();
+        }
+      }
+    };
   }
   function prepareShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
@@ -230,6 +357,19 @@
     if(!targetSheet)return;
     sheet=targetSheet;
     returnToProducts=typeof back==="function"?back:()=>window.openBotQuickAccess();
+    pilotCloseObserver?.disconnect();
+    const layer=sheet.closest?.(".bot-quick-access-layer");
+    if(layer?.parentNode&&typeof MutationObserver!=="undefined"){
+      pilotCloseObserver=new MutationObserver(()=>{
+        if(!layer.isConnected){
+          pilotCloseObserver?.disconnect();pilotCloseObserver=null;
+          if(disposePilotPreview){
+            const dispose=disposePilotPreview;disposePilotPreview=null;dispose();
+          }
+        }
+      });
+      pilotCloseObserver.observe(layer.parentNode,{childList:true});
+    }
     showGroups();
   };
   document.addEventListener("click",event=>{
@@ -238,7 +378,7 @@
   },true);
   const style=create("style");
   style.textContent=`
-    .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;max-height:min(65dvh,540px);padding-bottom:15px}
+    .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;height:min(68dvh,580px)!important;max-height:min(68dvh,580px)!important;padding-bottom:15px}
     .nu-il-group-heading{margin:16px 10px 8px;color:#33455f;font-size:14px;font-weight:750}
     .nu-il-row{width:100%;margin-bottom:8px}
     .nu-il-chevron{margin-left:auto;color:#3b82f6;font-size:20px;flex-shrink:0}
@@ -249,6 +389,7 @@
     .nu-il-thumbnail img,.nu-il-thumbnail video{width:100%;height:100%;object-fit:cover}.nu-il-play{color:#3377d8;font-size:22px}
     .nu-il-thumbnail{position:relative}.nu-il-thumbnail .nu-il-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.95);color:#2869d5;font:700 13px system-ui;text-shadow:none;pointer-events:none}
     .nu-il-video-stage{display:block;width:100%;height:100%;max-height:100%;object-fit:contain}
+    .nu-il-video-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
     .nu-il-video-shell{position:relative;width:100%;height:100%;min-width:0;min-height:0;display:grid;place-items:center}
     .nu-il-play-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)!important;z-index:1;display:grid;place-items:center;width:48px;height:48px;border:1px solid #e3eaf4;border-radius:50%;padding:0;background:rgba(255,255,255,.96);color:#2869d5;font:700 20px system-ui;cursor:pointer;transition:none!important;animation:none!important;box-shadow:none!important}
     .nu-il-play-overlay:active,.nu-il-play-overlay:hover,.nu-il-play-overlay:focus{transform:translate(-50%,-50%)!important;transition:none!important;animation:none!important;box-shadow:none!important}
