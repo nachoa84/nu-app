@@ -30,8 +30,9 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
             (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
               optimizedDay6.has(materialKey) ? "?v=day6-mobile-optimized-1" :
               convertedMovBatch.has(materialKey) ? "?v=international-mov-mp4-batch-1" : ""),
-          poster: optimizedDay6.has(materialKey)
-            ? assetPath + "?poster=first-frame&v=day6-poster-1"
+          // Miniaturas JPEG verificadas para los 55 MP4 internacionales.
+          poster: file.type === "video"
+            ? assetPath + "?poster=first-frame&v=international-posters-55-1"
             : undefined
         };
       });
