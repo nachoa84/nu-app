@@ -33,6 +33,7 @@ function normalizePreviewItem(item) {
 
   return {
     src: item.src,
+    displaySrc: item.mediaType === "video" ? item.src : (item.displaySrc || item.src),
     label: item.label || "Material",
     mediaType,
     poster: mediaType === "video"
@@ -267,7 +268,8 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
       video.playsInline = true;
       video.setAttribute("playsinline", "");
       video.setAttribute("webkit-playsinline", "");
-      video.preload = "none";
+      // La fuente recién se agrega por este gesto; priorizar el inicio real.
+      video.preload = "auto";
       video.draggable = false;
       video.setAttribute("draggable", "false");
       video.src = activePreviewCustomShare?.playbackSrc?.(item.src) || item.src;
@@ -315,6 +317,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
         shell.classList.remove("is-starting", "is-error");
         shell.classList.add("is-playing");
+        activePreviewCustomShare?.onPlaying?.();
         playButton.hidden = true;
         playButton.disabled = false;
         playButton.classList.remove("is-starting");
@@ -357,9 +360,12 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     media.draggable = false;
     media.setAttribute("draggable", "false");
     media.alt = item.label;
-    media.addEventListener("load", finishPreviewLoad, { once: true });
+    media.addEventListener("load", () => {
+      finishPreviewLoad();
+      activePreviewCustomShare?.onDisplayReady?.();
+    }, { once: true });
     media.addEventListener("error", failPreviewLoad, { once: true });
-    media.src = item.src;
+    media.src = item.displaySrc;
     stage.appendChild(media);
 
     if (media.complete && media.naturalWidth > 0) {
@@ -377,7 +383,9 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     );
   }
 
-  warmPreviewNeighbors();
+  // Los archivos internacionales aún son grandes: no descargar vecinos
+  // de App Storage mientras se está abriendo el material seleccionado.
+  if (!item.international) warmPreviewNeighbors();
 
   const saved = item.favorite && isFavorite(item.src, previewState.day);
   save.style.display = item.favorite ? "" : "none";
@@ -422,6 +430,9 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     share.disabled = true;
     try { activePreviewCustomShare = item.prepareShare(share) || null; }
     catch (error) { console.warn("No se pudo preparar Compartir", error); share.textContent = "Compartir no disponible"; }
+    // Una imagen de caché puede estar completa antes de instalar el callback.
+    const shown = item.mediaType === "image" ? stage.querySelector("img") : null;
+    if (shown?.complete && shown.naturalWidth > 0) activePreviewCustomShare?.onDisplayReady?.();
   }
 
   // Solo Biblioteca Internacional: reemplaza Guardar por una descarga explícita.
@@ -451,7 +462,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
 function previewWarmSource(item) {
   if (!item) return null;
-  return item.mediaType === "video" ? item.poster : item.src;
+  return item.mediaType === "video" ? item.poster : item.displaySrc;
 }
 
 function warmPreviewNeighbors() {
