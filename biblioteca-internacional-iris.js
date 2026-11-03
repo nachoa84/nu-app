@@ -7,16 +7,25 @@
   ];
   let sheet=null,returnToProducts=null;
   let disposePilotPreview=null,pilotCloseObserver=null;
-  const pilotShareReadyFiles=new Map();
-  const hasPilotPoster=item=>item?.type==="video"&&(
-    item.poster==="/api/international-assets/collagen-es/6/2?poster=first-frame&v=day6-poster-1"||
-    item.poster==="/api/international-assets/collagen-it/6/2?poster=first-frame&v=day6-poster-1"
-  );
+  // Cache acotada: evitar retener decenas de MP4 al navegar por la biblioteca.
+  const shareReadyFiles=new Map();
+  const hasStaticPoster=item=>item?.type==="video"&&
+    typeof item.poster==="string"&&item.poster.includes("?poster=first-frame&v=international-posters-55-1");
+  function rememberShareFile(key,file){
+    shareReadyFiles.delete(key);
+    shareReadyFiles.set(key,file);
+    let bytes=0;
+    for(const ready of shareReadyFiles.values())bytes+=ready.size;
+    while(shareReadyFiles.size>2||(bytes>35*1024*1024&&shareReadyFiles.size>1)){
+      const firstKey=shareReadyFiles.keys().next().value;
+      const old=shareReadyFiles.get(firstKey);
+      shareReadyFiles.delete(firstKey);
+      bytes-=old?.size||0;
+    }
+  }
   const create=(tag,cls,label)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(label!==undefined)el.textContent=label;return el;};
   const button=(label,click,cls)=>{const el=create("button",cls,label);el.type="button";el.onclick=click;return el;};
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
-  // Piloto acotado antes de migrar el resto de las rutinas internacionales.
-  const canonicalGalleryPilot=(id,day)=>id==="collagen/es"&&day===6;
   const isValid=item=>item&&/^(image|video)$/.test(item.type)&&/^\/api\/international-assets\/[a-z0-9-]+\/\d+\/\d+(?:\?v=[a-z0-9-]+)?$/.test(item.src);
   const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
 
@@ -64,14 +73,14 @@
     if(!files.length){list.append(create("p","nu-il-notice","Cargando materiales…"));return;}
     files.forEach((file,index)=>{
       if(!isValid(file))return;
-      const row=button("",()=>canonicalGalleryPilot(id,day)?showCanonicalGalleryPilot(id,day,index):showPreview(id,day,index),"nu-il-media-row");
+      const row=button("",()=>showCanonicalGallery(id,day,index),"nu-il-media-row");
       const thumb=create("span","nu-il-thumbnail");
       if(file.type==="image"){
         const img=create("img");img.src=file.src;img.alt="Material "+(index+1);img.loading="lazy";
         img.onerror=()=>thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
         thumb.append(img);
       }else{
-        if(hasPilotPoster(file)){
+        if(hasStaticPoster(file)){
           const still=create("img");
           still.src=file.poster;still.alt="Primer fotograma del video";still.loading="lazy";
           thumb.append(still);
@@ -98,7 +107,7 @@
     video.addEventListener("loadeddata",()=>{if(video.dataset.nuPlayback!=="active")video.pause();},{once:true});
     return video;
   }
-  function showCanonicalGalleryPilot(id,day,index){
+  function showCanonicalGallery(id,day,index){
     if(typeof window.openMediaPreview!=="function"){
       showPreview(id,day,index);
       return;
@@ -110,10 +119,10 @@
         src:file.src,
         label:"Material "+(position+1),
         mediaType:file.type,
-        poster:hasPilotPoster(file)?file.poster:undefined,
+        poster:hasStaticPoster(file)?file.poster:undefined,
         favorite:false,
         international:true,
-        prepareShare:control=>preparePilotShareFile(file,id,day,position,control),
+        prepareShare:control=>prepareInternationalShareFile(file,id,day,position,control),
         download:()=>download(file,id,day,position)
       };
     }).filter(Boolean);
@@ -127,7 +136,7 @@
     const list=frame("Material "+(index+1)+" de "+files.length,title(id)+" · Día "+day,()=>showDay(id,day));
     if(!list)return;
     const stage=create("div","nu-il-stage");
-    const pilot=hasPilotPoster(file);
+    const pilot=hasStaticPoster(file);
     let pilotVideo=null,pilotVideoObjectUrl=null,pilotShareLifecycle=null;
     if(file.type==="image"){
       const img=create("img");img.src=file.src;img.alt="Material "+(index+1);
@@ -166,7 +175,7 @@
         if(pilot){
           pilotShareLifecycle?.onPlay();
           if(!video.getAttribute("src")){
-            const ready=pilotShareReadyFiles.get(id+"/"+day+"/"+index);
+            const ready=shareReadyFiles.get(id+"/"+day+"/"+index);
             if(ready){
               pilotVideoObjectUrl=URL.createObjectURL(ready);
               video.src=pilotVideoObjectUrl;
@@ -219,7 +228,7 @@
     const share=button("Preparando…",null,"nu-il-action nu-il-primary");
     share.disabled=true;
     if(pilot){
-      pilotShareLifecycle=preparePilotShareFile(file,id,day,index,share);
+      pilotShareLifecycle=prepareInternationalShareFile(file,id,day,index,share);
       disposePilotPreview=()=>{
         pilotShareLifecycle?.dispose();
         if(pilotVideo){
@@ -244,7 +253,8 @@
     };
     resetTimeout();
     try{
-      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store"});
+      // La reproducción recibe prioridad frente a la preparación para compartir.
+      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store",priority:item.type==="video"?"low":"auto"});
       if(!response.ok)throw Error("HTTP "+response.status);
       const total=Number(response.headers.get("content-length"))||0;
       const type=response.headers.get("content-type")||(item.type==="video"?"video/mp4":"image/jpeg");
@@ -267,10 +277,9 @@
       return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type});
     }finally{clearTimeout(inactivityTimer);}
   }
-  function preparePilotShareFile(item,id,day,index,control){
+  function prepareInternationalShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
-    let pending=null,playing=false,disposed=false;
-    const playbackUrls=new Set();
+    let pending=null,disposed=false,scheduled=null,playbackUrl=null;
     const enable=ready=>{
       if(disposed||!control.isConnected)return;
       control.disabled=false;
@@ -278,8 +287,8 @@
       control.onclick=()=>sharePreparedFile(ready);
     };
     const begin=()=>{
-      if(disposed||playing||pending)return;
-      const cached=pilotShareReadyFiles.get(key);
+      if(disposed||pending)return;
+      const cached=shareReadyFiles.get(key);
       if(cached){enable(cached);return;}
       control.disabled=true;
       control.textContent="Compartir";
@@ -288,44 +297,46 @@
       const task={controller,promise:readShareFile(item,id,day,index,undefined,controller)};
       pending=task;
       task.promise.then(ready=>{
-        pilotShareReadyFiles.set(key,ready);
-        if(pending!==task)return;
+        if(disposed||pending!==task)return;
         pending=null;
+        rememberShareFile(key,ready);
         enable(ready);
       }).catch(error=>{
         if(pending!==task)return;
         pending=null;
         if(disposed||error?.name==="AbortError")return;
-        console.warn("No se pudo preparar el video piloto",error);
+        console.warn("No se pudo preparar el material internacional",error);
         control.disabled=false;
         control.textContent="Reintentar compartir";
         control.onclick=begin;
       });
     };
-    begin();
+    // Dejar que el Play inicie el stream antes de competir por ancho de banda.
+    if(item.type==="video")scheduled=setTimeout(()=>{scheduled=null;begin();},450);
+    else begin();
     return {
       playbackSrc(defaultSrc){
-        const ready=pilotShareReadyFiles.get(key);
+        const ready=shareReadyFiles.get(key);
         if(!ready)return defaultSrc;
-        const url=URL.createObjectURL(ready);
-        playbackUrls.add(url);
-        return url;
+        if(!playbackUrl)playbackUrl=URL.createObjectURL(ready);
+        return playbackUrl;
       },
       onPlay(){
         // La preparación sigue en segundo plano mientras se reproduce.
         // Si la cancelamos aquí, Compartir recién se habilita cuando termina.
-        playing=true;
-        if(!pilotShareReadyFiles.has(key)){
+        if(!shareReadyFiles.has(key)){
           control.disabled=true;
           control.textContent="Compartir";
           control.onclick=null;
         }
       },
-      onPause(){playing=false;begin();},
+      onPause(){begin();},
       dispose(){
         disposed=true;
-        for(const url of playbackUrls)URL.revokeObjectURL(url);
-        playbackUrls.clear();
+        if(scheduled!==null)clearTimeout(scheduled);
+        scheduled=null;
+        if(playbackUrl)URL.revokeObjectURL(playbackUrl);
+        playbackUrl=null;
         if(pending){
           const task=pending;
           pending=null;
