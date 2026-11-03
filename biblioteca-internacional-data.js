@@ -20,14 +20,21 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
     for (const [key, files] of Object.entries(catalog)) {
       const parts = key.split("/");
       if (parts.length !== 3 || !Array.isArray(files)) continue;
-      entries[key] = files.map((file, index) => ({
-        title: "Material " + (index + 1),
-        type: file.type,
-        src: "/api/international-assets/" + parts[0] + "-" + parts[1] + "/" + parts[2] + "/" + (index + 1) +
-          (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
-            optimizedDay6.has(key + "/" + (index + 1)) ? "?v=day6-mobile-optimized-1" :
-            convertedMovBatch.has(key + "/" + (index + 1)) ? "?v=international-mov-mp4-batch-1" : "")
-      }));
+      entries[key] = files.map((file, index) => {
+        const materialKey = key + "/" + (index + 1);
+        const assetPath = "/api/international-assets/" + parts[0] + "-" + parts[1] + "/" + parts[2] + "/" + (index + 1);
+        return {
+          title: "Material " + (index + 1),
+          type: file.type,
+          src: assetPath +
+            (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
+              optimizedDay6.has(materialKey) ? "?v=day6-mobile-optimized-1" :
+              convertedMovBatch.has(materialKey) ? "?v=international-mov-mp4-batch-1" : ""),
+          poster: optimizedDay6.has(materialKey)
+            ? assetPath + "?poster=first-frame&v=day6-poster-1"
+            : undefined
+        };
+      });
     }
     window.NuInternationalLibraryData = entries;
     dispatchEvent(new Event("nu-international-catalog-ready"));
