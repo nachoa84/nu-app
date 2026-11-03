@@ -74,7 +74,7 @@
       img.onerror=()=>stage.replaceChildren(create("p","nu-il-error","No se pudo cargar esta imagen."));
       stage.append(img);
     }else{
-      const video=create("video");video.src=file.src;video.controls=true;video.playsInline=true;video.preload="metadata";
+      const video=create("video");video.src=file.src;video.controls=true;video.playsInline=true;video.preload="none";
       video.onerror=()=>stage.append(create("p","nu-il-error","No se pudo reproducir este video."));
       stage.append(video);
     }
@@ -93,18 +93,50 @@
     list.append(actions);
   }
   const preparedShareFiles=new Map();
+  async function readShareFile(item,id,day,index,onProgress){
+    const controller=new AbortController();
+    // Un archivo puede ser grande: el tiempo se reinicia mientras llegan datos.
+    let inactivityTimer;
+    const resetTimeout=()=>{
+      clearTimeout(inactivityTimer);
+      inactivityTimer=setTimeout(()=>controller.abort(),60000);
+    };
+    resetTimeout();
+    try{
+      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store"});
+      if(!response.ok)throw Error("HTTP "+response.status);
+      const total=Number(response.headers.get("content-length"))||0;
+      const type=response.headers.get("content-type")||(item.type==="video"?"video/mp4":"image/jpeg");
+      let blob;
+      if(response.body?.getReader){
+        const reader=response.body.getReader(),chunks=[];let downloaded=0,shown=-1;
+        while(true){
+          const {done,value}=await reader.read();
+          if(done)break;
+          chunks.push(value);downloaded+=value.byteLength;resetTimeout();
+          if(total>0){
+            const percent=Math.min(99,Math.floor(downloaded*100/total));
+            if(percent>=shown+5){shown=percent;onProgress?.(percent);}
+          }else onProgress?.(null,downloaded);
+        }
+        blob=new Blob(chunks,{type});
+      }else blob=await response.blob();
+      const ext=item.type==="video"?(type.includes("quicktime")?"mov":"mp4"):
+        type.includes("png")?"png":"jpg";
+      return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type});
+    }finally{clearTimeout(inactivityTimer);}
+  }
   function prepareShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
+    control.disabled=true;
+    control.textContent="Preparando…";
     if(!preparedShareFiles.has(key)){
-      const task=(async()=>{
-        const response=await fetch(item.src);
-        if(!response.ok)throw Error("HTTP "+response.status);
-        const blob=await response.blob();
-        const mime=blob.type||(item.type==="video"?"video/mp4":"image/jpeg");
-        const ext=item.type==="video"?(mime.includes("quicktime")?"mov":"mp4"):
-          mime.includes("png")?"png":"jpg";
-        return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type:mime});
-      })();
+      const task=readShareFile(item,id,day,index,(percentage,bytes)=>{
+        if(!control.isConnected)return;
+        control.textContent=percentage===null?
+          "Cargando "+(bytes/1048576).toFixed(1)+" MB…":
+          "Cargando "+percentage+"%…";
+      });
       preparedShareFiles.set(key,task);
       task.catch(()=>preparedShareFiles.delete(key));
     }
@@ -112,10 +144,11 @@
       if(!control.isConnected)return;
       control.disabled=false;control.textContent="Compartir";
       control.onclick=()=>sharePreparedFile(prepared);
-    }).catch(()=>{
+    }).catch(error=>{
       if(!control.isConnected)return;
-      control.disabled=false;control.textContent="Reintentar";
+      control.disabled=false;control.textContent="Reintentar compartir";
       control.onclick=()=>prepareShareFile(item,id,day,index,control);
+      console.warn("No se pudo preparar un material internacional",error);
     });
   }
   function sharePreparedFile(file){
