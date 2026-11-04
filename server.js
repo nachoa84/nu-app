@@ -4511,9 +4511,13 @@ app.post(
 const botAssetStorage = new ObjectStorageClient();
 const BOT_ASSET_STORAGE_PREFIX = "bot/active/";
 const ROUTINE_ASSET_STORAGE_PREFIX = "routines/active/";
-const ASSET_METADATA_CACHE_TTL_MS = 60 * 1000;
-const ASSET_METADATA_CACHE_MAX = 512;
+// Los assets versionados y con SHA-256 son inmutables: conservar sus metadatos
+// reduce consultas remotas repetidas antes de cada reproduccion.
+const ASSET_METADATA_CACHE_TTL_MS = 5 * 60 * 1000;
+const ASSET_HASH_METADATA_CACHE_TTL_MS = 30 * 60 * 1000;
+const ASSET_METADATA_CACHE_MAX = 2048;
 const assetMetadataCacheV108 = new Map();
+const assetMetadataInflightV108 = new Map();
 let assetBucketPromiseV108 = null;
 
 function botAssetContentType(objectName) {
@@ -4586,7 +4590,11 @@ function normalizeStorageEtagV108(value, objectName) {
 
 async function getAssetBucketV108() {
   if (!assetBucketPromiseV108) {
-    assetBucketPromiseV108 = botAssetStorage.getBucket();
+    assetBucketPromiseV108 = botAssetStorage.getBucket().catch(error => {
+      // Un error transitorio no debe bloquear para siempre los siguientes intentos.
+      assetBucketPromiseV108 = null;
+      throw error;
+    });
   }
 
   return assetBucketPromiseV108;
@@ -4595,7 +4603,11 @@ async function getAssetBucketV108() {
 function rememberAssetMetadataV108(objectName, value) {
   assetMetadataCacheV108.delete(objectName);
   assetMetadataCacheV108.set(objectName, {
-    expiresAt: Date.now() + ASSET_METADATA_CACHE_TTL_MS,
+    expiresAt: Date.now() + (
+      /\/[a-f0-9]{64}\.[a-z0-9]+$/i.test(objectName)
+        ? ASSET_HASH_METADATA_CACHE_TTL_MS
+        : ASSET_METADATA_CACHE_TTL_MS
+    ),
     value
   });
 
@@ -4616,26 +4628,42 @@ async function getAssetFileV108(objectName) {
 
   assetMetadataCacheV108.delete(objectName);
 
-  const bucket = await getAssetBucketV108();
-  const file = bucket.file(objectName);
-  const [metadata] = await file.getMetadata();
-  const totalSize = Number(metadata.size);
+  // Si dos videos/posters piden el mismo objeto a la vez, una sola consulta
+  // remota abastece a todos. Los fallos no quedan cacheados.
+  let pending = assetMetadataInflightV108.get(objectName);
+  if (!pending) {
+    pending = (async () => {
+      const bucket = await getAssetBucketV108();
+      const file = bucket.file(objectName);
+      const [metadata] = await file.getMetadata();
+      const totalSize = Number(metadata.size);
 
-  if (!Number.isSafeInteger(totalSize) || totalSize < 0) {
-    const error = new Error("Tamaño de asset inválido.");
-    error.status = 502;
-    throw error;
+      if (!Number.isSafeInteger(totalSize) || totalSize < 0) {
+        const error = new Error("Tamaño de asset inválido.");
+        error.status = 502;
+        throw error;
+      }
+
+      const value = {
+        file,
+        totalSize,
+        contentType: metadata.contentType || botAssetContentType(objectName),
+        etag: normalizeStorageEtagV108(metadata.etag, objectName)
+      };
+
+      rememberAssetMetadataV108(objectName, value);
+      return value;
+    })();
+    assetMetadataInflightV108.set(objectName, pending);
   }
 
-  const value = {
-    file,
-    totalSize,
-    contentType: metadata.contentType || botAssetContentType(objectName),
-    etag: normalizeStorageEtagV108(metadata.etag, objectName)
-  };
-
-  rememberAssetMetadataV108(objectName, value);
-  return value;
+  try {
+    return await pending;
+  } finally {
+    if (assetMetadataInflightV108.get(objectName) === pending) {
+      assetMetadataInflightV108.delete(objectName);
+    }
+  }
 }
 
 function validAssetRelativePathV108(requestPath) {
