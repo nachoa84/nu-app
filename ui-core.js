@@ -32,13 +32,14 @@ const ICONS = {
   image: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m5 18 5-5 3.5 3.5 2.5-2.5 3 4"/></svg>`
 };
 
-// Portada de prueba: evita descargar metadata de cuatro MP4 solo para pintar
-// miniaturas del día 1 de LumiSpa. No cambia las URLs de video ni Compartir.
-const LUMISPA_DAY1_PREVIEW_VIDEO_SOURCES = new Set([
-  "/api/routine-assets/22f73d982f81c120a343a519c500e3cbff2ee58d459d32da411d91a741980781.mp4",
-  "/api/routine-assets/ddc6b1d1d267224df9669489e45be281e4b931665c2d322ac86a64033dcbb81d.mp4",
-  "/api/routine-assets/1cd00837ce9336c47f1cc45c1c34ec0009bb7742cf7d6450a530479898835459.mp4",
-  "/api/routine-assets/d75afd44f2655a02b87df342e866cffec671b5732e352d75e49a160bfcbd00d6.mp4"
+// Fotogramas auténticos del día 1 de LumiSpa, extraídos una sola vez
+// de sus respectivos videos. Evitan descargar MP4 para dibujar miniaturas.
+// Play y Compartir siguen usando las rutas originales de cada video.
+const LUMISPA_DAY1_VIDEO_POSTERS = new Map([
+  ["/api/routine-assets/22f73d982f81c120a343a519c500e3cbff2ee58d459d32da411d91a741980781.mp4", "assets/lumispa-day1-video1.webp"],
+  ["/api/routine-assets/ddc6b1d1d267224df9669489e45be281e4b931665c2d322ac86a64033dcbb81d.mp4", "assets/lumispa-day1-video2.webp"],
+  ["/api/routine-assets/1cd00837ce9336c47f1cc45c1c34ec0009bb7742cf7d6450a530479898835459.mp4", "assets/lumispa-day1-video3.webp"],
+  ["/api/routine-assets/d75afd44f2655a02b87df342e866cffec671b5732e352d75e49a160bfcbd00d6.mp4", "assets/lumispa-day1-video4.webp"]
 ]);
 
 function resolveRoutineVideoPoster(src, explicitPoster = null) {
@@ -49,9 +50,8 @@ function resolveRoutineVideoPoster(src, explicitPoster = null) {
   const cleanSrc = rawSrc.split(/[?#]/)[0];
   if (!cleanSrc) return null;
 
-  if (LUMISPA_DAY1_PREVIEW_VIDEO_SOURCES.has(cleanSrc)) {
-    return "assets/video-poster-lumispa-day1.svg";
-  }
+  const pilotPoster = LUMISPA_DAY1_VIDEO_POSTERS.get(cleanSrc);
+  if (pilotPoster) return pilotPoster;
 
   if (typeof days !== "undefined" && days) {
     for (const day of Object.values(days)) {
