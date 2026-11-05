@@ -78,6 +78,7 @@ for (let i = 0; i < planned.length; i++) {
   const destination = path.join(root, relativePoster);
   const temporary = destination + ".tmp.webp";
   console.log(`[${i + 1}/${planned.length}] ${src.split("/").pop()}`);
+  if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
   let success = false;
   for (const seek of ["2", "0.5"]) {
     const result = spawnSync("ffmpeg", [
