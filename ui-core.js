@@ -50,6 +50,11 @@ function resolveRoutineVideoPoster(src, explicitPoster = null) {
   const cleanSrc = rawSrc.split(/[?#]/)[0];
   if (!cleanSrc) return null;
 
+  const generatedPoster = typeof window !== "undefined"
+    ? window.NuRoutineVideoPosters?.[cleanSrc]
+    : null;
+  if (generatedPoster) return generatedPoster;
+
   const pilotPoster = LUMISPA_DAY1_VIDEO_POSTERS.get(cleanSrc);
   if (pilotPoster) return pilotPoster;
 
