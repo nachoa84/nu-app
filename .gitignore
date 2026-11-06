@@ -21,3 +21,6 @@ nu-app-inventario-archivos.txt
 # Replit/chat working attachments and generated screenshots
 attached_assets/
 screenshots/
+
+# Solo revisión local: MP4 recomprimidos y capturas, no publicar ni subir a Git
+assets/international-optimization-review/
