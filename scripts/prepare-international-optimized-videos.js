@@ -139,6 +139,9 @@ for (let i=0;i<selected.length;i++) {
     ],{encoding:"utf8",timeout:1200000,maxBuffer:1024*1024});
     if (encode.error||encode.status!==0) throw Error("ffmpeg: "+(encode.stderr||encode.error||encode.status));
     const after=probe(candidate);
+    if (!after.video?.codec_name || (before.audio && !after.audio)) {
+      throw Error("La candidata perdió el video o el audio; no se guarda.");
+    }
     if (after.duration<=0||before.duration<=0||
         Math.abs(after.duration-before.duration)>Math.max(1,before.duration*0.02)) {
       throw Error("La duración cambió demasiado; no guardé la versión.");
