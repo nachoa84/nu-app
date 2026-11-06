@@ -372,7 +372,114 @@ function setButtonBusy(button, busy, label = "Preparando") {
   }
 }
 
+// Compartir MP4 sin descargas automáticas cuando expira el gesto del usuario.
+// Mantenemos como máximo un archivo preparado en memoria; no precargamos videos.
+let preparedRoutineVideoShare = null;
+
+function setRoutineShareLabel(button, label) {
+  if (!button) return;
+  const text = button.querySelector("span");
+  if (text) text.textContent = label;
+  else button.textContent = label;
+}
+
+function routineVideoFilename(src) {
+  const sourceName = decodeURIComponent(
+    String(src).split("/").pop().split("?")[0]
+  );
+  return sourceName && sourceName.includes(".")
+    ? sourceName
+    : "rutina30-material.mp4";
+}
+
+async function shareRoutineVideo(src, triggerButton = null) {
+  const cached = preparedRoutineVideoShare?.src === src
+    ? preparedRoutineVideoShare
+    : null;
+
+  // Solo una segunda pulsación explícita puede activar la descarga alternativa.
+  if (cached?.mode === "download") {
+    const link = document.createElement("a");
+    link.href = src;
+    link.download = cached.name;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.click();
+    preparedRoutineVideoShare = null;
+    setRoutineShareLabel(triggerButton, "Compartir");
+    toast("Descarga iniciada", { type: "info" });
+    return;
+  }
+
+  // Archivo preparado: llamar share() directamente en el nuevo gesto, sin fetch.
+  if (cached?.mode === "share") {
+    setButtonBusy(triggerButton, true, "Compartiendo");
+    try {
+      await navigator.share({ files: [cached.file] });
+      toast("Compartir completado", { type: "success" });
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.warn("No se pudo compartir el video preparado:", error);
+        toast("No se pudo compartir. Intentá nuevamente.", { type: "error" });
+      }
+    } finally {
+      setButtonBusy(triggerButton, false);
+      setRoutineShareLabel(triggerButton, "Compartir");
+    }
+    return;
+  }
+
+  setButtonBusy(triggerButton, true, "Preparando");
+  let nextLabel = "Compartir";
+  try {
+    const res = await fetch(src);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const blob = await res.blob();
+    const file = new File(
+      [blob],
+      routineVideoFilename(src),
+      { type: blob.type || "video/mp4" }
+    );
+
+    if (!navigator.share || !navigator.canShare?.({ files: [file] })) {
+      preparedRoutineVideoShare = { src, name: file.name, mode: "download" };
+      nextLabel = "Descargar video";
+      toast(
+        "Este dispositivo no admite compartir el MP4. Tocá Descargar video si querés guardarlo.",
+        { type: "info", duration: 5000 }
+      );
+      return;
+    }
+
+    preparedRoutineVideoShare = { src, file, mode: "share" };
+
+    // Una descarga lenta puede agotar la activación temporal requerida por share().
+    if (navigator.userActivation?.isActive === false) {
+      nextLabel = "Compartir ahora";
+      toast("Video preparado. Tocá Compartir ahora.", { type: "info" });
+      return;
+    }
+
+    try {
+      await navigator.share({ files: [file] });
+      toast("Compartir completado", { type: "success" });
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+      console.warn("El video está preparado, pero compartir requiere otro toque:", error);
+      nextLabel = "Compartir ahora";
+      toast("Video preparado. Tocá Compartir ahora.", { type: "info" });
+    }
+  } catch (error) {
+    console.warn("No se pudo preparar el video para compartir:", error);
+    toast("No se pudo preparar el video. Intentá nuevamente.", { type: "error" });
+  } finally {
+    setButtonBusy(triggerButton, false);
+    setRoutineShareLabel(triggerButton, nextLabel);
+  }
+}
+
 async function shareAsset(src, label, mediaType, triggerButton = null) {
+  if (mediaType === "video") return shareRoutineVideo(src, triggerButton);
   setButtonBusy(triggerButton, true, "Preparando");
 
   try {
