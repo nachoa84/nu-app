@@ -239,24 +239,20 @@
     next.disabled=index===files.length-1;
     nav.append(previous,next);list.append(nav);
     const actions=create("div","nu-il-action-row");
-    const share=button("Preparando…",null,"nu-il-action nu-il-primary");
-    share.disabled=true;
-    if(pilot){
-      pilotShareLifecycle=prepareInternationalShareFile(file,id,day,index,share);
-      disposePilotPreview=()=>{
-        pilotShareLifecycle?.dispose();
-        if(pilotVideo){
-          pilotVideo.pause();
-          pilotVideo.removeAttribute("src");
-          pilotVideo.load();
-        }
-        if(pilotVideoObjectUrl)URL.revokeObjectURL(pilotVideoObjectUrl);
-      };
-    }else prepareShareFile(file,id,day,index,share);
+    const share=button("Compartir",null,"nu-il-action nu-il-primary");
+    pilotShareLifecycle=prepareInternationalShareFile(file,id,day,index,share);
+    disposePilotPreview=()=>{
+      pilotShareLifecycle?.dispose();
+      if(pilotVideo){
+        pilotVideo.pause();
+        pilotVideo.removeAttribute("src");
+        pilotVideo.load();
+      }
+      if(pilotVideoObjectUrl)URL.revokeObjectURL(pilotVideoObjectUrl);
+    };
     actions.append(share,button("Descargar",()=>download(file,id,day,index),"nu-il-action"));
     list.append(actions);
   }
-  const preparedShareFiles=new Map();
   async function readShareFile(item,id,day,index,onProgress,requestController){
     const controller=requestController||new AbortController();
     // Un archivo puede ser grande: el tiempo se reinicia mientras llegan datos.
@@ -268,7 +264,7 @@
     resetTimeout();
     try{
       // La reproducción recibe prioridad frente a la preparación para compartir.
-      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store",priority:item.type==="video"?"low":"auto"});
+      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store",priority:"high"});
       if(!response.ok)throw Error("HTTP "+response.status);
       const total=Number(response.headers.get("content-length"))||0;
       const type=response.headers.get("content-type")||(item.type==="video"?"video/mp4":"image/jpeg");
@@ -291,36 +287,61 @@
       return new File([blob],"nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext,{type});
     }finally{clearTimeout(inactivityTimer);}
   }
+  // No descargamos materiales al abrir la miniatura: se preparan solo al tocar Compartir.
   function prepareInternationalShareFile(item,id,day,index,control){
     const key=id+"/"+day+"/"+index;
-    let pending=null,disposed=false,scheduled=null,playbackUrl=null;
-    // Mantener siempre SVG + texto: textContent sobre el botón borra el icono.
+    let pending=null,disposed=false,playbackUrl=null;
     const setShareLabel=label=>{
       const span=control.querySelector("span");
       if(span)span.textContent=label;
       else control.textContent=label;
     };
-    const enable=ready=>{
+    const readyToShare=ready=>{
       if(disposed||!control.isConnected)return;
       control.disabled=false;
-      setShareLabel("Compartir");
+      setShareLabel("Compartir ahora");
       control.onclick=()=>sharePreparedFile(ready);
+    };
+    const onPrepared=ready=>{
+      readyToShare(ready);
+      if(disposed||!control.isConnected||navigator.userActivation?.isActive===false)return;
+      try{
+        Promise.resolve(navigator.share({files:[ready]})).then(()=>{
+          if(!disposed&&control.isConnected)setShareLabel("Compartir");
+        }).catch(error=>{
+          if(error?.name==="AbortError")return;
+          console.warn("Compartir internacional requiere otro toque",error);
+          readyToShare(ready);
+        });
+      }catch(error){readyToShare(ready);}
     };
     const begin=()=>{
       if(disposed||pending)return;
       const cached=shareReadyFiles.get(key);
-      if(cached){enable(cached);return;}
-      control.disabled=true;
-      setShareLabel("Compartir");
-      control.onclick=null;
+      if(cached){sharePreparedFile(cached);return;}
       const controller=new AbortController();
-      const task={controller,promise:readShareFile(item,id,day,index,undefined,controller)};
+      const task={controller,promise:null};
       pending=task;
+      control.disabled=true;
+      setShareLabel("Preparando…");
+      control.onclick=null;
+      task.promise=readShareFile(item,id,day,index,(percent,downloaded)=>{
+        if(disposed||pending!==task||!control.isConnected)return;
+        setShareLabel(percent!==null
+          ?"Preparando "+percent+"%"
+          :"Preparando "+(downloaded/1048576).toFixed(1)+" MB");
+      },controller);
       task.promise.then(ready=>{
         if(disposed||pending!==task)return;
         pending=null;
         rememberShareFile(key,ready);
-        enable(ready);
+        if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[ready]})){
+          control.disabled=false;
+          setShareLabel("Compartir no disponible");
+          control.onclick=()=>alert("Este navegador no permite compartir el archivo. Podés usar Descargar.");
+          return;
+        }
+        onPrepared(ready);
       }).catch(error=>{
         if(pending!==task)return;
         pending=null;
@@ -331,9 +352,9 @@
         control.onclick=begin;
       });
     };
-    // En imágenes esperamos a que se vea la imagen antes de descargar para compartir.
-    // En videos damos prioridad al Play, pero también preparamos si no se reproduce.
-    if(item.type==="video")scheduled=setTimeout(()=>{scheduled=null;begin();},1500);
+    control.disabled=false;
+    setShareLabel("Compartir");
+    control.onclick=begin;
     return {
       playbackSrc(defaultSrc){
         const ready=shareReadyFiles.get(key);
@@ -341,28 +362,12 @@
         if(!playbackUrl)playbackUrl=URL.createObjectURL(ready);
         return playbackUrl;
       },
-      onPlay(){
-        // Si empieza a reproducir, suspender la descarga duplicada hasta
-        // que el video esté realmente reproduciéndose, no hasta que termine.
-        if(scheduled!==null){clearTimeout(scheduled);scheduled=null;}
-        if(pending&&!shareReadyFiles.has(key)){
-          const task=pending;
-          pending=null;
-          task.controller.abort();
-        }
-        if(!shareReadyFiles.has(key)){
-          control.disabled=true;
-          setShareLabel("Compartir");
-          control.onclick=null;
-        }
-      },
-      onPlaying(){begin();},
-      onDisplayReady(){begin();},
-      onPause(){begin();},
+      onPlay(){},
+      onPlaying(){},
+      onDisplayReady(){},
+      onPause(){},
       dispose(){
         disposed=true;
-        if(scheduled!==null)clearTimeout(scheduled);
-        scheduled=null;
         if(playbackUrl)URL.revokeObjectURL(playbackUrl);
         playbackUrl=null;
         if(pending){
@@ -372,26 +377,6 @@
         }
       }
     };
-  }
-  function prepareShareFile(item,id,day,index,control){
-    const key=id+"/"+day+"/"+index;
-    control.disabled=true;
-    control.textContent="Compartir";
-    if(!preparedShareFiles.has(key)){
-      const task=readShareFile(item,id,day,index);
-      preparedShareFiles.set(key,task);
-      task.catch(()=>preparedShareFiles.delete(key));
-    }
-    preparedShareFiles.get(key).then(prepared=>{
-      if(!control.isConnected)return;
-      control.disabled=false;control.textContent="Compartir";
-      control.onclick=()=>sharePreparedFile(prepared);
-    }).catch(error=>{
-      if(!control.isConnected)return;
-      control.disabled=false;control.textContent="Reintentar compartir";
-      control.onclick=()=>prepareShareFile(item,id,day,index,control);
-      console.warn("No se pudo preparar un material internacional",error);
-    });
   }
   function sharePreparedFile(file){
     if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[file]})){
