@@ -5,6 +5,10 @@
 // Solo hace HEAD (o Range mínimo si HEAD no informa tamaño). No modifica assets.
 const fs = require("node:fs");
 const path = require("node:path");
+const os = require("node:os");
+const { spawnSync } = require("node:child_process");
+const { Readable } = require("node:stream");
+const { pipeline } = require("node:stream/promises");
 
 const argv = process.argv.slice(2);
 function flag(name, defaultValue) {
@@ -61,6 +65,43 @@ async function getSize(url) {
     clearTimeout(timeout);
   }
 }
+// --probe-heavy descarga temporalmente SOLO MP4 > 15 MB para leer metadatos.
+// Cada archivo se elimina al finalizar, sin sobrescribir los objetos originales.
+async function probeHeavyVideo(item) {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "nu-intl-probe-"));
+  const local = path.join(dir, "source.mp4");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 180000);
+  try {
+    const response = await fetch(item.url, { signal: controller.signal });
+    if (!response.ok || !response.body) throw Error("GET HTTP " + response.status);
+    await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(local));
+    const probe = spawnSync("ffprobe", [
+      "-v", "error",
+      "-show_entries", "stream=codec_type,codec_name,width,height,r_frame_rate,bit_rate:format=duration,size,bit_rate",
+      "-of", "json", local
+    ], { encoding: "utf8", maxBuffer: 1024 * 1024 });
+    if (probe.status !== 0) throw Error(probe.stderr || "ffprobe falló");
+    const info = JSON.parse(probe.stdout);
+    const video = info.streams?.find(stream => stream.codec_type === "video") || {};
+    const audio = info.streams?.find(stream => stream.codec_type === "audio") || {};
+    const duration = Number(info.format?.duration || 0);
+    const rate = Number(info.format?.bit_rate || 0);
+    const fps = video.r_frame_rate || "?";
+    console.log("  " + item.label + ": " +
+      (video.width || "?") + "x" + (video.height || "?") + ", " +
+      (video.codec_name || "?") + ", " + fps + " fps, " +
+      duration.toFixed(1) + " s, " + (rate / 1000000).toFixed(2) + " Mbps, " +
+      "audio " + (audio.codec_name || "sin audio"));
+  } catch (error) {
+    console.log("  " + item.label + ": ERROR " + (error.message || error));
+    process.exitCode = 1;
+  } finally {
+    clearTimeout(timeout);
+    await fs.promises.unlink(local).catch(() => {});
+    await fs.promises.rmdir(dir).catch(() => {});
+  }
+}
 async function main() {
   const results = new Array(selected.length);
   let next = 0;
@@ -83,6 +124,11 @@ async function main() {
     console.log(String(i + 1).padStart(2) + ". " + mb(x.bytes).padStart(9) + "  " + x.label)
   );
   unknown.forEach(x => console.log("SIN MEDIR " + x.label + ": " + x.error));
+  if (argv.includes("--probe-heavy")) {
+    const heavy = known.filter(x => x.bytes > 15 * 1048576);
+    console.log("\nDatos técnicos de " + heavy.length + " videos > 15 MB (copias temporales):");
+    for (const item of heavy) await probeHeavyVideo(item);
+  }
   if (unknown.length) process.exitCode = 1;
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
