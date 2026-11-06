@@ -46,7 +46,7 @@ selected.forEach(t => console.log("  " + t.key));
 if (args.includes("--dry-run")) process.exit(0);
 
 for (const bin of ["curl", "ffprobe", "ffmpeg"]) {
-  const test = spawnSync(bin, ["-version"], { encoding: "utf8", timeout: 10000 });
+  const test = spawnSync(bin, [bin === "curl" ? "--version" : "-version"], { encoding: "utf8", timeout: 10000 });
   if (test.error || test.status !== 0) throw Error("Falta " + bin + " en Replit Shell.");
 }
 
