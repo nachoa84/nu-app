@@ -4,6 +4,14 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
   .then(response => { if (!response.ok) throw new Error("Catálogo no disponible"); return response.json(); })
   .then(catalog => {
     const entries = Object.create(null);
+    // Solo en esta rama de Preview: cinco copias aprobadas, con respaldo original.
+    const optimizedPreviewBatch = new Set([
+      "collagen/it/3/4",
+      "lumispa/it/3/3",
+      "collagen/it/6/2",
+      "collagen/es/6/2",
+      "lumispa/it/6/3"
+    ]);
     // Rutas del lote MP4 verificado: conservar el cache-busting del piloto inicial.
     const convertedMovBatch = new Set([
       "collagen/es/2/1",
@@ -27,7 +35,8 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
           title: "Material " + (index + 1),
           type: file.type,
           src: assetPath +
-            (key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
+            (optimizedPreviewBatch.has(materialKey) ? "?v=optimized-preview-20261106" :
+              key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
               optimizedDay6.has(materialKey) ? "?v=day6-mobile-optimized-1" :
               convertedMovBatch.has(materialKey) ? "?v=international-mov-mp4-batch-1" : ""),
           // Miniaturas JPEG verificadas para los 55 MP4 internacionales.
