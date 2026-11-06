@@ -76,6 +76,12 @@ const port = portArgIndex >= 0
   : (process.env.PORT || "5000");
 if (!/^\d{2,5}$/.test(String(port))) throw new Error("Puerto inválido.");
 const origin = `http://127.0.0.1:${port}`;
+const limitArgIndex = process.argv.indexOf("--limit");
+const limit = limitArgIndex >= 0 ? Number(process.argv[limitArgIndex + 1]) : planned.length;
+if (!Number.isInteger(limit) || limit < 0 || (limitArgIndex >= 0 && limit < 1)) {
+  throw new Error("Límite inválido.");
+}
+const worklist = planned.slice(0, limit);
 
 fs.mkdirSync(outputDir, { recursive: true });
 const errors = [];
@@ -86,12 +92,12 @@ const errors = [];
 // se elimina antes de avanzar al siguiente archivo.
 const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), "nu-routine-poster-"));
 try {
-  for (let i = 0; i < planned.length; i++) {
-    const { src, relativePoster } = planned[i];
+  for (let i = 0; i < worklist.length; i++) {
+    const { src, relativePoster } = worklist[i];
     const destination = path.join(root, relativePoster);
     const temporary = destination + ".tmp.webp";
     const temporaryVideo = path.join(temporaryDir, "video.mp4");
-    console.log(`[${i + 1}/${planned.length}] ${src.split("/").pop()}`);
+    console.log(`[${i + 1}/${worklist.length}] ${src.split("/").pop()}`);
     if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
     if (fs.existsSync(temporaryVideo)) fs.unlinkSync(temporaryVideo);
 
@@ -142,6 +148,12 @@ if (errors.length) {
   console.error(`Quedaron ${errors.length} videos pendientes; no cambié el manifiesto.`);
   errors.forEach(error => console.error(`${error.src}: ${error.reason}`));
   process.exit(1);
+}
+
+if (worklist.length < planned.length) {
+  console.log(`Prueba completada: ${worklist.length} miniatura(s) creada(s); no cambié el manifiesto.`);
+  console.log(`Pendientes: ${planned.length - worklist.length}. Podés reanudar sin repetir lo generado.`);
+  process.exit(0);
 }
 
 const lines = sourceUrls.map(src => {
