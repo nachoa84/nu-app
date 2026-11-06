@@ -264,7 +264,7 @@
     resetTimeout();
     try{
       // La reproducción recibe prioridad frente a la preparación para compartir.
-      const response=await fetch(item.src,{signal:controller.signal,cache:"no-store",priority:"high"});
+      const response=await fetch(item.src,{signal:controller.signal,cache:"no-cache",priority:"high"});
       if(!response.ok)throw Error("HTTP "+response.status);
       const total=Number(response.headers.get("content-length"))||0;
       const type=response.headers.get("content-type")||(item.type==="video"?"video/mp4":"image/jpeg");
