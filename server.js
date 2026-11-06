@@ -4798,6 +4798,13 @@ const internationalCollectionFolders = Object.freeze({
   "collagen-it": ["collagen", "it", "IT COLAGENO"],
   "lumispa-it": ["lumispa", "it", "IT LUMI"]
 });
+const internationalOptimizedPreviewKeys = new Set([
+  "collagen/it/3/4",
+  "lumispa/it/3/3",
+  "collagen/it/6/2",
+  "collagen/es/6/2",
+  "lumispa/it/6/3"
+]);
 
 app.use("/api/international-assets/:collection/:day/:index", async (req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -4811,6 +4818,13 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
   const files = internationalLibraryCatalog[`${collection[0]}/${collection[1]}/${day}`];
   const item = files?.[index - 1];
   if (!item || !/^[0-9]+\.(?:jpg|jpeg|png|mp4|mov)$/i.test(item.filename)) {
+    return res.status(404).end();
+  }
+  // Solo cinco MP4 aprobados pueden solicitar una variante de prueba.
+  const optimizedPreviewRequested = req.query.v === "optimized-preview-20261106";
+  if (optimizedPreviewRequested &&
+      (item.type !== "video" ||
+       !internationalOptimizedPreviewKeys.has(collection[0]+"/"+collection[1]+"/"+day+"/"+index))) {
     return res.status(404).end();
   }
 
@@ -4837,25 +4851,40 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
   const filenames = [assetFilename];
   if (/\.jpg$/i.test(assetFilename)) filenames.push(assetFilename.replace(/\.jpg$/i, ".JPG"));
   let asset;
+  let selectedVariant = "original";
   try {
-    // Los nombres de las carpetas subidas pueden conservar o perder el acento.
-    for (const folder of folderNames) {
-      for (const filename of [...new Set(filenames)]) {
-        const name = `bot/active/international/v1/${collection[2]}/${folder}/${filename}`;
-        try { asset = await getAssetFileV108(name); break; }
-        catch (error) {
-          if (Number(error?.code) !== 404 && Number(error?.status) !== 404) throw error;
+    // Las copias Preview viven fuera de bot/active. Si todavía no se subieron,
+    // el video original sigue funcionando y no queda cacheado como optimizado.
+    const sources = optimizedPreviewRequested
+      ? [["optimized-preview", "bot/preview/international/optimized-20261106"],
+         ["original-fallback", "bot/active/international/v1"]]
+      : [["original", "bot/active/international/v1"]];
+    for (const [variant, prefix] of sources) {
+      // Los nombres de carpeta pueden conservar o perder el acento.
+      for (const folder of folderNames) {
+        for (const filename of [...new Set(filenames)]) {
+          const name = `${prefix}/${collection[2]}/${folder}/${filename}`;
+          try { asset = await getAssetFileV108(name); selectedVariant = variant; break; }
+          catch (error) {
+            if (Number(error?.code) !== 404 && Number(error?.status) !== 404) throw error;
+          }
         }
+        if (asset) break;
       }
       if (asset) break;
     }
     if (!asset) return res.status(404).end();
 
     const { file, totalSize, contentType, etag } = asset;
-    const cacheControl = validPoster || validVariant
-      ? "public, max-age=31536000, immutable"
-      : "public, max-age=86400";
-    const headers = { "Accept-Ranges": "bytes", "Cache-Control": cacheControl, "Content-Type": contentType };
+    const cacheControl = optimizedPreviewRequested && selectedVariant !== "optimized-preview"
+      ? "no-store"
+      : validPoster || validVariant
+        ? "public, max-age=31536000, immutable"
+        : "public, max-age=86400";
+    const headers = {
+      "Accept-Ranges": "bytes", "Cache-Control": cacheControl, "Content-Type": contentType,
+      ...(optimizedPreviewRequested ? { "X-Nu-International-Variant": selectedVariant } : {})
+    };
     if (etag) headers.ETag = etag;
     res.set(headers);
     if (shouldReturnNotModifiedV114(req, etag)) return res.status(304).end();
