@@ -24,3 +24,6 @@ screenshots/
 
 # Solo revisión local: MP4 recomprimidos y capturas, no publicar ni subir a Git
 assets/international-optimization-review/
+
+# Paquetes locales para auditoría visual (nunca publicar)
+scripts/_audit-output/
