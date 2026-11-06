@@ -19,7 +19,7 @@ const targets=[
   {product:"lumispa",country:"it",day:6,index:3,folder:"IT LUMI"}
 ];
 const upload=process.argv.includes("--upload-preview");
-if(process.argv.some(arg=>!["--dry-run","--upload-preview"].includes(arg))){
+if(process.argv.slice(2).some(arg=>!["--dry-run","--upload-preview"].includes(arg))){
   throw Error("Usá --dry-run o --upload-preview.");
 }
 const plans=targets.map(t=>{
