@@ -2689,6 +2689,87 @@
       {"type":"download-image","title":"Guía de cancelación de pedidos","description":"Pasos, ventana de 15 minutos y recomendaciones.","src":"/assets/cancelacion-pedidos.jpg","filename":"guia-cancelacion-pedidos.jpg","mediaType":"image","resourceKind":"guide"}
     ],
     "sourceFlow": "CANCELACIÓN DE PEDIDOS"
+  },
+  {
+    "id": "cambio-miembro-afiliado",
+    "title": "Cambio de miembro a afiliado de marca",
+    "command": "cambio miembro afiliado",
+    "aliases": [
+      "cambio de miembro a afiliado",
+      "cambio de miembro a afiliado de marca",
+      "miembro a afiliado",
+      "miembro a afiliado de marca",
+      "pasar de miembro a afiliado",
+      "pasar de miembro a afiliado de marca",
+      "pasar de miembro a afiliada de marca",
+      "convertir miembro en afiliado",
+      "convertirme en afiliado de marca",
+      "convertirme en afiliada de marca",
+      "convertirse en afiliado de marca",
+      "conviertete en afiliado de marca",
+      "cambiar tipo de cuenta",
+      "cambio de tipo de cuenta",
+      "cambiar de cliente preferente a afiliado",
+      "pasar de cliente preferente a afiliado",
+      "pasar de cliente preferente a afiliada",
+      "cliente preferente a afiliado de marca",
+      "convertir cuenta a afiliado"
+    ],
+    "phrases": [
+      "como cambiar de miembro a afiliado de marca",
+      "como paso de miembro a afiliado",
+      "como pasar de miembro a afiliado de marca",
+      "como pasar de miembro a afiliada de marca",
+      "como me convierto en afiliado de marca",
+      "como me hago afiliada de marca",
+      "soy miembro y quiero ser afiliada de marca",
+      "como hacer el cambio de miembro a afiliado",
+      "quiero convertirme en afiliado de marca",
+      "quiero convertirme en afiliada de marca",
+      "como hacerse afiliado de marca",
+      "como ser afiliado de marca",
+      "como cambiar mi cuenta a afiliado de marca",
+      "como cambio mi tipo de cuenta",
+      "como pasar de cliente preferente a afiliado de marca",
+      "como convertir cliente preferente en afiliado de marca",
+      "donde encuentro conviertete en afiliado de marca",
+      "como activar mi cuenta de afiliado",
+      "tutorial para ser afiliado de marca",
+      "guia para cambiar miembro por afiliado de marca",
+      "descargar guia cambio afiliado",
+      "miembro nu skin a afiliado de marca",
+      "como subir de miembro a afiliado",
+      "quiero dejar de ser miembro y ser afiliado",
+      "como cambiar perfil de cuenta en nu skin",
+      "como paso de cliente a afiliado de marca",
+      "como cambiar mi membresia a afiliado de marca"
+    ],
+    "keywords": [
+      "cambio de cuenta",
+      "cuenta de miembro",
+      "afiliado de marca",
+      "cliente preferente",
+      "perfil de la cuenta",
+      "tipo de cuenta",
+      "conviertete",
+      "brand affiliate"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Te comparto la guía para cambiar una cuenta existente de Miembro/Cliente Preferente a Afiliado de Marca en la web de Nu Skin. Abrí la imagen para verla en grande y descargarla.\n\nImportante: Nu Skin revisa la solicitud y, una vez aprobada, actualiza la cuenta."
+      },
+      {
+        "type": "download-image",
+        "title": "Guía · De miembro a afiliado de marca",
+        "description": "Paso a paso para hacer el cambio desde la página web.",
+        "src": "/assets/iris/tramites/cambio-miembro-afiliado-marca.jpg",
+        "filename": "guia-cambio-miembro-afiliado-de-marca.jpg",
+        "mediaType": "image",
+        "resourceKind": "guide"
+      }
+    ],
+    "sourceFlow": "CAMBIO MIEMBRO A AFILIADO DE MARCA"
   }
 ];
 
@@ -2702,6 +2783,11 @@
     "command": "tramites",
     "topicId": "tramites",
     "label": "Trámites"
+  },
+  {
+    "command": "cambio miembro afiliado",
+    "topicId": "cambio-miembro-afiliado",
+    "label": "De miembro a afiliado de marca"
   },
   {
     "command": "primera venta",
