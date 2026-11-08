@@ -50,6 +50,8 @@ test("la guía es la imagen JPEG original y se ofrece para descargar", () => {
 
 test("las formas habituales de preguntar encuentran la guía correcta", () => {
   const iris = loadIris();
+  const topic = iris.window.BotContent.find(item => item.id === "cambio-miembro-afiliado");
+  assert.equal(1 + topic.aliases.length + topic.phrases.length, 5);
   const queries = [
     "cambio miembro afiliado",
     "miembro a afiliado",
