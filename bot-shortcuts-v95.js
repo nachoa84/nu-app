@@ -35,7 +35,7 @@
       description: "Gestiones, documentación e información por mercado.",
       tone: "orange",
       icon: "document",
-      commands: ["tramites", "info argentina"]
+      commands: ["tramites", "cambio miembro afiliado", "info argentina"]
     },
     {
       id: "comunidad-llamadas",

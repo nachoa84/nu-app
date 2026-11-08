@@ -2722,6 +2722,45 @@
       {"type":"download-image","title":"Guía de cancelación de pedidos","description":"Pasos, ventana de 15 minutos y recomendaciones.","src":"/assets/cancelacion-pedidos.jpg","filename":"guia-cancelacion-pedidos.jpg","mediaType":"image","resourceKind":"guide"}
     ],
     "sourceFlow": "CANCELACIÓN DE PEDIDOS"
+  },
+  {
+    "id": "cambio-miembro-afiliado",
+    "title": "Cambio de miembro a afiliado de marca",
+    "command": "cambio miembro afiliado",
+    "aliases": [
+      "pasar de miembro a afiliado de marca",
+      "pasar de cliente preferente a afiliado de marca",
+      "convertirme en afiliado de marca",
+      "cambiar tipo de cuenta"
+    ],
+    "phrases": [],
+    "keywords": [
+      "cambio de cuenta",
+      "cuenta de miembro",
+      "afiliado de marca",
+      "afiliada de marca",
+      "cliente preferente",
+      "perfil de la cuenta",
+      "tipo de cuenta",
+      "conviertete",
+      "brand affiliate"
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Te comparto la guía para cambiar una cuenta existente de Miembro/Cliente Preferente a Afiliado de Marca en la web de Nu Skin. Abrí la imagen para verla en grande y descargarla.\n\nImportante: Nu Skin revisa la solicitud y, una vez aprobada, actualiza la cuenta."
+      },
+      {
+        "type": "download-image",
+        "title": "Guía · De miembro a afiliado de marca",
+        "description": "Paso a paso para hacer el cambio desde la página web.",
+        "src": "/assets/iris/tramites/cambio-miembro-afiliado-marca.jpg",
+        "filename": "guia-cambio-miembro-afiliado-de-marca.jpg",
+        "mediaType": "image",
+        "resourceKind": "guide"
+      }
+    ],
+    "sourceFlow": "CAMBIO MIEMBRO A AFILIADO DE MARCA"
   }
 ];
 
@@ -2735,6 +2774,11 @@
     "command": "tramites",
     "topicId": "tramites",
     "label": "Trámites"
+  },
+  {
+    "command": "cambio miembro afiliado",
+    "topicId": "cambio-miembro-afiliado",
+    "label": "De miembro a afiliado de marca"
   },
   {
     "command": "primera venta",
