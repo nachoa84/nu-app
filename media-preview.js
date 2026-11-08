@@ -47,6 +47,7 @@ function normalizePreviewItem(item) {
     prepareShare: typeof item.prepareShare === "function" ? item.prepareShare : null,
     download: typeof item.download === "function" ? item.download : null,
     international: item.international === true,
+    locale: item.international === true && item.locale === "it" ? "it" : "es",
     url: item.url || null
   };
 }
@@ -143,6 +144,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
 
   const renderToken = ++previewRenderToken;
   const item = previewState.items[previewState.index];
+  const italian = item.international && item.locale === "it";
   const stage = document.getElementById("previewStage");
   const counter = document.getElementById("previewCounter");
   const segments = document.getElementById("previewSegments");
@@ -154,7 +156,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   const prev = document.getElementById("previewPrevBtn");
   const next = document.getElementById("previewNextBtn");
 
-  counter.textContent = `${previewState.index + 1} de ${previewState.items.length}`;
+  counter.textContent = `${previewState.index + 1} ${italian ? "di" : "de"} ${previewState.items.length}`;
 
   if (segments) {
     segments.innerHTML = previewState.items
@@ -170,7 +172,12 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   }
 
   title.textContent = item.label;
-  type.textContent = item.mediaType === "video" ? "Video" : "Imagen";
+  type.textContent = item.mediaType === "video" ? "Video" : (italian ? "Immagine" : "Imagen");
+  modal.setAttribute("lang", italian ? "it" : "es");
+  document.getElementById("mediaPreviewShell")?.setAttribute("aria-label", italian ? "Anteprima del materiale" : "Vista previa del material");
+  document.getElementById("previewCloseBtn")?.setAttribute("aria-label", italian ? "Chiudi" : "Cerrar");
+  prev.setAttribute("aria-label", italian ? "Precedente" : "Anterior");
+  next.setAttribute("aria-label", italian ? "Successivo" : "Siguiente");
 
   // Liberar también cualquier preparación del archivo de la story anterior.
   destroyActivePreviewVideo();
@@ -197,8 +204,8 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     stage.classList.remove("is-loading");
     stage.innerHTML = `
       <div class="preview-load-error">
-        <strong>No se pudo cargar este archivo</strong>
-        <span>Revisá tu conexión e intentá nuevamente.</span>
+        <strong>${italian ? "Impossibile caricare questo file" : "No se pudo cargar este archivo"}</strong>
+        <span>${italian ? "Controlla la connessione e riprova." : "Revisá tu conexión e intentá nuevamente."}</span>
       </div>
     `;
   };
@@ -234,7 +241,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
     const playButton = document.createElement("button");
     playButton.type = "button";
     playButton.className = "preview-video-play";
-    playButton.setAttribute("aria-label", "Reproducir video");
+    playButton.setAttribute("aria-label", italian ? "Riproduci video" : "Reproducir video");
     playButton.hidden = false;
     playButton.disabled = false;
     playButton.innerHTML = `
@@ -310,7 +317,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
         restoreReadyState();
 
         console.warn("No se pudo iniciar el video:", error);
-        toast("No se pudo reproducir el video.", {
+        toast(italian ? "Impossibile riprodurre il video." : "No se pudo reproducir el video.", {
           type: "error",
           duration: 3200
         });
@@ -438,12 +445,12 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   share.hidden = !item.shareable;
   share.style.display = item.shareable ? "" : "none";
   share.disabled = false;
-  share.innerHTML = `${ICONS.share}<span>Compartir</span>`;
+  share.innerHTML = `${ICONS.share}<span>${italian ? "Condividi" : "Compartir"}</span>`;
   share.onclick = item.prepareShare ? null : () => shareAsset(item.src, item.label, item.mediaType, share);
   if (item.prepareShare) {
     share.disabled = true;
     try { activePreviewCustomShare = item.prepareShare(share) || null; }
-    catch (error) { console.warn("No se pudo preparar Compartir", error); share.textContent = "Compartir no disponible"; }
+    catch (error) { console.warn("No se pudo preparar Compartir", error); share.textContent = italian ? "Condivisione non disponibile" : "Compartir no disponible"; }
     // Una imagen de caché puede estar completa antes de instalar el callback.
     const shown = item.mediaType === "image" ? stage.querySelector("img") : null;
     if (shown?.complete && shown.naturalWidth > 0) activePreviewCustomShare?.onDisplayReady?.();
@@ -459,7 +466,7 @@ function renderMediaPreview({ enterFrom = null, favoritePulse = false } = {}) {
   }
   if (downloadButton) {
     downloadButton.style.display = item.download ? "" : "none";
-    downloadButton.textContent = "Descargar";
+    downloadButton.textContent = italian ? "Scarica" : "Descargar";
     downloadButton.onclick = item.download || null;
   }
 

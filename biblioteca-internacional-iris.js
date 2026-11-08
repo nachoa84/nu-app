@@ -28,6 +28,8 @@
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
   const isValid=item=>item&&/^(image|video)$/.test(item.type)&&/^\/api\/international-assets\/[a-z0-9-]+\/\d+\/\d+(?:\?v=[a-z0-9-]+)?$/.test(item.src);
   const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
+  const isItalian=id=>id.endsWith("/it");
+  const ui=(id,spanish,italian)=>isItalian(id)?italian:spanish;
 
   function frame(heading,subtitle,back){
     if(disposePilotPreview){
@@ -60,24 +62,24 @@
     }
   }
   function showDays(id){
-    const list=frame(title(id),"Elegí uno de los 10 días",showGroups);
+    const list=frame(title(id),ui(id,"Elegí uno de los 10 días","Scegli uno dei 10 giorni"),showGroups);
     if(!list)return;
     const days=create("div","nu-il-days");
-    for(let day=1;day<=10;day++)days.append(button("Día "+day,()=>showDay(id,day),"nu-il-day"));
+    for(let day=1;day<=10;day++)days.append(button(ui(id,"Día ","Giorno ")+day,()=>showDay(id,day),"nu-il-day"));
     list.append(days);
   }
   function showDay(id,day){
-    const list=frame(title(id),"Día "+day+" de 10",()=>showDays(id));
+    const list=frame(title(id),ui(id,"Día "+day+" de 10","Giorno "+day+" di 10"),()=>showDays(id));
     if(!list)return;
     const files=entries(id,day);
-    if(!files.length){list.append(create("p","nu-il-notice","Cargando materiales…"));return;}
+    if(!files.length){list.append(create("p","nu-il-notice",ui(id,"Cargando materiales…","Caricamento dei materiali…")));return;}
     files.forEach((file,index)=>{
       if(!isValid(file))return;
       const row=button("",()=>showCanonicalGallery(id,day,index),"nu-il-media-row");
       const thumb=create("span","nu-il-thumbnail");
       if(file.type==="image"){
         const img=create("img");
-        img.alt="Material "+(index+1);
+        img.alt=ui(id,"Material ","Materiale ")+(index+1);
         img.loading="lazy";
         img.decoding="async";
         let originalTried=false;
@@ -85,14 +87,14 @@
           if(!originalTried&&file.thumbSrc){
             originalTried=true;img.src=file.src;return;
           }
-          thumb.replaceChildren(create("span","nu-il-error","Sin vista previa"));
+          thumb.replaceChildren(create("span","nu-il-error",ui(id,"Sin vista previa","Anteprima non disponibile")));
         };
         img.src=file.thumbSrc||file.src;
         thumb.append(img);
       }else{
         if(hasStaticPoster(file)){
           const still=create("img");
-          still.alt="Primer fotograma del video";
+          still.alt=ui(id,"Primer fotograma del video","Primo fotogramma del video");
           still.loading="lazy";still.decoding="async";
           still.src=file.poster;
           thumb.append(still);
@@ -100,7 +102,7 @@
         thumb.append(create("span","nu-il-play","▶"));
       }
       const copy=create("span","nu-il-media-copy");
-      copy.append(create("strong","","Material "+(index+1)),create("small","",file.type==="video"?"Video":"Imagen"));
+      copy.append(create("strong","",ui(id,"Material ","Materiale ")+(index+1)),create("small","",file.type==="video"?"Video":ui(id,"Imagen","Immagine")));
       row.append(thumb,copy,create("span","nu-il-chevron","›"));list.append(row);
     });
   }
@@ -131,7 +133,8 @@
         src:file.src,
         displaySrc:file.type==="image"?(file.previewSrc||file.src):undefined,
         fallbackSrc:file.type==="image"?file.src:undefined,
-        label:"Material "+(position+1),
+        label:ui(id,"Material ","Materiale ")+(position+1),
+        locale:isItalian(id)?"it":"es",
         mediaType:file.type,
         poster:hasStaticPoster(file)?file.poster:undefined,
         favorite:false,
@@ -147,14 +150,14 @@
   function showPreview(id,day,index){
     const files=entries(id,day),file=files[index];
     if(!isValid(file))return;
-    const list=frame("Material "+(index+1)+" de "+files.length,title(id)+" · Día "+day,()=>showDay(id,day));
+    const list=frame(ui(id,"Material "+(index+1)+" de "+files.length,"Materiale "+(index+1)+" di "+files.length),title(id)+" · "+ui(id,"Día ","Giorno ")+day,()=>showDay(id,day));
     if(!list)return;
     const stage=create("div","nu-il-stage");
     const pilot=hasStaticPoster(file);
     let pilotVideo=null,pilotVideoObjectUrl=null,pilotShareLifecycle=null;
     if(file.type==="image"){
-      const img=create("img");img.src=file.src;img.alt="Material "+(index+1);
-      img.onerror=()=>stage.replaceChildren(create("p","nu-il-error","No se pudo cargar esta imagen."));
+      const img=create("img");img.src=file.src;img.alt=ui(id,"Material ","Materiale ")+(index+1);
+      img.onerror=()=>stage.replaceChildren(create("p","nu-il-error",ui(id,"No se pudo cargar esta imagen.","Impossibile caricare questa immagine.")));
       stage.append(img);
     }else{
       const media=create("div","nu-il-video-shell");
@@ -170,7 +173,7 @@
       const posterImage=pilot?create("img","nu-il-video-poster"):null;
       if(posterImage){
         posterImage.src=file.poster;
-        posterImage.alt="Primer fotograma";
+        posterImage.alt=ui(id,"Primer fotograma","Primo fotogramma");
       }
       let starting=false;
       const showPlaybackError=message=>{
@@ -178,7 +181,7 @@
         if(!notice){notice=create("p","nu-il-error nu-il-video-error");stage.append(notice);}
         notice.textContent=message;
       };
-      video.onerror=()=>showPlaybackError("No se pudo cargar el video. Probá nuevamente.");
+      video.onerror=()=>showPlaybackError(ui(id,"No se pudo cargar el video. Probá nuevamente.","Impossibile caricare il video. Riprova."));
       const play=button("▶",()=>{
         if(starting)return;
         starting=true;
@@ -208,11 +211,11 @@
           starting=false;
           play.style.visibility="visible";
           console.warn("No se pudo iniciar el video internacional",error);
-          showPlaybackError("No se pudo iniciar el video. Probá nuevamente.");
+          showPlaybackError(ui(id,"No se pudo iniciar el video. Probá nuevamente.","Impossibile avviare il video. Riprova."));
           if(pilot)pilotShareLifecycle?.onPause();
         });
       },"nu-il-play-overlay");
-      play.setAttribute("aria-label","Reproducir video");
+      play.setAttribute("aria-label",ui(id,"Reproducir video","Riproduci video"));
       if(posterImage)video.addEventListener("playing",()=>{
         posterImage.style.visibility="hidden";
       });
@@ -233,13 +236,13 @@
     }
     list.append(stage);
     const nav=create("div","nu-il-action-row");
-    const previous=button("← Anterior",()=>showPreview(id,day,index-1),"nu-il-action");
+    const previous=button(ui(id,"← Anterior","← Precedente"),()=>showPreview(id,day,index-1),"nu-il-action");
     previous.disabled=index===0;
-    const next=button("Siguiente →",()=>showPreview(id,day,index+1),"nu-il-action");
+    const next=button(ui(id,"Siguiente →","Successivo →"),()=>showPreview(id,day,index+1),"nu-il-action");
     next.disabled=index===files.length-1;
     nav.append(previous,next);list.append(nav);
     const actions=create("div","nu-il-action-row");
-    const share=button("Compartir",null,"nu-il-action nu-il-primary");
+    const share=button(ui(id,"Compartir","Condividi"),null,"nu-il-action nu-il-primary");
     pilotShareLifecycle=prepareInternationalShareFile(file,id,day,index,share);
     disposePilotPreview=()=>{
       pilotShareLifecycle?.dispose();
@@ -250,7 +253,7 @@
       }
       if(pilotVideoObjectUrl)URL.revokeObjectURL(pilotVideoObjectUrl);
     };
-    actions.append(share,button("Descargar",()=>download(file,id,day,index),"nu-il-action"));
+    actions.append(share,button(ui(id,"Descargar","Scarica"),()=>download(file,id,day,index),"nu-il-action"));
     list.append(actions);
   }
   async function readShareFile(item,id,day,index,onProgress,requestController){
@@ -299,15 +302,15 @@
     const readyToShare=ready=>{
       if(disposed||!control.isConnected)return;
       control.disabled=false;
-      setShareLabel("Compartir ahora");
-      control.onclick=()=>sharePreparedFile(ready);
+      setShareLabel(ui(id,"Compartir ahora","Condividi ora"));
+      control.onclick=()=>sharePreparedFile(ready,id);
     };
     const onPrepared=ready=>{
       readyToShare(ready);
       if(disposed||!control.isConnected||navigator.userActivation?.isActive===false)return;
       try{
         Promise.resolve(navigator.share({files:[ready]})).then(()=>{
-          if(!disposed&&control.isConnected)setShareLabel("Compartir");
+          if(!disposed&&control.isConnected)setShareLabel(ui(id,"Compartir","Condividi"));
         }).catch(error=>{
           if(error?.name==="AbortError")return;
           console.warn("Compartir internacional requiere otro toque",error);
@@ -318,18 +321,18 @@
     const begin=()=>{
       if(disposed||pending)return;
       const cached=shareReadyFiles.get(key);
-      if(cached){sharePreparedFile(cached);return;}
+      if(cached){sharePreparedFile(cached,id);return;}
       const controller=new AbortController();
       const task={controller,promise:null};
       pending=task;
       control.disabled=true;
-      setShareLabel("Preparando…");
+      setShareLabel(ui(id,"Preparando…","Preparazione…"));
       control.onclick=null;
       task.promise=readShareFile(item,id,day,index,(percent,downloaded)=>{
         if(disposed||pending!==task||!control.isConnected)return;
         setShareLabel(percent!==null
-          ?"Preparando "+percent+"%"
-          :"Preparando "+(downloaded/1048576).toFixed(1)+" MB");
+          ?ui(id,"Preparando ","Preparazione ")+percent+"%"
+          :ui(id,"Preparando ","Preparazione ")+(downloaded/1048576).toFixed(1)+" MB");
       },controller);
       task.promise.then(ready=>{
         if(disposed||pending!==task)return;
@@ -337,8 +340,8 @@
         rememberShareFile(key,ready);
         if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[ready]})){
           control.disabled=false;
-          setShareLabel("Compartir no disponible");
-          control.onclick=()=>alert("Este navegador no permite compartir el archivo. Podés usar Descargar.");
+          setShareLabel(ui(id,"Compartir no disponible","Condivisione non disponibile"));
+          control.onclick=()=>alert(ui(id,"Este navegador no permite compartir el archivo. Podés usar Descargar.","Questo browser non permette di condividere il file. Puoi usare Scarica."));
           return;
         }
         onPrepared(ready);
@@ -348,12 +351,12 @@
         if(disposed||error?.name==="AbortError")return;
         console.warn("No se pudo preparar el material internacional",error);
         control.disabled=false;
-        setShareLabel("Reintentar compartir");
+        setShareLabel(ui(id,"Reintentar compartir","Riprova a condividere"));
         control.onclick=begin;
       });
     };
     control.disabled=false;
-    setShareLabel("Compartir");
+    setShareLabel(ui(id,"Compartir","Condividi"));
     control.onclick=begin;
     return {
       playbackSrc(defaultSrc){
@@ -378,15 +381,15 @@
       }
     };
   }
-  function sharePreparedFile(file){
+  function sharePreparedFile(file,id){
     if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[file]})){
-      alert("Este navegador no admite compartir este formato. Podés usar Descargar para guardar el archivo.");
+      alert(ui(id,"Este navegador no admite compartir este formato. Podés usar Descargar para guardar el archivo.","Questo browser non supporta la condivisione di questo formato. Puoi usare Scarica per salvare il file."));
       return;
     }
     const showError=error=>{
       if(error?.name==="AbortError")return;
       console.warn("No se pudo compartir el material internacional",error);
-      alert("No se pudo abrir el menú de compartir ("+(error?.name||"error")+"). El archivo no se descargó.");
+      alert(ui(id,"No se pudo abrir el menú de compartir (","Impossibile aprire il menu di condivisione (")+(error?.name||"error")+ui(id,"). El archivo no se descargó.","). Il file non è stato scaricato."));
     };
     try{Promise.resolve(navigator.share({files:[file]})).catch(showError);}
     catch(error){showError(error);}
@@ -403,7 +406,7 @@
       link.href=url;link.download="nu-"+id.replace("/","-")+"-dia-"+day+"-"+(index+1)+"."+ext;
       document.body.append(link);link.click();link.remove();
       setTimeout(()=>URL.revokeObjectURL(url),60000);
-    }catch{alert("No se pudo descargar este material.");}
+    }catch{alert(ui(id,"No se pudo descargar este material.","Impossibile scaricare questo materiale."));}
   }
   window.openInternationalLibrary=(targetSheet,back)=>{
     if(!targetSheet?.isConnected&&typeof window.openBotQuickAccess==="function"){

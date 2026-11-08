@@ -61,6 +61,13 @@
     const [productId,countryId,dayText]=parse();
     const product=collections.find(x=>x.id===productId);
     const country=product?.countries.find(x=>x.id===countryId);
+    const italian=country?.id==="it";
+    document.documentElement.lang=italian?"it":"es";
+    const headerTitle=document.querySelector("header h1");
+    if(headerTitle)headerTitle.textContent=italian?"Biblioteca Internazionale":"Biblioteca Internacional";
+    const dayLabel=n=>(italian?"Giorno ":"Día ")+n;
+    const materialLabel=n=>(italian?"Materiale ":"Material ")+n;
+    const dayStatus=n=>italian?"Giorno "+n+" di 10":"Día "+n+" de 10";
     const day=Number(dayText);
     if(!product) {
       root.append(el("p","intro","Materiales organizados para que puedas encontrarlos y compartirlos fácilmente."));
@@ -69,31 +76,33 @@
       for(const item of collections)cards.append(card(item.name,item.countries.length+" mercado(s) disponibles",()=>go(item.id)));
       root.append(cards);return;
     }
-    back("Productos",()=>go());
+    back(italian?"Prodotti":"Productos",()=>go());
     if(!country) {
       heading(product.name,"Elegí el país del material.");
       const cards=el("div","cards");
       for(const item of product.countries)cards.append(card(item.flag+" "+item.label,"Material organizado en 10 días",()=>go(product.id,item.id)));
       root.append(cards);return;
     }
-    back("Países",()=>go(product.id));
-    heading(product.name+" · "+country.flag+" "+country.label,day>=1&&day<=10?"Día "+day+" de 10":"Elegí el día que necesitás. Todos los días se podrán consultar libremente.");
+    back(italian?"Paesi":"Países",()=>go(product.id));
+    heading(product.name+" · "+country.flag+" "+country.label,day>=1&&day<=10?dayStatus(day):italian?"Scegli il giorno che ti interessa. Puoi consultare liberamente tutti i giorni.":"Elegí el día que necesitás. Todos los días se podrán consultar libremente.");
     const days=el("div","days");
-    for(let n=1;n<=10;n++){const b=el("button","day","Día "+n);b.type="button";b.setAttribute("aria-current",String(n===day));b.addEventListener("click",()=>go(product.id,country.id,n));days.append(b);}
+    for(let n=1;n<=10;n++){const b=el("button","day",dayLabel(n));b.type="button";b.setAttribute("aria-current",String(n===day));b.addEventListener("click",()=>go(product.id,country.id,n));days.append(b);}
     root.append(days);
     if(!(day>=1&&day<=10&&Number.isInteger(day)))return;
     const key=product.id+"/"+country.id+"/"+day;
     const entries=Array.isArray(manifest[key])?manifest[key]:[];
-    if(!entries.length){root.append(el("p","notice","Material pendiente de cargar. La estructura está preparada, pero todavía no hay archivos publicados para este día."));return;}
-    for(const item of entries){
+    if(!entries.length){root.append(el("p","notice",italian?"Materiale in fase di caricamento. La struttura è pronta, ma non ci sono ancora file pubblicati per questo giorno.":"Material pendiente de cargar. La estructura está preparada, pero todavía no hay archivos publicados para este día."));return;}
+    for(let index=0;index<entries.length;index++){
+      const item=entries[index];
+      const label=italian?materialLabel(index+1):(item?.title||"Material");
       if(!item||typeof item.src!=="string"||!/^\/(assets\/|api\/bot-assets\/|api\/international-assets\/)[a-z0-9_./%-]+$/i.test(item.src)||item.src.includes(".."))continue;
-      const box=el("article","asset");box.append(el("strong","",item.title||"Material"));
-      if(item.type==="image"){const img=el("img");img.src=item.src;img.loading="lazy";img.alt=item.title||"Material visual";box.append(img);}
+      const box=el("article","asset");box.append(el("strong","",label));
+      if(item.type==="image"){const img=el("img");img.src=item.src;img.loading="lazy";img.alt=italian?"Materiale visivo":(item.title||"Material visual");box.append(img);}
       else if(item.type==="video"){const video=el("video");video.src=item.src;video.controls=true;video.preload="metadata";video.playsInline=true;box.append(video);}
       else continue;
-      const link=el("a","","Abrir o descargar archivo");link.href=item.src;link.target="_blank";link.rel="noopener";box.append(link);root.append(box);
+      const link=el("a","",italian?"Apri o scarica il file":"Abrir o descargar archivo");link.href=item.src;link.target="_blank";link.rel="noopener";box.append(link);root.append(box);
     }
-    root.append(el("p","footer-note","Los archivos se muestran en el orden definido para este día."));
+    root.append(el("p","footer-note",italian?"I file sono mostrati nell’ordine previsto per questo giorno.":"Los archivos se muestran en el orden definido para este día."));
   }
   addEventListener("nu-international-catalog-ready", () => { manifest = window.NuInternationalLibraryData || {}; render(); });
   addEventListener("hashchange",render);render();
