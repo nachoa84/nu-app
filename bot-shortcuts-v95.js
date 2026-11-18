@@ -24,6 +24,7 @@
         "como usar well spa",
         "como usar face wash 180",
         "box colageno",
+        "fichas tecnicas",
         "como asesorar lumi spa",
         "estrategia colageno europa"
       ]

@@ -1903,9 +1903,8 @@
     ],
     "phrases": [
       "quiero ver las fichas tecnicas",
-      "quiero ver las fichas técnicas",
       "donde estan las fichas tecnicas",
-      "dónde están las fichas técnicas"
+      "fichas tecnicas argentina"
     ],
     "keywords": [
       "fichas tecnicas",
@@ -1914,121 +1913,3579 @@
     "blocks": [
       {
         "type": "text",
-        "content": "Consultá las fichas técnicas disponibles de los productos."
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "Beauty Focus Collagen+",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "ageLOC y dispositivos",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/collagen-plus.pdf"
+            "title": "ageLOC Tru Face Essence Ultra — presentación con dosificador",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/AR-ageLOC-Tru-Face-Essence-Ultra-Pump-PIP.pdf"
+          },
+          {
+            "title": "AP 24 — Pasta dental blanqueadora con flúor",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ar-ap-24-pip.pdf"
+          },
+          {
+            "title": "ageLOC Elements",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Elements.pdf"
+          },
+          {
+            "title": "ageLOC Boost",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-boost-pip.pdf"
+          },
+          {
+            "title": "ageLOC Future Serum",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Future_Serum.pdf"
+          },
+          {
+            "title": "ageLOC Galvanic Spa",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_galvanic_spa_III_pip_ar.pdf"
+          },
+          {
+            "title": "Galvanic Spa PowerMask",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_powermask_pip_ar.pdf"
+          },
+          {
+            "title": "ageLOC Gentle Cleanse & Tone",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Gentle_Cleanse&Tone.pdf"
+          },
+          {
+            "title": "ageLOC LumiSpa",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_lumispa_pip_ar.pdf"
+          },
+          {
+            "title": "ageLOC LumiSpa Accent",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC-LumiSpa-Accent.pdf"
+          },
+          {
+            "title": "ageLOC LumiSpa IdealEyes",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC-LumiSpa-IdealEyes.pdf"
+          },
+          {
+            "title": "ageLOC LumiSpa iO",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-lumispa-io-pip.pdf"
+          },
+          {
+            "title": "ageLOC Radiant Day",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Radiant_Day.pdf"
+          },
+          {
+            "title": "ageLOC Transformation",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Transformation.pdf"
+          },
+          {
+            "title": "ageLOC Transforming Night",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Transforming_Night.pdf"
+          },
+          {
+            "title": "ageLOC Tru Face Essence Ultra Uplifting Cream",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-tfeu-uplifting-cream-pip.pdf"
+          },
+          {
+            "title": "ageLOC WellSpa iO",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc-wellspa-io-system-pip-ar.pdf"
+          },
+          {
+            "title": "ageLOC Galvanic Spa EnergEyes",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-energeyes-pip.pdf"
+          },
+          {
+            "title": "ageLOC Geles Faciales Galvanic Spa",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Face_Gels.pdf"
+          },
+          {
+            "title": "ageLOC Galvanic Body Spa",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ar-galvanic-body-spa-pip.pdf"
+          },
+          {
+            "title": "ageLOC Body Shaping Gel",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Body_Shaping.pdf"
+          },
+          {
+            "title": "ageLOC Dermatic Effects",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Dermatic_Effects.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "ageLOC LumiSpa",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Epoch",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/ageloc-lumispa.pdf"
+            "title": "Epoch Polishing Bar",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/epoch_polishing_bar_pip_ar.pdf"
+          },
+          {
+            "title": "Epoch Yin and Yang Mask",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/epoch-yin-and-yang-mask-pip-ar.pdf"
+          },
+          {
+            "title": "Glacial Marine Mud",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/Glacial_Marine_Mud.pdf"
+          },
+          {
+            "title": "Sole Solution",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/Sole_Solution.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "ageLOC Galvanic Spa",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Nutricentials",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/ageloc-galvanic-spa.pdf"
+            "title": "Nutricentials Day Away",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-away-pip-argentina.pdf"
+          },
+          {
+            "title": "Creamy Cleansing Lotion",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Creamy_Cleansing_Lotion_copia.pdf"
+          },
+          {
+            "title": "Moisture Restore",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore.pdf"
+          },
+          {
+            "title": "Moisture Restore Day — piel mixta a grasa",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore_Day%20M_G.pdf"
+          },
+          {
+            "title": "Moisture Restore Day — piel normal a seca",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore_Day%20N_S.pdf"
+          },
+          {
+            "title": "Night Supply",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Night_Supply.pdf"
+          },
+          {
+            "title": "Nutricentials Bioadaptive Skin Care — sistema",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-bioadaptive-skin-care-system-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Brighter Day",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-brighter-day-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Celltrex Always Right Recovery Fluid",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-celltrex-always-right-recovery-fluid-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Celltrex Always Right Recovery Mask",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-celltrex-always-right-recovery-mask-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Day Dream Protective Cream",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-dream-protective-cream-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Day Dream Protective Lotion",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-dream-protective-lotion-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Dew All Day",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-dew-all-day-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Eye Love Bright Eyes",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-eye-love-bright-eyes-pip.pdf"
+          },
+          {
+            "title": "Nutricentials Here You Glow",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-here-you-glow-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials HydraClean",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-hydraclean-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials In Balance",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-in-balance-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Moisturize Me",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-moisturize-me-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Pillow Glow",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pillow-glow-pip.pdf"
+          },
+          {
+            "title": "Nutricentials Pumps Bakuchiol",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-bakuchiol.pdf"
+          },
+          {
+            "title": "Nutricentials Pumps Vitamin C + Collagen",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-vitamin-c-plus-collagen-pip-ar.pdf"
+          },
+          {
+            "title": "Nutricentials Pumps Ceramidas + Postbióticos",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-ceramides-postbiotics-pip.pdf"
+          },
+          {
+            "title": "Nutricentials Pumps Hyaluronic Acid + B5",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-hyaluronic-acid-b5.pdf"
+          },
+          {
+            "title": "Nutricentials Spa Day",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-spa-day-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials Thirst Fix",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-thirst-fix-pip-argentina.pdf"
+          },
+          {
+            "title": "Nutricentials To Be Clear",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-to-be-clear-pip-argentina.pdf"
+          },
+          {
+            "title": "pH Balance Toner",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/pH_Balance_Toner.pdf"
+          },
+          {
+            "title": "pH Balance Mattefying Toner",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/pH_Balance_Toner_Mattefying.pdf"
+          },
+          {
+            "title": "Pure Cleansing Gel",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Pure_Cleansing_Gel.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "ageLOC WellSpa iO",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Protección solar y corporal",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/ageloc-wellspa-io.pdf"
+            "title": "Sunright Insta Glow",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/new-sunright-insta-glow-pip-ar.pdf"
+          },
+          {
+            "title": "Sunright 50 y Lip Balm SPF 15",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Defensa_Ambiental/Sunright_Products.pdf"
+          },
+          {
+            "title": "Scion Desodorante Roll-On",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/scioncolor/scion-deodorant-pip-ar.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "ageLOC Boost",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Cuidado capilar",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/ageloc-boost.pdf"
+            "title": "ageLOC Nutriol Scalp & Hair System",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-ageloc-nutriol-system-pip.pdf"
+          },
+          {
+            "title": "ageLOC Nutriol Intensive Scalp & Hair Serum",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-nutriol-intensive-scalp-serum-pip.pdf"
+          },
+          {
+            "title": "ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-nutriol-scalp-shamp-cond-pip.pdf"
+          },
+          {
+            "title": "Nutriol Hair Fitness Treatment & Shampoo",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/Nutriol_Hair_Fitness_Treatment_&_Shampoo.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "ageLOC Youth",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Cuidado facial",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/ageloc-youth.pdf"
+            "title": "Clear Action Day Treatment",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Day_Treatment.pdf"
+          },
+          {
+            "title": "Clear Action Foaming Cleanser",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Foaming_Cleanser.pdf"
+          },
+          {
+            "title": "Clear Action Night Treatment",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Night_Treatment.pdf"
+          },
+          {
+            "title": "Clear Action Sistema",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Sistema.pdf"
+          },
+          {
+            "title": "Clear Action Toner",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Toner.pdf"
+          },
+          {
+            "title": "ageLOC Tru Face Essence Ultra — cápsulas",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/tfeu-pip-ar-23102892.pdf"
+          },
+          {
+            "title": "Tru Face Essence Ultra — sobre de recarga",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/ageLOC-Tru-Face-Essence-Ultra-Refill-pouch-PIP_AR.pdf"
+          },
+          {
+            "title": "Tru Face Line Corrector",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/Tru_Face_Line_Corrector.pdf"
+          },
+          {
+            "title": "Enhancer",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/Enhancer.pdf"
+          },
+          {
+            "title": "NaPCA Moisture Mist",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/napca-moisture-mist-pip-global-spanish.pdf"
+          },
+          {
+            "title": "NaPCA Moisturizer",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/napca-Mosturizer-ar.pdf"
+          },
+          {
+            "title": "Rejuvenating Cream",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/Rejuvenating_Cream.pdf"
+          },
+          {
+            "title": "Ultimate Mask Snowhite",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/ultimate-mask-snowhite-pip-ar.pdf"
+          },
+          {
+            "title": "Ultimate Mask Waterfull",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/waterfull-mask-pip-ar.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "LifePak",
+        "kicker": "FICHAS TÉCNICAS · ARGENTINA",
+        "title": "Pharmanex",
+        "country": "Argentina",
+        "collapsible": true,
         "actions": [
           {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/lifepak.pdf"
+            "title": "YouthSpan",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/ageloc-youthspan-pip-ar.pdf"
+          },
+          {
+            "title": "Beauty Focus Collagen+",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/ar-beauty-focus-collagen-plus-pip.pdf"
+          },
+          {
+            "title": "LifePak",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/LifePak.pdf"
+          },
+          {
+            "title": "Optimum Omega",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/optimum-omega-pip-argentina.pdf"
+          },
+          {
+            "title": "VitaMeal",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/NTC/VitaMeal.pdf"
           }
         ]
       },
       {
         "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "LifePak Elements",
+        "kicker": "MATERIAL PREEXISTENTE",
+        "title": "LifePak Elements y Nu Biome",
+        "description": "Estos archivos ya estaban en Iris. Su correspondencia con Argentina está pendiente de verificar.",
         "actions": [
           {
-            "title": "Ver ficha técnica",
+            "title": "LifePak Elements",
             "url": "/assets/iris/fichas-tecnicas/lifepak-elements.pdf"
-          }
-        ]
-      },
-      {
-        "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "Nu Biome",
-        "actions": [
+          },
           {
-            "title": "Ver ficha técnica",
+            "title": "Nu Biome",
             "url": "/assets/iris/fichas-tecnicas/nu-biome.pdf"
-          }
-        ]
-      },
-      {
-        "type": "document",
-        "kicker": "FICHA TÉCNICA",
-        "title": "Optimum Omega",
-        "actions": [
-          {
-            "title": "Ver ficha técnica",
-            "url": "/assets/iris/fichas-tecnicas/optimum-omega.pdf"
           }
         ]
       }
     ],
     "sourceFlow": "FICHAS TECNICAS",
-    "hidden": true
+    "hidden": true,
+    "country": "Argentina"
+  },
+  {
+    "id": "ficha-ar-ageloc-tru-face-essence-ultra-presentacion-con-dosificador",
+    "title": "Ficha técnica · ageLOC Tru Face Essence Ultra — presentación con dosificador",
+    "command": "ficha tecnica ageLOC Tru Face Essence Ultra — presentación con dosificador",
+    "aliases": [
+      "ficha ageLOC Tru Face Essence Ultra — presentación con dosificador",
+      "pdf ageLOC Tru Face Essence Ultra — presentación con dosificador"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Tru Face Essence Ultra — presentación con dosificador",
+      "ficha tecnica de ageLOC Tru Face Essence Ultra — presentación con dosificador"
+    ],
+    "keywords": [
+      "ageLOC Tru Face Essence Ultra — presentación con dosificador",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Tru Face Essence Ultra — presentación con dosificador",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/AR-ageLOC-Tru-Face-Essence-Ultra-Pump-PIP.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ap-24-pasta-dental-blanqueadora-con-fluor",
+    "title": "Ficha técnica · AP 24 — Pasta dental blanqueadora con flúor",
+    "command": "ficha tecnica AP 24 — Pasta dental blanqueadora con flúor",
+    "aliases": [
+      "ficha AP 24 — Pasta dental blanqueadora con flúor",
+      "pdf AP 24 — Pasta dental blanqueadora con flúor"
+    ],
+    "phrases": [
+      "descargar ficha tecnica AP 24 — Pasta dental blanqueadora con flúor",
+      "ficha tecnica de AP 24 — Pasta dental blanqueadora con flúor"
+    ],
+    "keywords": [
+      "AP 24 — Pasta dental blanqueadora con flúor",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "AP 24 — Pasta dental blanqueadora con flúor",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ar-ap-24-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-elements",
+    "title": "Ficha técnica · ageLOC Elements",
+    "command": "ficha tecnica ageLOC Elements",
+    "aliases": [
+      "ficha ageLOC Elements",
+      "pdf ageLOC Elements"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Elements",
+      "ficha tecnica de ageLOC Elements"
+    ],
+    "keywords": [
+      "ageLOC Elements",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Elements",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Elements.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-boost",
+    "title": "Ficha técnica · ageLOC Boost",
+    "command": "ficha tecnica ageLOC Boost",
+    "aliases": [
+      "ficha ageLOC Boost",
+      "pdf ageLOC Boost"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Boost",
+      "ficha tecnica de ageLOC Boost"
+    ],
+    "keywords": [
+      "ageLOC Boost",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Boost",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-boost-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-future-serum",
+    "title": "Ficha técnica · ageLOC Future Serum",
+    "command": "ficha tecnica ageLOC Future Serum",
+    "aliases": [
+      "ficha ageLOC Future Serum",
+      "pdf ageLOC Future Serum"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Future Serum",
+      "ficha tecnica de ageLOC Future Serum"
+    ],
+    "keywords": [
+      "ageLOC Future Serum",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Future Serum",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Future_Serum.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-galvanic-spa",
+    "title": "Ficha técnica · ageLOC Galvanic Spa",
+    "command": "ficha tecnica ageLOC Galvanic Spa",
+    "aliases": [
+      "ficha ageLOC Galvanic Spa",
+      "pdf ageLOC Galvanic Spa",
+      "ficha tecnica galvanic"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Galvanic Spa",
+      "ficha tecnica de ageLOC Galvanic Spa"
+    ],
+    "keywords": [
+      "ageLOC Galvanic Spa",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Galvanic Spa",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_galvanic_spa_III_pip_ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-galvanic-spa-powermask",
+    "title": "Ficha técnica · Galvanic Spa PowerMask",
+    "command": "ficha tecnica Galvanic Spa PowerMask",
+    "aliases": [
+      "ficha Galvanic Spa PowerMask",
+      "pdf Galvanic Spa PowerMask"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Galvanic Spa PowerMask",
+      "ficha tecnica de Galvanic Spa PowerMask"
+    ],
+    "keywords": [
+      "Galvanic Spa PowerMask",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Galvanic Spa PowerMask",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_powermask_pip_ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-gentle-cleanse-tone",
+    "title": "Ficha técnica · ageLOC Gentle Cleanse & Tone",
+    "command": "ficha tecnica ageLOC Gentle Cleanse & Tone",
+    "aliases": [
+      "ficha ageLOC Gentle Cleanse & Tone",
+      "pdf ageLOC Gentle Cleanse & Tone"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Gentle Cleanse & Tone",
+      "ficha tecnica de ageLOC Gentle Cleanse & Tone"
+    ],
+    "keywords": [
+      "ageLOC Gentle Cleanse & Tone",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Gentle Cleanse & Tone",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Gentle_Cleanse&Tone.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-lumispa",
+    "title": "Ficha técnica · ageLOC LumiSpa",
+    "command": "ficha tecnica ageLOC LumiSpa",
+    "aliases": [
+      "ficha ageLOC LumiSpa",
+      "pdf ageLOC LumiSpa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC LumiSpa",
+      "ficha tecnica de ageLOC LumiSpa"
+    ],
+    "keywords": [
+      "ageLOC LumiSpa",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC LumiSpa",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc_lumispa_pip_ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-lumispa-accent",
+    "title": "Ficha técnica · ageLOC LumiSpa Accent",
+    "command": "ficha tecnica ageLOC LumiSpa Accent",
+    "aliases": [
+      "ficha ageLOC LumiSpa Accent",
+      "pdf ageLOC LumiSpa Accent"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC LumiSpa Accent",
+      "ficha tecnica de ageLOC LumiSpa Accent"
+    ],
+    "keywords": [
+      "ageLOC LumiSpa Accent",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC LumiSpa Accent",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC-LumiSpa-Accent.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-lumispa-idealeyes",
+    "title": "Ficha técnica · ageLOC LumiSpa IdealEyes",
+    "command": "ficha tecnica ageLOC LumiSpa IdealEyes",
+    "aliases": [
+      "ficha ageLOC LumiSpa IdealEyes",
+      "pdf ageLOC LumiSpa IdealEyes"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC LumiSpa IdealEyes",
+      "ficha tecnica de ageLOC LumiSpa IdealEyes"
+    ],
+    "keywords": [
+      "ageLOC LumiSpa IdealEyes",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC LumiSpa IdealEyes",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC-LumiSpa-IdealEyes.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-lumispa-io",
+    "title": "Ficha técnica · ageLOC LumiSpa iO",
+    "command": "ficha tecnica ageLOC LumiSpa iO",
+    "aliases": [
+      "ficha ageLOC LumiSpa iO",
+      "pdf ageLOC LumiSpa iO",
+      "ficha tecnica lumispa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC LumiSpa iO",
+      "ficha tecnica de ageLOC LumiSpa iO"
+    ],
+    "keywords": [
+      "ageLOC LumiSpa iO",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC LumiSpa iO",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-lumispa-io-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-radiant-day",
+    "title": "Ficha técnica · ageLOC Radiant Day",
+    "command": "ficha tecnica ageLOC Radiant Day",
+    "aliases": [
+      "ficha ageLOC Radiant Day",
+      "pdf ageLOC Radiant Day"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Radiant Day",
+      "ficha tecnica de ageLOC Radiant Day"
+    ],
+    "keywords": [
+      "ageLOC Radiant Day",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Radiant Day",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Radiant_Day.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-transformation",
+    "title": "Ficha técnica · ageLOC Transformation",
+    "command": "ficha tecnica ageLOC Transformation",
+    "aliases": [
+      "ficha ageLOC Transformation",
+      "pdf ageLOC Transformation"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Transformation",
+      "ficha tecnica de ageLOC Transformation"
+    ],
+    "keywords": [
+      "ageLOC Transformation",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Transformation",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Transformation.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-transforming-night",
+    "title": "Ficha técnica · ageLOC Transforming Night",
+    "command": "ficha tecnica ageLOC Transforming Night",
+    "aliases": [
+      "ficha ageLOC Transforming Night",
+      "pdf ageLOC Transforming Night"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Transforming Night",
+      "ficha tecnica de ageLOC Transforming Night"
+    ],
+    "keywords": [
+      "ageLOC Transforming Night",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Transforming Night",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageLOC_Transforming_Night.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-tru-face-essence-ultra-uplifting-cream",
+    "title": "Ficha técnica · ageLOC Tru Face Essence Ultra Uplifting Cream",
+    "command": "ficha tecnica ageLOC Tru Face Essence Ultra Uplifting Cream",
+    "aliases": [
+      "ficha ageLOC Tru Face Essence Ultra Uplifting Cream",
+      "pdf ageLOC Tru Face Essence Ultra Uplifting Cream"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Tru Face Essence Ultra Uplifting Cream",
+      "ficha tecnica de ageLOC Tru Face Essence Ultra Uplifting Cream"
+    ],
+    "keywords": [
+      "ageLOC Tru Face Essence Ultra Uplifting Cream",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Tru Face Essence Ultra Uplifting Cream",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-ageloc-tfeu-uplifting-cream-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-wellspa-io",
+    "title": "Ficha técnica · ageLOC WellSpa iO",
+    "command": "ficha tecnica ageLOC WellSpa iO",
+    "aliases": [
+      "ficha ageLOC WellSpa iO",
+      "pdf ageLOC WellSpa iO",
+      "ficha tecnica wellspa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC WellSpa iO",
+      "ficha tecnica de ageLOC WellSpa iO"
+    ],
+    "keywords": [
+      "ageLOC WellSpa iO",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC WellSpa iO",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ageloc-wellspa-io-system-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-galvanic-spa-energeyes",
+    "title": "Ficha técnica · ageLOC Galvanic Spa EnergEyes",
+    "command": "ficha tecnica ageLOC Galvanic Spa EnergEyes",
+    "aliases": [
+      "ficha ageLOC Galvanic Spa EnergEyes",
+      "pdf ageLOC Galvanic Spa EnergEyes"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Galvanic Spa EnergEyes",
+      "ficha tecnica de ageLOC Galvanic Spa EnergEyes"
+    ],
+    "keywords": [
+      "ageLOC Galvanic Spa EnergEyes",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Galvanic Spa EnergEyes",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/ageloc/ar-energeyes-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-epoch-polishing-bar",
+    "title": "Ficha técnica · Epoch Polishing Bar",
+    "command": "ficha tecnica Epoch Polishing Bar",
+    "aliases": [
+      "ficha Epoch Polishing Bar",
+      "pdf Epoch Polishing Bar"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Epoch Polishing Bar",
+      "ficha tecnica de Epoch Polishing Bar"
+    ],
+    "keywords": [
+      "Epoch Polishing Bar",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Epoch Polishing Bar",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/epoch_polishing_bar_pip_ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-epoch-yin-and-yang-mask",
+    "title": "Ficha técnica · Epoch Yin and Yang Mask",
+    "command": "ficha tecnica Epoch Yin and Yang Mask",
+    "aliases": [
+      "ficha Epoch Yin and Yang Mask",
+      "pdf Epoch Yin and Yang Mask"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Epoch Yin and Yang Mask",
+      "ficha tecnica de Epoch Yin and Yang Mask"
+    ],
+    "keywords": [
+      "Epoch Yin and Yang Mask",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Epoch Yin and Yang Mask",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/epoch-yin-and-yang-mask-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-glacial-marine-mud",
+    "title": "Ficha técnica · Glacial Marine Mud",
+    "command": "ficha tecnica Glacial Marine Mud",
+    "aliases": [
+      "ficha Glacial Marine Mud",
+      "pdf Glacial Marine Mud"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Glacial Marine Mud",
+      "ficha tecnica de Glacial Marine Mud"
+    ],
+    "keywords": [
+      "Glacial Marine Mud",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Glacial Marine Mud",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/Glacial_Marine_Mud.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-sole-solution",
+    "title": "Ficha técnica · Sole Solution",
+    "command": "ficha tecnica Sole Solution",
+    "aliases": [
+      "ficha Sole Solution",
+      "pdf Sole Solution"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Sole Solution",
+      "ficha tecnica de Sole Solution"
+    ],
+    "keywords": [
+      "Sole Solution",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Sole Solution",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Epoch/Sole_Solution.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-day-away",
+    "title": "Ficha técnica · Nutricentials Day Away",
+    "command": "ficha tecnica Nutricentials Day Away",
+    "aliases": [
+      "ficha Nutricentials Day Away",
+      "pdf Nutricentials Day Away"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Day Away",
+      "ficha tecnica de Nutricentials Day Away"
+    ],
+    "keywords": [
+      "Nutricentials Day Away",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Day Away",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-away-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-creamy-cleansing-lotion",
+    "title": "Ficha técnica · Creamy Cleansing Lotion",
+    "command": "ficha tecnica Creamy Cleansing Lotion",
+    "aliases": [
+      "ficha Creamy Cleansing Lotion",
+      "pdf Creamy Cleansing Lotion"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Creamy Cleansing Lotion",
+      "ficha tecnica de Creamy Cleansing Lotion"
+    ],
+    "keywords": [
+      "Creamy Cleansing Lotion",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Creamy Cleansing Lotion",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Creamy_Cleansing_Lotion_copia.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-moisture-restore",
+    "title": "Ficha técnica · Moisture Restore",
+    "command": "ficha tecnica Moisture Restore",
+    "aliases": [
+      "ficha Moisture Restore",
+      "pdf Moisture Restore"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Moisture Restore",
+      "ficha tecnica de Moisture Restore"
+    ],
+    "keywords": [
+      "Moisture Restore",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Moisture Restore",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-moisture-restore-day-piel-mixta-a-grasa",
+    "title": "Ficha técnica · Moisture Restore Day — piel mixta a grasa",
+    "command": "ficha tecnica Moisture Restore Day — piel mixta a grasa",
+    "aliases": [
+      "ficha Moisture Restore Day — piel mixta a grasa",
+      "pdf Moisture Restore Day — piel mixta a grasa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Moisture Restore Day — piel mixta a grasa",
+      "ficha tecnica de Moisture Restore Day — piel mixta a grasa"
+    ],
+    "keywords": [
+      "Moisture Restore Day — piel mixta a grasa",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Moisture Restore Day — piel mixta a grasa",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore_Day%20M_G.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-moisture-restore-day-piel-normal-a-seca",
+    "title": "Ficha técnica · Moisture Restore Day — piel normal a seca",
+    "command": "ficha tecnica Moisture Restore Day — piel normal a seca",
+    "aliases": [
+      "ficha Moisture Restore Day — piel normal a seca",
+      "pdf Moisture Restore Day — piel normal a seca"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Moisture Restore Day — piel normal a seca",
+      "ficha tecnica de Moisture Restore Day — piel normal a seca"
+    ],
+    "keywords": [
+      "Moisture Restore Day — piel normal a seca",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Moisture Restore Day — piel normal a seca",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Moisture_Restore_Day%20N_S.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-night-supply",
+    "title": "Ficha técnica · Night Supply",
+    "command": "ficha tecnica Night Supply",
+    "aliases": [
+      "ficha Night Supply",
+      "pdf Night Supply"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Night Supply",
+      "ficha tecnica de Night Supply"
+    ],
+    "keywords": [
+      "Night Supply",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Night Supply",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Night_Supply.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-bioadaptive-skin-care-sistema",
+    "title": "Ficha técnica · Nutricentials Bioadaptive Skin Care — sistema",
+    "command": "ficha tecnica Nutricentials Bioadaptive Skin Care — sistema",
+    "aliases": [
+      "ficha Nutricentials Bioadaptive Skin Care — sistema",
+      "pdf Nutricentials Bioadaptive Skin Care — sistema"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Bioadaptive Skin Care — sistema",
+      "ficha tecnica de Nutricentials Bioadaptive Skin Care — sistema"
+    ],
+    "keywords": [
+      "Nutricentials Bioadaptive Skin Care — sistema",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Bioadaptive Skin Care — sistema",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-bioadaptive-skin-care-system-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-brighter-day",
+    "title": "Ficha técnica · Nutricentials Brighter Day",
+    "command": "ficha tecnica Nutricentials Brighter Day",
+    "aliases": [
+      "ficha Nutricentials Brighter Day",
+      "pdf Nutricentials Brighter Day"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Brighter Day",
+      "ficha tecnica de Nutricentials Brighter Day"
+    ],
+    "keywords": [
+      "Nutricentials Brighter Day",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Brighter Day",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-brighter-day-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-celltrex-always-right-recovery-fluid",
+    "title": "Ficha técnica · Nutricentials Celltrex Always Right Recovery Fluid",
+    "command": "ficha tecnica Nutricentials Celltrex Always Right Recovery Fluid",
+    "aliases": [
+      "ficha Nutricentials Celltrex Always Right Recovery Fluid",
+      "pdf Nutricentials Celltrex Always Right Recovery Fluid"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Celltrex Always Right Recovery Fluid",
+      "ficha tecnica de Nutricentials Celltrex Always Right Recovery Fluid"
+    ],
+    "keywords": [
+      "Nutricentials Celltrex Always Right Recovery Fluid",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Celltrex Always Right Recovery Fluid",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-celltrex-always-right-recovery-fluid-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-celltrex-always-right-recovery-mask",
+    "title": "Ficha técnica · Nutricentials Celltrex Always Right Recovery Mask",
+    "command": "ficha tecnica Nutricentials Celltrex Always Right Recovery Mask",
+    "aliases": [
+      "ficha Nutricentials Celltrex Always Right Recovery Mask",
+      "pdf Nutricentials Celltrex Always Right Recovery Mask"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Celltrex Always Right Recovery Mask",
+      "ficha tecnica de Nutricentials Celltrex Always Right Recovery Mask"
+    ],
+    "keywords": [
+      "Nutricentials Celltrex Always Right Recovery Mask",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Celltrex Always Right Recovery Mask",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-celltrex-always-right-recovery-mask-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-day-dream-protective-cream",
+    "title": "Ficha técnica · Nutricentials Day Dream Protective Cream",
+    "command": "ficha tecnica Nutricentials Day Dream Protective Cream",
+    "aliases": [
+      "ficha Nutricentials Day Dream Protective Cream",
+      "pdf Nutricentials Day Dream Protective Cream"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Day Dream Protective Cream",
+      "ficha tecnica de Nutricentials Day Dream Protective Cream"
+    ],
+    "keywords": [
+      "Nutricentials Day Dream Protective Cream",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Day Dream Protective Cream",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-dream-protective-cream-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-day-dream-protective-lotion",
+    "title": "Ficha técnica · Nutricentials Day Dream Protective Lotion",
+    "command": "ficha tecnica Nutricentials Day Dream Protective Lotion",
+    "aliases": [
+      "ficha Nutricentials Day Dream Protective Lotion",
+      "pdf Nutricentials Day Dream Protective Lotion"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Day Dream Protective Lotion",
+      "ficha tecnica de Nutricentials Day Dream Protective Lotion"
+    ],
+    "keywords": [
+      "Nutricentials Day Dream Protective Lotion",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Day Dream Protective Lotion",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-day-dream-protective-lotion-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-dew-all-day",
+    "title": "Ficha técnica · Nutricentials Dew All Day",
+    "command": "ficha tecnica Nutricentials Dew All Day",
+    "aliases": [
+      "ficha Nutricentials Dew All Day",
+      "pdf Nutricentials Dew All Day"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Dew All Day",
+      "ficha tecnica de Nutricentials Dew All Day"
+    ],
+    "keywords": [
+      "Nutricentials Dew All Day",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Dew All Day",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-dew-all-day-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-eye-love-bright-eyes",
+    "title": "Ficha técnica · Nutricentials Eye Love Bright Eyes",
+    "command": "ficha tecnica Nutricentials Eye Love Bright Eyes",
+    "aliases": [
+      "ficha Nutricentials Eye Love Bright Eyes",
+      "pdf Nutricentials Eye Love Bright Eyes"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Eye Love Bright Eyes",
+      "ficha tecnica de Nutricentials Eye Love Bright Eyes"
+    ],
+    "keywords": [
+      "Nutricentials Eye Love Bright Eyes",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Eye Love Bright Eyes",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-eye-love-bright-eyes-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-here-you-glow",
+    "title": "Ficha técnica · Nutricentials Here You Glow",
+    "command": "ficha tecnica Nutricentials Here You Glow",
+    "aliases": [
+      "ficha Nutricentials Here You Glow",
+      "pdf Nutricentials Here You Glow"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Here You Glow",
+      "ficha tecnica de Nutricentials Here You Glow"
+    ],
+    "keywords": [
+      "Nutricentials Here You Glow",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Here You Glow",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-here-you-glow-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-hydraclean",
+    "title": "Ficha técnica · Nutricentials HydraClean",
+    "command": "ficha tecnica Nutricentials HydraClean",
+    "aliases": [
+      "ficha Nutricentials HydraClean",
+      "pdf Nutricentials HydraClean"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials HydraClean",
+      "ficha tecnica de Nutricentials HydraClean"
+    ],
+    "keywords": [
+      "Nutricentials HydraClean",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials HydraClean",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-hydraclean-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-in-balance",
+    "title": "Ficha técnica · Nutricentials In Balance",
+    "command": "ficha tecnica Nutricentials In Balance",
+    "aliases": [
+      "ficha Nutricentials In Balance",
+      "pdf Nutricentials In Balance"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials In Balance",
+      "ficha tecnica de Nutricentials In Balance"
+    ],
+    "keywords": [
+      "Nutricentials In Balance",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials In Balance",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-in-balance-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-moisturize-me",
+    "title": "Ficha técnica · Nutricentials Moisturize Me",
+    "command": "ficha tecnica Nutricentials Moisturize Me",
+    "aliases": [
+      "ficha Nutricentials Moisturize Me",
+      "pdf Nutricentials Moisturize Me"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Moisturize Me",
+      "ficha tecnica de Nutricentials Moisturize Me"
+    ],
+    "keywords": [
+      "Nutricentials Moisturize Me",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Moisturize Me",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-moisturize-me-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-pillow-glow",
+    "title": "Ficha técnica · Nutricentials Pillow Glow",
+    "command": "ficha tecnica Nutricentials Pillow Glow",
+    "aliases": [
+      "ficha Nutricentials Pillow Glow",
+      "pdf Nutricentials Pillow Glow"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Pillow Glow",
+      "ficha tecnica de Nutricentials Pillow Glow"
+    ],
+    "keywords": [
+      "Nutricentials Pillow Glow",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Pillow Glow",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pillow-glow-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-pumps-bakuchiol",
+    "title": "Ficha técnica · Nutricentials Pumps Bakuchiol",
+    "command": "ficha tecnica Nutricentials Pumps Bakuchiol",
+    "aliases": [
+      "ficha Nutricentials Pumps Bakuchiol",
+      "pdf Nutricentials Pumps Bakuchiol"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Pumps Bakuchiol",
+      "ficha tecnica de Nutricentials Pumps Bakuchiol"
+    ],
+    "keywords": [
+      "Nutricentials Pumps Bakuchiol",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Pumps Bakuchiol",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-bakuchiol.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-pumps-vitamin-c-collagen",
+    "title": "Ficha técnica · Nutricentials Pumps Vitamin C + Collagen",
+    "command": "ficha tecnica Nutricentials Pumps Vitamin C + Collagen",
+    "aliases": [
+      "ficha Nutricentials Pumps Vitamin C + Collagen",
+      "pdf Nutricentials Pumps Vitamin C + Collagen"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Pumps Vitamin C + Collagen",
+      "ficha tecnica de Nutricentials Pumps Vitamin C + Collagen"
+    ],
+    "keywords": [
+      "Nutricentials Pumps Vitamin C + Collagen",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Pumps Vitamin C + Collagen",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-vitamin-c-plus-collagen-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-pumps-ceramidas-postbioticos",
+    "title": "Ficha técnica · Nutricentials Pumps Ceramidas + Postbióticos",
+    "command": "ficha tecnica Nutricentials Pumps Ceramidas + Postbióticos",
+    "aliases": [
+      "ficha Nutricentials Pumps Ceramidas + Postbióticos",
+      "pdf Nutricentials Pumps Ceramidas + Postbióticos"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Pumps Ceramidas + Postbióticos",
+      "ficha tecnica de Nutricentials Pumps Ceramidas + Postbióticos"
+    ],
+    "keywords": [
+      "Nutricentials Pumps Ceramidas + Postbióticos",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Pumps Ceramidas + Postbióticos",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-ceramides-postbiotics-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-pumps-hyaluronic-acid-b5",
+    "title": "Ficha técnica · Nutricentials Pumps Hyaluronic Acid + B5",
+    "command": "ficha tecnica Nutricentials Pumps Hyaluronic Acid + B5",
+    "aliases": [
+      "ficha Nutricentials Pumps Hyaluronic Acid + B5",
+      "pdf Nutricentials Pumps Hyaluronic Acid + B5"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Pumps Hyaluronic Acid + B5",
+      "ficha tecnica de Nutricentials Pumps Hyaluronic Acid + B5"
+    ],
+    "keywords": [
+      "Nutricentials Pumps Hyaluronic Acid + B5",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Pumps Hyaluronic Acid + B5",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-pumps-hyaluronic-acid-b5.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-spa-day",
+    "title": "Ficha técnica · Nutricentials Spa Day",
+    "command": "ficha tecnica Nutricentials Spa Day",
+    "aliases": [
+      "ficha Nutricentials Spa Day",
+      "pdf Nutricentials Spa Day"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Spa Day",
+      "ficha tecnica de Nutricentials Spa Day"
+    ],
+    "keywords": [
+      "Nutricentials Spa Day",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Spa Day",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-spa-day-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-thirst-fix",
+    "title": "Ficha técnica · Nutricentials Thirst Fix",
+    "command": "ficha tecnica Nutricentials Thirst Fix",
+    "aliases": [
+      "ficha Nutricentials Thirst Fix",
+      "pdf Nutricentials Thirst Fix"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials Thirst Fix",
+      "ficha tecnica de Nutricentials Thirst Fix"
+    ],
+    "keywords": [
+      "Nutricentials Thirst Fix",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials Thirst Fix",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-thirst-fix-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutricentials-to-be-clear",
+    "title": "Ficha técnica · Nutricentials To Be Clear",
+    "command": "ficha tecnica Nutricentials To Be Clear",
+    "aliases": [
+      "ficha Nutricentials To Be Clear",
+      "pdf Nutricentials To Be Clear"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutricentials To Be Clear",
+      "ficha tecnica de Nutricentials To Be Clear"
+    ],
+    "keywords": [
+      "Nutricentials To Be Clear",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutricentials To Be Clear",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/nutricentials-to-be-clear-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ph-balance-toner",
+    "title": "Ficha técnica · pH Balance Toner",
+    "command": "ficha tecnica pH Balance Toner",
+    "aliases": [
+      "ficha pH Balance Toner",
+      "pdf pH Balance Toner"
+    ],
+    "phrases": [
+      "descargar ficha tecnica pH Balance Toner",
+      "ficha tecnica de pH Balance Toner"
+    ],
+    "keywords": [
+      "pH Balance Toner",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "pH Balance Toner",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/pH_Balance_Toner.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ph-balance-mattefying-toner",
+    "title": "Ficha técnica · pH Balance Mattefying Toner",
+    "command": "ficha tecnica pH Balance Mattefying Toner",
+    "aliases": [
+      "ficha pH Balance Mattefying Toner",
+      "pdf pH Balance Mattefying Toner"
+    ],
+    "phrases": [
+      "descargar ficha tecnica pH Balance Mattefying Toner",
+      "ficha tecnica de pH Balance Mattefying Toner"
+    ],
+    "keywords": [
+      "pH Balance Mattefying Toner",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "pH Balance Mattefying Toner",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/pH_Balance_Toner_Mattefying.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-pure-cleansing-gel",
+    "title": "Ficha técnica · Pure Cleansing Gel",
+    "command": "ficha tecnica Pure Cleansing Gel",
+    "aliases": [
+      "ficha Pure Cleansing Gel",
+      "pdf Pure Cleansing Gel"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Pure Cleansing Gel",
+      "ficha tecnica de Pure Cleansing Gel"
+    ],
+    "keywords": [
+      "Pure Cleansing Gel",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Pure Cleansing Gel",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutricentials/Pure_Cleansing_Gel.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-geles-faciales-galvanic-spa",
+    "title": "Ficha técnica · ageLOC Geles Faciales Galvanic Spa",
+    "command": "ficha tecnica ageLOC Geles Faciales Galvanic Spa",
+    "aliases": [
+      "ficha ageLOC Geles Faciales Galvanic Spa",
+      "pdf ageLOC Geles Faciales Galvanic Spa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Geles Faciales Galvanic Spa",
+      "ficha tecnica de ageLOC Geles Faciales Galvanic Spa"
+    ],
+    "keywords": [
+      "ageLOC Geles Faciales Galvanic Spa",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Geles Faciales Galvanic Spa",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Face_Gels.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-galvanic-body-spa",
+    "title": "Ficha técnica · ageLOC Galvanic Body Spa",
+    "command": "ficha tecnica ageLOC Galvanic Body Spa",
+    "aliases": [
+      "ficha ageLOC Galvanic Body Spa",
+      "pdf ageLOC Galvanic Body Spa"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Galvanic Body Spa",
+      "ficha tecnica de ageLOC Galvanic Body Spa"
+    ],
+    "keywords": [
+      "ageLOC Galvanic Body Spa",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Galvanic Body Spa",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ar-galvanic-body-spa-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-body-shaping-gel",
+    "title": "Ficha técnica · ageLOC Body Shaping Gel",
+    "command": "ficha tecnica ageLOC Body Shaping Gel",
+    "aliases": [
+      "ficha ageLOC Body Shaping Gel",
+      "pdf ageLOC Body Shaping Gel"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Body Shaping Gel",
+      "ficha tecnica de ageLOC Body Shaping Gel"
+    ],
+    "keywords": [
+      "ageLOC Body Shaping Gel",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Body Shaping Gel",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Body_Shaping.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-dermatic-effects",
+    "title": "Ficha técnica · ageLOC Dermatic Effects",
+    "command": "ficha tecnica ageLOC Dermatic Effects",
+    "aliases": [
+      "ficha ageLOC Dermatic Effects",
+      "pdf ageLOC Dermatic Effects"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Dermatic Effects",
+      "ficha tecnica de ageLOC Dermatic Effects"
+    ],
+    "keywords": [
+      "ageLOC Dermatic Effects",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Dermatic Effects",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/ageLOC_Dermatic_Effects.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-sunright-insta-glow",
+    "title": "Ficha técnica · Sunright Insta Glow",
+    "command": "ficha tecnica Sunright Insta Glow",
+    "aliases": [
+      "ficha Sunright Insta Glow",
+      "pdf Sunright Insta Glow"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Sunright Insta Glow",
+      "ficha tecnica de Sunright Insta Glow"
+    ],
+    "keywords": [
+      "Sunright Insta Glow",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Sunright Insta Glow",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Galvanic_Spa/new-sunright-insta-glow-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-nutriol-scalp-hair-system",
+    "title": "Ficha técnica · ageLOC Nutriol Scalp & Hair System",
+    "command": "ficha tecnica ageLOC Nutriol Scalp & Hair System",
+    "aliases": [
+      "ficha ageLOC Nutriol Scalp & Hair System",
+      "pdf ageLOC Nutriol Scalp & Hair System"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Nutriol Scalp & Hair System",
+      "ficha tecnica de ageLOC Nutriol Scalp & Hair System"
+    ],
+    "keywords": [
+      "ageLOC Nutriol Scalp & Hair System",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Nutriol Scalp & Hair System",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-ageloc-nutriol-system-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-nutriol-intensive-scalp-hair-serum",
+    "title": "Ficha técnica · ageLOC Nutriol Intensive Scalp & Hair Serum",
+    "command": "ficha tecnica ageLOC Nutriol Intensive Scalp & Hair Serum",
+    "aliases": [
+      "ficha ageLOC Nutriol Intensive Scalp & Hair Serum",
+      "pdf ageLOC Nutriol Intensive Scalp & Hair Serum"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Nutriol Intensive Scalp & Hair Serum",
+      "ficha tecnica de ageLOC Nutriol Intensive Scalp & Hair Serum"
+    ],
+    "keywords": [
+      "ageLOC Nutriol Intensive Scalp & Hair Serum",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Nutriol Intensive Scalp & Hair Serum",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-nutriol-intensive-scalp-serum-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-nutriol-scalp-hair-shampoo-y-conditioner",
+    "title": "Ficha técnica · ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+    "command": "ficha tecnica ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+    "aliases": [
+      "ficha ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+      "pdf ageLOC Nutriol Scalp & Hair Shampoo y Conditioner"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+      "ficha tecnica de ageLOC Nutriol Scalp & Hair Shampoo y Conditioner"
+    ],
+    "keywords": [
+      "ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Nutriol Scalp & Hair Shampoo y Conditioner",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/ar-nutriol-scalp-shamp-cond-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-nutriol-hair-fitness-treatment-shampoo",
+    "title": "Ficha técnica · Nutriol Hair Fitness Treatment & Shampoo",
+    "command": "ficha tecnica Nutriol Hair Fitness Treatment & Shampoo",
+    "aliases": [
+      "ficha Nutriol Hair Fitness Treatment & Shampoo",
+      "pdf Nutriol Hair Fitness Treatment & Shampoo"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Nutriol Hair Fitness Treatment & Shampoo",
+      "ficha tecnica de Nutriol Hair Fitness Treatment & Shampoo"
+    ],
+    "keywords": [
+      "Nutriol Hair Fitness Treatment & Shampoo",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Nutriol Hair Fitness Treatment & Shampoo",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Nutriol/Nutriol_Hair_Fitness_Treatment_&_Shampoo.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-clear-action-day-treatment",
+    "title": "Ficha técnica · Clear Action Day Treatment",
+    "command": "ficha tecnica Clear Action Day Treatment",
+    "aliases": [
+      "ficha Clear Action Day Treatment",
+      "pdf Clear Action Day Treatment"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Clear Action Day Treatment",
+      "ficha tecnica de Clear Action Day Treatment"
+    ],
+    "keywords": [
+      "Clear Action Day Treatment",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Clear Action Day Treatment",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Day_Treatment.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-clear-action-foaming-cleanser",
+    "title": "Ficha técnica · Clear Action Foaming Cleanser",
+    "command": "ficha tecnica Clear Action Foaming Cleanser",
+    "aliases": [
+      "ficha Clear Action Foaming Cleanser",
+      "pdf Clear Action Foaming Cleanser"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Clear Action Foaming Cleanser",
+      "ficha tecnica de Clear Action Foaming Cleanser"
+    ],
+    "keywords": [
+      "Clear Action Foaming Cleanser",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Clear Action Foaming Cleanser",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Foaming_Cleanser.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-clear-action-night-treatment",
+    "title": "Ficha técnica · Clear Action Night Treatment",
+    "command": "ficha tecnica Clear Action Night Treatment",
+    "aliases": [
+      "ficha Clear Action Night Treatment",
+      "pdf Clear Action Night Treatment"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Clear Action Night Treatment",
+      "ficha tecnica de Clear Action Night Treatment"
+    ],
+    "keywords": [
+      "Clear Action Night Treatment",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Clear Action Night Treatment",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Night_Treatment.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-clear-action-sistema",
+    "title": "Ficha técnica · Clear Action Sistema",
+    "command": "ficha tecnica Clear Action Sistema",
+    "aliases": [
+      "ficha Clear Action Sistema",
+      "pdf Clear Action Sistema"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Clear Action Sistema",
+      "ficha tecnica de Clear Action Sistema"
+    ],
+    "keywords": [
+      "Clear Action Sistema",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Clear Action Sistema",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Sistema.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-clear-action-toner",
+    "title": "Ficha técnica · Clear Action Toner",
+    "command": "ficha tecnica Clear Action Toner",
+    "aliases": [
+      "ficha Clear Action Toner",
+      "pdf Clear Action Toner"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Clear Action Toner",
+      "ficha tecnica de Clear Action Toner"
+    ],
+    "keywords": [
+      "Clear Action Toner",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Clear Action Toner",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Clear_Action/Clear_Action_Toner.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ageloc-tru-face-essence-ultra-capsulas",
+    "title": "Ficha técnica · ageLOC Tru Face Essence Ultra — cápsulas",
+    "command": "ficha tecnica ageLOC Tru Face Essence Ultra — cápsulas",
+    "aliases": [
+      "ficha ageLOC Tru Face Essence Ultra — cápsulas",
+      "pdf ageLOC Tru Face Essence Ultra — cápsulas"
+    ],
+    "phrases": [
+      "descargar ficha tecnica ageLOC Tru Face Essence Ultra — cápsulas",
+      "ficha tecnica de ageLOC Tru Face Essence Ultra — cápsulas"
+    ],
+    "keywords": [
+      "ageLOC Tru Face Essence Ultra — cápsulas",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "ageLOC Tru Face Essence Ultra — cápsulas",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/tfeu-pip-ar-23102892.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-tru-face-essence-ultra-sobre-de-recarga",
+    "title": "Ficha técnica · Tru Face Essence Ultra — sobre de recarga",
+    "command": "ficha tecnica Tru Face Essence Ultra — sobre de recarga",
+    "aliases": [
+      "ficha Tru Face Essence Ultra — sobre de recarga",
+      "pdf Tru Face Essence Ultra — sobre de recarga"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Tru Face Essence Ultra — sobre de recarga",
+      "ficha tecnica de Tru Face Essence Ultra — sobre de recarga"
+    ],
+    "keywords": [
+      "Tru Face Essence Ultra — sobre de recarga",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Tru Face Essence Ultra — sobre de recarga",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/ageLOC-Tru-Face-Essence-Ultra-Refill-pouch-PIP_AR.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-tru-face-line-corrector",
+    "title": "Ficha técnica · Tru Face Line Corrector",
+    "command": "ficha tecnica Tru Face Line Corrector",
+    "aliases": [
+      "ficha Tru Face Line Corrector",
+      "pdf Tru Face Line Corrector"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Tru Face Line Corrector",
+      "ficha tecnica de Tru Face Line Corrector"
+    ],
+    "keywords": [
+      "Tru Face Line Corrector",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Tru Face Line Corrector",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Tru_Face/Tru_Face_Line_Corrector.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-enhancer",
+    "title": "Ficha técnica · Enhancer",
+    "command": "ficha tecnica Enhancer",
+    "aliases": [
+      "ficha Enhancer",
+      "pdf Enhancer"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Enhancer",
+      "ficha tecnica de Enhancer"
+    ],
+    "keywords": [
+      "Enhancer",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Enhancer",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/Enhancer.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-napca-moisture-mist",
+    "title": "Ficha técnica · NaPCA Moisture Mist",
+    "command": "ficha tecnica NaPCA Moisture Mist",
+    "aliases": [
+      "ficha NaPCA Moisture Mist",
+      "pdf NaPCA Moisture Mist"
+    ],
+    "phrases": [
+      "descargar ficha tecnica NaPCA Moisture Mist",
+      "ficha tecnica de NaPCA Moisture Mist"
+    ],
+    "keywords": [
+      "NaPCA Moisture Mist",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "NaPCA Moisture Mist",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/napca-moisture-mist-pip-global-spanish.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-napca-moisturizer",
+    "title": "Ficha técnica · NaPCA Moisturizer",
+    "command": "ficha tecnica NaPCA Moisturizer",
+    "aliases": [
+      "ficha NaPCA Moisturizer",
+      "pdf NaPCA Moisturizer"
+    ],
+    "phrases": [
+      "descargar ficha tecnica NaPCA Moisturizer",
+      "ficha tecnica de NaPCA Moisturizer"
+    ],
+    "keywords": [
+      "NaPCA Moisturizer",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "NaPCA Moisturizer",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/napca-Mosturizer-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-rejuvenating-cream",
+    "title": "Ficha técnica · Rejuvenating Cream",
+    "command": "ficha tecnica Rejuvenating Cream",
+    "aliases": [
+      "ficha Rejuvenating Cream",
+      "pdf Rejuvenating Cream"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Rejuvenating Cream",
+      "ficha tecnica de Rejuvenating Cream"
+    ],
+    "keywords": [
+      "Rejuvenating Cream",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Rejuvenating Cream",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/Rejuvenating_Cream.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ultimate-mask-snowhite",
+    "title": "Ficha técnica · Ultimate Mask Snowhite",
+    "command": "ficha tecnica Ultimate Mask Snowhite",
+    "aliases": [
+      "ficha Ultimate Mask Snowhite",
+      "pdf Ultimate Mask Snowhite"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Ultimate Mask Snowhite",
+      "ficha tecnica de Ultimate Mask Snowhite"
+    ],
+    "keywords": [
+      "Ultimate Mask Snowhite",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Ultimate Mask Snowhite",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/ultimate-mask-snowhite-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-ultimate-mask-waterfull",
+    "title": "Ficha técnica · Ultimate Mask Waterfull",
+    "command": "ficha tecnica Ultimate Mask Waterfull",
+    "aliases": [
+      "ficha Ultimate Mask Waterfull",
+      "pdf Ultimate Mask Waterfull"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Ultimate Mask Waterfull",
+      "ficha tecnica de Ultimate Mask Waterfull"
+    ],
+    "keywords": [
+      "Ultimate Mask Waterfull",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Ultimate Mask Waterfull",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Hidatración/waterfull-mask-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-sunright-50-y-lip-balm-spf-15",
+    "title": "Ficha técnica · Sunright 50 y Lip Balm SPF 15",
+    "command": "ficha tecnica Sunright 50 y Lip Balm SPF 15",
+    "aliases": [
+      "ficha Sunright 50 y Lip Balm SPF 15",
+      "pdf Sunright 50 y Lip Balm SPF 15"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Sunright 50 y Lip Balm SPF 15",
+      "ficha tecnica de Sunright 50 y Lip Balm SPF 15"
+    ],
+    "keywords": [
+      "Sunright 50 y Lip Balm SPF 15",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Sunright 50 y Lip Balm SPF 15",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/Defensa_Ambiental/Sunright_Products.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-scion-desodorante-roll-on",
+    "title": "Ficha técnica · Scion Desodorante Roll-On",
+    "command": "ficha tecnica Scion Desodorante Roll-On",
+    "aliases": [
+      "ficha Scion Desodorante Roll-On",
+      "pdf Scion Desodorante Roll-On"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Scion Desodorante Roll-On",
+      "ficha tecnica de Scion Desodorante Roll-On"
+    ],
+    "keywords": [
+      "Scion Desodorante Roll-On",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Scion Desodorante Roll-On",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/nuskin_products/scioncolor/scion-deodorant-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-youthspan",
+    "title": "Ficha técnica · YouthSpan",
+    "command": "ficha tecnica YouthSpan",
+    "aliases": [
+      "ficha YouthSpan",
+      "pdf YouthSpan"
+    ],
+    "phrases": [
+      "descargar ficha tecnica YouthSpan",
+      "ficha tecnica de YouthSpan"
+    ],
+    "keywords": [
+      "YouthSpan",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "YouthSpan",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/ageloc-youthspan-pip-ar.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-beauty-focus-collagen",
+    "title": "Ficha técnica · Beauty Focus Collagen+",
+    "command": "ficha tecnica Beauty Focus Collagen+",
+    "aliases": [
+      "ficha Beauty Focus Collagen+",
+      "pdf Beauty Focus Collagen+",
+      "ficha tecnica colageno"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Beauty Focus Collagen+",
+      "ficha tecnica de Beauty Focus Collagen+"
+    ],
+    "keywords": [
+      "Beauty Focus Collagen+",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Beauty Focus Collagen+",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/ar-beauty-focus-collagen-plus-pip.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-lifepak",
+    "title": "Ficha técnica · LifePak",
+    "command": "ficha tecnica LifePak",
+    "aliases": [
+      "ficha LifePak",
+      "pdf LifePak"
+    ],
+    "phrases": [
+      "descargar ficha tecnica LifePak",
+      "ficha tecnica de LifePak"
+    ],
+    "keywords": [
+      "LifePak",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "LifePak",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/LifePak.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-optimum-omega",
+    "title": "Ficha técnica · Optimum Omega",
+    "command": "ficha tecnica Optimum Omega",
+    "aliases": [
+      "ficha Optimum Omega",
+      "pdf Optimum Omega",
+      "ficha tecnica omega"
+    ],
+    "phrases": [
+      "descargar ficha tecnica Optimum Omega",
+      "ficha tecnica de Optimum Omega"
+    ],
+    "keywords": [
+      "Optimum Omega",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "Optimum Omega",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/Nutricionales/optimum-omega-pip-argentina.pdf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha-ar-vitameal",
+    "title": "Ficha técnica · VitaMeal",
+    "command": "ficha tecnica VitaMeal",
+    "aliases": [
+      "ficha VitaMeal",
+      "pdf VitaMeal"
+    ],
+    "phrases": [
+      "descargar ficha tecnica VitaMeal",
+      "ficha tecnica de VitaMeal"
+    ],
+    "keywords": [
+      "VitaMeal",
+      "ficha tecnica",
+      "Argentina"
+    ],
+    "country": "Argentina",
+    "hidden": true,
+    "blocks": [
+      {
+        "type": "text",
+        "content": "Fichas oficiales publicadas en la biblioteca de Nu Skin Argentina. La biblioteca incluye versiones anteriores: verificá la presentación y el envase de tu producto. La presencia de una ficha no confirma disponibilidad de venta."
+      },
+      {
+        "type": "document",
+        "kicker": "FICHA TÉCNICA · ARGENTINA",
+        "title": "VitaMeal",
+        "country": "Argentina",
+        "description": "Documento oficial de Nu Skin Argentina.",
+        "actions": [
+          {
+            "title": "Ver ficha técnica",
+            "url": "https://www.nuskin.com/content/dam/office/s_america/AR/es/pharmanex_products/NTC/VitaMeal.pdf"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "box-colageno",

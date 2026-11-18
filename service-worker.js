@@ -1,4 +1,4 @@
-const CACHE="nuapp-v179-europe-combo-es";
+const CACHE="nuapp-v180-iris-fichas-ar";
 
 const CORE=[
   "./estrategia-europa.css?v=4",
@@ -36,7 +36,7 @@ const CORE=[
   "./bot.css?v=143-iris-layout-9",
   "./favorites.css?v=94-bot-folders",
   "./favorites-redesign-v1.css?v=146-wellspa-scale",
-  "./bot-content.js?v=europe-home-1",
+  "./bot-content.js?v=fichas-ar-20261118",
   "./ui-core.js?v=europe-home-1",
   "./routine-content.js?v=103a-unified-app-store",
   "./routine-content-collagen-8-30.js?v=63-collagen-30",
@@ -46,7 +46,7 @@ const CORE=[
   "./routine-sync.js?v=supplements-pilot-1",
   "./iris-ai-client-escalation-v1.js?v=1",
   "./bot.js?v=143-keyboard-layout",
-  "./bot-shortcuts-v95.js?v=europe-home-1",
+  "./bot-shortcuts-v95.js?v=fichas-ar-20261118",
   "./assets/custom/nuskin-logo-icon.svg",
   "./assets/custom/foco-live-card.png",
   "./assets/catalogos/catalogo-europa-02-2026.pdf",
