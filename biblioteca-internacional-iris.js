@@ -470,11 +470,9 @@
   });
   const style=create("style");
   style.textContent=`
-    /* El visor canónico debe quedar por encima de la hoja de selección (z-index 260).
-       Se limita el área visual para conservar un tamaño cómodo en el teléfono. */
+    /* Imágenes, videos y posters heredan las medidas del visor canónico.
+       Se conserva el nivel de superposición de los materiales internacionales. */
     .media-preview.is-international{z-index:300}
-    .media-preview.is-international .media-preview-stage>img{width:min(88vw,440px);height:min(48dvh,380px);object-fit:contain}
-    .media-preview.is-international .preview-video-shell{position:relative;inset:auto;width:min(88vw,440px);height:min(48dvh,380px)}
     .nu-il-group-heading{margin:16px 10px 8px;color:#33455f;font-size:14px;font-weight:750}
     .nu-il-row{width:100%;margin-bottom:8px}
     .nu-il-chevron{margin-left:auto;color:#3b82f6;font-size:20px;flex-shrink:0}
