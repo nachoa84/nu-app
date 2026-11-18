@@ -25,8 +25,7 @@
         "como usar face wash 180",
         "box colageno",
         "como asesorar lumi spa",
-        "estrategia colageno europa",
-        "material internacional"
+        "estrategia colageno europa"
       ]
     },
     {
@@ -138,10 +137,6 @@
     if (!item?.command) return;
     const command = item.command;
     closeBotQuickAccess();
-    if (command === "material internacional" && typeof window.openInternationalLibrary === "function") {
-      window.openInternationalLibrary();
-      return;
-    }
     window.requestAnimationFrame(() => {
       if (typeof botAsk === "function") {
         botAsk(command);
@@ -234,9 +229,7 @@
       const isTramitesEntry = category.id === "tramites-informacion" && item.command === "tramites";
       button.onclick = isTramitesEntry
         ? () => renderTramitesCountryList(sheet, category, categories, item)
-        : item.command === "material internacional" && typeof window.openInternationalLibrary === "function"
-          ? () => window.openInternationalLibrary(sheet, () => renderCommandList(sheet, category, categories))
-          : () => chooseBotCommand(item);
+        : () => chooseBotCommand(item);
       list.appendChild(button);
     });
   }

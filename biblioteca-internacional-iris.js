@@ -1,12 +1,15 @@
 (() => {
   "use strict";
-  // Biblioteca Internacional · mismas acciones individuales que las rutinas de Nu App.
+  // Estrategia Europa: la biblioteca existente ahora vive en Inicio.
+  // Conserva catálogo, orden, visor, descargas y preparación de archivos para compartir.
   const groups=[
-    {name:"España",flag:"🇪🇸",items:[["collagen/es","Collagen+"]]},
-    {name:"Italia",flag:"🇮🇹",items:[["collagen/it","Collagen+"],["lumispa/it","Lumi"]]}
+    {locale:"es",name:"Español",items:[["collagen/es","Colágeno"]]},
+    {locale:"it",name:"Italiano",items:[["collagen/it","Collagene"],["lumispa/it","LumiSpa"]]}
   ];
-  let sheet=null,returnToProducts=null;
-  let disposePilotPreview=null,pilotCloseObserver=null;
+  const sheet=document.getElementById("view-europa");
+  if(!sheet)return;
+  let locale="es",currentDay=null;
+  let disposePilotPreview=null;
   // Cache acotada: evitar retener decenas de MP4 al navegar por la biblioteca.
   const shareReadyFiles=new Map();
   const hasStaticPoster=item=>item?.type==="video"&&
@@ -38,28 +41,55 @@
       dispose();
     }
     if(!sheet?.isConnected)return null;
-    const list=sheet.querySelector(".bot-quick-access-list");
-    const backButton=sheet.querySelector(".bot-quick-access-back");
-    sheet.querySelector(".bot-quick-access-title").textContent=heading;
-    sheet.querySelector(".bot-quick-access-subtitle").textContent=subtitle;
-    backButton.hidden=false;backButton.onclick=back;
-    list.className="bot-quick-access-list nu-il-list";
+    const list=sheet.querySelector("#europeList");
+    const backButton=sheet.querySelector("#europeBackBtn");
+    sheet.querySelector("#europeTitle").textContent=heading;
+    sheet.querySelector("#europeSubtitle").textContent=subtitle;
+    sheet.lang=locale;
+    backButton.setAttribute("aria-label",locale==="it"?"Indietro":"Volver");
+    backButton.onclick=back;
+    list.className="nu-il-list";
     list.replaceChildren();list.scrollTop=0;
+    currentDay=null;
+    window.scrollTo({top:0,left:0,behavior:"auto"});
+    document.documentElement.scrollTop=0;document.body.scrollTop=0;
+    const headingNode=sheet.querySelector("#europeTitle");
+    headingNode.tabIndex=-1;headingNode.focus({preventScroll:true});
     return list;
   }
-  function card(list,label,click){
-    const el=button("",click,"bot-quick-access-row is-command nu-il-row");
-    const text=create("span","bot-quick-access-row-copy");
-    text.append(create("strong","",label));
-    el.append(text,create("span","nu-il-chevron","›"));list.append(el);
+  function card(list,id,label,click){
+    const el=button("",click,"europe-routine-card");
+    el.dataset.collection=id;
+    const cover=create("span","europe-routine-cover");
+    const image=create("img");image.alt="";image.loading="lazy";
+    image.src=id.startsWith("collagen/")?"assets/custom/routine-collagen-home.png":"assets/custom/routine-lumispa-home.png";
+    cover.setAttribute("aria-hidden","true");cover.append(image);
+    const text=create("span","europe-routine-copy");
+    text.append(create("strong","",label),
+      create("small","",locale==="it"?"10 giorni di contenuti":"10 días de contenido"),
+      create("span","europe-routine-action",locale==="it"?"Vedi contenuti →":"Ver contenido →"));
+    el.append(cover,text);list.append(el);
   }
   function showGroups(){
-    const list=frame("Material internacional","Elegí el país y contenido",returnToProducts);
+    const italian=locale==="it";
+    const list=frame(italian?"Strategia Europa":"Estrategia Europa",
+      italian?"Scegli la lingua e scopri i contenuti":"Elegí tu idioma y explorá el contenido",
+      ()=>activateMainView("hoy"));
     if(!list)return;
+    const languages=create("div","europe-languages");
+    languages.setAttribute("role","group");
+    languages.setAttribute("aria-label",italian?"Lingua dei contenuti":"Idioma del contenido");
     for(const group of groups){
-      list.append(create("h3","nu-il-group-heading",group.flag+" "+group.name));
-      for(const [id,name] of group.items)card(list,name,()=>showDays(id));
+      const choice=button(group.name,()=>{
+        locale=group.locale;showGroups();
+        sheet.querySelector('.europe-language[aria-pressed="true"]').focus({preventScroll:true});
+      },"europe-language");
+      choice.setAttribute("aria-pressed",String(group.locale===locale));
+      choice.lang=group.locale;
+      languages.append(choice);
     }
+    list.append(languages,create("h2","europe-section-title",italian?"Routine disponibili":"Rutinas disponibles"));
+    for(const [id,name] of groups.find(group=>group.locale===locale).items)card(list,id,name,()=>showDays(id));
   }
   function showDays(id){
     const list=frame(title(id),ui(id,"Elegí uno de los 10 días","Scegli uno dei 10 giorni"),showGroups);
@@ -71,8 +101,18 @@
   function showDay(id,day){
     const list=frame(title(id),ui(id,"Día "+day+" de 10","Giorno "+day+" di 10"),()=>showDays(id));
     if(!list)return;
+    currentDay={id,day};
     const files=entries(id,day);
-    if(!files.length){list.append(create("p","nu-il-notice",ui(id,"Cargando materiales…","Caricamento dei materiali…")));return;}
+    if(!files.length){
+      const failed=window.NuInternationalLibraryStatus==="error";
+      list.append(create("p","nu-il-notice",failed
+        ?ui(id,"No se pudo cargar el contenido.","Impossibile caricare i contenuti.")
+        :ui(id,"Cargando materiales…","Caricamento dei materiali…")));
+      if(failed)list.append(button(ui(id,"Reintentar","Riprova"),()=>{
+        window.NuReloadInternationalCatalog();showDay(id,day);
+      },"nu-il-action"));
+      return;
+    }
     files.forEach((file,index)=>{
       if(!isValid(file))return;
       const row=button("",()=>showCanonicalGallery(id,day,index),"nu-il-media-row");
@@ -408,36 +448,30 @@
       setTimeout(()=>URL.revokeObjectURL(url),60000);
     }catch{alert(ui(id,"No se pudo descargar este material.","Impossibile scaricare questo materiale."));}
   }
-  window.openInternationalLibrary=(targetSheet,back)=>{
-    if(!targetSheet?.isConnected&&typeof window.openBotQuickAccess==="function"){
-      window.openBotQuickAccess();targetSheet=document.querySelector(".bot-quick-access-sheet");
-      back=()=>window.openBotQuickAccess();
-    }
-    if(!targetSheet)return;
-    sheet=targetSheet;
-    returnToProducts=typeof back==="function"?back:()=>window.openBotQuickAccess();
-    pilotCloseObserver?.disconnect();
-    const layer=sheet.closest?.(".bot-quick-access-layer");
-    if(layer?.parentNode&&typeof MutationObserver!=="undefined"){
-      pilotCloseObserver=new MutationObserver(()=>{
-        if(!layer.isConnected){
-          pilotCloseObserver?.disconnect();pilotCloseObserver=null;
-          if(disposePilotPreview){
-            const dispose=disposePilotPreview;disposePilotPreview=null;dispose();
-          }
-        }
-      });
-      pilotCloseObserver.observe(layer.parentNode,{childList:true});
-    }
+  window.openEuropeStrategy=()=>{
+    activateMainView("europa");
     showGroups();
   };
+  // Enlaces de conversaciones anteriores siguen llegando al nuevo destino.
+  window.openInternationalLibrary=window.openEuropeStrategy;
+  document.getElementById("openEuropeBtn").onclick=window.openEuropeStrategy;
   document.addEventListener("click",event=>{
     const anchor=event.target.closest?.('a[href*="biblioteca-internacional.html"]');
-    if(anchor){event.preventDefault();window.openInternationalLibrary();}
+    if(anchor){event.preventDefault();window.openEuropeStrategy();}
   },true);
+  for(const type of ["nu-international-catalog-ready","nu-international-catalog-error"]){
+    window.addEventListener(type,()=>{
+      if(currentDay&&sheet.classList.contains("active"))showDay(currentDay.id,currentDay.day);
+    });
+  }
+  window.addEventListener("nu-main-view-change",event=>{
+    if(event.detail.view!=="europa"){
+      currentDay=null;
+      if(disposePilotPreview){disposePilotPreview();disposePilotPreview=null;}
+    }
+  });
   const style=create("style");
   style.textContent=`
-    .bot-quick-access-list.nu-il-list{display:block!important;overflow-y:auto!important;max-height:min(65dvh,540px);padding-bottom:15px}
     /* El visor canónico debe quedar por encima de la hoja de selección (z-index 260).
        Se limita el área visual para conservar un tamaño cómodo en el teléfono. */
     .media-preview.is-international{z-index:300}

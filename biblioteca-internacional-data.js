@@ -1,6 +1,8 @@
-// Biblioteca Internacional: carga el catálogo aprobado, sin modificar contenido de Iris.
+// Catálogo compartido por Estrategia Europa y los enlaces de biblioteca anteriores.
 window.NuInternationalLibraryData = Object.create(null);
-fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", cache: "no-store" })
+function loadInternationalCatalog(){
+window.NuInternationalLibraryStatus="loading";
+return fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", cache: "no-store" })
   .then(response => { if (!response.ok) throw new Error("Catálogo no disponible"); return response.json(); })
   .then(catalog => {
     const entries = Object.create(null);
@@ -54,6 +56,14 @@ fetch("/biblioteca-internacional-catalog.json", { credentials: "same-origin", ca
       });
     }
     window.NuInternationalLibraryData = entries;
+    window.NuInternationalLibraryStatus="ready";
     dispatchEvent(new Event("nu-international-catalog-ready"));
   })
-  .catch(error => console.warn("Biblioteca Internacional: catálogo pendiente.", error));
+  .catch(error => {
+    window.NuInternationalLibraryStatus="error";
+    console.warn("Biblioteca Internacional: catálogo pendiente.", error);
+    dispatchEvent(new Event("nu-international-catalog-error"));
+  });
+}
+window.NuReloadInternationalCatalog=loadInternationalCatalog;
+loadInternationalCatalog();

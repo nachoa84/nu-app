@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="app-navigation-floating-v1.css?v=20260830-floating-nav-v1" />
   <link rel="stylesheet" href="typography-poppins-v1.css?v=20260830-poppins-v1" />
   <link rel="stylesheet" href="supplements.css?v=9" />
+  <link rel="stylesheet" href="estrategia-europa.css?v=1" />
 </head>
 
 <body data-active-view="hoy">
@@ -97,6 +98,15 @@
         <section class="home-routines-section" aria-labelledby="homeRoutinesTitle">
           <div class="home-section-heading"><div><span>Tu día a día</span><h2 id="homeRoutinesTitle">Mis rutinas</h2></div></div>
           <div class="home-routines" aria-live="polite"></div>
+          <article id="europeHomeEntry" class="home-routine-card">
+            <div class="home-routine-cover" aria-hidden="true">
+              <svg class="europe-globe" viewBox="0 0 64 64"><circle cx="32" cy="32" r="23"/><ellipse cx="32" cy="32" rx="11" ry="23"/><path d="M9 32h46M13 19h38M13 45h38"/><path class="europe-globe-orbit" d="M8 42c-10 13 29 7 47-10"/></svg>
+            </div>
+            <div class="home-routine-body">
+              <div class="home-routine-heading"><h2>Estrategia Europa</h2></div>
+              <button id="openEuropeBtn" class="home-routine-continue" type="button"><span>Explorar contenido</span><span aria-hidden="true">→</span></button>
+            </div>
+          </article>
         </section>
 
         <div id="chatWrap" class="chat-wrap">
@@ -116,6 +126,15 @@
           <div><span id="guideHeaderKicker" class="page-kicker">Primeros pasos</span><h1 id="guideHeaderTitle">Guía de inicio</h1></div>
         </header>
         <div id="guideRoot" class="guide-root"></div>
+      </section>
+
+      <section id="view-europa" class="view" aria-labelledby="europeTitle">
+        <header class="app-page-header europe-page-header">
+          <button id="europeBackBtn" class="icon-button" type="button" aria-label="Volver a Inicio">‹</button>
+          <div><span class="page-kicker">Nu Comunidad</span><h1 id="europeTitle">Estrategia Europa</h1></div>
+        </header>
+        <p id="europeSubtitle" class="europe-subtitle"></p>
+        <div id="europeList" class="nu-il-list" aria-live="polite"></div>
       </section>
 
       <section id="view-suplementos" class="view" aria-label="Suplementos">
@@ -230,9 +249,9 @@
   <script src="routine-progress-sync-v1.js?v=1-durable-progress-sync"></script>
   <script src="backend-client.js?v=progress-sync-supplements-1"></script>
   <script src="push-client.js?v=61b-progress-canonical"></script>
-  <script src="bot-content.js?v=international-library-affiliate-guide-1"></script>
+  <script src="bot-content.js?v=europe-home-1"></script>
   <script src="routine-video-posters.generated.js?v=poster-manifest-v1"></script>
-  <script src="ui-core.js?v=supplements-polish-1"></script>
+  <script src="ui-core.js?v=europe-home-1"></script>
   <script src="routine-content.js?v=103a-unified-app-store"></script>
   <script src="routine-content-collagen-8-30.js?v=63-collagen-30"></script>
   <script src="routine-products-v92.js?v=supplements-pilot-2-wellspa-pdf"></script>
@@ -240,9 +259,9 @@
   <script src="routine-sync.js?v=supplements-pilot-1"></script>
   <script src="iris-ai-client-escalation-v1.js?v=1"></script>
   <script src="bot.js?v=145-cancel-order-guide"></script>
-  <script src="bot-shortcuts-v95.js?v=international-library-affiliate-guide-1"></script>
-  <script src="biblioteca-internacional-data.js?v=international-optimized-preview-1"></script>
-  <script src="biblioteca-internacional-iris.js?v=international-it-ui-1"></script>
+  <script src="bot-shortcuts-v95.js?v=europe-home-1"></script>
+  <script src="biblioteca-internacional-data.js?v=europe-home-1"></script>
+  <script src="biblioteca-internacional-iris.js?v=europe-home-1"></script>
   <script src="bot-sales-training-v102.js?v=102b-no-duplicate"></script>
   <script src="favorites.js?v=supplements-favorites-2"></script>
   <script src="notifications.js?v=143-single-sw"></script>

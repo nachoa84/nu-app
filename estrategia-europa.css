@@ -1,0 +1,40 @@
+/* Europa comparte la identidad del Inicio; sus estilos quedan aislados. */
+#view-hoy #europeHomeEntry { margin-top: 14px; }
+#europeHomeEntry .europe-globe { width: 70px; height: 70px; color: #0b2058; stroke-width: 2; }
+#europeHomeEntry .europe-globe-orbit { stroke: #ff552a; stroke-width: 3; }
+
+#view-europa {
+  color: #0b2058;
+  background:
+    radial-gradient(ellipse 75% 28% at 0 35%, rgb(0 167 200 / 16%), transparent 80%),
+    radial-gradient(ellipse 80% 35% at 100% 100%, rgb(0 167 200 / 24%), transparent 80%), #fff;
+  padding-top: calc(20px + var(--safe-top));
+  padding-bottom: 28px;
+}
+#view-europa .europe-page-header {
+  position: static;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+#view-europa .europe-page-header h1 { font-size: clamp(23px, 6vw, 28px); line-height: 1.18; }
+#view-europa .page-kicker { color: #68728e; }
+#view-europa .europe-subtitle { margin: 0 0 24px; color: #68728e; line-height: 1.5; }
+#view-europa .nu-il-list { display: block; padding: 0; }
+.europe-languages { display: flex; padding: 4px; gap: 4px; border: 1px solid rgba(11,32,88,.1); border-radius: 18px; background: #fff; }
+.europe-language { flex: 1; min-width: 0; min-height: 46px; border: 0; border-radius: 14px; background: #fff; color: #0b2058; font-weight: 650; }
+.europe-language[aria-pressed="true"] { color: #fff; background: #0b2058; }
+.europe-section-title { margin: 26px 2px 16px; font-size: 20px; line-height: 1.25; letter-spacing: -.025em; }
+.europe-routine-card { display: grid; grid-template-columns: minmax(100px, 36%) minmax(0, 1fr); width: 100%; min-height: 142px; margin: 0 0 14px; padding: 0; overflow: hidden; border: 1px solid rgba(11,32,88,.1); border-radius: 22px; background: #fff; color: #0b2058; text-align: left; box-shadow: 0 8px 24px rgba(11,32,88,.05); }
+.europe-routine-cover { display: grid; place-items: center; border-right: 1px solid rgba(11,32,88,.1); }
+.europe-routine-cover img { width: 100%; height: 138px; padding: 16px; object-fit: contain; }
+.europe-routine-card[data-collection="lumispa/it"] img { transform: scale(.78); }
+.europe-routine-copy { display: flex; flex-direction: column; justify-content: center; min-width: 0; gap: 7px; padding: 18px 14px; }
+.europe-routine-copy strong { font-size: 18px; line-height: 1.2; letter-spacing: -.025em; }
+.europe-routine-copy small { color: #68728e; font-size: 13px; line-height: 1.4; }
+.europe-routine-action { color: #ff552a; font-size: 13px; font-weight: 650; }
+#view-europa button:focus-visible, #openEuropeBtn:focus-visible { outline: 3px solid #00a7c8; outline-offset: 3px; }
+#view-europa .nu-il-day { color: #0b2058; font-family: inherit; }
+#view-europa .nu-il-chevron { color: #ff552a; }
+#view-europa .nu-il-media-copy strong { color: #0b2058; }

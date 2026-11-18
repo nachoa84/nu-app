@@ -550,7 +550,7 @@ function currentMainViewName() {
 }
 
 function nativeViewDirection(fromView, toView) {
-  const homeChildViews = new Set(["rutina", "guia", "suplementos", "suplementos-acciones"]);
+  const homeChildViews = new Set(["rutina", "guia", "suplementos", "suplementos-acciones", "europa"]);
   const fromNav = homeChildViews.has(fromView) ? "hoy" : fromView;
   const toNav = homeChildViews.has(toView) ? "hoy" : toView;
   const fromIndex = MAIN_VIEW_ORDER.indexOf(fromNav);
@@ -650,7 +650,7 @@ function activateMainView(view, { vibrate = false, animate = true } = {}) {
   const previousTarget = document.getElementById(`view-${previousView}`);
   const changingView = previousView !== view;
   const direction = nativeViewDirection(previousView, view);
-  const navView = ["rutina", "guia", "suplementos", "suplementos-acciones"].includes(view) ? "hoy" : view;
+  const navView = ["rutina", "guia", "suplementos", "suplementos-acciones", "europa"].includes(view) ? "hoy" : view;
   const activeNav = document.querySelector(`.nav-btn[data-view="${navView}"]`);
   const navWasActive = activeNav?.classList.contains("active") === true;
 
@@ -686,6 +686,7 @@ function activateMainView(view, { vibrate = false, animate = true } = {}) {
   if (view === "suplementos") renderSupplements();
   if (view === "suplementos-acciones") renderSupplementActions();
   if (view === "favoritos") renderFavorites();
+  window.dispatchEvent(new CustomEvent("nu-main-view-change", { detail: { view } }));
 
   if (view === "bot") {
     const thread = document.getElementById("botThread");
