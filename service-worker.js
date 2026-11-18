@@ -1,9 +1,9 @@
-const CACHE="nuapp-v176-europe-home";
+const CACHE="nuapp-v177-europe-markets";
 
 const CORE=[
-  "./estrategia-europa.css?v=1",
+  "./estrategia-europa.css?v=2",
   "./biblioteca-internacional-data.js?v=europe-home-1",
-  "./biblioteca-internacional-iris.js?v=europe-home-1",
+  "./biblioteca-internacional-iris.js?v=europe-markets-2",
   "./product-routine-config.js?v=5",
   "./supplements-content.js?v=7",
   "./supplements-view.js?v=supplements-release-review-1",

@@ -3,12 +3,12 @@
   // Estrategia Europa: la biblioteca existente ahora vive en Inicio.
   // Conserva catálogo, orden, visor, descargas y preparación de archivos para compartir.
   const groups=[
-    {locale:"es",name:"Español",items:[["collagen/es","Colágeno"]]},
-    {locale:"it",name:"Italiano",items:[["collagen/it","Collagene"],["lumispa/it","LumiSpa"]]}
+    {market:"es",name:"España",items:[["collagen/es","Colágeno · España"]]},
+    {market:"it",name:"Italia",items:[["collagen/it","Colágeno · Italia"],["lumispa/it","LumiSpa · Italia"]]}
   ];
   const sheet=document.getElementById("view-europa");
   if(!sheet)return;
-  let locale="es",currentDay=null;
+  let market="es",currentDay=null;
   let disposePilotPreview=null;
   // Cache acotada: evitar retener decenas de MP4 al navegar por la biblioteca.
   const shareReadyFiles=new Map();
@@ -34,7 +34,7 @@
   const isItalian=id=>id.endsWith("/it");
   const ui=(id,spanish,italian)=>isItalian(id)?italian:spanish;
 
-  function frame(heading,subtitle,back){
+  function frame(heading,subtitle,back,language="es"){
     if(disposePilotPreview){
       const dispose=disposePilotPreview;
       disposePilotPreview=null;
@@ -45,8 +45,8 @@
     const backButton=sheet.querySelector("#europeBackBtn");
     sheet.querySelector("#europeTitle").textContent=heading;
     sheet.querySelector("#europeSubtitle").textContent=subtitle;
-    sheet.lang=locale;
-    backButton.setAttribute("aria-label",locale==="it"?"Indietro":"Volver");
+    sheet.lang=language;
+    backButton.setAttribute("aria-label",language==="it"?"Indietro":"Volver");
     backButton.onclick=back;
     list.className="nu-il-list";
     list.replaceChildren();list.scrollTop=0;
@@ -66,40 +66,38 @@
     cover.setAttribute("aria-hidden","true");cover.append(image);
     const text=create("span","europe-routine-copy");
     text.append(create("strong","",label),
-      create("small","",locale==="it"?"10 giorni di contenuti":"10 días de contenido"),
-      create("span","europe-routine-action",locale==="it"?"Vedi contenuti →":"Ver contenido →"));
+      create("small","","10 días de contenido"),
+      create("span","europe-routine-action","Ver contenido →"));
     el.append(cover,text);list.append(el);
   }
   function showGroups(){
-    const italian=locale==="it";
-    const list=frame(italian?"Strategia Europa":"Estrategia Europa",
-      italian?"Scegli la lingua e scopri i contenuti":"Elegí tu idioma y explorá el contenido",
+    const group=groups.find(entry=>entry.market===market);
+    const list=frame("Estrategia Europa","Elegí el mercado y explorá sus estrategias",
       ()=>activateMainView("hoy"));
     if(!list)return;
-    const languages=create("div","europe-languages");
-    languages.setAttribute("role","group");
-    languages.setAttribute("aria-label",italian?"Lingua dei contenuti":"Idioma del contenido");
-    for(const group of groups){
-      const choice=button(group.name,()=>{
-        locale=group.locale;showGroups();
-        sheet.querySelector('.europe-language[aria-pressed="true"]').focus({preventScroll:true});
-      },"europe-language");
-      choice.setAttribute("aria-pressed",String(group.locale===locale));
-      choice.lang=group.locale;
-      languages.append(choice);
+    const markets=create("div","europe-markets");
+    markets.setAttribute("role","group");
+    markets.setAttribute("aria-label","Mercado de la estrategia");
+    for(const entry of groups){
+      const choice=button(entry.name,()=>{
+        market=entry.market;showGroups();
+        sheet.querySelector('.europe-market[aria-pressed="true"]').focus({preventScroll:true});
+      },"europe-market");
+      choice.setAttribute("aria-pressed",String(entry.market===market));
+      markets.append(choice);
     }
-    list.append(languages,create("h2","europe-section-title",italian?"Routine disponibili":"Rutinas disponibles"));
-    for(const [id,name] of groups.find(group=>group.locale===locale).items)card(list,id,name,()=>showDays(id));
+    list.append(markets,create("h2","europe-section-title","Estrategias para "+group.name));
+    for(const [id,name] of group.items)card(list,id,name,()=>showDays(id));
   }
   function showDays(id){
-    const list=frame(title(id),ui(id,"Elegí uno de los 10 días","Scegli uno dei 10 giorni"),showGroups);
+    const list=frame(title(id),ui(id,"Elegí uno de los 10 días","Scegli uno dei 10 giorni"),showGroups,isItalian(id)?"it":"es");
     if(!list)return;
     const days=create("div","nu-il-days");
     for(let day=1;day<=10;day++)days.append(button(ui(id,"Día ","Giorno ")+day,()=>showDay(id,day),"nu-il-day"));
     list.append(days);
   }
   function showDay(id,day){
-    const list=frame(title(id),ui(id,"Día "+day+" de 10","Giorno "+day+" di 10"),()=>showDays(id));
+    const list=frame(title(id),ui(id,"Día "+day+" de 10","Giorno "+day+" di 10"),()=>showDays(id),isItalian(id)?"it":"es");
     if(!list)return;
     currentDay={id,day};
     const files=entries(id,day);
@@ -190,7 +188,7 @@
   function showPreview(id,day,index){
     const files=entries(id,day),file=files[index];
     if(!isValid(file))return;
-    const list=frame(ui(id,"Material "+(index+1)+" de "+files.length,"Materiale "+(index+1)+" di "+files.length),title(id)+" · "+ui(id,"Día ","Giorno ")+day,()=>showDay(id,day));
+    const list=frame(ui(id,"Material "+(index+1)+" de "+files.length,"Materiale "+(index+1)+" di "+files.length),title(id)+" · "+ui(id,"Día ","Giorno ")+day,()=>showDay(id,day),isItalian(id)?"it":"es");
     if(!list)return;
     const stage=create("div","nu-il-stage");
     const pilot=hasStaticPoster(file);

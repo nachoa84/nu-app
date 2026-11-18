@@ -22,9 +22,9 @@
 #view-europa .page-kicker { color: #68728e; }
 #view-europa .europe-subtitle { margin: 0 0 24px; color: #68728e; line-height: 1.5; }
 #view-europa .nu-il-list { display: block; padding: 0; }
-.europe-languages { display: flex; padding: 4px; gap: 4px; border: 1px solid rgba(11,32,88,.1); border-radius: 18px; background: #fff; }
-.europe-language { flex: 1; min-width: 0; min-height: 46px; border: 0; border-radius: 14px; background: #fff; color: #0b2058; font-weight: 650; }
-.europe-language[aria-pressed="true"] { color: #fff; background: #0b2058; }
+.europe-markets { display: flex; padding: 4px; gap: 4px; border: 1px solid rgba(11,32,88,.1); border-radius: 18px; background: #fff; }
+.europe-market { flex: 1; min-width: 0; min-height: 46px; border: 0; border-radius: 14px; background: #fff; color: #0b2058; font-weight: 650; }
+.europe-market[aria-pressed="true"] { color: #fff; background: #0b2058; }
 .europe-section-title { margin: 26px 2px 16px; font-size: 20px; line-height: 1.25; letter-spacing: -.025em; }
 .europe-routine-card { display: grid; grid-template-columns: minmax(100px, 36%) minmax(0, 1fr); width: 100%; min-height: 142px; margin: 0 0 14px; padding: 0; overflow: hidden; border: 1px solid rgba(11,32,88,.1); border-radius: 22px; background: #fff; color: #0b2058; text-align: left; box-shadow: 0 8px 24px rgba(11,32,88,.05); }
 .europe-routine-cover { display: grid; place-items: center; border-right: 1px solid rgba(11,32,88,.1); }

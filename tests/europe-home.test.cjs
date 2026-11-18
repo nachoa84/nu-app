@@ -41,13 +41,20 @@ test("Europa filtra las tres colecciones y preserva los 30 días y las acciones 
     assert.ok(doc.querySelector('.nav-btn[data-view="hoy"].active'));
     assert.deepEqual([...doc.querySelectorAll("[data-collection]")].map(node=>node.dataset.collection),["collagen/es"]);
     let materialCount=0;
-    for(const [language,ids] of [["Español",["collagen/es"]],["Italiano",["collagen/it","lumispa/it"]]]){
-      [...doc.querySelectorAll(".europe-language")].find(node=>node.textContent===language).click();
-      assert.equal(doc.activeElement.textContent,language);
+    for(const [market,ids] of [["España",["collagen/es"]],["Italia",["collagen/it","lumispa/it"]]]){
+      [...doc.querySelectorAll(".europe-market")].find(node=>node.textContent===market).click();
+      assert.equal(doc.activeElement.textContent,market);
+      assert.equal(doc.querySelector("#europeTitle").textContent,"Estrategia Europa");
+      assert.equal(doc.querySelector("#europeSubtitle").textContent,"Elegí el mercado y explorá sus estrategias");
+      assert.equal(doc.querySelector(".europe-section-title").textContent,"Estrategias para "+market);
+      assert.equal(doc.querySelector("#view-europa").lang,"es");
+      assert.ok(!doc.querySelector("#europeList").textContent.includes("Español"));
+      assert.ok(!doc.querySelector("#europeList").textContent.includes("Italiano"));
       assert.deepEqual([...doc.querySelectorAll("[data-collection]")].map(node=>node.dataset.collection),ids);
       for(const id of ids){
         doc.querySelector(`[data-collection="${id}"]`).click();
         assert.equal(doc.querySelectorAll(".nu-il-day").length,10);
+        assert.equal(doc.querySelector("#view-europa").lang,id.endsWith("/it")?"it":"es");
         for(let day=1;day<=10;day++){
           doc.querySelectorAll(".nu-il-day")[day-1].click();
           const rows=[...doc.querySelectorAll(".nu-il-media-row")];
