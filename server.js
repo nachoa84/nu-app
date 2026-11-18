@@ -4793,10 +4793,12 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
 // Biblioteca Internacional: ruta de solo lectura, aislada de los assets existentes.
 // Los índices se resuelven contra una lista cerrada de materiales aprobados.
 const internationalLibraryCatalog = require("./biblioteca-internacional-catalog.json");
+const europeComboEs = require("./international-combo-es");
 const internationalCollectionFolders = Object.freeze({
   "collagen-es": ["collagen", "es", "ES COLAGENO"],
   "collagen-it": ["collagen", "it", "IT COLAGENO"],
-  "lumispa-it": ["lumispa", "it", "IT LUMI"]
+  "lumispa-it": ["lumispa", "it", "IT LUMI"],
+  "lumispa-collagen-es": ["lumispa-collagen", "es", "ES LUMI COLAGENO"]
 });
 const internationalOptimizedPreviewKeys = new Set([
   "collagen/it/3/4",
@@ -4805,6 +4807,18 @@ const internationalOptimizedPreviewKeys = new Set([
   "collagen/es/6/2",
   "lumispa/it/6/3"
 ]);
+
+// La nueva colección solo aparece tras completar y verificar su importación.
+app.get("/api/europe-combo-status", async (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  try {
+    const marker = await getAssetFileV108(europeComboEs.readyPath);
+    return res.json({ ready: marker.totalSize > 0 });
+  } catch (error) {
+    if (Number(error?.code) === 404 || Number(error?.status) === 404) return res.json({ ready: false });
+    return next(error);
+  }
+});
 
 app.use("/api/international-assets/:collection/:day/:index", async (req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -4838,14 +4852,14 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     item.type === "video" && /^[0-9]+\.mp4$/i.test(item.filename);
   const validVariant = variantRequested &&
     (req.query.variant === "preview" || req.query.variant === "thumb") &&
-    item.type === "image" && /^[0-9]+\.jpg$/i.test(item.filename);
+    item.type === "image" && /^[0-9]+\.(?:jpg|png)$/i.test(item.filename);
   if ((posterRequested && !validPoster) || (variantRequested && !validVariant)) {
     return res.status(404).end();
   }
   const assetFilename = validPoster
     ? item.filename.replace(/\.mp4$/i, ".jpg")
     : validVariant
-      ? item.filename.replace(/\.jpg$/i, "." + req.query.variant + ".jpg")
+      ? item.filename.replace(/\.(?:jpg|png)$/i, "." + req.query.variant + ".jpg")
       : item.filename;
   const folderNames = [`DIA ${day}`, `DÍA ${day}`];
   const filenames = [assetFilename];
@@ -4855,7 +4869,9 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
   try {
     // Las copias Preview viven fuera de bot/active. Si todavía no se subieron,
     // el video original sigue funcionando y no queda cacheado como optimizado.
-    const sources = optimizedPreviewRequested
+    const sources = req.params.collection === europeComboEs.route
+      ? [["combo-preview", europeComboEs.manifest.prefix]]
+      : optimizedPreviewRequested
       ? [["optimized-preview", "bot/preview/international/optimized-20261106"],
          ["original-fallback", "bot/active/international/v1"]]
       : [["original", "bot/active/international/v1"]];

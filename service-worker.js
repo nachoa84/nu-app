@@ -1,9 +1,9 @@
-const CACHE="nuapp-v178-europe-preview-size";
+const CACHE="nuapp-v179-europe-combo-es";
 
 const CORE=[
-  "./estrategia-europa.css?v=2",
-  "./biblioteca-internacional-data.js?v=europe-home-1",
-  "./biblioteca-internacional-iris.js?v=europe-preview-size-3",
+  "./estrategia-europa.css?v=4",
+  "./biblioteca-internacional-data.js?v=europe-combo-es-4",
+  "./biblioteca-internacional-iris.js?v=europe-combo-es-4",
   "./product-routine-config.js?v=5",
   "./supplements-content.js?v=7",
   "./supplements-view.js?v=supplements-release-review-1",

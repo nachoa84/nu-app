@@ -26,16 +26,17 @@ const catalog = JSON.parse(fs.readFileSync(
   path.join(__dirname, "..", "biblioteca-internacional-catalog.json"), "utf8"
 ));
 const groups = [
-  { id: "collagen/es", label: "Colágeno España", total: 48, videos: 11, images: 37 },
-  { id: "collagen/it", label: "Colágeno Italia", total: 48, videos: 12, images: 36 },
-  { id: "lumispa/it", label: "LumiSpa Italia", total: 41, videos: 32, images: 9 }
+  { id: "collagen/es", label: "Colágeno España", days: 10, total: 48, videos: 11, images: 37 },
+  { id: "collagen/it", label: "Colágeno Italia", days: 10, total: 48, videos: 12, images: 36 },
+  { id: "lumispa/it", label: "LumiSpa Italia", days: 10, total: 41, videos: 32, images: 9 },
+  { id: "lumispa-collagen/es", label: "LumiSpa + Colágeno España", days: 7, total: 26, videos: 20, images: 6 }
 ];
 const optimized = new Set([
   "collagen/it/3/4", "lumispa/it/3/3", "collagen/it/6/2",
   "collagen/es/6/2", "lumispa/it/6/3"
 ]);
 const expectedKeys = new Set(groups.flatMap(group =>
-  Array.from({ length: 10 }, (_, i) => group.id + "/" + (i + 1))
+  Array.from({ length: group.days }, (_, i) => group.id + "/" + (i + 1))
 ));
 const issues = [];
 const materials = [];
@@ -46,7 +47,7 @@ for (const key of Object.keys(catalog)) {
 }
 for (const group of groups) {
   let videos = 0, images = 0, total = 0, presentDays = 0;
-  for (let day = 1; day <= 10; day++) {
+  for (let day = 1; day <= group.days; day++) {
     const key = group.id + "/" + day;
     const items = catalog[key];
     if (!Array.isArray(items) || !items.length) {
@@ -62,10 +63,10 @@ for (const group of groups) {
       }
       const ext = typeof item.filename === "string"
         ? item.filename.toLowerCase().split(".").pop() : "";
-      if (!/^\d+\.(?:mp4|jpg)$/i.test(item.filename || ""))
+      if (!/^\d+\.(?:mp4|jpg|png)$/i.test(item.filename || ""))
         issues.push("Nombre/formato inesperado: " + label + " (" + item.filename + ")");
       if ((item.type === "video" && ext !== "mp4") ||
-          (item.type === "image" && ext !== "jpg") ||
+          (item.type === "image" && !["jpg", "png"].includes(ext)) ||
           !["video", "image"].includes(item.type)) {
         issues.push("Tipo y extensión no coinciden: " + label);
         return;
@@ -80,16 +81,16 @@ for (const group of groups) {
       const id = key + "/" + (i + 1);
       const url = "/api/international-assets/" + product + "-" + country +
         "/" + day + "/" + (i + 1);
-      materials.push({ id, label, type: item.type, url });
+      materials.push({ id, label, type: item.type, extension: ext, url });
     });
   }
-  console.log(group.label + ": " + presentDays + "/10 días | " + total + " materiales (" +
+  console.log(group.label + ": " + presentDays + "/" + group.days + " días | " + total + " materiales (" +
     videos + " videos, " + images + " imágenes)");
   if (total !== group.total || videos !== group.videos || images !== group.images)
     issues.push("Cambió la cantidad aprobada de " + group.label +
       ": se esperaba " + group.total + " (" + group.videos + "/" + group.images + ")");
 }
-if (materials.length !== 137 || stats.videos !== 55 || stats.images !== 82)
+if (materials.length !== 163 || stats.videos !== 75 || stats.images !== 88)
   issues.push("Total diferente del catálogo aprobado: " + materials.length +
     " materiales, " + stats.videos + " videos, " + stats.images + " imágenes");
 for (const id of optimized) {
@@ -117,7 +118,7 @@ const selected = limit ? materials.slice(0, limit) : materials;
 const tasks = [];
 for (const material of selected) {
   tasks.push({ material, role: "original", kind: "head", url: material.url,
-    expectType: material.type === "video" ? "video/mp4" : "image/jpeg" });
+    expectType: material.type === "video" ? "video/mp4" : material.extension === "png" ? "image/png" : "image/jpeg" });
   if (material.type === "video") {
     tasks.push({ material, role: "poster", kind: "head",
       url: material.url + "?poster=first-frame&v=international-posters-55-1",

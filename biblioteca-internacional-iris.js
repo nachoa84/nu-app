@@ -3,7 +3,7 @@
   // Estrategia Europa: la biblioteca existente ahora vive en Inicio.
   // Conserva catálogo, orden, visor, descargas y preparación de archivos para compartir.
   const groups=[
-    {market:"es",name:"España",items:[["collagen/es","Colágeno · España"]]},
+    {market:"es",name:"España",items:[["collagen/es","Colágeno · España"],["lumispa-collagen/es","LumiSpa + Colágeno · España"]]},
     {market:"it",name:"Italia",items:[["collagen/it","Colágeno · Italia"],["lumispa/it","LumiSpa · Italia"]]}
   ];
   const sheet=document.getElementById("view-europa");
@@ -30,7 +30,8 @@
   const button=(label,click,cls)=>{const el=create("button",cls,label);el.type="button";el.onclick=click;return el;};
   const entries=(id,day)=>window.NuInternationalLibraryData?.[id+"/"+day]||[];
   const isValid=item=>item&&/^(image|video)$/.test(item.type)&&/^\/api\/international-assets\/[a-z0-9-]+\/\d+\/\d+(?:\?v=[a-z0-9-]+)?$/.test(item.src);
-  const title=id=>id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
+  const duration=id=>id==="lumispa-collagen/es"?7:10;
+  const title=id=>id==="lumispa-collagen/es"?"LumiSpa + Colágeno · España":id==="collagen/es"?"Collagen+ · España":id==="collagen/it"?"Collagen+ · Italia":"Lumi · Italia";
   const isItalian=id=>id.endsWith("/it");
   const ui=(id,spanish,italian)=>isItalian(id)?italian:spanish;
 
@@ -64,9 +65,15 @@
     const image=create("img");image.alt="";image.loading="lazy";
     image.src=id.startsWith("collagen/")?"assets/custom/routine-collagen-home.png":"assets/custom/routine-lumispa-home.png";
     cover.setAttribute("aria-hidden","true");cover.append(image);
+    if(id==="lumispa-collagen/es"){
+      cover.classList.add("is-combo");
+      image.src="assets/custom/routine-lumispa-home.png";
+      const collagen=create("img");collagen.src="assets/custom/routine-collagen-home.png";
+      collagen.alt="";collagen.loading="lazy";cover.append(collagen);
+    }
     const text=create("span","europe-routine-copy");
     text.append(create("strong","",label),
-      create("small","","10 días de contenido"),
+      create("small","",duration(id)+" días de contenido"),
       create("span","europe-routine-action","Ver contenido →"));
     el.append(cover,text);list.append(el);
   }
@@ -87,17 +94,20 @@
       markets.append(choice);
     }
     list.append(markets,create("h2","europe-section-title","Estrategias para "+group.name));
-    for(const [id,name] of group.items)card(list,id,name,()=>showDays(id));
+    for(const [id,name] of group.items){
+      if(id==="lumispa-collagen/es"&&window.NuEuropeComboReady!==true)continue;
+      card(list,id,name,()=>showDays(id));
+    }
   }
   function showDays(id){
-    const list=frame(title(id),ui(id,"Elegí uno de los 10 días","Scegli uno dei 10 giorni"),showGroups,isItalian(id)?"it":"es");
+    const list=frame(title(id),ui(id,"Elegí uno de los "+duration(id)+" días","Scegli uno dei "+duration(id)+" giorni"),showGroups,isItalian(id)?"it":"es");
     if(!list)return;
     const days=create("div","nu-il-days");
-    for(let day=1;day<=10;day++)days.append(button(ui(id,"Día ","Giorno ")+day,()=>showDay(id,day),"nu-il-day"));
+    for(let day=1;day<=duration(id);day++)days.append(button(ui(id,"Día ","Giorno ")+day,()=>showDay(id,day),"nu-il-day"));
     list.append(days);
   }
   function showDay(id,day){
-    const list=frame(title(id),ui(id,"Día "+day+" de 10","Giorno "+day+" di 10"),()=>showDays(id),isItalian(id)?"it":"es");
+    const list=frame(title(id),ui(id,"Día "+day+" de "+duration(id),"Giorno "+day+" di "+duration(id)),()=>showDays(id),isItalian(id)?"it":"es");
     if(!list)return;
     currentDay={id,day};
     const files=entries(id,day);
@@ -446,7 +456,24 @@
       setTimeout(()=>URL.revokeObjectURL(url),60000);
     }catch{alert(ui(id,"No se pudo descargar este material.","Impossibile scaricare questo materiale."));}
   }
+  let comboStatusRequest=null;
+  function refreshComboAvailability(){
+    if(comboStatusRequest)return comboStatusRequest;
+    comboStatusRequest=fetch("/api/europe-combo-status",{cache:"no-store",credentials:"same-origin"})
+      .then(response=>{if(!response.ok)throw Error("Estado no disponible");return response.json();})
+      .then(status=>{
+        window.NuEuropeComboReady=status.ready===true;
+        if(sheet.classList.contains("active")&&sheet.querySelector(".europe-markets"))showGroups();
+      })
+      .catch(()=>{window.NuEuropeComboReady=false;})
+      .finally(()=>{
+        comboStatusRequest=null;
+        dispatchEvent(new Event("nu-europe-combo-status"));
+      });
+    return comboStatusRequest;
+  }
   window.openEuropeStrategy=()=>{
+    refreshComboAvailability();
     activateMainView("europa");
     showGroups();
   };

@@ -31,7 +31,7 @@ test("Europa filtra las tres colecciones y preserva los 30 días y las acciones 
     const requests=[];
     w.fetch=async url=>{
       requests.push(url);
-      return {ok:true,json:async()=>catalog};
+      return {ok:true,json:async()=>url==="/api/europe-combo-status"?{ready:false}:catalog};
     };
     w.eval(read("biblioteca-internacional-data.js"));
     await new Promise(resolve=>w.addEventListener("nu-international-catalog-ready",resolve,{once:true}));
@@ -83,7 +83,7 @@ test("Europa filtra las tres colecciones y preserva los 30 días y las acciones 
     doc.querySelector("#europeBackBtn").click();
     assert.ok(doc.querySelector("#view-hoy.active"));
     assert.equal(JSON.stringify(w.localStorage),before);
-    assert.deepEqual(requests,["/biblioteca-internacional-catalog.json"]);
+    assert.deepEqual(requests,["/biblioteca-internacional-catalog.json","/api/europe-combo-status"]);
     assert.ok(!w.BotContent.some(item=>item.id==="biblioteca-internacional"));
     assert.ok(w.BotContent.some(item=>item.id==="estrategia-colageno-europa"));
     const legacy=doc.createElement("a");legacy.href="/biblioteca-internacional.html";doc.body.append(legacy);legacy.click();
@@ -100,7 +100,7 @@ test("un catálogo demorado o fallido se actualiza al cargar y permite reintenta
   const {dom,w,doc}=fixture();
   try{
     let release,fail=true;
-    w.fetch=()=>new Promise(resolve=>{release=()=>resolve({ok:!fail,json:async()=>catalog});});
+    w.fetch=url=>url==="/api/europe-combo-status"?Promise.resolve({ok:true,json:async()=>({ready:false})}):new Promise(resolve=>{release=()=>resolve({ok:!fail,json:async()=>catalog});});
     w.console.warn=()=>{};
     w.eval(read("biblioteca-internacional-data.js"));
     doc.querySelector("#openEuropeBtn").click();
@@ -120,5 +120,43 @@ test("un catálogo demorado o fallido se actualiza al cargar y permite reintenta
     w.activateMainView("hoy",{animate:false});
     w.dispatchEvent(new w.Event("nu-international-catalog-ready"));
     assert.ok(doc.querySelector("#view-hoy.active"));
+  }finally{dom.window.close();}
+});
+
+
+test("la combinada aparece solo tras la importación y contiene siete días en orden",optionalDom,async()=>{
+  const {dom,w,doc}=fixture();
+  try{
+    let ready=false;
+    w.fetch=async url=>({ok:true,json:async()=>url==="/api/europe-combo-status"?{ready}:catalog});
+    w.eval(read("biblioteca-internacional-data.js"));
+    await new Promise(resolve=>w.addEventListener("nu-international-catalog-ready",resolve,{once:true}));
+    let checked=new Promise(resolve=>w.addEventListener("nu-europe-combo-status",resolve,{once:true}));
+    doc.querySelector("#openEuropeBtn").click();await checked;
+    assert.equal(doc.querySelector('[data-collection="lumispa-collagen/es"]'),null);
+    w.activateMainView("hoy",{animate:false});ready=true;
+    checked=new Promise(resolve=>w.addEventListener("nu-europe-combo-status",resolve,{once:true}));
+    doc.querySelector("#openEuropeBtn").click();await checked;
+    const card=doc.querySelector('[data-collection="lumispa-collagen/es"]');
+    assert.match(card.textContent,/7 días de contenido/);
+    assert.equal(card.querySelectorAll("img").length,2);
+    card.click();assert.equal(doc.querySelectorAll(".nu-il-day").length,7);
+    let total=0;
+    for(let day=1;day<=7;day++){
+      doc.querySelectorAll(".nu-il-day")[day-1].click();
+      assert.equal(doc.querySelectorAll(".nu-il-media-row").length,[3,3,4,3,4,5,4][day-1]);
+      assert.equal(doc.querySelector("#europeSubtitle").textContent,`Día ${day} de 7`);
+      const files=w.NuInternationalLibraryData[`lumispa-collagen/es/${day}`];
+      files.forEach((item,index)=>{
+        assert.ok(item.src.startsWith(`/api/international-assets/lumispa-collagen-es/${day}/${index+1}`));
+        assert.equal(item.type,day<=2?"image":"video");
+      });
+      total+=files.length;doc.querySelector("#europeBackBtn").click();
+    }
+    assert.equal(total,26);
+    assert.equal(w.NuInternationalLibraryData["lumispa-collagen/es/8"],undefined);
+    doc.querySelector("#europeBackBtn").click();
+    [...doc.querySelectorAll(".europe-market")].find(b=>b.textContent==="Italia").click();
+    assert.equal(doc.querySelector('[data-collection="lumispa-collagen/es"]'),null);
   }finally{dom.window.close();}
 });

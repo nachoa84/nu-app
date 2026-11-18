@@ -38,3 +38,6 @@
 #view-europa .nu-il-day { color: #0b2058; font-family: inherit; }
 #view-europa .nu-il-chevron { color: #ff552a; }
 #view-europa .nu-il-media-copy strong { color: #0b2058; }
+
+.europe-routine-cover.is-combo { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0; padding: 6px; }
+.europe-routine-cover.is-combo img { min-width: 0; height: 130px; padding: 2px; }
