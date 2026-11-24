@@ -37,7 +37,8 @@ return fetch("/biblioteca-internacional-catalog.json", { credentials: "same-orig
           title: "Material " + (index + 1),
           type: file.type,
           src: assetPath +
-            (key.startsWith("lumispa-collagen/es/") ? "?v=lumi-collagen-es-20261118-v1" :
+            (key.startsWith("collagen/pt/") ? "?v=collagen-pt-20261124-v1" :
+              key.startsWith("lumispa-collagen/es/") ? "?v=lumi-collagen-es-20261118-v1" :
               optimizedPreviewBatch.has(materialKey) ? "?v=optimized-preview-20261106" :
               key === "collagen/es/1" && index === 0 ? "?v=collagen-es-d1-mp4-pilot-1" :
               optimizedDay6.has(materialKey) ? "?v=day6-mobile-optimized-1" :

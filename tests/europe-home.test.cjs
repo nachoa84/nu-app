@@ -13,6 +13,52 @@ const root = path.resolve(__dirname,"..");
 const read = file => fs.readFileSync(path.join(root,file),"utf8");
 const catalog = JSON.parse(read("biblioteca-internacional-catalog.json"));
 
+test("Portugal conserva los siete días, el orden y las acciones del visor",optionalDom,async()=>{
+  const {dom,w,doc}=fixture();
+  try{
+    let ready=false;
+    w.fetch=async url=>({ok:true,json:async()=>url==="/api/portugal-collagen-status"?{ready}:url==="/api/europe-combo-status"?{ready:true}:catalog});
+    w.eval(read("biblioteca-internacional-data.js"));
+    await new Promise(resolve=>w.addEventListener("nu-international-catalog-ready",resolve,{once:true}));
+    let checked=new Promise(resolve=>w.addEventListener("nu-portugal-collagen-status",resolve,{once:true}));
+    w.openEuropeStrategy();await checked;
+    const choosePortugal=()=>[...doc.querySelectorAll(".europe-market")].find(b=>b.textContent==="Portugal").click();
+    choosePortugal();
+    assert.equal(doc.querySelector('[data-collection="collagen/pt"]'),null);
+    ready=true;
+    checked=new Promise(resolve=>w.addEventListener("nu-portugal-collagen-status",resolve,{once:true}));
+    w.openEuropeStrategy();await checked;choosePortugal();
+    const card=doc.querySelector('[data-collection="collagen/pt"]');
+    assert.match(card.textContent,/7 dias de conteúdo/);card.click();
+    assert.equal(doc.querySelectorAll(".nu-il-day").length,7);
+    assert.equal(doc.querySelector("#view-europa").lang,"pt");
+    assert.equal(doc.querySelector("#europeBackBtn").getAttribute("aria-label"),"Voltar");
+    let total=0;
+    for(let day=1;day<=7;day++){
+      doc.querySelectorAll(".nu-il-day")[day-1].click();
+      assert.equal(doc.querySelector("#europeSubtitle").textContent,`Dia ${day} de 7`);
+      const rows=[...doc.querySelectorAll(".nu-il-media-row")];
+      assert.equal(rows.length,[4,5,7,5,4,5,6][day-1]);
+      rows.forEach((row,index)=>{
+        let opened;
+        w.openMediaPreview=(items,selected,selectedDay)=>{opened={items,selected,selectedDay};};
+        row.click();
+        assert.equal(opened.selected,index);assert.equal(opened.selectedDay,day);
+        const item=opened.items[index];
+        assert.equal(item.locale,"pt");assert.equal(item.international,true);
+        assert.ok(item.src.startsWith(`/api/international-assets/collagen-pt/${day}/${index+1}?v=`));
+        assert.equal(item.mediaType,day===3&&index===6?"video":"image");
+        assert.equal(typeof item.download,"function");assert.equal(typeof item.prepareShare,"function");
+      });
+      total+=rows.length;doc.querySelector("#europeBackBtn").click();
+    }
+    assert.equal(total,36);assert.equal(w.NuInternationalLibraryData["collagen/pt/8"],undefined);
+    doc.querySelector("#europeBackBtn").click();
+    [...doc.querySelectorAll(".europe-market")].find(b=>b.textContent==="España").click();
+    assert.equal(doc.querySelector('[data-collection="collagen/pt"]'),null);
+  }finally{dom.window.close();}
+});
+
 function fixture(){
   const dom=new JSDOM(read("index.html"),{url:"https://nuapp.test/",runScripts:"outside-only"});
   const w=dom.window;
@@ -24,6 +70,22 @@ function fixture(){
   w.eval(read("bot-content.js"));
   return {dom,w,doc:w.document};
 }
+
+test("el visor compartido conserva español e italiano y permite portugués",optionalDom,()=>{
+  const {dom,w,doc}=fixture();
+  try{
+    w.ICONS={share:"",back:"",arrow:"",bookmark:"",bookmarkFilled:""};
+    w.prefersReducedMotion=()=>true;
+    w.eval(read("media-preview.js"));
+    for(const [locale,image,share,download] of [["pt","Imagem","Partilhar","Descarregar"],["it","Immagine","Condividi","Scarica"],["es","Imagen","Compartir","Descargar"]]){
+      w.openMediaPreview([{src:"/api/international-assets/collagen-pt/1/1",international:true,locale,favorite:false,download(){}}],0,1);
+      assert.equal(doc.querySelector("#mediaPreview").lang,locale);
+      assert.equal(doc.querySelector("#previewType").textContent,image);
+      assert.equal(doc.querySelector("#previewShareBtn").textContent,share);
+      assert.equal(doc.querySelector("#previewDownloadBtn").textContent,download);
+    }
+  }finally{dom.window.close();}
+});
 
 test("Europa filtra las tres colecciones y preserva los 30 días y las acciones de medios",optionalDom,async()=>{
   const {dom,w,doc}=fixture();
@@ -83,7 +145,7 @@ test("Europa filtra las tres colecciones y preserva los 30 días y las acciones 
     doc.querySelector("#europeBackBtn").click();
     assert.ok(doc.querySelector("#view-hoy.active"));
     assert.equal(JSON.stringify(w.localStorage),before);
-    assert.deepEqual(requests,["/biblioteca-internacional-catalog.json","/api/europe-combo-status"]);
+    assert.deepEqual(requests,["/biblioteca-internacional-catalog.json","/api/europe-combo-status","/api/portugal-collagen-status"]);
     assert.ok(!w.BotContent.some(item=>item.id==="biblioteca-internacional"));
     assert.ok(w.BotContent.some(item=>item.id==="estrategia-colageno-europa"));
     const legacy=doc.createElement("a");legacy.href="/biblioteca-internacional.html";doc.body.append(legacy);legacy.click();
@@ -100,7 +162,7 @@ test("un catálogo demorado o fallido se actualiza al cargar y permite reintenta
   const {dom,w,doc}=fixture();
   try{
     let release,fail=true;
-    w.fetch=url=>url==="/api/europe-combo-status"?Promise.resolve({ok:true,json:async()=>({ready:false})}):new Promise(resolve=>{release=()=>resolve({ok:!fail,json:async()=>catalog});});
+    w.fetch=url=>["/api/europe-combo-status","/api/portugal-collagen-status"].includes(url)?Promise.resolve({ok:true,json:async()=>({ready:false})}):new Promise(resolve=>{release=()=>resolve({ok:!fail,json:async()=>catalog});});
     w.console.warn=()=>{};
     w.eval(read("biblioteca-internacional-data.js"));
     doc.querySelector("#openEuropeBtn").click();

@@ -1,9 +1,9 @@
-const CACHE="nuapp-v179-europe-combo-es";
+const CACHE="nuapp-v180-europe-portugal";
 
 const CORE=[
   "./estrategia-europa.css?v=4",
-  "./biblioteca-internacional-data.js?v=europe-combo-es-4",
-  "./biblioteca-internacional-iris.js?v=europe-combo-es-4",
+  "./biblioteca-internacional-data.js?v=europe-portugal-1",
+  "./biblioteca-internacional-iris.js?v=europe-portugal-1",
   "./product-routine-config.js?v=5",
   "./supplements-content.js?v=7",
   "./supplements-view.js?v=supplements-release-review-1",
@@ -60,7 +60,7 @@ const CORE=[
   "./routine-content-quality-v2.js?v=supplements-polish-1",
   "./routine-ui-polish-v1.js?v=supplements-polish-1",
   "./progress-view.js?v=supplements-release-review-1",
-  "./media-preview.js?v=105-navigation-bot-fixes",
+  "./media-preview.js?v=international-pt-ui-1",
   "./app.js?v=supplements-release-review-1",
   "./routine-progress-sync-v1.js?v=1-durable-progress-sync",
   "./backend-client.js?v=progress-sync-supplements-1",

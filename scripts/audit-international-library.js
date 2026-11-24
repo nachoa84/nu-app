@@ -29,6 +29,7 @@ const groups = [
   { id: "collagen/es", label: "Colágeno España", days: 10, total: 48, videos: 11, images: 37 },
   { id: "collagen/it", label: "Colágeno Italia", days: 10, total: 48, videos: 12, images: 36 },
   { id: "lumispa/it", label: "LumiSpa Italia", days: 10, total: 41, videos: 32, images: 9 },
+  { id: "collagen/pt", label: "Colágeno Portugal", days: 7, total: 36, videos: 1, images: 35 },
   { id: "lumispa-collagen/es", label: "LumiSpa + Colágeno España", days: 7, total: 26, videos: 20, images: 6 }
 ];
 const optimized = new Set([
@@ -90,7 +91,7 @@ for (const group of groups) {
     issues.push("Cambió la cantidad aprobada de " + group.label +
       ": se esperaba " + group.total + " (" + group.videos + "/" + group.images + ")");
 }
-if (materials.length !== 163 || stats.videos !== 75 || stats.images !== 88)
+if (materials.length !== 199 || stats.videos !== 76 || stats.images !== 123)
   issues.push("Total diferente del catálogo aprobado: " + materials.length +
     " materiales, " + stats.videos + " videos, " + stats.images + " imágenes");
 for (const id of optimized) {

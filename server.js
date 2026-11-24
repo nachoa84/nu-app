@@ -4794,8 +4794,10 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
 // Los índices se resuelven contra una lista cerrada de materiales aprobados.
 const internationalLibraryCatalog = require("./biblioteca-internacional-catalog.json");
 const europeComboEs = require("./international-combo-es");
+const portugalCollagen = require("./international-collagen-pt");
 const internationalCollectionFolders = Object.freeze({
   "collagen-es": ["collagen", "es", "ES COLAGENO"],
+  "collagen-pt": ["collagen", "pt", "PT COLAGENO"],
   "collagen-it": ["collagen", "it", "IT COLAGENO"],
   "lumispa-it": ["lumispa", "it", "IT LUMI"],
   "lumispa-collagen-es": ["lumispa-collagen", "es", "ES LUMI COLAGENO"]
@@ -4813,6 +4815,17 @@ app.get("/api/europe-combo-status", async (req, res, next) => {
   res.set("Cache-Control", "no-store");
   try {
     const marker = await getAssetFileV108(europeComboEs.readyPath);
+    return res.json({ ready: marker.totalSize > 0 });
+  } catch (error) {
+    if (Number(error?.code) === 404 || Number(error?.status) === 404) return res.json({ ready: false });
+    return next(error);
+  }
+});
+
+app.get("/api/portugal-collagen-status", async (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  try {
+    const marker = await getAssetFileV108(portugalCollagen.readyPath);
     return res.json({ ready: marker.totalSize > 0 });
   } catch (error) {
     if (Number(error?.code) === 404 || Number(error?.status) === 404) return res.json({ ready: false });
@@ -4871,6 +4884,8 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
     // el video original sigue funcionando y no queda cacheado como optimizado.
     const sources = req.params.collection === europeComboEs.route
       ? [["combo-preview", europeComboEs.manifest.prefix]]
+      : req.params.collection === portugalCollagen.route
+      ? [["portugal-preview", portugalCollagen.manifest.prefix]]
       : optimizedPreviewRequested
       ? [["optimized-preview", "bot/preview/international/optimized-20261106"],
          ["original-fallback", "bot/active/international/v1"]]

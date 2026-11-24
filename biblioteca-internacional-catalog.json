@@ -724,5 +724,163 @@
       "filename": "4.mp4",
       "type": "video"
     }
+  ],
+  "collagen/pt/1": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/pt/2": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/pt/3": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "6.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "7.mp4",
+      "type": "video"
+    }
+  ],
+  "collagen/pt/4": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/pt/5": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/pt/6": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    }
+  ],
+  "collagen/pt/7": [
+    {
+      "filename": "1.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "2.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "3.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "4.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "5.jpg",
+      "type": "image"
+    },
+    {
+      "filename": "6.jpg",
+      "type": "image"
+    }
   ]
 }
