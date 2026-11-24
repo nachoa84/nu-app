@@ -4795,6 +4795,7 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
 const internationalLibraryCatalog = require("./biblioteca-internacional-catalog.json");
 const europeComboEs = require("./international-combo-es");
 const portugalCollagen = require("./international-collagen-pt");
+const organizedEurope = require("./international-asset-layout");
 const internationalCollectionFolders = Object.freeze({
   "collagen-es": ["collagen", "es", "ES COLAGENO"],
   "collagen-pt": ["collagen", "pt", "PT COLAGENO"],
@@ -4880,6 +4881,9 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
   let asset;
   let selectedVariant = "original";
   try {
+    const organizedRole = validPoster ? "poster" : validVariant ? req.query.variant : optimizedPreviewRequested ? "optimized" : "original";
+    asset = await organizedEurope.resolveAsset(getAssetFileV108, req.params.collection, day, index, organizedRole);
+    if (asset) selectedVariant = optimizedPreviewRequested ? "optimized-preview" : "organized";
     // Las copias Preview viven fuera de bot/active. Si todavía no se subieron,
     // el video original sigue funcionando y no queda cacheado como optimizado.
     const sources = req.params.collection === europeComboEs.route
@@ -4890,7 +4894,7 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
       ? [["optimized-preview", "bot/preview/international/optimized-20261106"],
          ["original-fallback", "bot/active/international/v1"]]
       : [["original", "bot/active/international/v1"]];
-    for (const [variant, prefix] of sources) {
+    for (const [variant, prefix] of asset ? [] : sources) {
       // Los nombres de carpeta pueden conservar o perder el acento.
       for (const folder of folderNames) {
         for (const filename of [...new Set(filenames)]) {
