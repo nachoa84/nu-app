@@ -46,7 +46,7 @@ test("cinco colecciones, 199 materiales y 526 destinos únicos por país, estrat
   assert.equal(cs.reduce((n,c)=>n+c.materials,0),199);
   const files=cs.flatMap(c=>c.files);
   assert.equal(files.length,526);assert.equal(new Set(files.map(f=>f.destination)).size,526);
-  assert.ok(files.every(f=>/^routines\/international\/v1\/(es|it|pt)\/[a-z-]+\/day-\d{2}\/(originals|previews|thumbnails|posters|optimized)\/\d{2}\.(mp4|jpg|png)$/.test(f.destination)));
+  assert.ok(files.every(f=>/^routines\/library\/v1\/europe\/(es|it|pt)\/[a-z-]+\/day-\d{2}\/(originals|previews|thumbnails|posters|optimized)\/\d{2}\.(mp4|jpg|png)$/.test(f.destination)));
   assert.equal(files.filter(f=>f.role==="optimized").length,5);
 });
 test("la revisión completa es de solo lectura",async()=>{

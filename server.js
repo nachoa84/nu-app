@@ -4710,7 +4710,7 @@ function pipeAssetStreamV108(stream, res, next) {
   stream.pipe(res);
 }
 
-function createStorageAssetHandlerV108(prefix, logLabel) {
+function createStorageAssetHandlerV108(prefix, logLabel, resolveOrganized = null, nextWhenMissing = false) {
   return async (req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") {
       return res.status(405).set("Allow", "GET, HEAD").end();
@@ -4721,16 +4721,20 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
       if (!relativePath) return res.status(400).end();
 
       const objectName = prefix + relativePath;
-      let asset;
+      let asset = resolveOrganized ? await resolveOrganized(req) : null;
+      const usingOrganized = Boolean(asset);
+      if (!asset && nextWhenMissing) return next();
 
-      try {
-        asset = await getAssetFileV108(objectName);
-      } catch (error) {
-        if (Number(error?.code) === 404 || Number(error?.status) === 404) {
-          console.warn(`[${logLabel}] No disponible:`, objectName);
-          return res.status(404).end();
+      if (!asset) {
+        try {
+          asset = await getAssetFileV108(objectName);
+        } catch (error) {
+          if (Number(error?.code) === 404 || Number(error?.status) === 404) {
+            console.warn(`[${logLabel}] No disponible:`, objectName);
+            return res.status(404).end();
+          }
+          throw error;
         }
-        throw error;
       }
 
       const { file, totalSize, contentType, etag } = asset;
@@ -4738,7 +4742,8 @@ function createStorageAssetHandlerV108(prefix, logLabel) {
       const commonHeaders = {
         "Accept-Ranges": "bytes",
         "Cache-Control": "public, max-age=31536000, immutable",
-        "Content-Type": contentType
+        "Content-Type": contentType,
+        ...(resolveOrganized ? {"X-Nu-Asset-Layout": usingOrganized ? "library-v1" : "legacy"} : {})
       };
 
       if (etag) commonHeaders.ETag = etag;
@@ -4796,6 +4801,19 @@ const internationalLibraryCatalog = require("./biblioteca-internacional-catalog.
 const europeComboEs = require("./international-combo-es");
 const portugalCollagen = require("./international-collagen-pt");
 const organizedEurope = require("./international-asset-layout");
+const organizedGeneralRoutines = require("./general-routine-asset-layout");
+app.get("/api/routine-library-status", async (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  try {
+    const collections = await Promise.all(Object.values({...organizedGeneralRoutines.collections,...organizedEurope.collections}).map(async collection => {
+      let ready = false;
+      try { ready = (await getAssetFileV108(collection.readyPath)).totalSize > 0; }
+      catch (error) { if (!organizedEurope.isMissing(error)) throw error; }
+      return {id:collection.route,ready,days:collection.days,materials:collection.materials,files:collection.files.length};
+    }));
+    res.json({layout:"library-v1",collections});
+  } catch (error) { next(error); }
+});
 const internationalCollectionFolders = Object.freeze({
   "collagen-es": ["collagen", "es", "ES COLAGENO"],
   "collagen-pt": ["collagen", "pt", "PT COLAGENO"],
@@ -4883,6 +4901,7 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
   try {
     const organizedRole = validPoster ? "poster" : validVariant ? req.query.variant : optimizedPreviewRequested ? "optimized" : "original";
     asset = await organizedEurope.resolveAsset(getAssetFileV108, req.params.collection, day, index, organizedRole);
+    const usingOrganized = Boolean(asset);
     if (asset) selectedVariant = optimizedPreviewRequested ? "optimized-preview" : "organized";
     // Las copias Preview viven fuera de bot/active. Si todavía no se subieron,
     // el video original sigue funcionando y no queda cacheado como optimizado.
@@ -4918,6 +4937,7 @@ app.use("/api/international-assets/:collection/:day/:index", async (req, res, ne
         : "public, max-age=86400";
     const headers = {
       "Accept-Ranges": "bytes", "Cache-Control": cacheControl, "Content-Type": contentType,
+      "X-Nu-Asset-Layout": usingOrganized ? "library-v1" : "legacy",
       ...(optimizedPreviewRequested ? { "X-Nu-International-Variant": selectedVariant } : {})
     };
     if (etag) headers.ETag = etag;
@@ -4946,8 +4966,18 @@ app.use(
 
 app.use(
   "/api/routine-assets",
-  createStorageAssetHandlerV108(ROUTINE_ASSET_STORAGE_PREFIX, "routine-assets")
+  createStorageAssetHandlerV108(ROUTINE_ASSET_STORAGE_PREFIX, "routine-assets",
+    req => organizedGeneralRoutines.resolveAlias(getAssetFileV108, "/api/routine-assets" + req.path))
 );
+
+// Las URLs guardadas en favoritos y en las rutinas conservan su identidad.
+// Si no existe una copia activada, express.static sirve el archivo original.
+const organizedStaticRoutineAssets = createStorageAssetHandlerV108("", "organized-routine-assets",
+  req => organizedGeneralRoutines.resolveAlias(getAssetFileV108, "/assets" + req.path), true);
+app.use("/assets", (req, res, next) => {
+  if (!organizedGeneralRoutines.aliases.has("/assets" + req.path)) return next();
+  return organizedStaticRoutineAssets(req, res, next);
+});
 
 function isBlockedPublicPath(requestPath) {
   const normalizedPath =

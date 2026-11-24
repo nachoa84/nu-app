@@ -2,7 +2,7 @@
 
 Las cinco colecciones comparten ahora este destino de almacenamiento:
 
-`routines/international/v1/{pais}/{estrategia}/day-{dia}/{tipo}/{numero}.{extension}`
+`routines/library/v1/europe/{pais}/{estrategia}/day-{dia}/{tipo}/{numero}.{extension}`
 
 | Colección | País | Estrategia | Días | Materiales |
 | --- | --- | --- | --- | --- |
@@ -16,10 +16,10 @@ Tipos: `originals`, `previews`, `thumbnails`, `posters`, `optimized`.
 Los números de día y material tienen dos dígitos.
 Ejemplos:
 
-- `routines/international/v1/es/collagen/day-01/originals/01.mp4`
-- `routines/international/v1/es/collagen/day-01/posters/01.jpg`
-- `routines/international/v1/pt/collagen/day-01/originals/01.jpg`
-- `routines/international/v1/pt/collagen/day-01/thumbnails/01.jpg`
+- `routines/library/v1/europe/es/collagen/day-01/originals/01.mp4`
+- `routines/library/v1/europe/es/collagen/day-01/posters/01.jpg`
+- `routines/library/v1/europe/pt/collagen/day-01/originals/01.jpg`
+- `routines/library/v1/europe/pt/collagen/day-01/thumbnails/01.jpg`
 
 ## Preparación en Replit
 
@@ -55,5 +55,5 @@ el cambio de los importadores no forman parte de esta migración.
 
 El informe de las copias verificadas se guarda en
 `scripts/_audit-output/europe-organized-v1.json` (fuera de Git).
-Esta fase solo organiza Estrategia Europa. Las rutinas generales y suplementos
-conservan sus rutas actuales.
+Para organizar también las cuatro rutinas generales, usar el procedimiento de
+`docs/routine-library-layout.md`. Los suplementos conservan sus rutas actuales.
